@@ -25,7 +25,20 @@ namespace SPade
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/fonts/font-awesome/css/font-awesome.min.css",
+                      "~/Content/animate.min.css",
+                      "~/Content/dashboardstyle.css",
+                      "~/Content/daterangepicker.css",
+                      "~/Content/indexstyle.css",
                       "~/Content/site.css"));
+
+            bundles.Add(new StyleBundle("~/Content/script").Include(
+                "~/Scripts/bootstrap.min.js",
+                      "~/Script/custom-script.js",
+                "~/Scripts/jquery-1.10.2.min.js",
+                "~/Scripts/jquery.tablesorter.min.js",
+                "~/Scripts/daterangepicker.js",
+                "~/Scripts/wow.min.js"));
         }
     }
 }

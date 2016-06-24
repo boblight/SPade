@@ -1,0 +1,15 @@
+﻿.glyphlarge {
+    font-size: 70px;
+    color: white;
+    background-color: #dd4814;
+    border-radius: 100px;
+    padding:25px;
+}
+
+.glyphextralarge {
+    font-size: 90px;
+    color: white;
+    background-color: #dd4814;
+    border-radius: 100px;
+    padding:45px;
+}

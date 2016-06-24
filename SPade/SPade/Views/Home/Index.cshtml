@@ -2,30 +2,86 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+<div class="jumbotron" id="header">
+    <div class="logo">
+        <img src="../img/logo.png" />
+    </div>
+    <h1 id="headertext">SPade</h1>
+    <h2><span id="changingtext">Singapore Polytechnic Auto-Grading</span></h2>
+
+    <br />
+    <a id="btnLogin" href="Login_Webforms/Login.aspx" class="btn btn-primary btn-lg btn-fixed-width">Login</a>
+    <a id="btnRegister" href="Registration_Webforms/Register.aspx" class="btn btn-default btn-lg btn-fixed-width">Register</a>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+<div class="jumbotron" id="section2">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 text-center">
+                <img class="center-block img-responsive wow fadeInLeft screenshot" src="../img/screenshot.png" />
+            </div>
+            <div class="col-sm-6 text-center wow fadeInRight">
+                <h1>About SPade</h1>
+
+                <h2>Singapore Polytechnic's automated grading system for programming exercises</h2>
+
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+</div>
+
+<div class="jumbotron" id="section3">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-8 col-lg-offset-2 text-center wow slideInUp">
+                <h1 class="section-heading">Benefits</h1>
+                <hr class="hrwhite wow fadeInUp" data-wow-delay="0.2s" />
+            </div>
+
+            <div class="col-sm-3 text-center wow bounceInLeft">
+                <div class="service-box">
+                    <i class="fa fa-4x fa-file-code-o" data-wow-delay=".0s"></i>
+                    <h3>Stress-Free</h3>
+                </div>
+            </div>
+            <div class="col-sm-3 text-center wow bounceInLeft">
+                <div class="service-box">
+                    <i class="fa fa-4x fa-coffee" data-wow-delay=".1s"></i>
+                    <h3>Fuss-Free</h3>
+                </div>
+            </div>
+            <div class="col-sm-3 text-center wow bounceInLeft">
+                <div class="service-box">
+                    <i class="fa fa-4x fa-hourglass-start" data-wow-delay=".2s"></i>
+                    <h3>Instant Results</h3>
+                </div>
+            </div>
+            <div class="col-sm-3 text-center wow bounceInLeft">
+                <div class="service-box">
+                    <i class="fa fa-4x fa-building-o" data-wow-delay=".3s"></i>
+                    <h3>Centralized</h3>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+</div>
+
+<div class="jumbotron" id="section4">
+    <div class="container">
+        <div class="row">
+
+            <h1 class="wow slideInUp">Get started now</h1>
+            <br />
+            <a href="Login_Webforms/Login.aspx" class="btn btn-primary btn-lg btn-fixed-width wow fadeInUp" data-wow-delay=".3s">Login</a>
+            <a href="Registration_Webforms/Register.aspx" class="btn btn-default btn-lg btn-fixed-width wow fadeInUp" data-wow-delay=".3s">Register</a>
+
+        </div>
     </div>
+</div>
+
+
+<div class="jumbotron" id="section5">
+    <p>Singapore Polytechnic</p>
+    <p>500 Dover Road Singapore 139651</p>
 </div>
