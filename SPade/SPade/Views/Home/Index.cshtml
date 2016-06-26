@@ -2,6 +2,8 @@
     ViewBag.Title = "Home Page";
 }
 
+@Styles.Render("~/Content/indexstyle.css");
+
 <div class="jumbotron" id="header">
     <div class="logo">
         <img src="../img/logo.png" />
@@ -80,8 +82,4 @@
     </div>
 </div>
 
-
-<div class="jumbotron" id="section5">
-    <p>Singapore Polytechnic</p>
-    <p>500 Dover Road Singapore 139651</p>
-</div>
+@Scripts.Render("~/Scripts/custom-script.js")

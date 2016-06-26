@@ -1,8 +1,12 @@
-﻿
+﻿$(document).ready(function () {
+    new WOW().init();
+});
+
+
 $(function () {
     var words = ['Complete task', 'Upload solution', 'Get grades'],
         index = -1,
-        $el = $('#changingtext')
+        $el = $('#changingtext');
     setInterval(function () {
         index++ < words.length - 1 || (index = 0);
         $el.fadeOut(function () {

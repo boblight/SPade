@@ -24,21 +24,23 @@ namespace SPade
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
                       "~/fonts/font-awesome/css/font-awesome.min.css",
                       "~/Content/animate.min.css",
                       "~/Content/dashboardstyle.css",
                       "~/Content/daterangepicker.css",
-                      "~/Content/indexstyle.css",
-                      "~/Content/site.css"));
+                      "~/Content/bootstrap.css"));
 
-            bundles.Add(new StyleBundle("~/Content/script").Include(
-                "~/Scripts/bootstrap.min.js",
-                      "~/Script/custom-script.js",
-                "~/Scripts/jquery-1.10.2.min.js",
-                "~/Scripts/jquery.tablesorter.min.js",
-                "~/Scripts/daterangepicker.js",
-                "~/Scripts/wow.min.js"));
+            bundles.Add(new StyleBundle("~/Content/index").Include(
+                        "~/Content/indexstyle.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/script").Include(
+                        "~/Scripts/bootstrap.min.js",
+                              "~/Script/custom-script.js",
+                        "~/Scripts/jquery-1.10.2.min.js",
+                        "~/Scripts/jquery.tablesorter.min.js",
+                        "~/Scripts/moment.min.js",
+                        "~/Scripts/daterangepicker.js",
+                        "~/Scripts/wow.min.js"));
         }
     }
 }
