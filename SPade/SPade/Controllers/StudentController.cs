@@ -8,10 +8,28 @@ namespace SPade.Controllers
 {
     public class StudentController : Controller
     {
-        // GET: Student
-        public ActionResult Index()
+        // GET: Dashboard
+        public ActionResult Dashboard()
         {
             return View();
         }
-    }
+
+        // GET: SubmitAssignment
+        public ActionResult SubmitAssignment()
+        {
+            return View();
+        }
+
+        // GET: ViewAssignment
+        public ActionResult ViewAssignment()
+        {
+            return View();
+        }
+
+        // GET: ViewResult
+        public ActionResult ViewResult()
+        {
+            return View();
+        }
+    }//end of controller
 }
