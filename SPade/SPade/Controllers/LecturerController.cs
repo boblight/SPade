@@ -14,12 +14,33 @@ namespace SPade.Controllers
             return View();
         }
 
+        public ActionResult ManageClassesAndStudents()
+        {
+            return View();
+
+        }
+
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
-        public ActionResult ViewResult()
+        public ActionResult ViewStudentsByClass()
+        {
+            return View();
+        }
+
+        public ActionResult UpdateStudent()
+        {
+            return View();
+        }
+
+        public ActionResult ManageAssignments()
+        {
+            return View();
+        }
+
+        public ActionResult AddAssignment()
         {
             return View();
         }
@@ -29,7 +50,7 @@ namespace SPade.Controllers
             return View();
         }
 
-        public ActionResult UpdateStudent()
+        public ActionResult ViewResults()
         {
             return View();
         }

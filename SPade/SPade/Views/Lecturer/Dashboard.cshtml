@@ -1,44 +1,62 @@
 ﻿
 @{
-    ViewBag.Title = "Student Dashboard";
+    ViewBag.Title = "Lecturer Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @Styles.Render("~/Content/dashboardstyle.css");
 
 <div class="container">
+
     <div id="divMessage" runat="server"></div>
+
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Student Dashboard</h1>
+            <h1 class="page-header">Lecturer Dashboard</h1>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-4">
+            <div class="panel panel-default text-center">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-time glyphlarge"></span>
+                </div>
+                <div class="panel-body">
+                    <h2>Classes</h2>
+                    <p>Manage <strong>Classes</strong> and students</p>
+                    <a href="ManageClassesAndStudents.aspx" class="btn btn-primary">Manage Classes</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
             <div class="panel panel-default text-center">
                 <div class="panel-heading">
                     <span class="glyphicon glyphicon-duplicate glyphlarge"></span>
                 </div>
                 <div class="panel-body">
                     <h2>Assignments</h2>
-                    <p>View <strong>Assignments</strong> to complete</p>
-                    <a id="btnViewAssignments" href="ViewAssignments.aspx" class="btn btn-primary">View Assignments</a>
+                    <p>Manage <strong>Assignments</strong> of students</p>
+                    <a href="ManageAssignments.aspx" class="btn btn-primary">Manage Assignments</a>
                 </div>
             </div>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <div class="panel panel-default text-center">
                 <div class="panel-heading">
                     <span class="glyphicon glyphicon-list-alt glyphlarge"></span>
                 </div>
                 <div class="panel-body">
                     <h2>Results</h2>
-                    <p>View <strong>Results</strong> of previous assignments</p>
-                    <a id="btnViewResults" href="ViewResults.aspx" class="btn btn-primary">View Results</a>
+                    <p>View <strong>Results</strong> of students</p>
+                    <a href="ViewResults.aspx" class="btn btn-primary">View Results</a>
                 </div>
             </div>
         </div>
+
     </div>
+
     <hr />
+
 </div>
 
