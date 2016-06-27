@@ -13,5 +13,11 @@ namespace SPade.Controllers
         {
             return View();
         }
+
+        public ActionResult BulkAddStudent()
+        {
+            return View();
+        }
+
     }
 }

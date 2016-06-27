@@ -256,6 +256,7 @@
     <Content Include="Views\Student\ViewResult.cshtml" />
     <Content Include="Views\Student\SubmitAssignment.cshtml" />
     <Content Include="Views\Lecturer\Dashboard.cshtml" />
+    <Content Include="Views\Lecturer\BulkAddStudent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
