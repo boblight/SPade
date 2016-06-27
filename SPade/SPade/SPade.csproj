@@ -257,6 +257,9 @@
     <Content Include="Views\Student\SubmitAssignment.cshtml" />
     <Content Include="Views\Lecturer\Dashboard.cshtml" />
     <Content Include="Views\Lecturer\BulkAddStudent.cshtml" />
+    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
+    <Content Include="Views\Lecturer\ManageAssignment.cshtml" />
+    <Content Include="Views\Lecturer\ManageClassesAndStudent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,144 @@
+﻿
+@{
+    ViewBag.Title = "Add Assignment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Scripts/daterangepicker.js");
+
+<div class="col-md-4 col-md-offset-4 form-horizontal">
+    <fieldset>
+        <legend>Add Assignment</legend>
+
+        <p>1. To set a question, please type the question into the text area below.</p>
+        <p>
+            2. Please ensure that solutions uploaded are working as the system will compile the
+            solution uploaded.
+        </p>
+        <p>
+            3. <a href="XMLdownload/testcase.xml">
+                <i class="glyphicon glyphicon-file"></i>Download
+                this .xml file
+            </a> and input the test cases in a similar format as presented inside.
+        </p>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <label>Assignment Name</label>
+                <input type="text" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <label>
+                    Question
+                </label>
+                <textarea class="col-md-12 form-control" rows="4"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
+                <input id="SolutionsFile" class="form-control" type="file" style="border: solid 1px red" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="control-label" for="SolutionsFile">Upload Test Cases</label>
+                <input id="TestCase" class="form-control" type="file" style="border: solid 1px red" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="control-label" for="daterange">Select start and end date</label>
+                <input type="text" class="form-control" name="daterange" value="" />
+
+                <script type="text/javascript">
+                    $(function () {
+                        $('input[name="daterange"]').daterangepicker();
+                    });
+                </script>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="control-label">
+                    Select classes to allocate assignment to
+                </label>
+                <input type="text" class="form-control" id="classSelect" placeholder="Select classes..." />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="control-label">
+                    Select maximum attempts allowed
+                </label>
+                <input type="number" class="form-control" min="0" id="maxAttempt" />
+            </div>
+        </div>
+
+        <!-- Modal for choosing class-->
+        <div id="classModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Choose classes to allocate assignment to</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" />DIT/1A/FT/21
+                            </label>
+                        </div>
+
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" />DIT/1A/FT/22
+                            </label>
+                        </div>
+
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" />DIT/1A/FT/23
+                            </label>
+                        </div>
+
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" />DIT/1A/FT/24
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+
+            $("#classSelect").click(function () {
+
+                $("#classModal").modal("show");
+
+            })
+
+        </script>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <a href="ManageAssignments.aspx" class="btn btn-primary">Submit</a>
+                <a href="#" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
