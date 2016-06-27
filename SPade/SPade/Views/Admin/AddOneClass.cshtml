@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "Add Class";
+}
+
+<div class="col-md-4 col-md-offset-4 form-horizontal">
+    <fieldset>
+
+        <legend>Add Class</legend>
+
+        <!--Select Course-->
+        <div class="form-group">
+            <div class="col-md-12">
+                <label for="lecturerSelect" class="control-label">Course</label>
+                <select class="form-control" id="courseSelect">
+                    <option>Select a course...</option>
+                    <option>DIT</option>
+                    <option>DBIT</option>
+                    <option>DISM</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- classNameInput-->
+        <div class="form-group">
+            <div class="col-md-12">
+                <label for="classNameInput" class="control-label">Class Name </label>
+                <input id="classNameInput" name="classNameInput" type="text" placeholder="E.g. 1A/21" class="form-control input-md" />
+            </div>
+        </div>
+
+        <!--Select lecturer-->
+        <div class="form-group">
+            <div class="col-md-12">
+                <label for="lecturerSelect" class="control-label">Lecturer</label>
+                <select class="form-control" id="lecturerSelect">
+                    <option>Select a lecturer...</option>
+                    <option>Peter Lim</option>
+                    <option>Bob Low</option>
+                    <option>Lim Keng</option>
+                    <option>John Tan</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- saveBtn, cancelBtn -->
+        <div class="form-group">
+            <div class="col-md-12 ">
+                <a id="btnSave" href="/Admin/ManageClass" class="btn btn-primary">Save</a>
+                <a id="btnCancel" href="#" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+

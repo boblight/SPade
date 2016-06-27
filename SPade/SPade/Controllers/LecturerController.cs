@@ -34,19 +34,5 @@ namespace SPade.Controllers
             return View();
         }
 
-        public ActionResult AddAssignment()
-        {
-            return View();
-        }
-
-        public ActionResult ManageAssignment()
-        {
-            return View();
-        }
-
-        public ActionResult ManageClassesAndStudent()
-        {
-            return View();
-        }
-    }
+    }//end of controller
 }

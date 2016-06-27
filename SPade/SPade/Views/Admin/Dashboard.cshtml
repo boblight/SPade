@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+
+@Styles.Render("~/Content/dashboardstyle.css");
+
+
+
+<div class="container">
+
+    <div id="divMessage" runat="server"></div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Admin Dashboard</h1>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default text-center">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-time glyphlarge"></span>
+                </div>
+                <div class="panel-body">
+                    <h2>Classes</h2>
+                    <p>View <strong>Classes</strong> to manage</p>
+                    <a href="/Admin/ManageClass" class="btn btn-primary">Manage Classes</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default text-center">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-certificate glyphlarge"></span>
+                </div>
+                <div class="panel-body">
+                    <h2>Lecturers</h2>
+                    <p>View <strong>Lecturers</strong> to manage</p>
+                    <a href="/Admin/ManageLecturer"  class="btn btn-primary">Manage Lecturers</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default text-center">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-user glyphlarge"></span>
+                </div>
+                <div class="panel-body">
+                    <h2>Students</h2>
+                    <p>View <strong>Students</strong> to manage</p>
+                    <a href="/Admin/ManageStudent"  class="btn btn-primary">Manage Students</a>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <hr />
+
+</div>
+
