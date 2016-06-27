@@ -19,5 +19,20 @@ namespace SPade.Controllers
             return View();
         }
 
-    }
+        public ActionResult ViewResult()
+        {
+            return View();
+        }
+
+        public ActionResult UpdateAssignment()
+        {
+            return View();
+        }
+
+        public ActionResult UpdateStudent()
+        {
+            return View();
+        }
+
+    }//end of controller
 }

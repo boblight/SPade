@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewBag.Title = "View Result";
+}
+
+<div class="col-md-8 col-md-offset-2">
+
+    <fieldset>
+        <legend>View Results</legend>
+        <div class="row">
+            <div class="col-md-3">
+                <select id="selectclass" name="selectclass" class="form-control">
+                    <option value="1">DIT/1A/FT/21</option>
+                    <option value="2">DIT/1A/FT/22</option>
+                    <option value="4">DIT/1A/FT/23</option>
+                    <option value="5">DIT/1A/FT/24</option>
+                </select>
+            </div>
+            <div class="col-md-4 ">
+                <select id="selectAssignment" name="selectAssignment" class="form-control">
+                    <option value="1">Java Practical 1</option>
+                    <option value="2">Java Practical 2</option>
+                    <option value="3">Java Practical 3</option>
+                </select>
+            </div>
+        </div>
+    </fieldset>
+
+    <table id="classTable" class="table table-striped table-hover ">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Result</th>
+                <th>Overall</th>
+                <th>Student's solution</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1431897</td>
+                <td>Bob Chan</td>
+                <td>5/5</td>
+                <td>P</td>
+                <td><a href="#"><span class="glyphicon glyphicon-download-alt"></span></a></td>
+            </tr>
+            <tr>
+                <td>1431954</td>
+                <td>Jenny Tan</td>
+                <td>4/5</td>
+                <td>P</td>
+                <td><a href="#"><span class="glyphicon glyphicon-download-alt"></span></a></td>
+            </tr>
+            <tr>
+                <td>146454</td>
+                <td>Jonathan Chia</td>
+                <td>2/5</td>
+                <td>F</td>
+                <td><a href="#"><span class="glyphicon glyphicon-download-alt"></span></a></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
