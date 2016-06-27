@@ -40,18 +40,8 @@
         </div>
     </nav>
     <!-- end of nav bar -->
-
-    <div class="">
-
-        <!-- all views rendered here-->
-        @RenderBody()
-        
-        <div class="jumbotron" id="section5">
-            <p>Singapore Polytechnic</p>
-            <p>500 Dover Road Singapore 139651</p>
-            <p>&copy; @DateTime.Now.Year - SPade | SP Auto-Grading</p>
-        </div>
-    </div>
+    <!-- all views rendered here-->
+    @RenderBody()
 
     @RenderSection("scripts", required: false)
 </body>
