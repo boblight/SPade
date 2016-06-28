@@ -272,6 +272,12 @@
     <Content Include="Views\Lecturer\ManageClassesAndStudents.cshtml" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
     <Content Include="Views\Lecturer\ViewResults.cshtml" />
+    <Content Include="Views\Admin\ManageClass.cshtml" />
+    <Content Include="Views\Admin\ManageLecturer.cshtml" />
+    <Content Include="Views\Admin\ManageStudent.cshtml" />
+    <Content Include="Views\Admin\UpdateClass.cshtml" />
+    <Content Include="Views\Admin\UpdateLecturer.cshtml" />
+    <Content Include="Views\Admin\UpdateStudent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
