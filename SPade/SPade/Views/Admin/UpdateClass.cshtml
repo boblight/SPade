@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewBag.Title = "UpdateClass";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <div class="col-md-6 col-md-offset-3 form-horizontal">
+        <fieldset>
+
+            <legend>Update Class</legend>
+
+            <!--Select Course-->
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label for="lecturerSelect" class="control-label">Course</label>
+                    <select class="form-control" id="courseSelect">
+                        <option>Select a course...</option>
+                        <option>DIT</option>
+                        <option>DBIT</option>
+                        <option>DISM</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label for="" class="control-label">Class name</label>
+                    <input type="text" class="form-control" placeholder="E.g. 1A/21" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label for="" class="control-label">Lecturer</label>
+                    <select class="form-control">
+                        <option>Select a lecturer...</option>
+                        <option>Peter Lim</option>
+                        <option>David Tan</option>
+                        <option>Ronald Keng</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <a href="ManageClass" class="btn btn-primary">Update</a>
+                    <a href="#" class="btn btn-danger">Delete</a>
+                    <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                </div>
+            </div>
+
+        </fieldset>
+    </div>
+</div>
