@@ -9,7 +9,7 @@ namespace SPade.DAL
     {
         protected override void Seed(SpadeContext context)
         {
-            base.Seed(context);
+            
         }
     }//end of class
 }
