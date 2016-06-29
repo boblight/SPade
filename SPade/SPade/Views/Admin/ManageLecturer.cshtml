@@ -19,7 +19,7 @@
 
             <div class="form-group">
                 <!--        <div class ="row">  -->
-                <table id="lecturerTable" class="table table-striped table-hover ">
+                <table id="lecturerTable" class="table table-striped table-hover tablesorter">
                     <thead>
                         <tr>
                             <th>Staff ID</th>
@@ -79,6 +79,12 @@
                 <!--</div>-->
 
             </div>
+            <script>
+                    $(document).ready(function () {
+                        $("#classTable").tablesorter();
+                    });
+            </script>
+
         </fieldset>
     </div>
 </div>
