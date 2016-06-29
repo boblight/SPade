@@ -13,8 +13,14 @@
                 <div>
                     <a href="AddOneLecturer" class="btn btn-primary">Add Lecturer</a>
                     <a href="BulkAddLecturer" class="btn btn-primary">Bulk Add Lecturer</a>
-                    <button class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
                 </div>
+            </div>
+
+            <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                        <input id="search" name="search" class="form-control" placeholder="Search" type="text" data-column="any" />
+                    </div>
             </div>
 
             <div class="form-group">
@@ -26,7 +32,7 @@
                             <th>Lecturer Name</th>
                             <th>Contact No.</th>
                             <th>Email</th>
-                            <th>Update</th>
+                            <th class="sorter-false">Update</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,15 +80,34 @@
 
                         </tr>
 
+
+                        
                     </tbody>
                 </table>
                 <!--</div>-->
 
             </div>
+
             <script>
-                    $(document).ready(function () {
-                        $("#lecturerTable").tablesorter();
-                    });
+    $(document).ready(function () {
+        $(function () {
+            $("#lecturerTable").tablesorter(
+            {
+                theme: 'bootstrap',
+
+                widthFixed: true,
+                headerTemplate: '{content} {icon}', // Add icon for various themes
+                sortList: [[0,0]],
+                widgets: ['stickyHeaders', 'uitheme', 'filter'],
+                
+                widgetOptions: {
+                filter_external: '#search',
+                filter_columnFilters: false
+                }
+
+            });
+        });
+    });
             </script>
 
         </fieldset>

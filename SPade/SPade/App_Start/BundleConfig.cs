@@ -28,16 +28,20 @@ namespace SPade
                       "~/Content/animate.min.css",
                       "~/Content/dashboardstyle.css",
                       "~/Content/daterangepicker.css",
-                      "~/Content/bootstrap.css"));
+                      "~/Content/bootstrap.css",
+                      "~/Content/theme.bootstrap.css" //css for tablesorter
+                      ));
 
             bundles.Add(new StyleBundle("~/Content/index").Include(
                         "~/Content/indexstyle.css"));
 
             bundles.Add(new ScriptBundle("~/bundles/script").Include(
                         "~/Scripts/bootstrap.min.js",
-                              "~/Script/custom-script.js",
+                        "~/Script/custom-script.js",
                         "~/Scripts/jquery-1.10.2.min.js",
-                        "~/Scripts/jquery.tablesorter.min.js",
+                        "~/Scripts/jquery.tablesorter.combined.js",
+                        //"~/Scripts/jquery.tablesorter.min.js",
+                        //"~/Scripts/jquery.tablesorter.widgets.js", //extra features for tablesorter
                         "~/Scripts/moment.min.js",
                         "~/Scripts/daterangepicker.js",
                         "~/Scripts/wow.min.js"));
