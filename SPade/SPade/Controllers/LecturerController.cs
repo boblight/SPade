@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using SPade.DAL;
+using SPade.Models;
 
 namespace SPade.Controllers
 {
     public class LecturerController : Controller
     {
+        //init the db
+        private SpadeContext db = new SpadeContext();
+
         // GET: Lecturer
         public ActionResult Dashboard()
         {
@@ -16,7 +21,36 @@ namespace SPade.Controllers
 
         public ActionResult ManageClassesAndStudents()
         {
-            return View();
+            //get the data from the database 
+            //we sort them according to the lecturer and what not 
+            //store in a list and append it to the page 
+
+            //things to note: how am i gonna settle the counting of students
+
+            string x = "s123456"; //temp 
+
+            List<Lec_Class> lecClassList = new List<Lec_Class>();
+            List<Class> classList = new List<Class>();
+            List<Class> managedClasses = new List<Class>();
+
+            lecClassList = db.Lec_Class.ToList();
+            classList = db.Class.ToList();
+
+            foreach (Lec_Class lc in lecClassList)
+            {
+                if (lc.LecturerID == x)//lecturer ID matches 
+                {
+                    foreach (Class c in classList)
+                    {
+                        if (c.ClassID == lc.ClassID) //class ID matches the class ID of that row 
+                        {
+                            managedClasses.Add(c); //store the item inside the list
+                        }
+                    }
+                }
+            }
+
+            return View(managedClasses);
 
         }
 
