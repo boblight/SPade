@@ -31,7 +31,8 @@ namespace SPade.Controllers
 
             List<Lec_Class> lecClassList = new List<Lec_Class>();
             List<Class> classList = new List<Class>();
-            List<Class> managedClasses = new List<Class>();
+            //List<Class> managedClasses = db.Class.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().LecturerID == x).ToList();
+            List<Class> managedClasses = db.Class.Where(c => c.CourseID == 1 && c.Course.CourseName == "DIT").ToList();
 
             lecClassList = db.Lec_Class.ToList();
             classList = db.Class.ToList();

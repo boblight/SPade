@@ -18,6 +18,7 @@ namespace SPade.Models
         public DateTime? DeletedAt { get; set; }
         public string DeletedBy { get; set; }
 
+        public virtual Course Course { get; set; }
         public virtual ICollection<Assgn_Class> Assgn_Class { get; set; }
         public virtual ICollection<Student> Student { get; set; }
         public virtual ICollection<Lec_Class> Lec_Class { get; set; }
