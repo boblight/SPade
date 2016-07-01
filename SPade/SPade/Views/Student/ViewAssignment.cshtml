@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<SPade.Models.Assignment>
+
 @{
     ViewBag.Title = "View Assignment";
 }
@@ -38,6 +39,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.AssgnID)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.CreateBy)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DueDate)</td>
+                                </tr>
+                            }
+
+                            <!--
                             <tr>
                                 <td>Java Practical 5</td>
                                 <td>Mr Low</td>
@@ -50,6 +61,8 @@
                                 <td>12/5/2016</td>
                                 <td><a href="SubmitAssignment2.aspx">View</a></td>
                             </tr>
+                                -->
+
                         </tbody>
                     </table>
                 </div>
