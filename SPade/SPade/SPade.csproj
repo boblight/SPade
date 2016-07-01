@@ -229,6 +229,10 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\Lecturer\ManageClassesViewModel.cs" />
+    <Compile Include="ViewModels\Student\SubmitAssignmentViewModel.cs" />
+    <Compile Include="ViewModels\Student\ViewAssignmentViewModel.cs" />
+    <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\animate.min.css" />
@@ -354,6 +358,7 @@
     <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
+    <Folder Include="ViewModels\Admin\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

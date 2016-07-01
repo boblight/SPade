@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using SPade.DAL;
 using SPade.Models;
 
 namespace SPade.Controllers
@@ -11,7 +10,7 @@ namespace SPade.Controllers
     public class LecturerController : Controller
     {
         //init the db
-        private SpadeContext db = new SpadeContext();
+        private SPadeEntities db = new SPadeEntities();
 
         // GET: Lecturer
         public ActionResult Dashboard()
@@ -32,24 +31,24 @@ namespace SPade.Controllers
             List<Lec_Class> lecClassList = new List<Lec_Class>();
             List<Class> classList = new List<Class>();
             //List<Class> managedClasses = db.Class.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().LecturerID == x).ToList();
-            List<Class> managedClasses = db.Class.Where(c => c.CourseID == 1 && c.Course.CourseName == "DIT").ToList();
+            List<Class> managedClasses = db.Classes.Where(c => c.CourseID == 1 && c.Course.CourseName == "DIT").ToList();
 
             lecClassList = db.Lec_Class.ToList();
-            classList = db.Class.ToList();
+            classList = db.Classes.ToList();
 
-            foreach (Lec_Class lc in lecClassList)
-            {
-                if (lc.LecturerID == x)//lecturer ID matches 
-                {
-                    foreach (Class c in classList)
-                    {
-                        if (c.ClassID == lc.ClassID) //class ID matches the class ID of that row 
-                        {
-                            managedClasses.Add(c); //store the item inside the list
-                        }
-                    }
-                }
-            }
+            //foreach (Lec_Class lc in lecClassList)
+            //{
+            //    if (lc.sta == x)//lecturer ID matches 
+            //    {
+            //        foreach (Class c in classList)
+            //        {
+            //            if (c.ClassID == lc.ClassID) //class ID matches the class ID of that row 
+            //            {
+            //                managedClasses.Add(c); //store the item inside the list
+            //            }
+            //        }
+            //    }
+            //}
 
             return View(managedClasses);
 
