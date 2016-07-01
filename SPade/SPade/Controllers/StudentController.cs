@@ -20,8 +20,10 @@ namespace SPade.Controllers
         }
 
         // GET: SubmitAssignment
-        public ActionResult SubmitAssignment()
+        public ActionResult SubmitAssignment(int? AssgnID)
         {
+            List<Assignment> pass = new List<Assignment>();
+            pass = db.Assignments.ToList().FindAll(a => a.AssgnID == AssgnID);
             return View();
         }
 

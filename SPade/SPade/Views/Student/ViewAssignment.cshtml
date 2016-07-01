@@ -39,29 +39,16 @@
                             </tr>
                         </thead>
                         <tbody>
+
                             @foreach (var item in Model)
                             {
                                 <tr>
                                     <td>@Html.DisplayFor(modelItem => item.AssgnID)</td>
                                     <td>@Html.DisplayFor(modelItem => item.CreateBy)</td>
                                     <td>@Html.DisplayFor(modelItem => item.DueDate)</td>
+                                    <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.AssgnID)">View</a></td>
                                 </tr>
                             }
-
-                            <!--
-                            <tr>
-                                <td>Java Practical 5</td>
-                                <td>Mr Low</td>
-                                <td>12/5/2016</td>
-                                <td><a href="SubmitAssignment.aspx">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>Java Practical 6</td>
-                                <td>Ms Low</td>
-                                <td>12/5/2016</td>
-                                <td><a href="SubmitAssignment2.aspx">View</a></td>
-                            </tr>
-                                -->
 
                         </tbody>
                     </table>
