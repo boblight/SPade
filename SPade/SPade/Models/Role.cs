@@ -12,25 +12,18 @@ namespace SPade.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Course
+    public partial class Role
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Course()
+        public Role()
         {
-            this.Classes = new HashSet<Class>();
+            this.Logins = new HashSet<Login>();
         }
     
-        public int CourseID { get; set; }
-        public string CourseName { get; set; }
-        public string CourseAbbr { get; set; }
-        public System.DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public System.DateTime UpdatedAt { get; set; }
-        public string UpdatedBy { get; set; }
-        public Nullable<System.DateTime> DeletedAt { get; set; }
-        public string DeletedBy { get; set; }
+        public int RoleID { get; set; }
+        public string RoleName { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Class> Classes { get; set; }
+        public virtual ICollection<Login> Logins { get; set; }
     }
 }

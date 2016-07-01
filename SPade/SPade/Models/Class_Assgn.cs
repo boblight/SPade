@@ -12,14 +12,13 @@ namespace SPade.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Lec_Class
+    public partial class Class_Assgn
     {
-        public string StaffID { get; set; }
         public int ClassID { get; set; }
+        public int AssgnID { get; set; }
         public int C_id { get; set; }
     
+        public virtual Assignment Assignment { get; set; }
         public virtual Class Class { get; set; }
-        public virtual Lecturer Lecturer { get; set; }
-        public virtual Lecturer Lecturer1 { get; set; }
     }
 }
