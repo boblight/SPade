@@ -7,5 +7,6 @@ namespace SPade.ViewModels.Student
 {
     public class ViewAssignmentViewModel
     {
-    }
+
+    }//end of class
 }
