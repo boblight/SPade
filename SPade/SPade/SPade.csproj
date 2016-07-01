@@ -229,6 +229,17 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\Admin\AddClassViewModel.cs" />
+    <Compile Include="ViewModels\Admin\AddLecturerViewMode.cs" />
+    <Compile Include="ViewModels\Admin\AddStudentViewModel.cs" />
+    <Compile Include="ViewModels\Admin\BulkAddLecturerViewModel.cs" />
+    <Compile Include="ViewModels\Admin\BulkAddStudentViewModel.cs" />
+    <Compile Include="ViewModels\Admin\ManageClassViewModel.cs" />
+    <Compile Include="ViewModels\Admin\ManageLecturerViewModel.cs" />
+    <Compile Include="ViewModels\Admin\ManageStudentViewModel.cs" />
+    <Compile Include="ViewModels\Admin\UpdateClassViewModel.cs" />
+    <Compile Include="ViewModels\Admin\UpdateLecturerViewModel.cs" />
+    <Compile Include="ViewModels\Admin\UpdateStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\AddAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\BulkAddStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ManageAssignmentViewModel.cs" />
@@ -365,7 +376,6 @@
     <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
-    <Folder Include="ViewModels\Admin\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
