@@ -17,7 +17,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeEntities2 db = new SPadeEntities2();
 
         public AccountController()
         {

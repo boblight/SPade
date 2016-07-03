@@ -12,19 +12,16 @@ namespace SPade.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Student
+    public partial class ProgLanguage
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Student()
+        public ProgLanguage()
         {
-            this.Submissions = new HashSet<Submission>();
+            this.Modules = new HashSet<Module>();
         }
     
-        public string AdminNo { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public int ContactNo { get; set; }
-        public int ClassID { get; set; }
+        public int LanguageId { get; set; }
+        public string LangageType { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
         public System.DateTime UpdatedAt { get; set; }
@@ -32,8 +29,7 @@ namespace SPade.Models
         public Nullable<System.DateTime> DeletedAt { get; set; }
         public string DeletedBy { get; set; }
     
-        public virtual Login Login { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Submission> Submissions { get; set; }
+        public virtual ICollection<Module> Modules { get; set; }
     }
 }

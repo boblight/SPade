@@ -4,12 +4,14 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using SPade.Models;
+using SPade.ViewModels;
+using SPade.ViewModels.Student;
 
 namespace SPade.Controllers
 {
     public class StudentController : Controller
     {
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeEntities2 db = new SPadeEntities2();
 
         // GET: Dashboard
         public ActionResult Dashboard()
@@ -18,17 +20,27 @@ namespace SPade.Controllers
         }
 
         // GET: SubmitAssignment
-        public ActionResult SubmitAssignment()
+        public ActionResult SubmitAssignment(int id)
         {
-            return View();
+            List<Assignment> pass = new List<Assignment>();
+            pass = db.Assignments.ToList().FindAll(a => a.AssgnID == id);
+            return View(pass);
         }
 
         // GET: ViewAssignment
         public ActionResult ViewAssignment()
         {
-            //temporary user student id as 1
+            List<Assignment> assignments = new List<Assignment>();
 
-            return View();
+            //to replace hardcoded classid with sessions values
+            List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == 1);
+
+            foreach (Class_Assgn i in ca)
+            {
+                assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssgnID == i.AssgnID);
+            }
+            
+            return View(assignments);
         }
 
         // GET: ViewResult
