@@ -18,6 +18,7 @@ namespace SPade.Models
         public Assignment()
         {
             this.Class_Assgn = new HashSet<Class_Assgn>();
+            this.Submissions = new HashSet<Submission>();
         }
     
         public int AssgnID { get; set; }
@@ -25,6 +26,7 @@ namespace SPade.Models
         public int MaxAttempt { get; set; }
         public System.DateTime DueDate { get; set; }
         public string Solution { get; set; }
+        public string ModuleCode { get; set; }
         public System.DateTime CreateAt { get; set; }
         public string CreateBy { get; set; }
         public System.DateTime UpdatedAt { get; set; }
@@ -34,5 +36,8 @@ namespace SPade.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Class_Assgn> Class_Assgn { get; set; }
+        public virtual Module Module { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Submission> Submissions { get; set; }
     }
 }

@@ -13,10 +13,10 @@ namespace SPade.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class SPadeEntities : DbContext
+    public partial class SPadeEntities2 : DbContext
     {
-        public SPadeEntities()
-            : base("name=SPadeEntities")
+        public SPadeEntities2()
+            : base("name=SPadeEntities2")
         {
         }
     
@@ -33,7 +33,10 @@ namespace SPade.Models
         public virtual DbSet<Lec_Class> Lec_Class { get; set; }
         public virtual DbSet<Lecturer> Lecturers { get; set; }
         public virtual DbSet<Login> Logins { get; set; }
+        public virtual DbSet<Module> Modules { get; set; }
+        public virtual DbSet<ProgLanguage> ProgLanguages { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Student> Students { get; set; }
+        public virtual DbSet<Submission> Submissions { get; set; }
     }
 }
