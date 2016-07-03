@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using SPade.Models;
 using SPade.ViewModels;
 using SPade.ViewModels.Student;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace SPade.Controllers
 {
@@ -19,12 +21,36 @@ namespace SPade.Controllers
             return View();
         }
 
+        //POST: SubmitAssignment
+        [HttpPost]
+        public Task<ActionResult> SubmitAssignment(SubmitAssignmentViewModel svm)
+        {
+            if (ModelState.IsValid)
+            {
+                // Use your file here
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    svm.File.InputStream.CopyTo(memoryStream);
+                }
+            }
+            return null;
+        }
+
         // GET: SubmitAssignment
         public ActionResult SubmitAssignment(int id)
         {
             List<Assignment> pass = new List<Assignment>();
-            pass = db.Assignments.ToList().FindAll(a => a.AssgnID == id);
-            return View(pass);
+            SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
+            Assignment ass = db.Assignments.ToList().Find(a => a.AssgnID == id);
+
+            svm.AssgnID = ass.AssgnID;
+            svm.Describe = ass.Describe;
+            svm.DueDate = ass.DueDate;
+            svm.CreateBy = ass.CreateBy;
+            svm.ModuleCode = ass.ModuleCode;
+            svm.MaxAttempt = ass.MaxAttempt;
+
+            return View(svm);
         }
 
         // GET: ViewAssignment
@@ -39,7 +65,7 @@ namespace SPade.Controllers
             {
                 assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssgnID == i.AssgnID);
             }
-            
+
             return View(assignments);
         }
 
