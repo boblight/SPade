@@ -4,6 +4,9 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using SPade.Models;
+using SPade.ViewModels.Admin;
+using SPade.ViewModels.Lecturer;
+using SPade.ViewModels.Student;
 
 namespace SPade.Controllers
 {
@@ -26,15 +29,20 @@ namespace SPade.Controllers
 
             //things to note: how am i gonna settle the counting of students
 
-            string x = "s123456"; //temp 
+            string x = "1431489"; //temp 
 
-            List<Lec_Class> lecClassList = new List<Lec_Class>();
-            List<Class> classList = new List<Class>();
-            //List<Class> managedClasses = db.Class.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().LecturerID == x).ToList();
-            List<Class> managedClasses = db.Classes.Where(c => c.CourseID == 1 && c.Course.CourseName == "DIT").ToList();
+            //List<Lec_Class> lecClassList = new List<Lec_Class>();
+            //List<Class> classList = new List<Class>();
+            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
-            lecClassList = db.Lec_Class.ToList();
-            classList = db.Classes.ToList();
+           // List<ManageAssignmentViewModel> manageAssignments;  //to be sent to the view
+                                                                // List<Class> managedClasses = db.Classes.Where(c => c.CourseID == 1 && c.Course.CourseName == "DIT").ToList();
+
+            // List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault() 
+
+
+            //lecClassList = db.Lec_Class.ToList();
+            //classList = db.Classes.ToList();
 
             //foreach (Lec_Class lc in lecClassList)
             //{
