@@ -43,9 +43,9 @@
                                 -->
                         </p>
                     </div>
-                    <label class="control-label">@Html.DisplayFor(modelItem => item.DueDate)</label><br />
-                    <label class="control-label">@Html.DisplayFor(modelItem => item.CreateBy)</label><br />
-                    <label class="control-label">Number of attempts remaining: @Html.DisplayFor(modelItem => item.MaxAttempt)</label>
+                    <label>Due date: </label>@Html.DisplayFor(modelItem => item.DueDate)<br />
+                    <label>Posted by: </label>@Html.DisplayFor(modelItem => item.CreateBy)<br />
+                    <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => item.MaxAttempt)
                 </div>
             </div>
         }
@@ -53,9 +53,9 @@
         <!-- File Button -->
         <div class="form-group">
             <div class="col-md-12">
-                <label class=" control-label" for="filebutton">Upload Solution</label>
-                <input id="AssignmentFile" type="file" style="border: solid 1px red" runat="server" />
-                <!--<asp:FileUpload ID="submissionFile" CssClass="form-control" runat="server" />-->
+                <label class="control-label" for="AssignmentFile">Upload Solution</label>
+                <input id="AssignmentFile" class="glyphicon-upload" type="file"  runat="server" />
+                <!--<asp:FileUpload ID="submissionFile" CssClass="form-control" runat=style="border: solid 1px red""server" />-->
             </div>
         </div>
 
@@ -87,10 +87,10 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <label id="outputSol" runat="server"></label>
+                                        <label id="outputSol"></label>
                                     </td>
                                     <td>
-                                        <label id="grade" runat="server"></label>
+                                        <label id="grade"></label>
                                     </td>
                                 </tr>
                             </tbody>
@@ -105,7 +105,7 @@
 
         <div class="form-group">
             <div class="col-md-10">
-                <asp:Label ID="lblmessage" runat="server" />
+                <label id="lblmesseage"></label>
             </div>
         </div>
 
