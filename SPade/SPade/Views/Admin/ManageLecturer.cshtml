@@ -1,8 +1,10 @@
-﻿
-@{
-    ViewBag.Title = "ManageLecturer";
+﻿@{
+    ViewBag.Title = "Manage Lecturer";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+@Scripts.Render("~/bundles/tablescript")
+@Styles.Render("~/bundles/tablestyle")
 
 <div class="container">
     <div class="col-md-10 col-md-offset-1">
@@ -25,7 +27,7 @@
 
             <div class="form-group">
                 <!--        <div class ="row">  -->
-                <table id="lecturerTable" class="table table-striped table-hover tablesorter">
+                <table class="table table-striped table-hover tablesorter">
                     <thead>
                         <tr>
                             <th>Staff ID</th>
@@ -87,28 +89,6 @@
                 <!--</div>-->
 
             </div>
-
-            <script>
-    $(document).ready(function () {
-        $(function () {
-            $("#lecturerTable").tablesorter(
-            {
-                theme: 'bootstrap',
-
-                widthFixed: true,
-                headerTemplate: '{content} {icon}', // Add icon for various themes
-                sortList: [[0,0]],
-                widgets: ['stickyHeaders', 'uitheme', 'filter'],
-                
-                widgetOptions: {
-                filter_external: '#search',
-                filter_columnFilters: false
-                }
-
-            });
-        });
-    });
-            </script>
 
         </fieldset>
     </div>
