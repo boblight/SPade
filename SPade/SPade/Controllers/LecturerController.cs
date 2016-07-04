@@ -13,7 +13,7 @@ namespace SPade.Controllers
     public class LecturerController : Controller
     {
         //init the db
-        private SPadeEntities2 db = new SPadeEntities2();
+        private SPadeEntities db = new SPadeEntities();
 
         // GET: Lecturer
         public ActionResult Dashboard()
@@ -23,42 +23,29 @@ namespace SPade.Controllers
 
         public ActionResult ManageClassesAndStudents()
         {
-            //get the data from the database 
-            //we sort them according to the lecturer and what not 
-            //store in a list and append it to the page 
-
-            //things to note: how am i gonna settle the counting of students
+            List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
+            ManageClassesViewModel e = new ManageClassesViewModel();
 
             string x = "1431489"; //temp 
 
-            //List<Lec_Class> lecClassList = new List<Lec_Class>();
-            //List<Class> classList = new List<Class>();
+            //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
-           // List<ManageAssignmentViewModel> manageAssignments;  //to be sent to the view
-                                                                // List<Class> managedClasses = db.Classes.Where(c => c.CourseID == 1 && c.Course.CourseName == "DIT").ToList();
+            //get the students in that classs
+            foreach (Class c in managedClasses)
+            {
+                //match the class ID of student wit hthe class ID of the managed Classes
+                var count = db.Students.Where(s => s.ClassID == c.ClassID).Count();
 
-            // List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault() 
+                e.ClassName = c.ClassName;
+                e.Id = c.ClassID;
+                e.NumberOfStudents = count;
 
+                manageClassView.Add(e);
 
-            //lecClassList = db.Lec_Class.ToList();
-            //classList = db.Classes.ToList();
+            }
 
-            //foreach (Lec_Class lc in lecClassList)
-            //{
-            //    if (lc.sta == x)//lecturer ID matches 
-            //    {
-            //        foreach (Class c in classList)
-            //        {
-            //            if (c.ClassID == lc.ClassID) //class ID matches the class ID of that row 
-            //            {
-            //                managedClasses.Add(c); //store the item inside the list
-            //            }
-            //        }
-            //    }
-            //}
-
-            return View(managedClasses);
+            return View(manageClassView);
 
         }
 
@@ -86,6 +73,15 @@ namespace SPade.Controllers
         {
             return View();
         }
+
+        //[HttpPost]
+        //public ActionResult AddAssignment()
+        //{
+
+
+
+        //    return View();
+        //}
 
         public ActionResult UpdateAssignment()
         {

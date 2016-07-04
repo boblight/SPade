@@ -13,7 +13,7 @@ namespace SPade.Controllers
 {
     public class StudentController : Controller
     {
-        private SPadeEntities2 db = new SPadeEntities2();
+        private SPadeEntities db = new SPadeEntities();
 
         // GET: Dashboard
         public ActionResult Dashboard()
@@ -30,7 +30,7 @@ namespace SPade.Controllers
                 // Use your file here
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
-                    svm.File.InputStream.CopyTo(memoryStream);
+                    //  svm.File.InputStream.CopyTo(memoryStream);
                 }
             }
             return null;

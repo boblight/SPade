@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SPade.Models.Class>
+﻿@model IEnumerable<SPade.ViewModels.Lecturer.ManageClassesViewModel>
 
 @{
     ViewBag.Title = "Manage Classes & Students";
@@ -38,7 +38,7 @@
                                 @Html.DisplayFor(model => item.ClassName)
                             </td>
                             <td>
-                                Still figuring out
+                                @Html.DisplayFor(model => item.NumberOfStudents)
                             </td>
                         </tr>
 

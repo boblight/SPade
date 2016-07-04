@@ -746,7 +746,7 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="SPadeEntities2" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="SPadeEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Admins" EntityType="Self.Admin" />
           <EntitySet Name="Assignments" EntityType="Self.Assignment" />
           <EntitySet Name="Classes" EntityType="Self.Class" />
@@ -818,7 +818,7 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="SPadeModelStoreContainer" CdmEntityContainer="SPadeEntities2">
+        <EntityContainerMapping StorageEntityContainer="SPadeModelStoreContainer" CdmEntityContainer="SPadeEntities">
           <EntitySetMapping Name="Admins">
             <EntityTypeMapping TypeName="SPadeModel.Admin">
               <MappingFragment StoreEntitySet="Admin">
