@@ -11,7 +11,7 @@ namespace SPade.ViewModels.Student
         /*
         [Required, Microsoft.Web.Mvc.FileExtensions(Extensions = "csv",
              ErrorMessage = "Specify a CSV file. (Comma-separated values)")]*/
-        public string FilePath { get; set; }
+        public HttpPostedFile File { get; set; }
 
     }//end of class
 }

@@ -178,6 +178,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Grading\Grader.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Admin.cs">
@@ -262,6 +263,7 @@
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\Solutions\1solution.txt" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -379,9 +381,11 @@
     <Content Include="Views\Admin\UpdateClass.cshtml" />
     <Content Include="Views\Admin\UpdateLecturer.cshtml" />
     <Content Include="Views\Admin\UpdateStudent.cshtml" />
+    <Content Include="Views\Student\PostSubmission.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <Folder Include="App_Data\Submissions\" />
+    <Folder Include="App_Data\TestCase\" />
     <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
