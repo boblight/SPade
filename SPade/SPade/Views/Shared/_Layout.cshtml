@@ -7,9 +7,9 @@
 
     <link rel="icon" href="/img/favicon.ico" />
 
-    @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/script")
-
+    @Styles.Render("~/bundles/style")
+    
 </head>
 <body>
 
@@ -33,7 +33,7 @@
 
             <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#"><i class="glyphicon glyphicon-th"></i>Dashboard</a></li>
+                    <li><a href="#"><i class="glyphicon glyphicon-th"></i> Dashboard</a></li>
                     <li> @Html.Partial("_LoginPartial")</li>
                 </ul>
             </div>
