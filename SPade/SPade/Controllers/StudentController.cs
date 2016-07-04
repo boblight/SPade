@@ -8,12 +8,14 @@ using SPade.ViewModels;
 using SPade.ViewModels.Student;
 using System.Threading.Tasks;
 using System.IO;
+using SPade.Grading;
 
 namespace SPade.Controllers
 {
     public class StudentController : Controller
     {
         private SPadeEntities db = new SPadeEntities();
+        private Grader grader = new Grader();
 
         // GET: Dashboard
         public ActionResult Dashboard()
@@ -23,17 +25,24 @@ namespace SPade.Controllers
 
         //POST: SubmitAssignment
         [HttpPost]
-        public Task<ActionResult> SubmitAssignment(SubmitAssignmentViewModel svm)
+        public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
-            if (ModelState.IsValid)
+            Submission submission = new Submission();
+
+            //getting file path
+            if (file.ContentLength > 0)
             {
-                // Use your file here
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    //  svm.File.InputStream.CopyTo(memoryStream);
-                }
+                var fileName = Path.GetFileName(file.FileName);
+                var filePath = Server.MapPath("~/App_Data/Submissions/" +  "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName);
+                System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
+                fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
+                file.SaveAs(filePath);
             }
-            return null;
+
+            //grading
+
+            
+            return RedirectToAction("PostSubmission");
         }
 
         // GET: SubmitAssignment
@@ -71,6 +80,12 @@ namespace SPade.Controllers
 
         // GET: ViewResult
         public ActionResult ViewResult()
+        {
+            return View();
+        }
+
+        // GET: PostSubmission
+        public ActionResult PostSubmission()
         {
             return View();
         }
