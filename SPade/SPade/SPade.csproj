@@ -182,60 +182,60 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Admin.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Assignment.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Class.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Class_Assgn.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Course.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Lecturer.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Lec_Class.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Login.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Module.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ProgLanguage.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Role.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SpadeModel.Context.cs">
+    <Compile Include="Models\SPadeModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SpadeModel.Context.tt</DependentUpon>
+      <DependentUpon>SPadeModel.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SpadeModel.cs">
+    <Compile Include="Models\SPadeModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SpadeModel.Designer.cs">
+    <Compile Include="Models\SPadeModel.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SpadeModel.edmx</DependentUpon>
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\Student.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Submission.cs">
-      <DependentUpon>SpadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -277,15 +277,15 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\SpadeModel.Context.tt">
+    <Content Include="Models\SPadeModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SpadeModel.edmx</DependentUpon>
-      <LastGenOutput>SpadeModel.Context.cs</LastGenOutput>
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeModel.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="Models\SpadeModel.tt">
+    <Content Include="Models\SPadeModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SpadeModel.edmx</DependentUpon>
-      <LastGenOutput>SpadeModel.cs</LastGenOutput>
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeModel.cs</LastGenOutput>
     </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -293,12 +293,12 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
-    <EntityDeploy Include="Models\SpadeModel.edmx">
+    <EntityDeploy Include="Models\SPadeModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>SpadeModel.Designer.cs</LastGenOutput>
+      <LastGenOutput>SPadeModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Models\SpadeModel.edmx.diagram">
-      <DependentUpon>SpadeModel.edmx</DependentUpon>
+    <Content Include="Models\SPadeModel.edmx.diagram">
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
