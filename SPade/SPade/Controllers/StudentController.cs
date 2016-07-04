@@ -42,18 +42,21 @@ namespace SPade.Controllers
                 Decimal temp = Decimal.Parse(grader.grade("~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName, 1).ToString());
                 if (temp != 2)
                 {
-                    submission.Grade =
+                    submission.Grade = temp;
                     submission.AssgnID = int.Parse(Session["id"].ToString());
                     submission.AdminNo = "1431476";
                     submission.FilePath = filePath.ToString();
                     submission.Timestamp = DateTime.Now;
-                } else if (temp == 2)
+                }
+                else if (temp == 2)
                 {
                     return Redirect("/Student/ViewAssignment");
                 }
             }
 
             db.Submissions.Add(submission);
+
+            Session["submission"] = submission;
 
             return RedirectToAction("PostSubmission");
         }
@@ -103,9 +106,7 @@ namespace SPade.Controllers
         // GET: PostSubmission
         public ActionResult PostSubmission()
         {
-            Submission submission = db.Submissions.ToList().Find(s => s.AssgnID == int.Parse(Session["id"].ToString()));
-
-            return View(submission);
+            return View(Session["Submission"]);
         }
     }//end of controller
 }
