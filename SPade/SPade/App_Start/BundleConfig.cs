@@ -32,8 +32,8 @@ namespace SPade
                       ));
 
             bundles.Add(new ScriptBundle("~/bundles/indexscript").Include(
-                      "~/Script/indexscript.js",
-                      "~/Scripts/wow.min.js"));
+                      "~/Scripts/wow.min.js",
+                      "~/Scripts/indexscript.js"));
 
             bundles.Add(new StyleBundle("~/bundles/indexstyle").Include(
                       "~/Content/indexstyle.css"));

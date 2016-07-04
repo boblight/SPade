@@ -14,7 +14,7 @@ namespace SPade.Controllers
 {
     public class StudentController : Controller
     {
-        private SPadeEntities2 db = new SPadeEntities2();
+        private SPadeEntities db = new SPadeEntities();
         private Grader grader = new Grader();
 
         // GET: Dashboard
@@ -33,21 +33,37 @@ namespace SPade.Controllers
             if (file.ContentLength > 0)
             {
                 var fileName = Path.GetFileName(file.FileName);
-                var filePath = Server.MapPath("~/App_Data/Submissions/" +  "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName);
+                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName);
                 System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
                 fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
                 file.SaveAs(filePath);
+
+                //grading hardcoded assignment id to be changed
+                Decimal temp = Decimal.Parse(grader.grade("~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName, 1).ToString());
+                if (temp != 2)
+                {
+                    submission.Grade =
+                    submission.AssgnID = int.Parse(Session["id"].ToString());
+                    submission.AdminNo = "1431476";
+                    submission.FilePath = filePath.ToString();
+                    submission.Timestamp = DateTime.Now;
+                } else if (temp == 2)
+                {
+                    return Redirect("/Student/ViewAssignment");
+                }
             }
 
-            //grading
+            db.Submissions.Add(submission);
 
-            
             return RedirectToAction("PostSubmission");
         }
 
         // GET: SubmitAssignment
         public ActionResult SubmitAssignment(int id)
         {
+            //start a session to check which assignment student is viewing
+            Session["id"] = id;
+
             List<Assignment> pass = new List<Assignment>();
             SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
             Assignment ass = db.Assignments.ToList().Find(a => a.AssgnID == id);
@@ -87,7 +103,9 @@ namespace SPade.Controllers
         // GET: PostSubmission
         public ActionResult PostSubmission()
         {
-            return View();
+            Submission submission = db.Submissions.ToList().Find(s => s.AssgnID == int.Parse(Session["id"].ToString()));
+
+            return View(submission);
         }
     }//end of controller
 }
