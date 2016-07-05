@@ -76,10 +76,9 @@ namespace SPade.Grading
                     return 0;
                 }
             }
-            else
+            else //means fail
             {
-                //return error.ToString();
-                return 2;
+                return 2; //debug
             }
         }//end of grade method
 

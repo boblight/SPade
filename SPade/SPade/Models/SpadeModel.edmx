@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="SPadeModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="SPadeModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Admin">
           <Key>
             <PropertyRef Name="AdminID" />
@@ -149,18 +149,11 @@
           <Property Name="DeletedAt" Type="datetime" />
           <Property Name="DeletedBy" Type="varchar" MaxLength="20" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="Submission">
           <Key>
             <PropertyRef Name="SubmissionID" />
-            <PropertyRef Name="AdminNo" />
-            <PropertyRef Name="AssgnID" />
-            <PropertyRef Name="Grade" />
-            <PropertyRef Name="FilePath" />
-            <PropertyRef Name="Timestamp" />
           </Key>
-          <Property Name="SubmissionID" Type="int" Nullable="false" />
+          <Property Name="SubmissionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="AdminNo" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="AssgnID" Type="int" Nullable="false" />
           <Property Name="Grade" Type="decimal" Precision="3" Scale="2" Nullable="false" />
@@ -336,16 +329,7 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
           <EntitySet Name="ProgLanguage" EntityType="Self.ProgLanguage" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Role" EntityType="Self.Role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Submission" EntityType="Self.Submission" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [Submission].[SubmissionID] AS [SubmissionID], 
-    [Submission].[AdminNo] AS [AdminNo], 
-    [Submission].[AssgnID] AS [AssgnID], 
-    [Submission].[Grade] AS [Grade], 
-    [Submission].[FilePath] AS [FilePath], 
-    [Submission].[Timestamp] AS [Timestamp]
-    FROM [dbo].[Submission] AS [Submission]</DefiningQuery>
-          </EntitySet>
+          <EntitySet Name="Submission" EntityType="Self.Submission" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="adminlogin_fk" Association="Self.adminlogin_fk">
             <End Role="Admin" EntitySet="Admin" />
             <End Role="Login" EntitySet="Login" />
@@ -399,8 +383,7 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
             <End Role="Submission" EntitySet="Submission" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SPadeModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -432,7 +415,7 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
           <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Class_Assgn" Relationship="Self.assgn_fk" FromRole="Assignment" ToRole="Class_Assgn" />
           <NavigationProperty Name="Module" Relationship="Self.Module_fk_constrain" FromRole="Assignment" ToRole="Module" />
-          <NavigationProperty Name="Submissions" Relationship="Self.subassgn_fk" FromRole="Assignment" ToRole="Submission" />
+          <NavigationProperty Name="Submissions" Relationship="SPadeModel.subassgn_fk" FromRole="Assignment" ToRole="Submission" />
         </EntityType>
         <EntityType Name="Class">
           <Key>
@@ -570,25 +553,7 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
           <Property Name="DeletedAt" Type="DateTime" Precision="3" />
           <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Login" Relationship="Self.studlogin_fk" FromRole="Student" ToRole="Login" />
-          <NavigationProperty Name="Submissions" Relationship="Self.substud_fk" FromRole="Student" ToRole="Submission" />
-        </EntityType>
-        <EntityType Name="Submission">
-          <Key>
-            <PropertyRef Name="SubmissionID" />
-            <PropertyRef Name="AdminNo" />
-            <PropertyRef Name="AssgnID" />
-            <PropertyRef Name="Grade" />
-            <PropertyRef Name="FilePath" />
-            <PropertyRef Name="Timestamp" />
-          </Key>
-          <Property Name="SubmissionID" Type="Int32" Nullable="false" />
-          <Property Name="AdminNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="AssgnID" Type="Int32" Nullable="false" />
-          <Property Name="Grade" Type="Decimal" Precision="3" Scale="2" Nullable="false" />
-          <Property Name="FilePath" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Assignment" Relationship="Self.subassgn_fk" FromRole="Submission" ToRole="Assignment" />
-          <NavigationProperty Name="Student" Relationship="Self.substud_fk" FromRole="Submission" ToRole="Student" />
+          <NavigationProperty Name="Submissions" Relationship="SPadeModel.substud_fk" FromRole="Student" ToRole="Submission" />
         </EntityType>
         <Association Name="adminlogin_fk">
           <End Role="Admin" Type="Self.Admin" Multiplicity="1" />
@@ -623,18 +588,6 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
             </Principal>
             <Dependent Role="Assignment">
               <PropertyRef Name="ModuleCode" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="subassgn_fk">
-          <End Role="Assignment" Type="Self.Assignment" Multiplicity="1" />
-          <End Role="Submission" Type="Self.Submission" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Assignment">
-              <PropertyRef Name="AssgnID" />
-            </Principal>
-            <Dependent Role="Submission">
-              <PropertyRef Name="AssgnID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -734,18 +687,6 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="substud_fk">
-          <End Role="Student" Type="Self.Student" Multiplicity="1" />
-          <End Role="Submission" Type="Self.Submission" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="AdminNo" />
-            </Principal>
-            <Dependent Role="Submission">
-              <PropertyRef Name="AdminNo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="SPadeEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Admins" EntityType="Self.Admin" />
           <EntitySet Name="Assignments" EntityType="Self.Assignment" />
@@ -759,7 +700,6 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
           <EntitySet Name="ProgLanguages" EntityType="Self.ProgLanguage" />
           <EntitySet Name="Roles" EntityType="Self.Role" />
           <EntitySet Name="Students" EntityType="Self.Student" />
-          <EntitySet Name="Submissions" EntityType="Self.Submission" />
           <AssociationSet Name="adminlogin_fk" Association="Self.adminlogin_fk">
             <End Role="Admin" EntitySet="Admins" />
             <End Role="Login" EntitySet="Logins" />
@@ -771,10 +711,6 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
           <AssociationSet Name="Module_fk_constrain" Association="Self.Module_fk_constrain">
             <End Role="Module" EntitySet="Modules" />
             <End Role="Assignment" EntitySet="Assignments" />
-          </AssociationSet>
-          <AssociationSet Name="subassgn_fk" Association="Self.subassgn_fk">
-            <End Role="Assignment" EntitySet="Assignments" />
-            <End Role="Submission" EntitySet="Submissions" />
           </AssociationSet>
           <AssociationSet Name="class_fk" Association="Self.class_fk">
             <End Role="Class" EntitySet="Classes" />
@@ -808,11 +744,53 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
             <End Role="ProgLanguage" EntitySet="ProgLanguages" />
             <End Role="Module" EntitySet="Modules" />
           </AssociationSet>
-          <AssociationSet Name="substud_fk" Association="Self.substud_fk">
+          <EntitySet Name="Submissions" EntityType="SPadeModel.Submission" />
+          <AssociationSet Name="subassgn_fk" Association="SPadeModel.subassgn_fk">
+            <End Role="Assignment" EntitySet="Assignments" />
+            <End Role="Submission" EntitySet="Submissions" />
+          </AssociationSet>
+          <AssociationSet Name="substud_fk" Association="SPadeModel.substud_fk">
             <End Role="Student" EntitySet="Students" />
             <End Role="Submission" EntitySet="Submissions" />
           </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Submission">
+          <Key>
+            <PropertyRef Name="SubmissionID" />
+          </Key>
+          <Property Name="SubmissionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AdminNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="AssgnID" Type="Int32" Nullable="false" />
+          <Property Name="Grade" Type="Decimal" Nullable="false" Precision="3" Scale="2" />
+          <Property Name="FilePath" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Assignment" Relationship="SPadeModel.subassgn_fk" FromRole="Submission" ToRole="Assignment" />
+          <NavigationProperty Name="Student" Relationship="SPadeModel.substud_fk" FromRole="Submission" ToRole="Student" />
+        </EntityType>
+        <Association Name="subassgn_fk">
+          <End Type="SPadeModel.Assignment" Role="Assignment" Multiplicity="1" />
+          <End Type="SPadeModel.Submission" Role="Submission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Assignment">
+              <PropertyRef Name="AssgnID" />
+            </Principal>
+            <Dependent Role="Submission">
+              <PropertyRef Name="AssgnID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="substud_fk">
+          <End Type="SPadeModel.Student" Role="Student" Multiplicity="1" />
+          <End Type="SPadeModel.Submission" Role="Submission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="AdminNo" />
+            </Principal>
+            <Dependent Role="Submission">
+              <PropertyRef Name="AdminNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -978,12 +956,12 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
           <EntitySetMapping Name="Submissions">
             <EntityTypeMapping TypeName="SPadeModel.Submission">
               <MappingFragment StoreEntitySet="Submission">
-                <ScalarProperty Name="SubmissionID" ColumnName="SubmissionID" />
-                <ScalarProperty Name="AdminNo" ColumnName="AdminNo" />
-                <ScalarProperty Name="AssgnID" ColumnName="AssgnID" />
-                <ScalarProperty Name="Grade" ColumnName="Grade" />
-                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
                 <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+                <ScalarProperty Name="Grade" ColumnName="Grade" />
+                <ScalarProperty Name="AssgnID" ColumnName="AssgnID" />
+                <ScalarProperty Name="AdminNo" ColumnName="AdminNo" />
+                <ScalarProperty Name="SubmissionID" ColumnName="SubmissionID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

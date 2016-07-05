@@ -33,28 +33,30 @@ namespace SPade.Controllers
             if (file.ContentLength > 0)
             {
                 var fileName = Path.GetFileName(file.FileName);
-                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName);
+                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + "solution.jar");
                 System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
                 fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
                 file.SaveAs(filePath);
 
                 //grading hardcoded assignment id to be changed
-                Decimal temp = Decimal.Parse(grader.grade("~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName, 1).ToString());
-                if (temp != 2)
+                Decimal result = Decimal.Parse(grader.grade(filePath, 1).ToString());
+                if (result != 2)
                 {
-                    submission.Grade = temp;
+                    submission.Grade = result;
                     submission.AssgnID = int.Parse(Session["id"].ToString());
                     submission.AdminNo = "1431476";
                     submission.FilePath = filePath.ToString();
                     submission.Timestamp = DateTime.Now;
                 }
-                else if (temp == 2)
+                else if (result == 2)
                 {
+                    //if error
                     return Redirect("/Student/ViewAssignment");
                 }
             }
 
             db.Submissions.Add(submission);
+            db.SaveChanges();
 
             Session["submission"] = submission;
 
