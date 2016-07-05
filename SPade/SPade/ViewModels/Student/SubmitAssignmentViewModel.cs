@@ -6,12 +6,14 @@ using SPade.Models;
 
 namespace SPade.ViewModels.Student
 {
-    public class SubmitAssignmentViewModel : Assignment
+    public class SubmitAssignmentViewModel
     {
         /*
         [Required, Microsoft.Web.Mvc.FileExtensions(Extensions = "csv",
              ErrorMessage = "Specify a CSV file. (Comma-separated values)")]*/
         public HttpPostedFile File { get; set; }
+
+        public Assignment assignment { get; set; }
 
     }//end of class
 }

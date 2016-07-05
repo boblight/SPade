@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SPade.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,9 +8,10 @@ namespace SPade.ViewModels.Student
 {
     public class ViewAssignmentViewModel
     {
-        public string Description { get; set;}
-        public string IssuedBy { get; set; }
-        public DateTime DueDate { get; set; }
-        public int AssgnID { get; set; }
+        public bool submitted { get; set; }
+
+        public Assignment assignment { get; set; }
+
+        public DateTime timestamp { get; set; }
     }//end of class
 }

@@ -9,6 +9,7 @@ using SPade.ViewModels.Student;
 using System.Threading.Tasks;
 using System.IO;
 using SPade.Grading;
+using System.Diagnostics;
 
 namespace SPade.Controllers
 {
@@ -28,6 +29,8 @@ namespace SPade.Controllers
         public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
             Submission submission = new Submission();
+            int assgnId = (int)Session["id"];
+            Assignment assignment = db.Assignments.ToList().Find(a => a.AssgnID == assgnId);
 
             //getting file path
             if (file.ContentLength > 0)
@@ -39,11 +42,11 @@ namespace SPade.Controllers
                 file.SaveAs(filePath);
 
                 //grading hardcoded assignment id to be changed
-                Decimal result = Decimal.Parse(grader.grade(filePath, 1).ToString());
+                Decimal result = Decimal.Parse(grader.grade("14314761solution.jar", 1).ToString());
                 if (result != 2)
                 {
                     submission.Grade = result;
-                    submission.AssgnID = int.Parse(Session["id"].ToString());
+                    submission.AssgnID = assgnId;
                     submission.AdminNo = "1431476";
                     submission.FilePath = filePath.ToString();
                     submission.Timestamp = DateTime.Now;
@@ -56,29 +59,25 @@ namespace SPade.Controllers
             }
 
             db.Submissions.Add(submission);
+            assignment.MaxAttempt -= 1; //updating the max attempt
             db.SaveChanges();
 
             Session["submission"] = submission;
 
             return RedirectToAction("PostSubmission");
-        }
+        }//end of submit assignment
 
         // GET: SubmitAssignment
         public ActionResult SubmitAssignment(int id)
         {
+            List<Assignment> pass = new List<Assignment>();
+            SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
+            Assignment assignment = db.Assignments.ToList().Find(a => a.AssgnID == id);
+
             //start a session to check which assignment student is viewing
             Session["id"] = id;
 
-            List<Assignment> pass = new List<Assignment>();
-            SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
-            Assignment ass = db.Assignments.ToList().Find(a => a.AssgnID == id);
-
-            svm.AssgnID = ass.AssgnID;
-            svm.Describe = ass.Describe;
-            svm.DueDate = ass.DueDate;
-            svm.CreateBy = ass.CreateBy;
-            svm.ModuleCode = ass.ModuleCode;
-            svm.MaxAttempt = ass.MaxAttempt;
+            svm.assignment = assignment;
 
             return View(svm);
         }
@@ -86,6 +85,7 @@ namespace SPade.Controllers
         // GET: ViewAssignment
         public ActionResult ViewAssignment()
         {
+            List<ViewAssignmentViewModel> vm = new List<ViewAssignmentViewModel>();
             List<Assignment> assignments = new List<Assignment>();
 
             //to replace hardcoded classid with sessions values
@@ -94,9 +94,25 @@ namespace SPade.Controllers
             foreach (Class_Assgn i in ca)
             {
                 assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssgnID == i.AssgnID);
-            }
 
-            return View(assignments);
+                foreach(Assignment a in assignments)
+                {
+                    ViewAssignmentViewModel v = new ViewAssignmentViewModel();
+                    v.assignment = a;
+                    v.timestamp = db.Submissions.ToList().Find(s => s.AssgnID == a.AssgnID).Timestamp;
+                    //check if the assignment has been attempted before
+                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == "1431476").Count() > 0) //hardcoded admin number to be replaced by session admin numer
+                    {
+                        v.submitted = true;
+                    }
+                    else
+                    {
+                        v.submitted = false;
+                    }
+                    vm.Add(v);
+                }
+            }
+            return View(vm);
         }
 
         // GET: ViewResult

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SPade.Models.Assignment>
+﻿@model IEnumerable<SPade.ViewModels.Student.ViewAssignmentViewModel>
 
 @{
     ViewBag.Title = "View Assignment";
@@ -90,12 +90,15 @@
 
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td>@Html.DisplayFor(modelItem => item.AssgnID)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.CreateBy)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DueDate)</td>
-                                    <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.AssgnID)" class="btn btn-primary">View</a></td>
-                                </tr>
+                                if (item.submitted == false)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.AssgnID)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
+                                        <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssgnID)" class="btn btn-primary">View</a></td>
+                                    </tr>
+                                }
                             }
 
                         </tbody>
@@ -123,7 +126,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Sample-->
+
+                            @foreach (var item in Model)
+                            {
+                                if (item.submitted == true)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.AssgnID)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.timestamp)</td>
+                                        <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssgnID)" class="btn btn-primary">View</a></td>
+                                    </tr>
+                                }
+                            }
+
+                            <!-- Sample
                             <tr>
                                 <td>Java Intro Practical 1</td>
                                 <td>Mr Low</td>
@@ -152,7 +170,7 @@
                                 <td>12/5/2016</td>
                                 <td><a href="SubmitAssignment2.aspx" class="btn btn-primary">View</a></td>
                             </tr>
-
+                                -->
 
                         </tbody>
                     </table>
@@ -161,11 +179,11 @@
             </div>
         </div>
         @*<script>
-            $(document).ready(function () {
-                $("#viewPendingAssignmentsTable").tablesorter();
-                $("#viewSubmittedAssignments").tablesorter();
-            });
-        </script>*@
+                $(document).ready(function () {
+                    $("#viewPendingAssignmentsTable").tablesorter();
+                    $("#viewSubmittedAssignments").tablesorter();
+                });
+            </script>*@
     </fieldset>
 </div>
 
