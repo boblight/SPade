@@ -26,7 +26,6 @@ namespace SPade.Models
         }
     
         public virtual DbSet<Admin> Admins { get; set; }
-        public virtual DbSet<Assignment> Assignments { get; set; }
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<Class_Assgn> Class_Assgn { get; set; }
         public virtual DbSet<Course> Courses { get; set; }
@@ -38,5 +37,6 @@ namespace SPade.Models
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Submission> Submissions { get; set; }
+        public virtual DbSet<Assignment> Assignments { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace SPade.Grading
 
         public double grade(string filePath, int assgnId)
         {
-            procInfo = new ProcessStartInfo("java.exe", "-jar " + HttpContext.Current.Server.MapPath(@filePath));
+            procInfo = new ProcessStartInfo("java.exe", "-jar " + HttpContext.Current.Server.MapPath(@"~/App_Data/Submissions/" + filePath));
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 

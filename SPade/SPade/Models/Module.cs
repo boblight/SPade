@@ -30,8 +30,8 @@ namespace SPade.Models
         public Nullable<System.DateTime> DeletedAt { get; set; }
         public string DeletedBy { get; set; }
     
+        public virtual ProgLanguage ProgLanguage { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Assignment> Assignments { get; set; }
-        public virtual ProgLanguage ProgLanguage { get; set; }
     }
 }

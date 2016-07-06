@@ -21,7 +21,7 @@ namespace SPade.Models
         public string FilePath { get; set; }
         public System.DateTime Timestamp { get; set; }
     
-        public virtual Assignment Assignment { get; set; }
         public virtual Student Student { get; set; }
+        public virtual Assignment Assignment { get; set; }
     }
 }
