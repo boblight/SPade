@@ -1,7 +1,22 @@
-﻿
+﻿@model SPade.Models.Submission
+
 @{
-    ViewBag.Title = "PostSubmission";
+    ViewBag.Title = "Post Submission";
 }
 
-<h2>PostSubmission</h2>
+<div class="col-md-4 col-md-offset-4 form-horizontal">
 
+    <fieldset>
+
+        <legend>Results</legend>
+
+        <ul>
+            <li>Completed By: @Html.DisplayFor(modelItem => modelItem.AdminNo)</li>
+            <li>Submitted On: @Html.DisplayFor(modelItem => modelItem.Timestamp)</li>
+            <li>Grade: @Html.DisplayFor(modelItem => modelItem.Grade)</li>
+            <li><a href="/Student/ViewAssignment" class="btn btn-default">Back to view Assignments</a></li>
+        </ul>
+
+    </fieldset>
+
+</div>

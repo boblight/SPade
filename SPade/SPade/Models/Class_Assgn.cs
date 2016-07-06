@@ -18,7 +18,7 @@ namespace SPade.Models
         public int AssgnID { get; set; }
         public int C_id { get; set; }
     
-        public virtual Assignment Assignment { get; set; }
         public virtual Class Class { get; set; }
+        public virtual Assignment Assignment { get; set; }
     }
 }

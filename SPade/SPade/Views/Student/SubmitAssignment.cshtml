@@ -12,33 +12,47 @@
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-            var item = Model;
             <!-- To change assignment id to assignment title when database updated -->
-            <legend>@Html.DisplayFor(modelItem => modelItem.ModuleCode):  @Html.DisplayFor(modelItem => modelItem.AssgnID)</legend>
+            <legend>@Html.DisplayFor(modelItem => modelItem.assignment.ModuleCode):  @Html.DisplayFor(modelItem => modelItem.assignment.AssgnTitle)</legend>
 
             <!-- QuestionTextArea -->
             <div class="form-group">
                 <div class="col-md-12">
                     <div class="jumbotron col-md-12">
                         <p>
-                            @Html.DisplayFor(modelItem => modelItem.Describe)
+                            @Html.DisplayFor(modelItem => modelItem.assignment.Describe)
                         </p>
                     </div>
-                    <label>Due date: </label>@Html.DisplayFor(modelItem => modelItem.DueDate)<br />
-                    <label>Posted by: </label>@Html.DisplayFor(modelItem => modelItem.CreateBy)<br />
-                    <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => modelItem.MaxAttempt)
+                    <label>Start date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.StartDate)<br />
+                    <label>Due date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.DueDate)<br />
+                    <label>Posted by: </label>@Html.DisplayFor(modelItem => modelItem.assignment.CreateBy)<br />
+                    <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => modelItem.assignment.MaxAttempt)
                 </div>
             </div>
 
-        <!-- File Button -->
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label class="control-label" for="AssignmentFile">Upload Solution</label>
-                    <!--<input id="AssignmentFile" class="glyphicon-upload" style="border: solid 1px red" type="file" />-->
-                    @Html.TextBoxFor(m => m.File, new { type = "file" })
-                    @Html.ValidationMessageFor(m => m.File)
+            if (Model.assignment.MaxAttempt == 0)
+            {
+                <h4>You have ran out of retries. Click <a href="/Student/ViewAssignment">here</a> to go back.</h4>
+            }
+            else if (Model.assignment.StartDate.Date > DateTime.Now.Date)
+            {
+                <h4>Please wait until the start date to submit your assignment. Click <a href="/Student/ViewAssignment">here</a> to go back.</h4>
+            }
+            else if (Model.assignment.DueDate.Date < DateTime.Now.Date)
+            {
+                <h4>Due date of assignment has been passed. You may not attempt it anymore. Click <a href="/Student/ViewAssignment">here</a> to go back.</h4>
+            }
+            else
+            {
+                  <!-- File Button -->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label" for="AssignmentFile">Upload Solution</label>
+                        <!--<input id="AssignmentFile" class="glyphicon-upload" style="border: solid 1px red" type="file" />-->
+                        @Html.TextBoxFor(m => m.File, new { type = "file" })
+                        @Html.ValidationMessageFor(m => m.File)
+                    </div>
                 </div>
-            </div>
 
         <!-- Button -->
                 <div class="form-group">
@@ -47,6 +61,7 @@
                         <a id="btnCancel" href="#" class="btn btn-default">Cancel</a>
                     </div>
                 </div>
+            }
         }
         <!--end of form-->
 
