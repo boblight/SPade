@@ -71,17 +71,34 @@ namespace SPade.Controllers
 
         public ActionResult AddAssignment()
         {
-            return View();
+            //get the classes that the lecturer who is currently logged in manages 
+
+            List<ClassesAndModulesViewModel> cm = new List<ClassesAndModulesViewModel>();
+            AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
+
+            string x = "1431489"; //temp 
+
+            //get the classes managed by the lecturer 
+            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+
+            //get the modules 
+            List<Module> allModules = db.Modules.ToList();
+
+            aaVM.ClassList = managedClasses;
+            aaVM.Modules = allModules;
+
+            return View(aaVM);
         }
 
-        //[HttpPost]
-        //public ActionResult AddAssignment()
-        //{
+        [HttpPost]
+        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn)
+        {
+            //insert data into db 
 
 
 
-        //    return View();
-        //}
+            return View();
+        }
 
         public ActionResult UpdateAssignment()
         {

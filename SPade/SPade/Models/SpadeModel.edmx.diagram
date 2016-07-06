@@ -4,11 +4,11 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="c308a68f329d43798d7632e67506280e" Name="Diagram1">
+      <Diagram DiagramId="ee1a2de1c6e74551877104f58404b686" Name="Diagram1">
         <EntityTypeShape EntityType="SPadeModel.Admin" Width="1.5" PointX="0.75" PointY="8" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeModel.Assignment" Width="1.5" PointX="3.75" PointY="11.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeModel.Assignment" Width="1.5" PointX="3.75" PointY="11" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Class" Width="1.5" PointX="5.75" PointY="20.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeModel.Class_Assgn" Width="1.5" PointX="8" PointY="16.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeModel.Class_Assgn" Width="1.5" PointX="8" PointY="16.25" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Course" Width="1.5" PointX="3.5" PointY="20.375" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Lec_Class" Width="1.5" PointX="8" PointY="8.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Lecturer" Width="1.5" PointX="5.75" PointY="8.25" IsExpanded="true" />

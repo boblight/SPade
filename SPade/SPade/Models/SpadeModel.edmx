@@ -19,8 +19,10 @@
             <PropertyRef Name="AssgnID" />
           </Key>
           <Property Name="AssgnID" Type="int" Nullable="false" />
+          <Property Name="AssgnTitle" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="Describe" Type="varchar" MaxLength="5000" Nullable="false" />
           <Property Name="MaxAttempt" Type="int" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
           <Property Name="DueDate" Type="datetime" Nullable="false" />
           <Property Name="Solution" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="ModuleCode" Type="varchar" MaxLength="20" Nullable="false" />
@@ -419,8 +421,10 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
             <PropertyRef Name="AssgnID" />
           </Key>
           <Property Name="AssgnID" Type="Int32" Nullable="false" />
+          <Property Name="AssgnTitle" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Describe" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="MaxAttempt" Type="Int32" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Solution" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="ModuleCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
@@ -833,8 +837,10 @@ warning 6002: The table/view 'SPade.dbo.Submission' does not have a primary key 
             <EntityTypeMapping TypeName="SPadeModel.Assignment">
               <MappingFragment StoreEntitySet="Assignment">
                 <ScalarProperty Name="AssgnID" ColumnName="AssgnID" />
+                <ScalarProperty Name="AssgnTitle" ColumnName="AssgnTitle" />
                 <ScalarProperty Name="Describe" ColumnName="Describe" />
                 <ScalarProperty Name="MaxAttempt" ColumnName="MaxAttempt" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
                 <ScalarProperty Name="DueDate" ColumnName="DueDate" />
                 <ScalarProperty Name="Solution" ColumnName="Solution" />
                 <ScalarProperty Name="ModuleCode" ColumnName="ModuleCode" />

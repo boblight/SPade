@@ -22,8 +22,10 @@ namespace SPade.Models
         }
     
         public int AssgnID { get; set; }
+        public string AssgnTitle { get; set; }
         public string Describe { get; set; }
         public int MaxAttempt { get; set; }
+        public System.DateTime StartDate { get; set; }
         public System.DateTime DueDate { get; set; }
         public string Solution { get; set; }
         public string ModuleCode { get; set; }
