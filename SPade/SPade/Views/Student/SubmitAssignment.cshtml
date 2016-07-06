@@ -13,7 +13,7 @@
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
             <!-- To change assignment id to assignment title when database updated -->
-            <legend>@Html.DisplayFor(modelItem => modelItem.assignment.ModuleCode):  @Html.DisplayFor(modelItem => modelItem.assignment.AssgnID)</legend>
+            <legend>@Html.DisplayFor(modelItem => modelItem.assignment.ModuleCode):  @Html.DisplayFor(modelItem => modelItem.assignment.AssgnTitle)</legend>
 
             <!-- QuestionTextArea -->
             <div class="form-group">
@@ -23,6 +23,7 @@
                             @Html.DisplayFor(modelItem => modelItem.assignment.Describe)
                         </p>
                     </div>
+                    <label>Start date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.StartDate)<br />
                     <label>Due date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.DueDate)<br />
                     <label>Posted by: </label>@Html.DisplayFor(modelItem => modelItem.assignment.CreateBy)<br />
                     <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => modelItem.assignment.MaxAttempt)
@@ -32,6 +33,14 @@
             if (Model.assignment.MaxAttempt == 0)
             {
                 <h4>You have ran out of retries. Click <a href="/Student/ViewAssignment">here</a> to go back.</h4>
+            }
+            else if (Model.assignment.StartDate.Date > DateTime.Now.Date)
+            {
+                <h4>Please wait until the start date to submit your assignment. Click <a href="/Student/ViewAssignment">here</a> to go back.</h4>
+            }
+            else if (Model.assignment.DueDate.Date < DateTime.Now.Date)
+            {
+                <h4>Due date of assignment has been passed. You may not attempt it anymore. Click <a href="/Student/ViewAssignment">here</a> to go back.</h4>
             }
             else
             {

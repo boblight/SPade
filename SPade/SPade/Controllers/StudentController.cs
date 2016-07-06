@@ -92,17 +92,17 @@ namespace SPade.Controllers
             List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == 1);
 
             foreach (Class_Assgn i in ca)
-            {
+            { 
                 assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssgnID == i.AssgnID);
 
                 foreach(Assignment a in assignments)
                 {
                     ViewAssignmentViewModel v = new ViewAssignmentViewModel();
                     v.assignment = a;
-                    v.timestamp = db.Submissions.ToList().Find(s => s.AssgnID == a.AssgnID).Timestamp;
                     //check if the assignment has been attempted before
-                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == "1431476").Count() > 0) //hardcoded admin number to be replaced by session admin numer
+                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == "1431476" && s.AssgnID == a.AssgnID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
                     {
+                        v.timestamp = db.Submissions.ToList().Find(s => s.AssgnID == a.AssgnID).Timestamp;
                         v.submitted = true;
                     }
                     else

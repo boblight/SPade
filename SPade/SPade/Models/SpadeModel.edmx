@@ -18,7 +18,7 @@
           <Key>
             <PropertyRef Name="AssgnID" />
           </Key>
-          <Property Name="AssgnID" Type="int" Nullable="false" />
+          <Property Name="AssgnID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Describe" Type="varchar" MaxLength="5000" Nullable="false" />
           <Property Name="MaxAttempt" Type="int" Nullable="false" />
           <Property Name="DueDate" Type="datetime" Nullable="false" />
@@ -30,6 +30,8 @@
           <Property Name="UpdatedBy" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="DeletedAt" Type="datetime" />
           <Property Name="DeletedBy" Type="varchar" MaxLength="20" />
+          <Property Name="AssgnTitle" Type="varchar" MaxLength="100" />
+          <Property Name="StartDate" Type="datetime" />
         </EntityType>
         <EntityType Name="Class">
           <Key>
@@ -397,26 +399,6 @@
           <Property Name="FullName" Type="String" MaxLength="60" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Login" Relationship="Self.adminlogin_fk" FromRole="Admin" ToRole="Login" />
         </EntityType>
-        <EntityType Name="Assignment">
-          <Key>
-            <PropertyRef Name="AssgnID" />
-          </Key>
-          <Property Name="AssgnID" Type="Int32" Nullable="false" />
-          <Property Name="Describe" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="MaxAttempt" Type="Int32" Nullable="false" />
-          <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Solution" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="ModuleCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CreateAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CreateBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdatedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="DeletedAt" Type="DateTime" Precision="3" />
-          <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Class_Assgn" Relationship="Self.assgn_fk" FromRole="Assignment" ToRole="Class_Assgn" />
-          <NavigationProperty Name="Module" Relationship="Self.Module_fk_constrain" FromRole="Assignment" ToRole="Module" />
-          <NavigationProperty Name="Submissions" Relationship="SPadeModel.subassgn_fk" FromRole="Assignment" ToRole="Submission" />
-        </EntityType>
         <EntityType Name="Class">
           <Key>
             <PropertyRef Name="ClassID" />
@@ -441,8 +423,8 @@
           <Property Name="ClassID" Type="Int32" Nullable="false" />
           <Property Name="AssgnID" Type="Int32" Nullable="false" />
           <Property Name="C_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="Assignment" Relationship="Self.assgn_fk" FromRole="Class_Assgn" ToRole="Assignment" />
           <NavigationProperty Name="Class" Relationship="Self.class_fk2" FromRole="Class_Assgn" ToRole="Class" />
+          <NavigationProperty Name="Assignment" Relationship="SPadeModel.assgn_fk" FromRole="Class_Assgn" ToRole="Assignment" />
         </EntityType>
         <EntityType Name="Course">
           <Key>
@@ -512,8 +494,8 @@
           <Property Name="UpdatedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="DeletedAt" Type="DateTime" Precision="3" />
           <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Assignments" Relationship="Self.Module_fk_constrain" FromRole="Module" ToRole="Assignment" />
           <NavigationProperty Name="ProgLanguage" Relationship="Self.Language_fk_constrain" FromRole="Module" ToRole="ProgLanguage" />
+          <NavigationProperty Name="Assignments" Relationship="SPadeModel.Module_fk_constrain" FromRole="Module" ToRole="Assignment" />
         </EntityType>
         <EntityType Name="ProgLanguage">
           <Key>
@@ -564,30 +546,6 @@
             </Principal>
             <Dependent Role="Login">
               <PropertyRef Name="LoginID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="assgn_fk">
-          <End Role="Assignment" Type="Self.Assignment" Multiplicity="1" />
-          <End Role="Class_Assgn" Type="Self.Class_Assgn" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Assignment">
-              <PropertyRef Name="AssgnID" />
-            </Principal>
-            <Dependent Role="Class_Assgn">
-              <PropertyRef Name="AssgnID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="Module_fk_constrain">
-          <End Role="Module" Type="Self.Module" Multiplicity="1" />
-          <End Role="Assignment" Type="Self.Assignment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Module">
-              <PropertyRef Name="ModuleCode" />
-            </Principal>
-            <Dependent Role="Assignment">
-              <PropertyRef Name="ModuleCode" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -689,7 +647,6 @@
         </Association>
         <EntityContainer Name="SPadeEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Admins" EntityType="Self.Admin" />
-          <EntitySet Name="Assignments" EntityType="Self.Assignment" />
           <EntitySet Name="Classes" EntityType="Self.Class" />
           <EntitySet Name="Class_Assgn" EntityType="Self.Class_Assgn" />
           <EntitySet Name="Courses" EntityType="Self.Course" />
@@ -703,14 +660,6 @@
           <AssociationSet Name="adminlogin_fk" Association="Self.adminlogin_fk">
             <End Role="Admin" EntitySet="Admins" />
             <End Role="Login" EntitySet="Logins" />
-          </AssociationSet>
-          <AssociationSet Name="assgn_fk" Association="Self.assgn_fk">
-            <End Role="Assignment" EntitySet="Assignments" />
-            <End Role="Class_Assgn" EntitySet="Class_Assgn" />
-          </AssociationSet>
-          <AssociationSet Name="Module_fk_constrain" Association="Self.Module_fk_constrain">
-            <End Role="Module" EntitySet="Modules" />
-            <End Role="Assignment" EntitySet="Assignments" />
           </AssociationSet>
           <AssociationSet Name="class_fk" Association="Self.class_fk">
             <End Role="Class" EntitySet="Classes" />
@@ -745,15 +694,24 @@
             <End Role="Module" EntitySet="Modules" />
           </AssociationSet>
           <EntitySet Name="Submissions" EntityType="SPadeModel.Submission" />
-          <AssociationSet Name="subassgn_fk" Association="SPadeModel.subassgn_fk">
-            <End Role="Assignment" EntitySet="Assignments" />
-            <End Role="Submission" EntitySet="Submissions" />
-          </AssociationSet>
           <AssociationSet Name="substud_fk" Association="SPadeModel.substud_fk">
             <End Role="Student" EntitySet="Students" />
             <End Role="Submission" EntitySet="Submissions" />
           </AssociationSet>
-        </EntityContainer>
+          <EntitySet Name="Assignments" EntityType="SPadeModel.Assignment" />
+          <AssociationSet Name="assgn_fk" Association="SPadeModel.assgn_fk">
+            <End Role="Assignment" EntitySet="Assignments" />
+            <End Role="Class_Assgn" EntitySet="Class_Assgn" />
+          </AssociationSet>
+          <AssociationSet Name="Module_fk_constrain" Association="SPadeModel.Module_fk_constrain">
+            <End Role="Module" EntitySet="Modules" />
+            <End Role="Assignment" EntitySet="Assignments" />
+          </AssociationSet>
+          <AssociationSet Name="subassgn_fk" Association="SPadeModel.subassgn_fk">
+            <End Role="Assignment" EntitySet="Assignments" />
+            <End Role="Submission" EntitySet="Submissions" />
+          </AssociationSet>
+          </EntityContainer>
         <EntityType Name="Submission">
           <Key>
             <PropertyRef Name="SubmissionID" />
@@ -764,21 +722,9 @@
           <Property Name="Grade" Type="Decimal" Nullable="false" Precision="3" Scale="2" />
           <Property Name="FilePath" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Assignment" Relationship="SPadeModel.subassgn_fk" FromRole="Submission" ToRole="Assignment" />
           <NavigationProperty Name="Student" Relationship="SPadeModel.substud_fk" FromRole="Submission" ToRole="Student" />
+          <NavigationProperty Name="Assignment" Relationship="SPadeModel.subassgn_fk" FromRole="Submission" ToRole="Assignment" />
         </EntityType>
-        <Association Name="subassgn_fk">
-          <End Type="SPadeModel.Assignment" Role="Assignment" Multiplicity="1" />
-          <End Type="SPadeModel.Submission" Role="Submission" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Assignment">
-              <PropertyRef Name="AssgnID" />
-            </Principal>
-            <Dependent Role="Submission">
-              <PropertyRef Name="AssgnID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="substud_fk">
           <End Type="SPadeModel.Student" Role="Student" Multiplicity="1" />
           <End Type="SPadeModel.Submission" Role="Submission" Multiplicity="*" />
@@ -791,7 +737,65 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        <EntityType Name="Assignment">
+          <Key>
+            <PropertyRef Name="AssgnID" />
+          </Key>
+          <Property Name="AssgnID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Describe" Type="String" Nullable="false" MaxLength="5000" FixedLength="false" Unicode="false" />
+          <Property Name="MaxAttempt" Type="Int32" Nullable="false" />
+          <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Solution" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="ModuleCode" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CreateAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreateBy" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedBy" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DeletedAt" Type="DateTime" Precision="3" />
+          <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="AssgnTitle" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Class_Assgn" Relationship="SPadeModel.assgn_fk" FromRole="Assignment" ToRole="Class_Assgn" />
+          <NavigationProperty Name="Module" Relationship="SPadeModel.Module_fk_constrain" FromRole="Assignment" ToRole="Module" />
+          <NavigationProperty Name="Submissions" Relationship="SPadeModel.subassgn_fk" FromRole="Assignment" ToRole="Submission" />
+        </EntityType>
+        <Association Name="assgn_fk">
+          <End Type="SPadeModel.Assignment" Role="Assignment" Multiplicity="1" />
+          <End Type="SPadeModel.Class_Assgn" Role="Class_Assgn" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Assignment">
+              <PropertyRef Name="AssgnID" />
+            </Principal>
+            <Dependent Role="Class_Assgn">
+              <PropertyRef Name="AssgnID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Module_fk_constrain">
+          <End Type="SPadeModel.Module" Role="Module" Multiplicity="1" />
+          <End Type="SPadeModel.Assignment" Role="Assignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Module">
+              <PropertyRef Name="ModuleCode" />
+            </Principal>
+            <Dependent Role="Assignment">
+              <PropertyRef Name="ModuleCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="subassgn_fk">
+          <End Type="SPadeModel.Assignment" Role="Assignment" Multiplicity="1" />
+          <End Type="SPadeModel.Submission" Role="Submission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Assignment">
+              <PropertyRef Name="AssgnID" />
+            </Principal>
+            <Dependent Role="Submission">
+              <PropertyRef Name="AssgnID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -804,24 +808,6 @@
                 <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="FullName" ColumnName="FullName" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Assignments">
-            <EntityTypeMapping TypeName="SPadeModel.Assignment">
-              <MappingFragment StoreEntitySet="Assignment">
-                <ScalarProperty Name="AssgnID" ColumnName="AssgnID" />
-                <ScalarProperty Name="Describe" ColumnName="Describe" />
-                <ScalarProperty Name="MaxAttempt" ColumnName="MaxAttempt" />
-                <ScalarProperty Name="DueDate" ColumnName="DueDate" />
-                <ScalarProperty Name="Solution" ColumnName="Solution" />
-                <ScalarProperty Name="ModuleCode" ColumnName="ModuleCode" />
-                <ScalarProperty Name="CreateAt" ColumnName="CreateAt" />
-                <ScalarProperty Name="CreateBy" ColumnName="CreateBy" />
-                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
-                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
-                <ScalarProperty Name="DeletedAt" ColumnName="DeletedAt" />
-                <ScalarProperty Name="DeletedBy" ColumnName="DeletedBy" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -962,6 +948,26 @@
                 <ScalarProperty Name="AssgnID" ColumnName="AssgnID" />
                 <ScalarProperty Name="AdminNo" ColumnName="AdminNo" />
                 <ScalarProperty Name="SubmissionID" ColumnName="SubmissionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Assignments">
+            <EntityTypeMapping TypeName="SPadeModel.Assignment">
+              <MappingFragment StoreEntitySet="Assignment">
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="AssgnTitle" ColumnName="AssgnTitle" />
+                <ScalarProperty Name="DeletedBy" ColumnName="DeletedBy" />
+                <ScalarProperty Name="DeletedAt" ColumnName="DeletedAt" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="CreateBy" ColumnName="CreateBy" />
+                <ScalarProperty Name="CreateAt" ColumnName="CreateAt" />
+                <ScalarProperty Name="ModuleCode" ColumnName="ModuleCode" />
+                <ScalarProperty Name="Solution" ColumnName="Solution" />
+                <ScalarProperty Name="DueDate" ColumnName="DueDate" />
+                <ScalarProperty Name="MaxAttempt" ColumnName="MaxAttempt" />
+                <ScalarProperty Name="Describe" ColumnName="Describe" />
+                <ScalarProperty Name="AssgnID" ColumnName="AssgnID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

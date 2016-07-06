@@ -82,6 +82,7 @@
                             <tr>
                                 <th>Assignment</th>
                                 <th>Issued By</th>
+                                <th>Start Date</th>
                                 <th>Due Date</th>
                                 <th class="sorter-false">View Assignment</th>
                             </tr>
@@ -95,6 +96,7 @@
                                     <tr>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.AssgnID)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.StartDate)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
                                         <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssgnID)" class="btn btn-primary">View</a></td>
                                     </tr>
@@ -121,6 +123,7 @@
                                 <th>Assignment</th>
                                 <th>Issued by</th>
                                 <th>Due date</th>
+                                <th>Attempts remaining</th>
                                 <th>Submitted on</th>
                                 <th class="sorter-false">View Assignment</th>
                             </tr>
@@ -135,42 +138,12 @@
                                         <td>@Html.DisplayFor(modelItem => item.assignment.AssgnID)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.MaxAttempt)</td>
                                         <td>@Html.DisplayFor(modelItem => item.timestamp)</td>
                                         <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssgnID)" class="btn btn-primary">View</a></td>
                                     </tr>
                                 }
                             }
-
-                            <!-- Sample
-                            <tr>
-                                <td>Java Intro Practical 1</td>
-                                <td>Mr Low</td>
-                                <td>5/5/2016</td>
-                                <td>10/5/2016</td>
-                                <td><a href="CompletedAssignment.aspx" class="btn btn-primary">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>Java Intro Practical 2</td>
-                                <td>Ms Low</td>
-                                <td>6/5/2016</td>
-                                <td>10/5/2016</td>
-                                <td><a href="SubmitAssignment2.aspx" class="btn btn-primary">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>Java Practical 3</td>
-                                <td>Mr Tan</td>
-                                <td>7/5/2016</td>
-                                <td>11/5/2016</td>
-                                <td><a href="SubmitAssignment2.aspx" class="btn btn-primary">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>Java Practical 4</td>
-                                <td>Mr Chong</td>
-                                <td>8/5/2016</td>
-                                <td>12/5/2016</td>
-                                <td><a href="SubmitAssignment2.aspx" class="btn btn-primary">View</a></td>
-                            </tr>
-                                -->
 
                         </tbody>
                     </table>
