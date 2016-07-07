@@ -71,17 +71,43 @@ namespace SPade.Controllers
 
         public ActionResult AddAssignment()
         {
-            return View();
+
+            List<AssignmentClass> ac = new List<AssignmentClass>();
+            AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
+
+            string x = "1431489"; //temp 
+
+            //get the classes managed by the lecturer 
+            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+
+            //get the modules 
+            List<Module> allModules = db.Modules.ToList();
+
+            //we loop through the classList to fill up the assignmentclass -> which is used to populate 
+            foreach (var c in managedClasses)
+            {
+                AssignmentClass a = new AssignmentClass();
+                a.ClassName = c.ClassName;
+                a.ClassId = c.ClassID;
+                a.isSelected = false;
+                ac.Add(a);
+            }
+
+            aaVM.ClassList = ac;
+            aaVM.Modules = allModules;
+
+            return View(aaVM);
         }
 
-        //[HttpPost]
-        //public ActionResult AddAssignment()
-        //{
+        [HttpPost]
+        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn)
+        {
+            //insert data into db 
 
 
 
-        //    return View();
-        //}
+            return View();
+        }
 
         public ActionResult UpdateAssignment()
         {

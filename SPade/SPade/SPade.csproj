@@ -217,7 +217,9 @@
     <Compile Include="ViewModels\Admin\UpdateLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\AddAssignmentViewModel.cs" />
+    <Compile Include="ViewModels\Lecturer\AssignmentClass.cs" />
     <Compile Include="ViewModels\Lecturer\BulkAddStudentViewModel.cs" />
+    <Compile Include="ViewModels\Lecturer\ClassesAndModulesViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ManageAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ManageClassesViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\UpdateAssignmentViewModel.cs" />
