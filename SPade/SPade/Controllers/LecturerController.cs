@@ -15,12 +15,14 @@ namespace SPade.Controllers
         //init the db
         private SPadeModel db = new SPadeModel();
 
+        [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
             return View();
         }
 
+        [Authorize(Roles = "")]
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -49,26 +51,31 @@ namespace SPade.Controllers
 
         }
 
+        [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
+        [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass()
         {
             return View();
         }
 
+        [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
+        [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
         }
 
+        [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
@@ -100,6 +107,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn)
         {
             //insert data into db 
@@ -109,11 +117,13 @@ namespace SPade.Controllers
             return View();
         }
 
+        [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
+        [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             return View();

@@ -94,8 +94,6 @@ namespace SPade.Controllers
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
-
-
         }
 
         //

@@ -19,13 +19,15 @@ namespace SPade.Controllers
         private Grader grader = new Grader();
 
         // GET: Dashboard
+        [Authorize(Roles = "")]
         public ActionResult Dashboard()
         {
             return View();
         }
-
+        
         //POST: SubmitAssignment
         [HttpPost]
+        [Authorize(Roles = "")]
         public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
             Submission submission = new Submission();
@@ -68,6 +70,7 @@ namespace SPade.Controllers
         }//end of submit assignment
 
         // GET: SubmitAssignment
+        [Authorize(Roles = "")]
         public ActionResult SubmitAssignment(int id)
         {
             List<Assignment> pass = new List<Assignment>();
@@ -83,6 +86,7 @@ namespace SPade.Controllers
         }
 
         // GET: ViewAssignment
+        [Authorize(Roles = "")]
         public ActionResult ViewAssignment()
         {
             List<ViewAssignmentViewModel> vm = new List<ViewAssignmentViewModel>();
@@ -116,12 +120,14 @@ namespace SPade.Controllers
         }
 
         // GET: ViewResult
+        [Authorize(Roles = "")]
         public ActionResult ViewResult()
         {
             return View();
         }
 
         // GET: PostSubmission
+        [Authorize(Roles = "")]
         public ActionResult PostSubmission()
         {
             return View(Session["Submission"]);
