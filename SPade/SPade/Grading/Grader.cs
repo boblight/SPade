@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Text;
 using System.IO;
+using System.Xml;
 
 namespace SPade.Grading
 {
@@ -12,9 +13,10 @@ namespace SPade.Grading
     {
         private string ans, error, subOut, solOut;
         private string[] output;
-        private int exitcode;
+        private int exitcode, testCaseFailed, noOfTestCase;
         private ProcessStartInfo procInfo;
         private Process proc;
+        private List<object> testcases = new List<object>();
 
         public Grader()
         {
@@ -34,19 +36,46 @@ namespace SPade.Grading
 
             proc = Process.Start(procInfo);
 
-            /*
+            //read test cases
+            using (XmlReader reader = XmlReader.Create(HttpContext.Current.Server.MapPath(@"C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/App_Data/TestCase/" + assgnId + "testcase.xml")))
+            {
+                while (reader.Read())
+                {
+                    if (reader.Name == "input")
+                    {
+                        testcases.Add(reader.ReadString());
+                    }
+                }
+            }//end of xml reader
+
             System.IO.StreamWriter sw = proc.StandardInput;
-            sw.WriteLine(5);
-            sw.Flush();
-            sw.WriteLine(5);
-            sw.Flush();
+            foreach (object testcase in testcases)
+            {
+                noOfTestCase++;
+
+                if (testcase != null)
+                {
+                    try
+                    {
+                        sw.WriteLine(testcase);
+                    }
+                    catch (Exception e)
+                    {
+                        testCaseFailed++;
+                        break;
+                    }
+                    finally
+                    {
+                        sw.Flush();
+                    }
+                }
+            }//end of input
+
             sw.Close();
-            */
 
             proc.WaitForExit();
 
             //read output and error
-            //ans = proc.StandardOutput.ReadToEnd();
             error = proc.StandardError.ReadToEnd();
             exitcode = proc.ExitCode; //0 means success 1 means failure
 
@@ -60,7 +89,7 @@ namespace SPade.Grading
             //get the output from solution
             output = File.ReadAllLines(HttpContext.Current.Server.MapPath(@"~/App_Data/Solutions/" + assgnId + "solution.txt"));
 
-            foreach(string s in output)
+            foreach (string s in output)
             {
                 solOut += s;
             }
