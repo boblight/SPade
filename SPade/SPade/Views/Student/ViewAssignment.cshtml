@@ -94,11 +94,11 @@
                                 if (item.submitted == false)
                                 {
                                     <tr>
-                                        <td>@Html.DisplayFor(modelItem => item.assignment.AssgnID)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.AssignmentID)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.StartDate)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
-                                        <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssgnID)" class="btn btn-primary">View</a></td>
+                                        <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssignmentID)" class="btn btn-primary">View</a></td>
                                     </tr>
                                 }
                             }
@@ -135,12 +135,12 @@
                                 if (item.submitted == true)
                                 {
                                     <tr>
-                                        <td>@Html.DisplayFor(modelItem => item.assignment.AssgnID)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.AssignmentID)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.MaxAttempt)</td>
                                         <td>@Html.DisplayFor(modelItem => item.timestamp)</td>
-                                        <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssgnID)" class="btn btn-primary">View</a></td>
+                                        <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssignmentID)" class="btn btn-primary">View</a></td>
                                     </tr>
                                 }
                             }

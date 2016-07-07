@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using SPade.Models;
+using SPade.Models.DAL;
 using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SPadeModel db = new SPadeModel();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
         public AccountController()
         {
@@ -80,7 +81,7 @@ namespace SPade.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -144,11 +145,10 @@ namespace SPade.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            //List<Class> classList = db.Classes.ToList();
-            //RegViewModel rVM = new RegViewModel();
-            //rVM.classList = classList;
-            //return View(rVM);
-            return View();
+            List<Class> classList = db.Classes.ToList();
+            RegisterViewModel rVM = new RegisterViewModel();
+            rVM.classList = classList;
+            return View(rVM);
         }
 
         //
@@ -160,7 +160,7 @@ namespace SPade.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

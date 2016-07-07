@@ -181,27 +181,8 @@
     <Compile Include="Grading\Grader.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\Admin.cs" />
-    <Compile Include="Models\AspNetRole.cs" />
-    <Compile Include="Models\AspNetUser.cs" />
-    <Compile Include="Models\AspNetUserClaim.cs" />
-    <Compile Include="Models\AspNetUserLogin.cs" />
-    <Compile Include="Models\Assignment.cs" />
-    <Compile Include="Models\Class.cs" />
-    <Compile Include="Models\Class_Assgn.cs" />
-    <Compile Include="Models\Course.cs" />
-    <Compile Include="Models\C__MigrationHistory.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\Lecturer.cs" />
-    <Compile Include="Models\Lec_Class.cs" />
-    <Compile Include="Models\Login.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\Module.cs" />
-    <Compile Include="Models\ProgLanguage.cs" />
-    <Compile Include="Models\Role.cs" />
-    <Compile Include="Models\SPadeModel.cs" />
-    <Compile Include="Models\Student.cs" />
-    <Compile Include="Models\Submission.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModels\Accounts\RegViewModel.cs" />
@@ -272,15 +253,6 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -334,6 +306,13 @@
     <Content Include="Views\Admin\UpdateLecturer.cshtml" />
     <Content Include="Views\Admin\UpdateStudent.cshtml" />
     <Content Include="Views\Student\PostSubmission.cshtml" />
+    <Content Include="Web.Config" />
+    <None Include="Web.Debug.Config">
+      <DependentUpon>Web.Config</DependentUpon>
+    </None>
+    <None Include="Web.Release.Config">
+      <DependentUpon>Web.Config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Submissions\" />
@@ -341,6 +320,7 @@
     <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
+    <Folder Include="Models\DAL\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
