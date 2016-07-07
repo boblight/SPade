@@ -8,8 +8,8 @@ namespace SPade.ViewModels.Lecturer
 {
     public class AddAssignmentViewModel : Assignment
     {
-        public List<Class> ClassList { get; set; }
+        public List<AssignmentClass> ClassList { get; set; }
         public List<Module> Modules { get; set; }
-
+        public string ModuleId { get; set; }
     }
 }

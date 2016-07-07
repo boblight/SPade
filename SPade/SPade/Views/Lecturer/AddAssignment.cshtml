@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Styles.Render("~/Scripts/daterangepicker.js");
+@Scripts.Render("~/bundles/daterangescripts")
 
 @using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post))
 {
@@ -30,26 +30,18 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label>Assignment Name</label>
-
-                        <input type="text" class="form-control" />
-
+                        @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control" })
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div>
                         <label></label>
-                        <select class="form-control">
-                            <!--This part is for the modules-->
-                            @{
-                                foreach (var item in Model.Modules)
-                                {
-                                    <option>
-                                        @Html.DisplayName(item.ModuleCode + " " + item.ModuleName)
-                                    </option>
-                                }
-                            }
-                        </select>
+
+                        @{
+                            @Html.DropDownListFor(c => Model.ModuleId, new SelectList(Model.Modules, "ModuleCode", "ModuleName"), new { @class = "form-control" })
+                        }
+
                     </div>
                 </div>
 
@@ -79,13 +71,32 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="daterange">Select start and end date</label>
-                        <input type="text" class="form-control" name="daterange" value="" />
+                        <!--<input type="text" class="form-control" name="daterange" value="" />-->
+                        @Html.TextBox("daterange", "", new { @class = "form-control" })
+                        @Html.HiddenFor(m => Model.StartDate)
+                        @Html.HiddenFor(m => Model.DueDate)
 
                         <script type="text/javascript">
                             $(function () {
                                 $('input[name="daterange"]').daterangepicker();
                             });
+
+                            var range = $("#daterange").data("daterangepicker");
+
+                            $("#daterange").on('apply.daterangepicker', function (ev, picker) {
+
+                                console.log(picker.startDate.format('YYYY-MM-DD'));
+                                console.log(picker.endDate.format('YYYY-MM-DD'));
+
+                                var sd = picker.startDate.format('YYYY-MM-DD');
+                                var ed = picker.endDate.format('YYYY-MM-DD')
+
+                                $('#StartDate').val(sd)
+                                $('#DueDate').val(ed)
+
+                            })
                         </script>
+
                     </div>
                 </div>
 
@@ -103,7 +114,7 @@
                         <label class="control-label">
                             Select maximum attempts allowed
                         </label>
-                        <input type="number" class="form-control" min="0" id="maxAttempt" />
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @type = "number" })
                     </div>
                 </div>
 
@@ -117,17 +128,14 @@
                             </div>
 
                             <div class="modal-body">
-
                                 @{
-                                    foreach (var x in Model.ClassList)
+                                    for (var i = 0; i < Model.ClassList.Count(); i++)
                                     {
-                                        <div>
-                                            <input type="checkbox" />
-                                            @Html.DisplayName(x.ClassName)
-                                        </div>
+                                        @Html.HiddenFor(m => Model.ClassList[i].ClassId)
+                                        @Html.CheckBoxFor(m => Model.ClassList[i].isSelected)
+                                        @Model.ClassList[i].ClassName
                                     }
                                 }
-
                             </div>
 
                             <div class="modal-footer">
@@ -138,18 +146,16 @@
                 </div>
 
                 <script>
-
                     $("#classSelect").click(function () {
 
                         $("#classModal").modal("show");
 
                     })
-
                 </script>
 
                 <div class="form-group">
                     <div class="col-md-12">
-                        <a href="ManageAssignments" class="btn btn-primary">Submit</a>
+                        <input type="submit" value="Submit" class="btn btn-primary" />
                         <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                     </div>
                 </div>

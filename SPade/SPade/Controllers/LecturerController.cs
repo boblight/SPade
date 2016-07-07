@@ -71,9 +71,8 @@ namespace SPade.Controllers
 
         public ActionResult AddAssignment()
         {
-            //get the classes that the lecturer who is currently logged in manages 
 
-            List<ClassesAndModulesViewModel> cm = new List<ClassesAndModulesViewModel>();
+            List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
             string x = "1431489"; //temp 
@@ -84,7 +83,17 @@ namespace SPade.Controllers
             //get the modules 
             List<Module> allModules = db.Modules.ToList();
 
-            aaVM.ClassList = managedClasses;
+            //we loop through the classList to fill up the assignmentclass -> which is used to populate 
+            foreach (var c in managedClasses)
+            {
+                AssignmentClass a = new AssignmentClass();
+                a.ClassName = c.ClassName;
+                a.ClassId = c.ClassID;
+                a.isSelected = false;
+                ac.Add(a);
+            }
+
+            aaVM.ClassList = ac;
             aaVM.Modules = allModules;
 
             return View(aaVM);
