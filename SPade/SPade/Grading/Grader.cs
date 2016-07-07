@@ -10,7 +10,8 @@ namespace SPade.Grading
 {
     public class Grader
     {
-        private string ans, error, output;
+        private string ans, error, subOut, solOut;
+        private string[] output;
         private int exitcode;
         private ProcessStartInfo procInfo;
         private Process proc;
@@ -22,7 +23,7 @@ namespace SPade.Grading
 
         public double grade(string filePath, int assgnId)
         {
-            procInfo = new ProcessStartInfo("java.exe", "-jar " + HttpContext.Current.Server.MapPath(@filePath));
+            procInfo = new ProcessStartInfo("java.exe", "-jar " + HttpContext.Current.Server.MapPath(@"~/App_Data/Submissions/" + filePath));
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -45,16 +46,28 @@ namespace SPade.Grading
             proc.WaitForExit();
 
             //read output and error
-            ans = proc.StandardOutput.ReadToEnd();
+            //ans = proc.StandardOutput.ReadToEnd();
             error = proc.StandardError.ReadToEnd();
             exitcode = proc.ExitCode; //0 means success 1 means failure
 
-            //get the output
-            output = File.ReadAllText(HttpContext.Current.Server.MapPath(@"~/App_Data/Solutions/" + assgnId + "solution.txt"));
+            //get output from submission
+            do
+            {
+                subOut = proc.StandardOutput.ReadLine();
+                ans += subOut;
+            } while (subOut != null);
+
+            //get the output from solution
+            output = File.ReadAllLines(HttpContext.Current.Server.MapPath(@"~/App_Data/Solutions/" + assgnId + "solution.txt"));
+
+            foreach(string s in output)
+            {
+                solOut += s;
+            }
 
             if (exitcode == 0)
             {
-                if (ans.Equals(output))
+                if (ans.Equals(solOut))
                 {
                     return 1;
                 }
@@ -63,10 +76,9 @@ namespace SPade.Grading
                     return 0;
                 }
             }
-            else
+            else //means fail
             {
-                //return error.ToString();
-                return 2;
+                return 2; //debug
             }
         }//end of grade method
 

@@ -6,7 +6,6 @@
     <edmx:Diagrams>
       <Diagram DiagramId="2c281979a21b44799e9613e87c094938" Name="Diagram1">
         <EntityTypeShape EntityType="SPadeModel.Admin" Width="1.5" PointX="0.75" PointY="8" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeModel.Assignment" Width="1.5" PointX="3.75" PointY="11.25" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Class" Width="1.5" PointX="5.75" PointY="20.25" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Class_Assgn" Width="1.5" PointX="8" PointY="16.375" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Course" Width="1.5" PointX="3.5" PointY="20.375" IsExpanded="true" />
@@ -17,11 +16,7 @@
         <EntityTypeShape EntityType="SPadeModel.ProgLanguage" Width="1.5" PointX="1.5" PointY="15.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Role" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeModel.Student" Width="1.5" PointX="0.75" PointY="3.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeModel.Submission" Width="1.5" PointX="6" PointY="3.875" IsExpanded="true" />
         <AssociationConnector Association="SPadeModel.adminlogin_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeModel.assgn_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeModel.Module_fk_constrain" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeModel.subassgn_fk" ManuallyRouted="false" />
         <AssociationConnector Association="SPadeModel.class_fk" ManuallyRouted="false" />
         <AssociationConnector Association="SPadeModel.class_fk2" ManuallyRouted="false" />
         <AssociationConnector Association="SPadeModel.classcrse_fk" ManuallyRouted="false" />
@@ -30,8 +25,13 @@
         <AssociationConnector Association="SPadeModel.loginrole_fk" ManuallyRouted="false" />
         <AssociationConnector Association="SPadeModel.studlogin_fk" ManuallyRouted="false" />
         <AssociationConnector Association="SPadeModel.Language_fk_constrain" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeModel.substud_fk" ManuallyRouted="false" />
-      </Diagram>
+        <EntityTypeShape EntityType="SPadeModel.Submission" Width="1.5" PointX="8" PointY="5" />
+        <AssociationConnector Association="SPadeModel.substud_fk" />
+        <EntityTypeShape EntityType="SPadeModel.Assignment" Width="1.5" PointX="3.75" PointY="13" />
+        <AssociationConnector Association="SPadeModel.assgn_fk" />
+        <AssociationConnector Association="SPadeModel.Module_fk_constrain" />
+        <AssociationConnector Association="SPadeModel.subassgn_fk" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

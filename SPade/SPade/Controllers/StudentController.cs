@@ -9,6 +9,7 @@ using SPade.ViewModels.Student;
 using System.Threading.Tasks;
 using System.IO;
 using SPade.Grading;
+using System.Diagnostics;
 
 namespace SPade.Controllers
 {
@@ -28,52 +29,55 @@ namespace SPade.Controllers
         public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
             Submission submission = new Submission();
+            int assgnId = (int)Session["id"];
+            Assignment assignment = db.Assignments.ToList().Find(a => a.AssgnID == assgnId);
 
             //getting file path
             if (file.ContentLength > 0)
             {
                 var fileName = Path.GetFileName(file.FileName);
-                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName);
+                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + "solution.jar");
                 System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
                 fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
                 file.SaveAs(filePath);
 
                 //grading hardcoded assignment id to be changed
-                Decimal temp = Decimal.Parse(grader.grade("~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + fileName, 1).ToString());
-                if (temp != 2)
+                Decimal result = Decimal.Parse(grader.grade("14314761solution.jar", 1).ToString());
+                if (result != 2)
                 {
-                    submission.Grade =
-                    submission.AssgnID = int.Parse(Session["id"].ToString());
+                    submission.Grade = result;
+                    submission.AssgnID = assgnId;
                     submission.AdminNo = "1431476";
                     submission.FilePath = filePath.ToString();
                     submission.Timestamp = DateTime.Now;
-                } else if (temp == 2)
+                }
+                else if (result == 2)
                 {
+                    //if error
                     return Redirect("/Student/ViewAssignment");
                 }
             }
 
             db.Submissions.Add(submission);
+            assignment.MaxAttempt -= 1; //updating the max attempt
+            db.SaveChanges();
+
+            Session["submission"] = submission;
 
             return RedirectToAction("PostSubmission");
-        }
+        }//end of submit assignment
 
         // GET: SubmitAssignment
         public ActionResult SubmitAssignment(int id)
         {
+            List<Assignment> pass = new List<Assignment>();
+            SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
+            Assignment assignment = db.Assignments.ToList().Find(a => a.AssgnID == id);
+
             //start a session to check which assignment student is viewing
             Session["id"] = id;
 
-            List<Assignment> pass = new List<Assignment>();
-            SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
-            Assignment ass = db.Assignments.ToList().Find(a => a.AssgnID == id);
-
-            svm.AssgnID = ass.AssgnID;
-            svm.Describe = ass.Describe;
-            svm.DueDate = ass.DueDate;
-            svm.CreateBy = ass.CreateBy;
-            svm.ModuleCode = ass.ModuleCode;
-            svm.MaxAttempt = ass.MaxAttempt;
+            svm.assignment = assignment;
 
             return View(svm);
         }
@@ -81,17 +85,34 @@ namespace SPade.Controllers
         // GET: ViewAssignment
         public ActionResult ViewAssignment()
         {
+            List<ViewAssignmentViewModel> vm = new List<ViewAssignmentViewModel>();
             List<Assignment> assignments = new List<Assignment>();
 
             //to replace hardcoded classid with sessions values
             List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == 1);
 
             foreach (Class_Assgn i in ca)
-            {
+            { 
                 assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssgnID == i.AssgnID);
-            }
 
-            return View(assignments);
+                foreach(Assignment a in assignments)
+                {
+                    ViewAssignmentViewModel v = new ViewAssignmentViewModel();
+                    v.assignment = a;
+                    //check if the assignment has been attempted before
+                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == "1431476" && s.AssgnID == a.AssgnID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
+                    {
+                        v.timestamp = db.Submissions.ToList().Find(s => s.AssgnID == a.AssgnID).Timestamp;
+                        v.submitted = true;
+                    }
+                    else
+                    {
+                        v.submitted = false;
+                    }
+                    vm.Add(v);
+                }
+            }
+            return View(vm);
         }
 
         // GET: ViewResult
@@ -103,9 +124,7 @@ namespace SPade.Controllers
         // GET: PostSubmission
         public ActionResult PostSubmission()
         {
-            Submission submission = db.Submissions.ToList().Find(s => s.AssgnID == int.Parse(Session["id"].ToString()));
-
-            return View(submission);
+            return View(Session["Submission"]);
         }
     }//end of controller
 }
