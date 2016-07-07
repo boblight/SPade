@@ -6,23 +6,21 @@ namespace SPade.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Role")]
-    public partial class Role
+    public partial class AspNetRole
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Role()
+        public AspNetRole()
         {
-            Logins = new HashSet<Login>();
+            AspNetUsers = new HashSet<AspNetUser>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int RoleID { get; set; }
+        public string Id { get; set; }
 
         [Required]
-        [StringLength(20)]
-        public string RoleName { get; set; }
+        [StringLength(256)]
+        public string Name { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Login> Logins { get; set; }
+        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeModel db = new SPadeModel();
 
         public AccountController()
         {
@@ -146,10 +146,11 @@ namespace SPade.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            List<Class> classList = db.Classes.ToList();
-            RegViewModel rVM = new RegViewModel();
-            rVM.classList = classList;
-            return View(rVM);
+            //List<Class> classList = db.Classes.ToList();
+            //RegViewModel rVM = new RegViewModel();
+            //rVM.classList = classList;
+            //return View(rVM);
+            return View();
         }
 
         //
@@ -161,7 +162,7 @@ namespace SPade.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.PersonalID, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

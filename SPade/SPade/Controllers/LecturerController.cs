@@ -13,7 +13,7 @@ namespace SPade.Controllers
     public class LecturerController : Controller
     {
         //init the db
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeModel db = new SPadeModel();
 
         // GET: Lecturer
         public ActionResult Dashboard()

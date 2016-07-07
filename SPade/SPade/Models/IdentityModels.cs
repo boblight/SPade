@@ -22,7 +22,7 @@ namespace SPade.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("SPadeModel", throwIfV1Schema: false)
         {
         }
 

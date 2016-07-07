@@ -80,10 +80,11 @@ namespace SPade.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
+        /*
         public string PersonalID { get; set; }
         public string FullName { get; set; }
         public int ContactNo { get; set; }
-        public int? ClassID { get; set; }
+        public int? ClassID { get; set; }*/
     }
 
     public class ResetPasswordViewModel

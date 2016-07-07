@@ -23,7 +23,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="Password">Password</label>
             <div class="col-md-10">
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control", @required="required" })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", @required = "required" })
                 <span class="help-block">@Html.ValidationMessage("Password", new { @class = "text-danger" })</span>
             </div>
         </div>
@@ -36,32 +36,33 @@
             </div>
         </div>
 
+        <!--
         <h3 class="page-header">Info</h3>
 
         <div class="form-group">
             <label class="col-md-2 control-label" for="AdminNo">Admin No.</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.AdminNo, new { @class = "form-control" })
+                @@Html.TextBoxFor(m => m.AdminNo, new { @@class = "form-control" })
                 <span class="help-block">With 'p' (e.g. p123456)</span>
-                <span class="help-block">@Html.ValidationMessage("AdminNo", new { @class = "text-danger" })</span>
+                <span class="help-block">@@Html.ValidationMessage("AdminNo", new { @@class = "text-danger" })</span>
             </div>
         </div>
 
         <div class="form-group">
             <label class="col-md-2 control-label" for="Name">Full Name</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                @@Html.TextBoxFor(m => m.Name, new { @@class = "form-control" })
                 <span class="help-block">As stated in Student Card</span>
-                <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
+                <span class="help-block">@@Html.ValidationMessage("Name", new { @@class = "text-danger" })</span>
             </div>
         </div>
 
         <div class="form-group">
             <label class="col-md-2 control-label" for="ContactNo">Contact Number</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control", @Value = (Model.ContactNo > 0 ? Model.ContactNo.ToString() : string.Empty) })
+                @@Html.TextBoxFor(m => m.ContactNo, new { @@class = "form-control", @@Value = (Model.ContactNo > 0 ? Model.ContactNo.ToString() : string.Empty) })
                 <span class="help-block">For emergency contact</span>
-                <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+                <span class="help-block">@@Html.ValidationMessage("ContactNo", new { @@class = "text-danger" })</span>
             </div>
         </div>
 
@@ -71,12 +72,12 @@
 
                 <select class="form-control">
 
-                    @{
+                    @@{
                         foreach (var m in Model.classList)
                         {
 
-                            <option value="@Html.DisplayFor(modelitem => m.ClassID)" >
-                                @Html.DisplayFor(modelitem => m.ClassName)
+                            <option value="@@Html.DisplayFor(modelitem => m.ClassID)" >
+                                @@Html.DisplayFor(modelitem => m.ClassName)
                             </option>
 
                         }
@@ -86,13 +87,13 @@
 
             </div>
         </div>
-
+            -->
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" class="btn btn-primary" value="Register" />
             </div>
         </div>
-                        }
+    }
 </div>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

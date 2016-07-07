@@ -15,7 +15,7 @@ namespace SPade.Controllers
 {
     public class StudentController : Controller
     {
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeModel db = new SPadeModel();
         private Grader grader = new Grader();
 
         // GET: Dashboard
