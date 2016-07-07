@@ -7,5 +7,11 @@ namespace SPade.ViewModels.Admin
 {
     public class AddStudentViewModel
     {
+
+        public string AdminNo { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public int ContactNo { get; set; }
+
     }
 }

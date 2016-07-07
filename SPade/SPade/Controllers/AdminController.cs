@@ -3,6 +3,7 @@ using SPade.ViewModels.Admin;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -12,8 +13,7 @@ namespace SPade.Controllers
     public class AdminController : Controller
     {
 
-        private SPadeEntities db = new SPadeEntities();
-        
+
 
         // GET: Admin
         public ActionResult Dashboard()
@@ -31,31 +31,66 @@ namespace SPade.Controllers
             return View();
         }
 
+
+        [HttpPost]
+        public ActionResult AddOneStudent(AddStudentViewModel model)
+        {
+
+
+
+
+            try
+            {
+
+                var db = new SPadeEntities();
+                var student = new Student()
+                {
+                    AdminNo = model.AdminNo,
+                    Name = model.Name,
+                    Email = model.Email,
+                    ContactNo = model.ContactNo,
+                    ClassID = '1',
+                    CreatedBy = "Admin",
+                    UpdatedBy = "Admin",
+                    DeletedBy = "Admin",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    DeletedAt = DateTime.Now
+
+
+
+                };
+
+                db.Students.Add(student);
+                db.SaveChanges();
+            }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                throw;
+
+            }
+            return View(model);
+
+        }
+
         public ActionResult AddOneStudent()
         {
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult AddOneClass([Bind(Include = "CourseID, ClassName")]Class class1)
+        public ActionResult AddOneClass()
         {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    db.Classes.Add(class1);
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-            }
-
-            catch (DataException /* dex */)
-            {
-                //Log the error (uncomment dex variable name and add a line here to write a log.
-                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
-            }
-            return View(class1);
+            return View();
         }
 
         public ActionResult AddOneLecturer()
