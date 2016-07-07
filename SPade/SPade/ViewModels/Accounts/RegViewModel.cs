@@ -10,8 +10,6 @@ namespace SPade.ViewModels.Accounts
     {
         public List<Class> classList{ get; set; }
 
-        public int MyProperty { get; set; }
-
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
     }
