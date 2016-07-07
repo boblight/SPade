@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using SPade.Models;
+using SPade.Models.DAL;
 using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SPadeModel db = new SPadeModel();
+        private Entities db = new Entities();
 
         public AccountController()
         {
@@ -144,11 +145,10 @@ namespace SPade.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            //List<Class> classList = db.Classes.ToList();
-            //RegViewModel rVM = new RegViewModel();
-            //rVM.classList = classList;
-            //return View(rVM);
-            return View();
+            List<Class> classList = db.Classes.ToList();
+            RegViewModel rVM = new RegViewModel();
+            rVM.classList = classList;
+            return View(rVM);
         }
 
         //
