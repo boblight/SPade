@@ -181,6 +181,69 @@
     <Compile Include="Grading\Grader.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\DAL\Admin.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\AspNetRole.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\AspNetUser.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\AspNetUserClaim.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\AspNetUserLogin.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Assignment.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Class.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Class_Assgn.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Course.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\C__MigrationHistory.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Lecturer.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Lec_Class.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Module.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\ProgLanguage.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\SPadeModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SPadeModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\SPadeModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\SPadeModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Student.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Submission.cs">
+      <DependentUpon>SPadeModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -226,12 +289,29 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Models\DAL\SPadeModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\DAL\SPadeModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeModel.cs</LastGenOutput>
+    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <EntityDeploy Include="Models\DAL\SPadeModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>SPadeModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\DAL\SPadeModel.edmx.diagram">
+      <DependentUpon>SPadeModel.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
     <Content Include="Scripts\indexscript.js" />
@@ -320,7 +400,6 @@
     <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
-    <Folder Include="Models\DAL\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
