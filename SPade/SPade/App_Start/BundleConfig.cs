@@ -40,16 +40,15 @@ namespace SPade
 
             bundles.Add(new ScriptBundle("~/bundles/script").Include(
                         "~/Scripts/jquery-1.10.2.min.js",
-                        "~/Scripts/bootstrap.min.js",
+                        "~/Scripts/bootstrap.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/daterangescripts").Include(
                         "~/Scripts/moment.min.js",
                         "~/Scripts/daterangepicker.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/tablescript").Include(
                     "~/Scripts/jquery.tablesorter.combined.js",
-                    "~/Scripts/initializetablesorter.js"//,
-                    //"~/Scripts/jquery.tablesorter.min.js",
-                    //"~/Scripts/jquery.tablesorter.widgets.js", //extra features for tablesorter
-            ));
+                    "~/Scripts/initializetablesorter.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/tablestyle").Include(
                       "~/Content/theme.bootstrap.css" //css for tablesorter

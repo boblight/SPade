@@ -239,6 +239,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\Accounts\RegViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddClassViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddLecturerViewMode.cs" />
     <Compile Include="ViewModels\Admin\AddStudentViewModel.cs" />
@@ -251,7 +252,9 @@
     <Compile Include="ViewModels\Admin\UpdateLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\AddAssignmentViewModel.cs" />
+    <Compile Include="ViewModels\Lecturer\AssignmentClass.cs" />
     <Compile Include="ViewModels\Lecturer\BulkAddStudentViewModel.cs" />
+    <Compile Include="ViewModels\Lecturer\ClassesAndModulesViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ManageAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ManageClassesViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\UpdateAssignmentViewModel.cs" />

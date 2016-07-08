@@ -11,7 +11,7 @@ namespace SPade.Models
 {
     using System;
     using System.Collections.Generic;
-    
+
     public partial class Assignment
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -20,10 +20,12 @@ namespace SPade.Models
             this.Class_Assgn = new HashSet<Class_Assgn>();
             this.Submissions = new HashSet<Submission>();
         }
-    
+
         public int AssgnID { get; set; }
+        public string AssgnTitle { get; set; }
         public string Describe { get; set; }
         public int MaxAttempt { get; set; }
+        public System.DateTime StartDate { get; set; }
         public System.DateTime DueDate { get; set; }
         public string Solution { get; set; }
         public string ModuleCode { get; set; }
@@ -33,9 +35,7 @@ namespace SPade.Models
         public string UpdatedBy { get; set; }
         public Nullable<System.DateTime> DeletedAt { get; set; }
         public string DeletedBy { get; set; }
-        public string AssgnTitle { get; set; }
-        public System.DateTime StartDate { get; set; }
-    
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Class_Assgn> Class_Assgn { get; set; }
         public virtual Module Module { get; set; }

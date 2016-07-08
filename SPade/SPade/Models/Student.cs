@@ -11,7 +11,7 @@ namespace SPade.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
     public partial class Student
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -19,11 +19,26 @@ namespace SPade.Models
         {
             this.Submissions = new HashSet<Submission>();
         }
-    
+
+        [Required]
+        [MinLength(7, ErrorMessage = "The field Admin No. must be 7 characters in length.")]
+        [MaxLength(7, ErrorMessage = "The field Admin No. must be 7 characters in length.")]
+        [Display(Name = "Admin No.")]
         public string AdminNo { get; set; }
+        [Required]
+        [StringLength(50)]
+        [Display(Name = "Full Name")]
         public string Name { get; set; }
+        [Required]
+        [EmailAddress]
+        [StringLength(50)]
         public string Email { get; set; }
+        [Required]
+        [Phone]
+        [Display(Name = "Contact Number")]
         public int ContactNo { get; set; }
+        [Required]
+        [StringLength(8)]
         public int ClassID { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
@@ -31,7 +46,7 @@ namespace SPade.Models
         public string UpdatedBy { get; set; }
         public Nullable<System.DateTime> DeletedAt { get; set; }
         public string DeletedBy { get; set; }
-    
+
         public virtual Login Login { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Submission> Submissions { get; set; }
