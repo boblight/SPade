@@ -117,7 +117,12 @@ namespace SPade.Controllers
             {
                 if (file != null && file.ContentLength > 0)
                 {
-                    file.SaveAs(Path.Combine(Server.MapPath("/App_Data/Temp"), Guid.NewGuid() + Path.GetExtension(file.FileName)));
+                    string filePath = file.FileName;
+                    string ext = Path.GetExtension(filePath);
+
+
+
+                    //file.SaveAs(Path.Combine(Server.MapPath("/App_Data/Temp"), Guid.NewGuid() + Path.GetExtension(file.FileName)));
                 }
 
 
