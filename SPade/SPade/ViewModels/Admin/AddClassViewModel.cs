@@ -9,7 +9,8 @@ namespace SPade.ViewModels.Admin
     public class AddClassViewModel
     {
 
-        public int Id { get; set; }
+        public int ClassID { get; set; }
+        public int CourseID { get; set; }
         public string ClassName { get; set; }
 
     }

@@ -35,10 +35,6 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult AddOneStudent(AddStudentViewModel model)
         {
-
-
-
-
             try
             {
 
@@ -56,8 +52,6 @@ namespace SPade.Controllers
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     DeletedAt = DateTime.Now
-
-
 
                 };
 
@@ -86,6 +80,48 @@ namespace SPade.Controllers
         public ActionResult AddOneStudent()
         {
             return View();
+        }
+
+
+        [HttpPost]
+        public ActionResult AddOneClass(AddClassViewModel model)
+        {
+            try
+            {
+
+                var db = new SPadeEntities();
+                var class1 = new Class()
+                {
+                    ClassName = model.ClassName,
+                    CourseID = 1,            
+                    CreatedBy = "Admin",
+                    UpdatedBy = "Admin",
+                    DeletedBy = "Admin",                   
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    DeletedAt = DateTime.Now
+
+                };
+
+                db.Classes.Add(class1);
+                db.SaveChanges();
+            }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                throw;
+
+            }
+            return View(model);
         }
 
         public ActionResult AddOneClass()
