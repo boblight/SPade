@@ -15,7 +15,7 @@ namespace SPade.Controllers
         //init the db
         private Entities db = new Entities();
 
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
@@ -51,31 +51,31 @@ namespace SPade.Controllers
 
         }
 
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass()
         {
             return View();
         }
 
-      //  [Authorize(Roles = "")]
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
-     //   [Authorize(Roles = "")]
+        //   [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
         }
 
-     //   [Authorize(Roles = "")]
+        //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
@@ -107,23 +107,30 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-      //  [Authorize(Roles = "")]
-        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn)
+        //  [Authorize(Roles = "")]
+        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
             //insert data into db 
 
+            foreach (var file in fileList)
+            {
 
+                if (file.ContentType == ".xml")
+                {
+                    Console.Write("ayy lmao");
+                }
 
+            }
             return View();
         }
 
-      //  [Authorize(Roles = "")]
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
-    //    [Authorize(Roles = "")]
+        //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             return View();
