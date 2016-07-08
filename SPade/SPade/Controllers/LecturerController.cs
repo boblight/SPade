@@ -28,7 +28,7 @@ namespace SPade.Controllers
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
             ManageClassesViewModel e = new ManageClassesViewModel();
 
-            string x = "1431489"; //temp 
+            string x = "s1431489"; //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -126,7 +126,45 @@ namespace SPade.Controllers
     //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
-            return View();
+            List<ViewResultsViewModel> viewResultsView = new List<ViewResultsViewModel>();
+            
+            string loggedInLecturer = "s1431489"; //temp 
+
+            int inAssignment = 1;
+            int inClass = 1;
+
+            //get the classes managed by the lecturer 
+            //List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+
+            //assignment
+
+            List<Submission> submissions = db.Submissions.ToList();
+
+            //get the students in that classs
+            foreach (Submission s in submissions)
+            {
+                if (s.AssignmentID==inAssignment)
+                {
+                    //not done yet
+                    var temp = db.Students.Where(u => u.AdminNo == s.AdminNo).Select(u => new {u.Name, u.ClassID}).FirstOrDefault();
+
+                    if (temp.ClassID == inClass)
+                    {
+
+                        ViewResultsViewModel v = new ViewResultsViewModel();
+
+                        v.Id = s.AdminNo.ToString().ToUpper();
+                        v.Name = temp.Name;
+                        v.Result = (double)s.Grade * 100 + "%";
+                        v.Solution = "test";
+
+                        viewResultsView.Add(v);
+                    }
+                }
+
+            }
+
+            return View(viewResultsView);
         }
 
     }//end of controller
