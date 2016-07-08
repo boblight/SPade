@@ -22,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private Entities db = new Entities();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
         public AccountController()
         {
@@ -110,7 +110,6 @@ namespace SPade.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
         // POST: /Account/VerifyCode
         [HttpPost]
         [AllowAnonymous]
