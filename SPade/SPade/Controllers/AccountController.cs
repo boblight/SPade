@@ -146,12 +146,11 @@ namespace SPade.Controllers
         public ActionResult Register()
         {
             List<Class> classList = db.Classes.ToList();
-            RegisterViewModel rVM = new RegisterViewModel();
-            rVM.classList = classList;
-            return View(rVM);
+            RegisterViewModel rvm = new RegisterViewModel();
+            rvm.classList = classList;
+            return View(rvm);
         }
-
-        //
+        
         // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
@@ -165,6 +164,17 @@ namespace SPade.Controllers
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+                    //store student data
+                    Student student = new Student();
+                    student = model.student;
+                    student.Email = model.Email;
+                    student.CreatedBy = model.student.Name;
+                    student.UpdatedBy = model.student.Name;
+                    student.ClassID = 
+
+                    db.Students.Add(student);
+                    db.SaveChanges();
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
