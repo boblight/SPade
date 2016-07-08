@@ -7,6 +7,7 @@ using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
+using System.IO;
 
 namespace SPade.Controllers
 {
@@ -114,11 +115,11 @@ namespace SPade.Controllers
 
             foreach (var file in fileList)
             {
-
-                if (file.ContentType == ".xml")
+                if (file != null && file.ContentLength > 0)
                 {
-                    Console.Write("ayy lmao");
+                    file.SaveAs(Path.Combine(Server.MapPath("/App_Data/Temp"), Guid.NewGuid() + Path.GetExtension(file.FileName)));
                 }
+
 
             }
             return View();
