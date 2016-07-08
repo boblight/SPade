@@ -1,4 +1,4 @@
-﻿@model SPade.ViewModels.Accounts.RegViewModel
+﻿@model SPade.Models.RegisterViewModel
 @{
     ViewBag.Title = "Register";
 }
@@ -41,16 +41,16 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="AdminNo">Admin No.</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.AdminNo, new { @class = "form-control" })
+                @Html.TextBoxFor(m => m.student.AdminNo, new { @class = "form-control" })
                 <span class="help-block">With 'p' (e.g. p123456)</span>
-                <span class="help-block">@@Html.ValidationMessage("AdminNo", new { @@class = "text-danger" })</span>
+                <span class="help-block">@Html.ValidationMessage("AdminNo", new { @class = "text-danger" })</span>
             </div>
         </div>
 
         <div class="form-group">
             <label class="col-md-2 control-label" for="Name">Full Name</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                @Html.TextBoxFor(m => m.student.Name, new { @class = "form-control" })
                 <span class="help-block">As stated in Student Card</span>
                 <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
             </div>
@@ -59,7 +59,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="ContactNo">Contact Number</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control", @Value = (Model.ContactNo > 0 ? Model.ContactNo.ToString() : string.Empty) })
+                @Html.TextBoxFor(m => m.student.ContactNo, new { @class = "form-control" })
                 <span class="help-block">For emergency contact</span>
                 <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
             </div>
@@ -74,13 +74,12 @@
                     @{
                         foreach (var m in Model.classList)
                         {
-
-                            <option value="@Html.DisplayFor(modelitem => m.ClassID)" >
-                                @Html.DisplayFor(modelitem => m.ClassName)
-                            </option>
-
+                            <option value="@m.ClassID">@m.ClassName</option>
+                            <!--
+                            <option value="@@Html.DisplayFor(modelitem => m.ClassID)" >
+                                @@Html.DisplayFor(modelitem => m.ClassName)
+                            </option>-->
                         }
-
                     }
                 </select>
 

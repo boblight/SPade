@@ -7,6 +7,7 @@ using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
+using System.IO;
 
 namespace SPade.Controllers
 {
@@ -15,7 +16,7 @@ namespace SPade.Controllers
         //init the db
         private Entities db = new Entities();
 
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
@@ -51,31 +52,31 @@ namespace SPade.Controllers
 
         }
 
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass()
         {
             return View();
         }
 
-      //  [Authorize(Roles = "")]
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
-     //   [Authorize(Roles = "")]
+        //   [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
         }
 
-     //   [Authorize(Roles = "")]
+        //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
@@ -107,23 +108,55 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-      //  [Authorize(Roles = "")]
-        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn)
+        //  [Authorize(Roles = "")]
+        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
             //insert data into db 
 
+            foreach (var file in fileList)
+            {
+                if (file != null && file.ContentLength > 0)
+                {
+                    FileInfo fileInfo;
+                    string fp = file.FileName;
+                    string ext = Path.GetExtension(fp);
 
+                    if (ext == ".xml") //test case 
+                    {
+                        //this is for the testcase 
 
+                        //i put inside the testcase -> this is temporary. will be renamed after inserted into the DB
+                        var fileName = Path.GetFileName(file.FileName);
+                        var filePath = Server.MapPath(@"~/App_Data/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
+                        fileInfo = new FileInfo(filePath);
+                        fileInfo.Directory.Create();
+                        file.SaveAs(filePath);
+
+                    }
+                    else
+                    {
+                        //for the solution file  
+
+                        var fileName = Path.GetFileName(file.FileName);
+                        //extension at the back is dynamic. cater for other language also 
+                        var filePath = Server.MapPath(@"~/App_Data/Submissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
+                        fileInfo = new FileInfo(filePath);
+                        fileInfo.Directory.Create();
+                        file.SaveAs(filePath);
+                    }
+                    //file.SaveAs(Path.Combine(Server.MapPath("/App_Data/Temp"), Guid.NewGuid() + Path.GetExtension(file.FileName)));
+                }
+            }
             return View();
         }
 
-      //  [Authorize(Roles = "")]
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
-    //    [Authorize(Roles = "")]
+        //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             List<ViewResultsViewModel> viewResultsView = new List<ViewResultsViewModel>();
