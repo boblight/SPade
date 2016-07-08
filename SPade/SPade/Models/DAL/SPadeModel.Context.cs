@@ -13,10 +13,10 @@ namespace SPade.Models.DAL
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class SPadeDBEntities : DbContext
+    public partial class Entities : DbContext
     {
-        public SPadeDBEntities()
-            : base("name=SPadeDBEntities")
+        public Entities()
+            : base("name=Entities")
         {
         }
     
@@ -41,6 +41,5 @@ namespace SPade.Models.DAL
         public virtual DbSet<ProgLanguage> ProgLanguages { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Submission> Submissions { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
     }
 }
