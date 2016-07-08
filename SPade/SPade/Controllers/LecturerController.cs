@@ -117,15 +117,35 @@ namespace SPade.Controllers
             {
                 if (file != null && file.ContentLength > 0)
                 {
-                    string filePath = file.FileName;
-                    string ext = Path.GetExtension(filePath);
+                    FileInfo fileInfo;
+                    string fp = file.FileName;
+                    string ext = Path.GetExtension(fp);
 
+                    if (ext == ".xml") //test case 
+                    {
+                        //this is for the testcase 
 
+                        //i put inside the testcase -> this is temporary. will be renamed after inserted into the DB
+                        var fileName = Path.GetFileName(file.FileName);
+                        var filePath = Server.MapPath(@"~/App_Data/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
+                        fileInfo = new FileInfo(filePath);
+                        fileInfo.Directory.Create();
+                        file.SaveAs(filePath);
 
+                    }
+                    else
+                    {
+                        //for the solution file  
+
+                        var fileName = Path.GetFileName(file.FileName);
+                        //extension at the back is dynamic. cater for other language also 
+                        var filePath = Server.MapPath(@"~/App_Data/Submissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
+                        fileInfo = new FileInfo(filePath);
+                        fileInfo.Directory.Create();
+                        file.SaveAs(filePath);
+                    }
                     //file.SaveAs(Path.Combine(Server.MapPath("/App_Data/Temp"), Guid.NewGuid() + Path.GetExtension(file.FileName)));
                 }
-
-
             }
             return View();
         }
