@@ -7,7 +7,7 @@
 
 @Scripts.Render("~/bundles/daterangescripts")
 
-@using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post))
+@using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <div class="container">
 
@@ -57,14 +57,14 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
-                        <input id="SolutionsFile" class="form-control" type="file" style="border: solid 1px red" />
+                        <input id="solutionsFile" name="fileList[0]" class="form-control" type="file" style="border: solid 1px red" />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Test Cases</label>
-                        <input id="TestCase" class="form-control" type="file" style="border: solid 1px red" />
+                        <input id="testCase" name="fileList[1]" class="form-control" type="file" style="border: solid 1px red" />
                     </div>
                 </div>
 
@@ -87,9 +87,10 @@
 
                                 console.log(picker.startDate.format('YYYY-MM-DD'));
                                 console.log(picker.endDate.format('YYYY-MM-DD'));
-
-                                var sd = picker.startDate.format('YYYY-MM-DD');
-                                var ed = picker.endDate.format('YYYY-MM-DD')
+                                var currentTime = moment().format('HH:mm:ss');
+                                console.log(currentTime);
+                                var sd = picker.startDate.format('YYYY-MM-DD') + " " + currentTime;
+                                var ed = picker.endDate.format('YYYY-MM-DD') + " " + currentTime;
 
                                 $('#StartDate').val(sd)
                                 $('#DueDate').val(ed)
