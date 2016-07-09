@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="SPadeEntities.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="SPadeDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="__MigrationHistory">
           <Key>
             <PropertyRef Name="MigrationId" />
@@ -419,7 +419,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="SPadeEntitiesStoreContainer">
+        <EntityContainer Name="SPadeDBModelStoreContainer">
           <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Admin" EntityType="Self.Admin" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
@@ -510,7 +510,7 @@
     </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="SPadeEntities" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="SPadeDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="C__MigrationHistory">
           <Key>
             <PropertyRef Name="MigrationId" />
@@ -925,7 +925,7 @@
           <End Role="AspNetRoles" Type="Self.AspNetRole" Multiplicity="*" />
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
         </Association>
-        <EntityContainer Name="SPadeDBEntities1" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="SPadeDBEntities2" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="C__MigrationHistory" EntityType="Self.C__MigrationHistory" />
           <EntitySet Name="Admins" EntityType="Self.Admin" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRole" />
@@ -1012,9 +1012,9 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="SPadeEntitiesStoreContainer" CdmEntityContainer="SPadeDBEntities1">
+        <EntityContainerMapping StorageEntityContainer="SPadeDBModelStoreContainer" CdmEntityContainer="SPadeDBEntities2">
           <EntitySetMapping Name="C__MigrationHistory">
-            <EntityTypeMapping TypeName="SPadeEntities.C__MigrationHistory">
+            <EntityTypeMapping TypeName="SPadeDBModel.C__MigrationHistory">
               <MappingFragment StoreEntitySet="__MigrationHistory">
                 <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
                 <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
@@ -1024,7 +1024,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Admins">
-            <EntityTypeMapping TypeName="SPadeEntities.Admin">
+            <EntityTypeMapping TypeName="SPadeDBModel.Admin">
               <MappingFragment StoreEntitySet="Admin">
                 <ScalarProperty Name="AdminID" ColumnName="AdminID" />
                 <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
@@ -1034,7 +1034,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="AspNetRoles">
-            <EntityTypeMapping TypeName="SPadeEntities.AspNetRole">
+            <EntityTypeMapping TypeName="SPadeDBModel.AspNetRole">
               <MappingFragment StoreEntitySet="AspNetRoles">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
@@ -1042,7 +1042,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="AspNetUserClaims">
-            <EntityTypeMapping TypeName="SPadeEntities.AspNetUserClaim">
+            <EntityTypeMapping TypeName="SPadeDBModel.AspNetUserClaim">
               <MappingFragment StoreEntitySet="AspNetUserClaims">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -1052,7 +1052,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="AspNetUserLogins">
-            <EntityTypeMapping TypeName="SPadeEntities.AspNetUserLogin">
+            <EntityTypeMapping TypeName="SPadeDBModel.AspNetUserLogin">
               <MappingFragment StoreEntitySet="AspNetUserLogins">
                 <ScalarProperty Name="LoginProvider" ColumnName="LoginProvider" />
                 <ScalarProperty Name="ProviderKey" ColumnName="ProviderKey" />
@@ -1061,7 +1061,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="AspNetUsers">
-            <EntityTypeMapping TypeName="SPadeEntities.AspNetUser">
+            <EntityTypeMapping TypeName="SPadeDBModel.AspNetUser">
               <MappingFragment StoreEntitySet="AspNetUsers">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
@@ -1079,7 +1079,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Assignments">
-            <EntityTypeMapping TypeName="SPadeEntities.Assignment">
+            <EntityTypeMapping TypeName="SPadeDBModel.Assignment">
               <MappingFragment StoreEntitySet="Assignment">
                 <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
                 <ScalarProperty Name="Describe" ColumnName="Describe" />
@@ -1099,7 +1099,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Classes">
-            <EntityTypeMapping TypeName="SPadeEntities.Class">
+            <EntityTypeMapping TypeName="SPadeDBModel.Class">
               <MappingFragment StoreEntitySet="Class">
                 <ScalarProperty Name="ClassID" ColumnName="ClassID" />
                 <ScalarProperty Name="CourseID" ColumnName="CourseID" />
@@ -1114,7 +1114,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Class_Assgn">
-            <EntityTypeMapping TypeName="SPadeEntities.Class_Assgn">
+            <EntityTypeMapping TypeName="SPadeDBModel.Class_Assgn">
               <MappingFragment StoreEntitySet="Class_Assgn">
                 <ScalarProperty Name="ClassID" ColumnName="ClassID" />
                 <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
@@ -1123,7 +1123,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Courses">
-            <EntityTypeMapping TypeName="SPadeEntities.Course">
+            <EntityTypeMapping TypeName="SPadeDBModel.Course">
               <MappingFragment StoreEntitySet="Course">
                 <ScalarProperty Name="CourseID" ColumnName="CourseID" />
                 <ScalarProperty Name="CourseName" ColumnName="CourseName" />
@@ -1138,7 +1138,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Lec_Class">
-            <EntityTypeMapping TypeName="SPadeEntities.Lec_Class">
+            <EntityTypeMapping TypeName="SPadeDBModel.Lec_Class">
               <MappingFragment StoreEntitySet="Lec_Class">
                 <ScalarProperty Name="StaffID" ColumnName="StaffID" />
                 <ScalarProperty Name="ClassID" ColumnName="ClassID" />
@@ -1147,7 +1147,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Lecturers">
-            <EntityTypeMapping TypeName="SPadeEntities.Lecturer">
+            <EntityTypeMapping TypeName="SPadeDBModel.Lecturer">
               <MappingFragment StoreEntitySet="Lecturer">
                 <ScalarProperty Name="StaffID" ColumnName="StaffID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
@@ -1163,7 +1163,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Modules">
-            <EntityTypeMapping TypeName="SPadeEntities.Module">
+            <EntityTypeMapping TypeName="SPadeDBModel.Module">
               <MappingFragment StoreEntitySet="Module">
                 <ScalarProperty Name="ModuleCode" ColumnName="ModuleCode" />
                 <ScalarProperty Name="ModuleName" ColumnName="ModuleName" />
@@ -1178,7 +1178,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="ProgLanguages">
-            <EntityTypeMapping TypeName="SPadeEntities.ProgLanguage">
+            <EntityTypeMapping TypeName="SPadeDBModel.ProgLanguage">
               <MappingFragment StoreEntitySet="ProgLanguage">
                 <ScalarProperty Name="LanguageId" ColumnName="LanguageId" />
                 <ScalarProperty Name="LangageType" ColumnName="LangageType" />
@@ -1192,7 +1192,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Students">
-            <EntityTypeMapping TypeName="SPadeEntities.Student">
+            <EntityTypeMapping TypeName="SPadeDBModel.Student">
               <MappingFragment StoreEntitySet="Student">
                 <ScalarProperty Name="AdminNo" ColumnName="AdminNo" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
@@ -1209,7 +1209,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Submissions">
-            <EntityTypeMapping TypeName="SPadeEntities.Submission">
+            <EntityTypeMapping TypeName="SPadeDBModel.Submission">
               <MappingFragment StoreEntitySet="Submission">
                 <ScalarProperty Name="SubmissionID" ColumnName="SubmissionID" />
                 <ScalarProperty Name="AdminNo" ColumnName="AdminNo" />
@@ -1220,7 +1220,7 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="AspNetUserRoles" TypeName="SPadeEntities.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
+          <AssociationSetMapping Name="AspNetUserRoles" TypeName="SPadeDBModel.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
             <EndProperty Name="AspNetRoles">
               <ScalarProperty Name="Id" ColumnName="RoleId" />
             </EndProperty>

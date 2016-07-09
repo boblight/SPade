@@ -1,4 +1,4 @@
-﻿using SPade.Models;
+﻿using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ namespace SPade.Controllers
             try
             {
 
-                var db = new SPadeEntities();
+                var db = new SPadeDBEntities2();
                 var student = new Student()
                 {
                     AdminNo = model.AdminNo,
@@ -90,7 +90,7 @@ namespace SPade.Controllers
             try
             {
 
-                var db = new SPadeEntities();
+                var db = new SPadeDBEntities2();
                 var class1 = new Class()
                 {
                     ClassName = model.ClassName,
