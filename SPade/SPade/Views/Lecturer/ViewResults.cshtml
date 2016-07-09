@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<SPade.ViewModels.Lecturer.ViewResultsViewModel>
+
 @{
     ViewBag.Title = "View Results";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -45,34 +46,53 @@
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Result</th>
-                        <th>Overall</th>
                         <th class="sorter-false">Student's solution</th>
                     </tr>
                 </thead>
+
                 <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(model => item.Id)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => item.Result)
+                            </td>
+                            <td><a href="@Html.DisplayFor(model => item.Solution)"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
+                        </tr>
+                    }
+                </tbody>
+
+                @*<tbody>
                     <tr>
                         <td>1431897</td>
                         <td>Bob Chan</td>
                         <td>5/5</td>
                         <td>P</td>
-                        <td><a href="#"><span class="glyphicon glyphicon-download-alt"></span></a></td>
+                        <td><a href="#"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
                     </tr>
                     <tr>
                         <td>1431954</td>
                         <td>Jenny Tan</td>
                         <td>4/5</td>
                         <td>P</td>
-                        <td><a href="#"><span class="glyphicon glyphicon-download-alt"></span></a></td>
+                        <td><a href="#"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
                     </tr>
                     <tr>
                         <td>146454</td>
                         <td>Jonathan Chia</td>
                         <td>2/5</td>
                         <td>F</td>
-                        <td><a href="#"><span class="glyphicon glyphicon-download-alt"></span></a></td>
+                        <td><a href="#"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
                     </tr>
 
-                </tbody>
+                </tbody>*@
             </table>
         </fieldset>
     </div>
