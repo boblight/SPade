@@ -1,7 +1,12 @@
-﻿
+﻿@model SPade.ViewModels.Admin.AddLecturerViewMode
+
 @{
     ViewBag.Title = "Add Lecturer";
 }
+
+
+@using (Html.BeginForm("AddOneLecturer", "Admin", FormMethod.Post))
+{
 
 <div class="col-md-4 col-md-offset-4 form-horizontal">
     <fieldset>
@@ -10,37 +15,37 @@
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputStaffNo" class="control-label">Staff ID</label>
-                <input type="text" class="form-control" id="inputStaffNo" placeholder="1234567" />
+                @Html.TextBoxFor(m => m.StaffID, new { @class = "form-control input-md" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputLecturerName" class="control-label">Lecturer Name</label>
-                <input type="text" class="form-control" id="inputLecturerName" placeholder="Lecturer" />
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputContact" class="control-label">Contact</label>
-                <input type="text" class="form-control" id="inputContact" placeholder="Contact" />
+                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputEmail" class="control-label">Email</label>
-                <input type="text" class="form-control" id="inputEmail" placeholder="Email" />
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-12">
-                <a id="btnSave" href="ManageLecturer" class="btn btn-primary">Save</a>
+                <input type="submit" value="Save" class="btn btn-primary" />
                 <a id="btnCancel" href="javascript:history.back()" class="btn btn-default">Cancel</a>
             </div>
         </div>
     </fieldset>
 </div>
-
+}
