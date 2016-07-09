@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using SPade.Models;
+using SPade.Models.DAL;
 
 namespace SPade.ViewModels.Lecturer
 {

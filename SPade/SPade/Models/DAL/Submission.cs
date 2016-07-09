@@ -7,18 +7,21 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Class_Assgn
+    public partial class Submission
     {
-        public int ClassID { get; set; }
-        public int AssgnID { get; set; }
-        public int C_id { get; set; }
+        public int SubmissionID { get; set; }
+        public string AdminNo { get; set; }
+        public int AssignmentID { get; set; }
+        public decimal Grade { get; set; }
+        public string FilePath { get; set; }
+        public System.DateTime Timestamp { get; set; }
     
         public virtual Assignment Assignment { get; set; }
-        public virtual Class Class { get; set; }
+        public virtual Student Student { get; set; }
     }
 }

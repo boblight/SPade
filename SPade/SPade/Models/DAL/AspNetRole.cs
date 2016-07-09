@@ -7,29 +7,23 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class ProgLanguage
+    public partial class AspNetRole
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public ProgLanguage()
+        public AspNetRole()
         {
-            this.Modules = new HashSet<Module>();
+            this.AspNetUsers = new HashSet<AspNetUser>();
         }
     
-        public int LanguageId { get; set; }
-        public string LangageType { get; set; }
-        public System.DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public System.DateTime UpdatedAt { get; set; }
-        public string UpdatedBy { get; set; }
-        public Nullable<System.DateTime> DeletedAt { get; set; }
-        public string DeletedBy { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Module> Modules { get; set; }
+        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
     }
 }

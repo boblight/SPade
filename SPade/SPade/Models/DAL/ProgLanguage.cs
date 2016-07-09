@@ -7,22 +7,21 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Course
+    public partial class ProgLanguage
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Course()
+        public ProgLanguage()
         {
-            this.Classes = new HashSet<Class>();
+            this.Modules = new HashSet<Module>();
         }
     
-        public int CourseID { get; set; }
-        public string CourseName { get; set; }
-        public string CourseAbbr { get; set; }
+        public int LanguageId { get; set; }
+        public string LangageType { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
         public System.DateTime UpdatedAt { get; set; }
@@ -31,6 +30,6 @@ namespace SPade.Models
         public string DeletedBy { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Class> Classes { get; set; }
+        public virtual ICollection<Module> Modules { get; set; }
     }
 }

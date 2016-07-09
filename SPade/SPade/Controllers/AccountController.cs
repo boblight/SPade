@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using SPade.Models;
+using SPade.Models.DAL;
 using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SPadeEntities db = new SPadeEntities();
+        private Entities db = new Entities();
 
         public AccountController()
         {
@@ -94,8 +95,6 @@ namespace SPade.Controllers
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
-
-
         }
 
         //
@@ -161,7 +160,7 @@ namespace SPade.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.PersonalID, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

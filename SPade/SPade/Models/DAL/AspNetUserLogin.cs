@@ -7,19 +7,17 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Lec_Class
+    public partial class AspNetUserLogin
     {
-        public string StaffID { get; set; }
-        public int ClassID { get; set; }
-        public int C_id { get; set; }
+        public string LoginProvider { get; set; }
+        public string ProviderKey { get; set; }
+        public string UserId { get; set; }
     
-        public virtual Class Class { get; set; }
-        public virtual Lecturer Lecturer { get; set; }
-        public virtual Lecturer Lecturer1 { get; set; }
+        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

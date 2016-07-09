@@ -7,23 +7,22 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Class
+    public partial class Course
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Class()
+        public Course()
         {
-            this.Lec_Class = new HashSet<Lec_Class>();
-            this.Class_Assgn = new HashSet<Class_Assgn>();
+            this.Classes = new HashSet<Class>();
         }
     
-        public int ClassID { get; set; }
         public int CourseID { get; set; }
-        public string ClassName { get; set; }
+        public string CourseName { get; set; }
+        public string CourseAbbr { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
         public System.DateTime UpdatedAt { get; set; }
@@ -32,9 +31,6 @@ namespace SPade.Models
         public string DeletedBy { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Lec_Class> Lec_Class { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Class_Assgn> Class_Assgn { get; set; }
-        public virtual Course Course { get; set; }
+        public virtual ICollection<Class> Classes { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using SPade.Models;
+using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
@@ -13,14 +13,16 @@ namespace SPade.Controllers
     public class LecturerController : Controller
     {
         //init the db
-        private SPadeEntities db = new SPadeEntities();
+        private Entities db = new Entities();
 
+       // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
             return View();
         }
 
+        //[Authorize(Roles = "")]
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -49,26 +51,31 @@ namespace SPade.Controllers
 
         }
 
+       // [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
+       // [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass()
         {
             return View();
         }
 
+      //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
+     //   [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
         }
 
+     //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
@@ -100,6 +107,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
+      //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn)
         {
             //insert data into db 
@@ -109,11 +117,13 @@ namespace SPade.Controllers
             return View();
         }
 
+      //  [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
+    //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             return View();

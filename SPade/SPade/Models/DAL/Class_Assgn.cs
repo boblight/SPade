@@ -7,18 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Admin
+    public partial class Class_Assgn
     {
-        public string AdminID { get; set; }
-        public int ContactNo { get; set; }
-        public string Email { get; set; }
-        public string FullName { get; set; }
+        public int ClassID { get; set; }
+        public int AssignmentID { get; set; }
+        public int C_id { get; set; }
     
-        public virtual Login Login { get; set; }
+        public virtual Assignment Assignment { get; set; }
+        public virtual Class Class { get; set; }
     }
 }
