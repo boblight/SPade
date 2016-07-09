@@ -7,13 +7,14 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using SPade.Models.DAL;
 
 namespace SPade.Controllers
 {
     public class AdminController : Controller
     {
 
-        
+        private SPadeDBEntities db = new SPadeDBEntities();
 
 
         // GET: Admin
@@ -38,8 +39,6 @@ namespace SPade.Controllers
         {
             try
             {
-
-                var db = new SPadeEntities();
                 var student = new Student()
                 {
                     AdminNo = model.AdminNo,
@@ -89,15 +88,13 @@ namespace SPade.Controllers
         {
             try
             {
-
-                var db = new SPadeEntities();
                 var class1 = new Class()
                 {
                     ClassName = model.ClassName,
-                    CourseID = 1,            
+                    CourseID = 1,
                     CreatedBy = "Admin",
                     UpdatedBy = "Admin",
-                    DeletedBy = "Admin",                   
+                    DeletedBy = "Admin",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     DeletedAt = DateTime.Now

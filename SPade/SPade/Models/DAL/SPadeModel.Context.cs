@@ -13,10 +13,10 @@ namespace SPade.Models.DAL
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class SPadeDBEntities1 : DbContext
+    public partial class SPadeDBEntities : DbContext
     {
-        public SPadeDBEntities1()
-            : base("name=SPadeDBEntities1")
+        public SPadeDBEntities()
+            : base("name=SPadeDBEntities")
         {
         }
     

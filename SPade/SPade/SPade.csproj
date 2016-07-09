@@ -275,6 +275,7 @@
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\LecturerSolution\14314761solution.jar" />
     <Content Include="App_Data\log.txt" />
     <Content Include="App_Data\Solutions\1solution.txt" />
     <Content Include="App_Data\Submissions\14314761solution.jar" />
