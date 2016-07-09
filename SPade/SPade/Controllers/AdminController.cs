@@ -13,6 +13,7 @@ namespace SPade.Controllers
     public class AdminController : Controller
     {
 
+        
 
 
         // GET: Admin

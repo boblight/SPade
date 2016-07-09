@@ -397,7 +397,6 @@
   <ItemGroup>
     <Folder Include="App_Data\Submissions\" />
     <Folder Include="App_Data\TestCase\" />
-    <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
   </ItemGroup>
