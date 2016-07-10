@@ -44,15 +44,14 @@
                 </div>
 
                 <div class="col-md-1">
-                    <button class="btn btn-default removeButton" type="button">
+                    <button class="btn btn-default removeButton" id="removeButton" type="button">
                         <span class="glyphicon-minus"></span>
                     </button>
                 </div>
                     
-                    
                 </fieldset> @*end of studentInput*@
 
-            </div>
+            </div> @*End of Fields form group*@
     
     <div id="errorStudentMessage"></div>
             
@@ -62,7 +61,7 @@
             @*Add Button*@ 
             <div class="form-group">
                 <div class="col-md-12">
-                    <button class="btn btn-default" id="addButton" placeholder="Add Column">Add Column</button>
+                    <button class="btn btn-default" id="addButton" placeholder="Add Row">Add Row</button>
                 </div>
             </div>
 
@@ -77,18 +76,24 @@
 </div>
 
 <script>
+
     $('#addButton').on('click', function () {
-        $('#studentInput').append('<div class="col-md-2"><input type="text" name="adminInput[]" id="adminInput" placeholder="Admin No" class="form-control" /></div>');
-        $('#studentInput').append('<div class="col-md-3"><input type="text" name="nameInput[]" id="nameInput" placeholder="Name" class="form-control" /></div>');
-        $('#studentInput').append('<div class="col-md-3"><input type="text" name="emailInput[]" id="emailInput" placeholder="Email" class="form-control" /></div>');
-        $('#studentInput').append('<div class="col-md-3"><input type="text" name="contactInput[]" id="contactInput" placeholder="Contact" class="form-control" /></div>');
-        $('#studentInput').append('<div class="col-md-1"><button class="btn btn-default removeButton" type="button"><span class="glyphicon-minus"></span></button></div>');
+
+        $('#studentInput').append('<div class="hi">'
+        + '<div class="col-md-2"><input type="text" name="adminInput[]" id="adminInput" placeholder="Admin No" class="form-control" /></div>'
+        + '<div class="col-md-3"><input type="text" name="nameInput[]" id="nameInput" placeholder="Name" class="form-control" /></div>'
+        + '<div class="col-md-3"><input type="text" name="emailInput[]" id="emailInput" placeholder="Email" class="form-control" /></div>'
+        + '<div class="col-md-3"><input type="text" name="contactInput[]" id="contactInput" placeholder="Contact" class="form-control" /></div>'
+        + '<div class="col-md-1"><button class="btn btn-default removeButton" type="button"><span class="glyphicon-minus"></span></button></div>'
+        + '</div>');
         return false; // prevent form submission
     });
 
     $('#studentInput').on('click', '.removeButton', function ()
     {
-        $(this).parent().remove();
-        return false; // prevent form submission
+        console.log($(this));
+        console.log($(this).parent());
+        console.log($(this).parent().parent());
+        $(this).parent().parent().remove();
     });
 </script>
