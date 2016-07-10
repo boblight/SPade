@@ -7,39 +7,34 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Assignment
+    public partial class Class
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Assignment()
+        public Class()
         {
+            this.Lec_Class = new HashSet<Lec_Class>();
             this.Class_Assgn = new HashSet<Class_Assgn>();
-            this.Submissions = new HashSet<Submission>();
         }
     
-        public int AssgnID { get; set; }
-        public string Describe { get; set; }
-        public int MaxAttempt { get; set; }
-        public System.DateTime DueDate { get; set; }
-        public string Solution { get; set; }
-        public string ModuleCode { get; set; }
-        public System.DateTime CreateAt { get; set; }
-        public string CreateBy { get; set; }
+        public int ClassID { get; set; }
+        public int CourseID { get; set; }
+        public string ClassName { get; set; }
+        public System.DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
         public System.DateTime UpdatedAt { get; set; }
         public string UpdatedBy { get; set; }
         public Nullable<System.DateTime> DeletedAt { get; set; }
         public string DeletedBy { get; set; }
-        public string AssgnTitle { get; set; }
-        public System.DateTime StartDate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Class_Assgn> Class_Assgn { get; set; }
-        public virtual Module Module { get; set; }
+        public virtual ICollection<Lec_Class> Lec_Class { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Submission> Submissions { get; set; }
+        public virtual ICollection<Class_Assgn> Class_Assgn { get; set; }
+        public virtual Course Course { get; set; }
     }
 }

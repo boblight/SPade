@@ -7,23 +7,31 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Role
+    public partial class Module
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Role()
+        public Module()
         {
-            this.Logins = new HashSet<Login>();
+            this.Assignments = new HashSet<Assignment>();
         }
     
-        public int RoleID { get; set; }
-        public string RoleName { get; set; }
+        public string ModuleCode { get; set; }
+        public string ModuleName { get; set; }
+        public int LanguageId { get; set; }
+        public System.DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
+        public System.DateTime UpdatedAt { get; set; }
+        public string UpdatedBy { get; set; }
+        public Nullable<System.DateTime> DeletedAt { get; set; }
+        public string DeletedBy { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Login> Logins { get; set; }
+        public virtual ICollection<Assignment> Assignments { get; set; }
+        public virtual ProgLanguage ProgLanguage { get; set; }
     }
 }

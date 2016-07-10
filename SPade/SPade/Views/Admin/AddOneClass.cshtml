@@ -1,11 +1,14 @@
-﻿
+﻿@model SPade.ViewModels.Admin.AddClassViewModel
+
 @{
     ViewBag.Title = "Add Class";
 }
 
-<div class="col-md-4 col-md-offset-4 form-horizontal">
-    <fieldset>
+@using (Html.BeginForm("AddOneClass", "Admin", FormMethod.Post))
+{
 
+<div class="col-md-4 col-md-offset-4 form-horizontal">
+    <fieldset>      
         <legend>Add Class</legend>
 
         <!--Select Course-->
@@ -24,8 +27,8 @@
         <!-- classNameInput-->
         <div class="form-group">
             <div class="col-md-12">
-                <label for="classNameInput" class="control-label">Class Name </label>
-                <input id="classNameInput" name="classNameInput" type="text" placeholder="E.g. 1A/21" class="form-control input-md" />
+                @Html.LabelFor(m => m.ClassName, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md" })
             </div>
         </div>
 
@@ -46,7 +49,7 @@
         <!-- saveBtn, cancelBtn -->
         <div class="form-group">
             <div class="col-md-12 ">
-                <a id="btnSave" href="ManageClass" class="btn btn-primary">Save</a>
+                <input type="submit" value="Save" class="btn btn-primary" />
                 <a id="btnCancel" href="javascript:history.back()" class="btn btn-default">Cancel</a>
             </div>
         </div>
@@ -54,3 +57,5 @@
 </div>
 
 
+
+}

@@ -7,18 +7,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SPade.Models
+namespace SPade.Models.DAL
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Class_Assgn
+    public partial class C__MigrationHistory
     {
-        public int ClassID { get; set; }
-        public int AssgnID { get; set; }
-        public int C_id { get; set; }
-    
-        public virtual Class Class { get; set; }
-        public virtual Assignment Assignment { get; set; }
+        public string MigrationId { get; set; }
+        public string ContextKey { get; set; }
+        public byte[] Model { get; set; }
+        public string ProductVersion { get; set; }
     }
 }
