@@ -79,7 +79,15 @@ namespace SPade.Controllers
 
         public ActionResult AddOneStudent()
         {
-            return View();
+
+            AddStudentViewModel model = new AddStudentViewModel();
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
+
+
+
         }
 
 
@@ -124,7 +132,12 @@ namespace SPade.Controllers
 
         public ActionResult AddOneClass()
         {
-            return View();
+            AddClassViewModel model = new AddClassViewModel();
+            //Get all classes
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+            return View(model);
+
         }
 
         [HttpPost]
