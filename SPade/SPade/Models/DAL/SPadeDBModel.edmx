@@ -925,7 +925,7 @@
           <End Role="AspNetRoles" Type="Self.AspNetRole" Multiplicity="*" />
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
         </Association>
-        <EntityContainer Name="SPadeEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="SPadeDBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="C__MigrationHistory" EntityType="Self.C__MigrationHistory" />
           <EntitySet Name="Admins" EntityType="Self.Admin" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRole" />
@@ -1012,7 +1012,7 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="SPadeDBModelStoreContainer" CdmEntityContainer="SPadeEntities">
+        <EntityContainerMapping StorageEntityContainer="SPadeDBModelStoreContainer" CdmEntityContainer="SPadeDBEntities">
           <EntitySetMapping Name="C__MigrationHistory">
             <EntityTypeMapping TypeName="SPadeDBModel.C__MigrationHistory">
               <MappingFragment StoreEntitySet="__MigrationHistory">
