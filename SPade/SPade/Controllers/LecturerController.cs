@@ -8,13 +8,14 @@ using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
 using System.IO;
+using System.Data.Entity.Validation;
 
 namespace SPade.Controllers
 {
     public class LecturerController : Controller
     {
         //init the db
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
         // [Authorize(Roles = "")]
         // GET: Lecturer
@@ -111,8 +112,6 @@ namespace SPade.Controllers
         //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
-            //insert data into db 
-
             foreach (var file in fileList)
             {
                 if (file != null && file.ContentLength > 0)
@@ -124,19 +123,15 @@ namespace SPade.Controllers
                     if (ext == ".xml") //test case 
                     {
                         //this is for the testcase 
-
-                        //i put inside the testcase -> this is temporary. will be renamed after inserted into the DB
                         var fileName = Path.GetFileName(file.FileName);
                         var filePath = Server.MapPath(@"~/App_Data/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
-
                     }
                     else
                     {
-                        //for the solution file  
-
+                        //for the solution file 
                         var fileName = Path.GetFileName(file.FileName);
                         //extension at the back is dynamic. cater for other language also 
                         var filePath = Server.MapPath(@"~/App_Data/Submissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
@@ -144,9 +139,53 @@ namespace SPade.Controllers
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
                     }
-                    //file.SaveAs(Path.Combine(Server.MapPath("/App_Data/Temp"), Guid.NewGuid() + Path.GetExtension(file.FileName)));
                 }
             }
+
+            //this part is to run the solution and get the results 
+
+            //now to add into the DB 
+            Assignment newAssignment = new Assignment();
+            Class_Assgn classAssgn = new Class_Assgn();
+
+            newAssignment.AssgnTitle = addAssgn.AssgnTitle;
+            newAssignment.Describe = addAssgn.Describe;
+            newAssignment.MaxAttempt = addAssgn.MaxAttempt;
+            newAssignment.StartDate = addAssgn.StartDate;
+            newAssignment.DueDate = addAssgn.DueDate;
+            newAssignment.ModuleCode = addAssgn.ModuleId;
+            //List<Module> Module = db.Modules.Where(m => m.ModuleCode == addAssgn.ModuleId).ToList();
+            //foreach (Module m in Module)
+            //{
+            //    newAssignment.Module = m;
+            //}
+            newAssignment.CreateBy = "1431485"; //temp. will get from session
+            newAssignment.CreateAt = DateTime.Now;
+            newAssignment.UpdatedBy = "1431485"; //temp
+            newAssignment.UpdatedAt = DateTime.Now;
+            db.Assignments.Add(newAssignment);
+
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+
+            var temp = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList(); //get the ID
+
+
+
+
+
+            //then we rename the file and UPDATE the DB 
+
+
             return View();
         }
 
@@ -160,7 +199,7 @@ namespace SPade.Controllers
         public ActionResult ViewResults()
         {
             List<ViewResultsViewModel> viewResultsView = new List<ViewResultsViewModel>();
-            
+
             string loggedInLecturer = "s1431489"; //temp 
 
             int inAssignment = 1;
@@ -176,10 +215,10 @@ namespace SPade.Controllers
             //get the students in that classs
             foreach (Submission s in submissions)
             {
-                if (s.AssignmentID==inAssignment)
+                if (s.AssignmentID == inAssignment)
                 {
                     //not done yet
-                    var temp = db.Students.Where(u => u.AdminNo == s.AdminNo).Select(u => new {u.Name, u.ClassID}).FirstOrDefault();
+                    var temp = db.Students.Where(u => u.AdminNo == s.AdminNo).Select(u => new { u.Name, u.ClassID }).FirstOrDefault();
 
                     if (temp.ClassID == inClass)
                     {
