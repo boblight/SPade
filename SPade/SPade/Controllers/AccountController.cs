@@ -22,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private Entities db = new Entities();
+        private SPadeEntities db = new SPadeEntities();
 
         public AccountController()
         {
@@ -150,7 +150,7 @@ namespace SPade.Controllers
             rvm.classList = classList;
             return View(rvm);
         }
-        
+
         // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
@@ -169,9 +169,11 @@ namespace SPade.Controllers
                     Student student = new Student();
                     student = model.student;
                     student.Email = model.Email;
+                    student.CreatedAt = DateTime.Now;
                     student.CreatedBy = model.student.Name;
+                    student.UpdatedAt = DateTime.Now;
                     student.UpdatedBy = model.student.Name;
-                    student.ClassID = 
+                    student.ClassID = 1; //this is temporary. added to stop error from coming out
 
                     db.Students.Add(student);
                     db.SaveChanges();

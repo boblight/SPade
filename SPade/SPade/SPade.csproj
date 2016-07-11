@@ -275,7 +275,11 @@
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\LecturerSolution\14314761solution.jar" />
+    <Content Include="App_Data\log.txt" />
     <Content Include="App_Data\Solutions\1solution.txt" />
+    <Content Include="App_Data\Submissions\14314761solution.jar" />
+    <Content Include="App_Data\TestCase\1testcase.xml" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -386,7 +390,9 @@
     <Content Include="Views\Admin\UpdateLecturer.cshtml" />
     <Content Include="Views\Admin\UpdateStudent.cshtml" />
     <Content Include="Views\Student\PostSubmission.cshtml" />
-    <Content Include="Web.Config" />
+    <Content Include="Web.Config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -395,8 +401,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\Submissions\" />
-    <Folder Include="App_Data\TestCase\" />
     <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />

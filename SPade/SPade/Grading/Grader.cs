@@ -111,5 +111,70 @@ namespace SPade.Grading
             }
         }//end of grade method
 
+        //to run the lecturer's solution and get the output 
+        public Boolean LecturerOutput(string slnFilePath, string testCaseFilePath)
+        {
+            //stuff i need to do: 
+            //what if no test cases for that solution -> need to cater to that
+
+            bool isSlnValid = false; //to be returned to the controller 
+
+            //lecturer solution
+            procInfo = new ProcessStartInfo("java.exe", "-jar" + HttpContext.Current.Server.MapPath(@"~/App_Data/LecturerSolution/" + slnFilePath));
+
+            procInfo.RedirectStandardError = true;
+            procInfo.RedirectStandardOutput = true;
+            procInfo.RedirectStandardInput = true;
+
+            proc = Process.Start(procInfo);
+
+            //read the testcases
+            using (XmlReader reader = XmlReader.Create(HttpContext.Current.Server.MapPath(@"~/App_Data/TestCase/" + testCaseFilePath)))
+            {
+                while (reader.Read())
+                {
+                    if (reader.Name == "input")
+                    {
+                        testcases.Add(reader.ReadString());
+                    }
+                }
+            };
+
+            //insert the testcases into the sln 
+            StreamWriter sw = proc.StandardInput;
+            foreach (object testcase in testcases)
+            {
+                noOfTestCase++;
+
+                if (testcases != null)
+                {
+                    try
+                    {
+                        sw.WriteLine(testcases);
+                    }
+                    catch (Exception e)
+                    {
+                        testCaseFailed++;
+                        break;
+                    }
+                    finally
+                    {
+                        sw.Flush();
+                    }
+                }
+            }
+
+            if (testCaseFailed > 0) //break immeditely 
+            {
+                return isSlnValid; 
+            }
+
+
+
+
+
+            return false;
+        }
+
     }//end of class
 }
