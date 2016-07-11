@@ -22,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SPadeDBEntities db = new SPadeDBEntities();
+        private SPadeEntities db = new SPadeEntities();
 
         public AccountController()
         {
@@ -169,7 +169,9 @@ namespace SPade.Controllers
                     Student student = new Student();
                     student = model.student;
                     student.Email = model.Email;
+                    student.CreatedAt = DateTime.Now;
                     student.CreatedBy = model.student.Name;
+                    student.UpdatedAt = DateTime.Now;
                     student.UpdatedBy = model.student.Name;
                     student.ClassID = 1; //this is temporary. added to stop error from coming out
 

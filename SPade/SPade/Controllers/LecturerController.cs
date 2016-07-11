@@ -14,7 +14,7 @@ namespace SPade.Controllers
     public class LecturerController : Controller
     {
         //init the db
-        private SPadeDBEntities db = new SPadeDBEntities();
+        private SPadeEntities db = new SPadeEntities();
 
         // [Authorize(Roles = "")]
         // GET: Lecturer
