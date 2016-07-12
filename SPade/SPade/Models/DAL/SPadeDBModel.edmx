@@ -82,8 +82,9 @@
           <Property Name="AssignmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Describe" Type="varchar" MaxLength="5000" Nullable="false" />
           <Property Name="MaxAttempt" Type="int" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
           <Property Name="DueDate" Type="datetime" Nullable="false" />
-          <Property Name="Solution" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="Solution" Type="varchar" MaxLength="200" />
           <Property Name="ModuleCode" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="CreateAt" Type="datetime" Nullable="false" />
           <Property Name="CreateBy" Type="varchar" MaxLength="20" Nullable="false" />
@@ -92,7 +93,6 @@
           <Property Name="DeletedAt" Type="datetime" />
           <Property Name="DeletedBy" Type="varchar" MaxLength="20" />
           <Property Name="AssgnTitle" Type="varchar" MaxLength="100" Nullable="false" />
-          <Property Name="StartDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Class">
           <Key>
@@ -590,8 +590,9 @@
           <Property Name="AssignmentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Describe" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="MaxAttempt" Type="Int32" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Solution" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Solution" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="ModuleCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="CreateAt" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="CreateBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
@@ -600,7 +601,6 @@
           <Property Name="DeletedAt" Type="DateTime" Precision="3" />
           <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="AssgnTitle" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Class_Assgn" Relationship="Self.assgn_fk" FromRole="Assignment" ToRole="Class_Assgn" />
           <NavigationProperty Name="Submissions" Relationship="Self.FK_Submission_ToTable" FromRole="Assignment" ToRole="Submission" />
           <NavigationProperty Name="Module" Relationship="Self.Module_fk_constrain" FromRole="Assignment" ToRole="Module" />
@@ -1084,6 +1084,7 @@
                 <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
                 <ScalarProperty Name="Describe" ColumnName="Describe" />
                 <ScalarProperty Name="MaxAttempt" ColumnName="MaxAttempt" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
                 <ScalarProperty Name="DueDate" ColumnName="DueDate" />
                 <ScalarProperty Name="Solution" ColumnName="Solution" />
                 <ScalarProperty Name="ModuleCode" ColumnName="ModuleCode" />
@@ -1094,7 +1095,6 @@
                 <ScalarProperty Name="DeletedAt" ColumnName="DeletedAt" />
                 <ScalarProperty Name="DeletedBy" ColumnName="DeletedBy" />
                 <ScalarProperty Name="AssgnTitle" ColumnName="AssgnTitle" />
-                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -80,11 +80,10 @@ namespace SPade.Controllers
         //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
-
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            string x = "1431489"; //temp 
+            string x = "s1431489"; //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -112,7 +111,7 @@ namespace SPade.Controllers
         //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
-            foreach (var file in fileList)
+            foreach (var file in fileList) //renaming files
             {
                 if (file != null && file.ContentLength > 0)
                 {
@@ -134,19 +133,19 @@ namespace SPade.Controllers
                         //for the solution file 
                         var fileName = Path.GetFileName(file.FileName);
                         //extension at the back is dynamic. cater for other language also 
-                        var filePath = Server.MapPath(@"~/App_Data/Submissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
+                        var filePath = Server.MapPath(@"~/App_Data/Solutions/" + addAssgn.AssgnTitle + "_Solution" + ext);
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
                     }
                 }
             }
-
-            //this part is to run the solution and get the results 
+            //run the solution and get the result 
 
             //now to add into the DB 
             Assignment newAssignment = new Assignment();
             Class_Assgn classAssgn = new Class_Assgn();
+            List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
 
             newAssignment.AssgnTitle = addAssgn.AssgnTitle;
             newAssignment.Describe = addAssgn.Describe;
@@ -154,39 +153,71 @@ namespace SPade.Controllers
             newAssignment.StartDate = addAssgn.StartDate;
             newAssignment.DueDate = addAssgn.DueDate;
             newAssignment.ModuleCode = addAssgn.ModuleId;
-            //List<Module> Module = db.Modules.Where(m => m.ModuleCode == addAssgn.ModuleId).ToList();
-            //foreach (Module m in Module)
-            //{
-            //    newAssignment.Module = m;
-            //}
-            newAssignment.CreateBy = "1431485"; //temp. will get from session
+            newAssignment.CreateBy = "1431485"; //temp
             newAssignment.CreateAt = DateTime.Now;
             newAssignment.UpdatedBy = "1431485"; //temp
             newAssignment.UpdatedAt = DateTime.Now;
             db.Assignments.Add(newAssignment);
+            db.SaveChanges();
 
+            var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First(); //get the ID
 
-            try
+            //insert into Class_Assgn
+            foreach (AssignmentClass a in addAssgn.ClassList)
             {
-                db.SaveChanges();
+                if (a.isSelected == true)
+                {
+                    classAssgn.ClassID = a.ClassId;
+                    classAssgn.AssignmentID = assgnID;
+                    db.Class_Assgn.Add(classAssgn);
+                    db.SaveChanges();
+                }
             }
-            catch (Exception ex)
+
+            //then we rename the files and UPDATE the DB 
+            string testCasePath = Server.MapPath(@"~/App_Data/TestCase/");
+            string solutionPath = Server.MapPath(@"~/App_Data/Solutions/");
+
+            //rename the TestCase
+            foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
             {
-
+                if (f.Name == addAssgn.AssgnTitle + "_TestCase.xml")
+                {
+                    var sourcePath = testCasePath + f.Name;
+                    var destPath = testCasePath + assgnID + "_TestCase.xml";
+                    FileInfo info = new FileInfo(sourcePath);
+                    info.MoveTo(destPath);
+                }
             }
 
+            //rename the solution
+            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
+            {
+                if (f.Name == addAssgn.AssgnTitle + "_Solution.txt") //to be renamed
+                {
+                    var sourcePath = solutionPath + f.Name;
+                    var destPath = solutionPath + assgnID + "_Solution.txt";
+                    FileInfo info = new FileInfo(sourcePath);
+                    info.MoveTo(destPath);
 
+                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
 
-            var temp = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList(); //get the ID
+                    foreach (Assignment a in query)
+                    {
+                        a.Solution = destPath;
+                    }
 
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
 
-
-
-
-            //then we rename the file and UPDATE the DB 
-
-
-            return View();
+                    }
+                }
+            }
+            return View("ManageAssignments");
         }
 
         //  [Authorize(Roles = "")]

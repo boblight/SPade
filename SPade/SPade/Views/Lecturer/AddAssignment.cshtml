@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Scripts.Render("~/bundles/daterangescripts")
+@Scripts.Render("~/bundles/addassignmentscripts")
 
 @using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
@@ -35,13 +35,11 @@
                 </div>
 
                 <div class="form-group">
-                    <div>
-                        <label></label>
-
+                    <div class="col-md-12">
+                        <label>Assignment Module</label>
                         @{
                             @Html.DropDownListFor(c => Model.ModuleId, new SelectList(Model.Modules, "ModuleCode", "ModuleName"), new { @class = "form-control" })
                         }
-
                     </div>
                 </div>
 
@@ -75,29 +73,6 @@
                         @Html.TextBox("daterange", "", new { @class = "form-control" })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
-
-                        <script type="text/javascript">
-                            $(function () {
-                                $('input[name="daterange"]').daterangepicker();
-                            });
-
-                            var range = $("#daterange").data("daterangepicker");
-
-                            $("#daterange").on('apply.daterangepicker', function (ev, picker) {
-
-                                console.log(picker.startDate.format('YYYY-MM-DD'));
-                                console.log(picker.endDate.format('YYYY-MM-DD'));
-                                var currentTime = moment().format('HH:mm:ss');
-                                console.log(currentTime);
-                                var sd = picker.startDate.format('YYYY-MM-DD') + " " + currentTime;
-                                var ed = picker.endDate.format('YYYY-MM-DD') + " " + currentTime;
-
-                                $('#StartDate').val(sd)
-                                $('#DueDate').val(ed)
-
-                            })
-                        </script>
-
                     </div>
                 </div>
 
@@ -106,7 +81,7 @@
                         <label class="control-label">
                             Select classes to allocate assignment to
                         </label>
-                        <input type="text" class="form-control" id="classSelect" placeholder="Select classes..." />
+                        <input type="text" class="form-control" id="classSelect" name="classSelect" placeholder="Select classes..." />
                     </div>
                 </div>
 
@@ -119,8 +94,7 @@
                     </div>
                 </div>
 
-                <!-- Modal for choosing class-->
-                <div id="classModal" class="modal fade" role="dialog">
+                <div name="classModal" id="classModal" class="modal fade" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -138,7 +112,6 @@
                                     }
                                 }
                             </div>
-
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Select</button>
                             </div>
@@ -148,9 +121,7 @@
 
                 <script>
                     $("#classSelect").click(function () {
-
                         $("#classModal").modal("show");
-
                     })
                 </script>
 
