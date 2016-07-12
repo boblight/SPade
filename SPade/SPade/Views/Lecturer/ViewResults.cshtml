@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SPade.ViewModels.Lecturer.ViewResultsViewModel>
+﻿@model SPade.ViewModels.Lecturer.ViewResultsViewModel
 
 @{
     ViewBag.Title = "View Results";
@@ -16,18 +16,24 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-4">
-                        <select id="selectclass" name="selectclass" class="form-control">
-                            <option value="1">DIT/1A/FT/21</option>
-                            <option value="2">DIT/1A/FT/22</option>
-                            <option value="4">DIT/1A/FT/23</option>
-                            <option value="5">DIT/1A/FT/24</option>
+                        <select id="selectClass" name="selectClass" class="form-control">
+
+                            @{
+                                int n = 0;
+                                foreach (var i in Model.classIds)
+                                {
+
+                                    <option value="@i">@Model.classNames[n]</option>
+                                    n++;
+                                }
+                            }
+
                         </select>
                     </div>
                     <div class="col-md-4">
                         <select id="selectAssignment" name="selectAssignment" class="form-control">
-                            <option value="1">Java Practical 1</option>
-                            <option value="2">Java Practical 2</option>
-                            <option value="3">Java Practical 3</option>
+
+
                         </select>
                     </div>
                 </div>
@@ -46,54 +52,104 @@
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Result</th>
-                        <th class="sorter-false">Student's solution</th>
+                        <th class="sorter-false">Student's Solution</th>
                     </tr>
                 </thead>
 
+
                 <tbody>
 
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(model => item.Id)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(model => item.Result)
-                            </td>
-                            <td><a href="@Html.DisplayFor(model => item.Solution)"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
-                        </tr>
-                    }
+
                 </tbody>
 
-                @*<tbody>
-                    <tr>
-                        <td>1431897</td>
-                        <td>Bob Chan</td>
-                        <td>5/5</td>
-                        <td>P</td>
-                        <td><a href="#"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td>1431954</td>
-                        <td>Jenny Tan</td>
-                        <td>4/5</td>
-                        <td>P</td>
-                        <td><a href="#"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td>146454</td>
-                        <td>Jonathan Chia</td>
-                        <td>2/5</td>
-                        <td>F</td>
-                        <td><a href="#"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
-                    </tr>
 
-                </tbody>*@
             </table>
         </fieldset>
     </div>
 </div>
+
+
+
+<script>
+
+
+    $(document).ready(function () {
+
+        $.ajax({
+            url: getAssgn(),
+            success: function () {
+                fillTable();
+            }
+        });
+
+    });
+
+
+    $('select').on('change', function (e) {
+        fillTable();
+    });
+
+
+    function fillTable() {
+
+        $.ajax({
+            url: this.href,
+            type: 'POST',
+            data: '{\'Class\':\'' + $('#selectClass').val() + '\', \'Assignment\':\'' + $('#selectAssignment').val() + '\'}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+
+
+                function updateTable() {
+
+                    var tableContents = "";
+
+                    $.each(data, function (key, val) {
+
+                        tableContents += '<tr><td>' + val.adminno.toUpperCase() + '</td><td>' + val.name + '</td><td>' + val.grade * 100 + '%</td><td><a href=\"' + val.filepath + '\"><span class=\"glyphicon glyphicon-download-alt btn btn-primary\"></span></a></td></tr>';
+
+                    });
+
+                    $('tbody').html(tableContents);
+                }
+
+                $.ajax({
+                    url: updateTable(),
+                    success: function () {
+                        $('table').trigger("update");
+                    }
+                });
+
+            },
+            error: function () {
+            }
+        });
+        
+
+    }
+
+    function getAssgn() {
+        $.ajax({
+            url: 'GetAssignment',
+            type: 'POST',
+            data: '{\'Class\':\'' + $('#selectClass').val() + '\'}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+
+                $.each(data, function (key, val) {
+
+                    $('#selectAssignment')
+                             .append($('<option>', { value: val.AssignmentID })
+                             .text(val.AssgnTitle));
+
+                });
+
+            },
+            error: function () {
+            }
+        });
+    }
+
+</script>

@@ -13,6 +13,7 @@ namespace SPade.Controllers
 {
     public class AdminController : Controller
     {
+      //  { UserID = Request.QueryString["UserID"]
 
         private SPadeDBEntities db = new SPadeDBEntities();
 
@@ -79,7 +80,15 @@ namespace SPade.Controllers
 
         public ActionResult AddOneStudent()
         {
-            return View();
+
+            AddStudentViewModel model = new AddStudentViewModel();
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
+
+
+
         }
 
 
@@ -124,7 +133,14 @@ namespace SPade.Controllers
 
         public ActionResult AddOneClass()
         {
-            return View();
+            AddClassViewModel model = new AddClassViewModel();
+            //Get all classes
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+            return View(model);
+
         }
 
         [HttpPost]
@@ -172,12 +188,10 @@ namespace SPade.Controllers
         {
             return View();
         }
-
         public ActionResult ManageClass()
         {
             return View();
         }
-
         public ActionResult ManageStudent()
         {
             return View();
@@ -188,17 +202,149 @@ namespace SPade.Controllers
         }
         public ActionResult UpdateClass()
         {
+            UpdateClassViewModel model = new UpdateClassViewModel();
+            string x = "1";
+            //Get all classes
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+            return View(model);
+
+            //Get Class           
+            List<Class> Classes = db.Classes.ToList();
+
+            foreach (Class C in Classes)
+            {
+                if (C.ClassID.Equals(x))
+                {
+                    model.CourseID = C.CourseID;
+                    model.ClassID = C.ClassID;
+                }
+
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult UpdateClass(UpdateClassViewModel model)
+        {
             return View();
         }
         public ActionResult UpdateStudent()
         {
-            return View();
+            UpdateStudentViewModel model = new UpdateStudentViewModel();
+            string x = "p1234567";
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+
+            //Get Student           
+            List<Student> Students = db.Students.ToList();
+
+            foreach (Student S in Students)
+            {
+                if (S.AdminNo == x)
+                {
+                    model.Name = S.Name;
+                    model.ClassID = S.ClassID;
+                    model.ContactNo = S.ContactNo;
+                    model.Email = S.Email;
+                }
+
+            }
+            return View(model);
+
+
+
+        }
+        [HttpPost]
+        public ActionResult UpdateStudent(UpdateStudentViewModel model)
+        {
+            string x = "p1234567";
+
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+
+            //Get Student           
+            List<Student> Students = db.Students.ToList();
+
+            foreach (Student S in Students)
+            {
+                if (S.AdminNo == x)
+                {
+                    if (TryUpdateModel(S, "",
+                       new string[] { "Name", "ClassID", "Email", "ContactNo" }))
+                    {
+                        try
+                        {
+
+                            db.SaveChanges();
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                        }
+                    }
+                }
+
+            }
+            return View(model);
         }
         public ActionResult UpdateLecturer()
         {
-            return View();
-        }
+            UpdateLecturerViewModel model = new UpdateLecturerViewModel();
+            //Get Lecturer
 
+            string x = "s1431489";
+            List<Lecturer> Lecturers = db.Lecturers.ToList();
+
+            foreach (Lecturer L in Lecturers)
+            {
+                if (L.StaffID == x)
+                {
+                    model.Name = L.Name;
+                    model.ContactNo = L.ContactNo;
+                    model.Email = L.Email;
+
+                }
+
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult UpdateLecturer(UpdateLecturerViewModel model)
+        {
+            string x = "s1431489";
+            List<Lecturer> Lecturers = db.Lecturers.ToList();
+
+            foreach (Lecturer L in Lecturers)
+            {
+                if (L.StaffID == x)
+                {
+                    //Update Lecturer
+                    if (TryUpdateModel(L, "",
+                       new string[] { "Name", "Email", "ContactNo" }))
+                    {
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                        }
+                    }
+
+                }
+
+            }
+
+            return View(model);
+
+        }
 
 
 
