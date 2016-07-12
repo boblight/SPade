@@ -15,9 +15,8 @@ namespace SPade.ViewModels.Admin
         public string Email { get; set; }
         public int ContactNo { get; set; }
         public List<Class> Classes { get; set; }
-        public List<Lecturer> Lecturers { get; set; }
         public string ClassName { get; set; }
-        public int ClassId { get; set; }
+        public int ClassID { get; set; }
 
 
     }

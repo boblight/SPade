@@ -18,10 +18,9 @@ namespace SPade.ViewModels.Admin
         public string CourseName { get; set; }
         public int CourseId { get; set; }
 
-   //     public List<Lecturer> Lecturers { get; set; }
-   //     public string LecturerName { get; set; }
-     //   public int LecturerId { get; set; }
-
+        public List<SPade.Models.DAL.Lecturer> Lecturers { get; set; }
+        public string LecturerName { get; set; }
+        public int LecturerID { get; set; }
 
 
     }
