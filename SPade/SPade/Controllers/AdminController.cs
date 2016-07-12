@@ -206,53 +206,71 @@ namespace SPade.Controllers
         }
         public ActionResult UpdateStudent()
         {
+            AddStudentViewModel model = new AddStudentViewModel();
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
+
+        }
+        [HttpPost]
+        public ActionResult UpdateStudent(UpdateStudentViewModel model)
+        {
             return View();
         }
         public ActionResult UpdateLecturer()
         {
-            return View();
-        }
-        [HttpPost]
-        public ActionResult UpdateLecturer(UpdateLecturerViewModel model)
-        {
-            try
-            {
-                var lecturer = new Lecturer()
-                {
-                    StaffID = model.StaffID,
-                    Name = model.Name,
-                    ContactNo = model.ContactNo,
-                    Email = model.Email,
-                    CreatedBy = "Admin",
-                    UpdatedBy = "Admin",
-                    DeletedBy = "Admin",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    DeletedAt = DateTime.Now
+            UpdateLecturerViewModel model = new UpdateLecturerViewModel();
+            //Get Lecturer
 
-                };
+            string x = "s1431489";
+            List<Lecturer> Lecturers = db.Lecturers.ToList();
 
-                db.Lecturers.Add(lecturer);
-                db.SaveChanges();
-            }
-            catch (DbEntityValidationException e)
+            foreach (Lecturer L in Lecturers)
             {
-                foreach (var eve in e.EntityValidationErrors)
+                if (L.StaffID == x)
                 {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
+                    model.Name = L.Name;
+                    model.ContactNo = L.ContactNo;
+                    model.Email = L.Email;
+
                 }
-                throw;
 
             }
             return View(model);
         }
+        [HttpPost]
+        public ActionResult UpdateLecturer(UpdateLecturerViewModel model)
+        {
+            string x = "s1431489";
+            List<Lecturer> Lecturers = db.Lecturers.ToList();
 
+            foreach (Lecturer L in Lecturers)
+            {
+                if (L.StaffID == x)
+                {
+                    //Update Lecturer
+                    if (TryUpdateModel(L, "",
+                       new string[] { "Name", "Email", "ContactNo" }))
+                    {
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                        }
+                    }
+
+                }
+
+            }
+
+            return View(model);
+
+        }
 
 
 
