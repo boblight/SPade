@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SPade.ViewModels.Lecturer.ViewResultsViewModel>
+﻿@model SPade.ViewModels.Lecturer.ViewResultsViewModel
 
 @{
     ViewBag.Title = "View Results";
@@ -17,17 +17,32 @@
                 <div class="row">
                     <div class="col-md-4">
                         <select id="selectclass" name="selectclass" class="form-control">
-                            <option value="1">DIT/1A/FT/21</option>
-                            <option value="2">DIT/1A/FT/22</option>
-                            <option value="4">DIT/1A/FT/23</option>
-                            <option value="5">DIT/1A/FT/24</option>
+
+                            @{
+                                int n = 0;
+                                foreach (var i in Model.classIds)
+                                {
+
+                                             <option value="@i">@Model.classNames[n]</option>
+                                    n++;
+                                }
+                             }
+
                         </select>
                     </div>
                     <div class="col-md-4">
                         <select id="selectAssignment" name="selectAssignment" class="form-control">
-                            <option value="1">Java Practical 1</option>
-                            <option value="2">Java Practical 2</option>
-                            <option value="3">Java Practical 3</option>
+
+                            @{
+                                int n2 = 0;
+                                foreach (var i in Model.assIds)
+                                {
+
+                                    <option value="@i">@Model.assNames[n2]</option>
+                                    n2++;
+                                }
+                            }
+
                         </select>
                     </div>
                 </div>
@@ -52,21 +67,27 @@
 
                 <tbody>
 
-                    @foreach (var item in Model)
-                    {
+                    @{
+                        int n3 = 0;
+                        foreach (var r in Model.subIds)
+                        {
                         <tr>
                             <td>
-                                @Html.DisplayFor(model => item.Id)
+                                @Model.admNos[n3]
                             </td>
                             <td>
-                                @Html.DisplayFor(model => item.Name)
+                                @Model.names[n3]
                             </td>
                             <td>
-                                @Html.DisplayFor(model => item.Result)
+                                @Model.grades[n3]
                             </td>
-                            <td><a href="@Html.DisplayFor(model => item.Solution)"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
+                            <td><a href="@Model.solutions[n3]"><span class="glyphicon glyphicon-download-alt btn btn-primary"></span></a></td>
                         </tr>
-                    }
+
+
+                            n3++;
+                        }
+                        }
                 </tbody>
 
                 @*<tbody>

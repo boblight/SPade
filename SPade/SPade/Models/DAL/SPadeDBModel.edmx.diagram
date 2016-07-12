@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="be6aad257cf84913947a0224125ff957" Name="Diagram1">
+        <EntityTypeShape EntityType="SpadeDBModel.C__MigrationHistory" Width="1.5" PointX="7.75" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Admin" Width="1.5" PointX="0.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetRole" Width="1.5" PointX="0.75" PointY="10.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetUser" Width="1.5" PointX="3" PointY="2.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Assignment" Width="1.5" PointX="12.25" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Class" Width="1.5" PointX="3.75" PointY="17.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Class_Assgn" Width="1.5" PointX="14.5" PointY="13.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Course" Width="1.5" PointX="1.5" PointY="17.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Lec_Class" Width="1.5" PointX="6" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Lecturer" Width="1.5" PointX="0.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Module" Width="1.5" PointX="10" PointY="9.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.ProgLanguage" Width="1.5" PointX="7.75" PointY="9.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Student" Width="1.5" PointX="0.75" PointY="12.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Submission" Width="1.5" PointX="14.5" PointY="10.25" IsExpanded="true" />
+        <AssociationConnector Association="SpadeDBModel.FK_AspNetUsers_ToTable_2" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.FK_AspNetUsers_ToTable" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.FK_AspNetUsers_ToTable_1" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.assgn_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.FK_Submission_ToTable" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.Module_fk_constrain" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.class_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.class_fk2" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.classcrse_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.staff_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.staff_fkk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.Language_fk_constrain" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.substud_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.AspNetUserRoles" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
