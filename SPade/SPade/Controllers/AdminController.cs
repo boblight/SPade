@@ -202,6 +202,32 @@ namespace SPade.Controllers
         }
         public ActionResult UpdateClass()
         {
+            UpdateClassViewModel model = new UpdateClassViewModel();
+            string x = "1";
+            //Get all classes
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+            return View(model);
+
+            //Get Class           
+            List<Class> Classes = db.Classes.ToList();
+
+            foreach (Class C in Classes)
+            {
+                if (C.ClassID.Equals(x))
+                {
+                    model.CourseID = C.CourseID;
+                    model.ClassID = C.ClassID;
+                }
+
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult UpdateClass(UpdateClassViewModel model)
+        {
             return View();
         }
         public ActionResult UpdateStudent()
