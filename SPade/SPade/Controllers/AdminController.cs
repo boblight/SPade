@@ -206,17 +206,65 @@ namespace SPade.Controllers
         }
         public ActionResult UpdateStudent()
         {
-            AddStudentViewModel model = new AddStudentViewModel();
+            UpdateStudentViewModel model = new UpdateStudentViewModel();
+            string x = "p1234567";
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
+
+            //Get Student           
+            List<Student> Students = db.Students.ToList();
+
+            foreach (Student S in Students)
+            {
+                if (S.AdminNo == x)
+                {
+                    model.Name = S.Name;
+                    model.ClassID = S.ClassID;
+                    model.ContactNo = S.ContactNo;
+                    model.Email = S.Email;
+                }
+
+            }
             return View(model);
+
+
 
         }
         [HttpPost]
         public ActionResult UpdateStudent(UpdateStudentViewModel model)
         {
-            return View();
+            string x = "p1234567";
+
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+
+            //Get Student           
+            List<Student> Students = db.Students.ToList();
+
+            foreach (Student S in Students)
+            {
+                if (S.AdminNo == x)
+                {
+                    if (TryUpdateModel(S, "",
+                       new string[] { "Name", "ClassID", "Email", "ContactNo" }))
+                    {
+                        try
+                        {
+
+                            db.SaveChanges();
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                        }
+                    }
+                }
+
+            }
+            return View(model);
         }
         public ActionResult UpdateLecturer()
         {

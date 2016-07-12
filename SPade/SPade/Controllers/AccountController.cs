@@ -22,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SpadeDBEntities db = new SpadeDBEntities();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
         public AccountController()
         {
