@@ -1,8 +1,13 @@
-﻿
+﻿@model SPade.ViewModels.Admin.UpdateLecturerViewModel
+
 @{
     ViewBag.Title = "UpdateLecturer";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+
+@using (Html.BeginForm("UpdateLecturer", "Admin", FormMethod.Post))
+{
 
 <div class="container">
     <div class="col-md-4 col-md-offset-4 form-horizontal">
@@ -12,28 +17,27 @@
             <div class="form-group">
                 <div class="col-md-12">
                     <label for="inputLecturerName" class="control-label">Lecturer Name</label>
-                    <input type="text" class="form-control" id="inputLecturerName" placeholder="Name" />
-
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md" })
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="col-md-12">
                     <label for="inputContact" class="control-label">Contact</label>
-                    <input type="text" class="form-control" id="inputContact" placeholder="Contact" />
+                    @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md" })
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="col-md-12">
                     <label for="inputEmail" class="control-label">Email</label>
-                    <input type="text" class="form-control" id="inputEmail" placeholder="Email" />
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md" })
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="col-md-12">
-                    <a id="btnUpdate" href="ManageLecturer" class="btn btn-primary">Update</a>
+                    <input type="submit" value="Update" class="btn btn-primary" />
                     <a id="btnDelete" href="ManageLecturer" class="btn btn-danger">Delete</a>
                     <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                 </div>
@@ -41,3 +45,4 @@
         </fieldset>
     </div>
 </div>
+}

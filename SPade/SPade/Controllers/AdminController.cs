@@ -13,8 +13,9 @@ namespace SPade.Controllers
 {
     public class AdminController : Controller
     {
+      //  { UserID = Request.QueryString["UserID"]
 
-        private SpadeDBEntities db = new SpadeDBEntities();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
 
         // GET: Admin
@@ -79,7 +80,15 @@ namespace SPade.Controllers
 
         public ActionResult AddOneStudent()
         {
-            return View();
+
+            AddStudentViewModel model = new AddStudentViewModel();
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
+
+
+
         }
 
 
@@ -124,7 +133,14 @@ namespace SPade.Controllers
 
         public ActionResult AddOneClass()
         {
-            return View();
+            AddClassViewModel model = new AddClassViewModel();
+            //Get all classes
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+            return View(model);
+
         }
 
         [HttpPost]
@@ -172,12 +188,10 @@ namespace SPade.Controllers
         {
             return View();
         }
-
         public ActionResult ManageClass()
         {
             return View();
         }
-
         public ActionResult ManageStudent()
         {
             return View();
@@ -197,6 +211,46 @@ namespace SPade.Controllers
         public ActionResult UpdateLecturer()
         {
             return View();
+        }
+        [HttpPost]
+        public ActionResult UpdateLecturer(UpdateLecturerViewModel model)
+        {
+            try
+            {
+                var lecturer = new Lecturer()
+                {
+                    StaffID = model.StaffID,
+                    Name = model.Name,
+                    ContactNo = model.ContactNo,
+                    Email = model.Email,
+                    CreatedBy = "Admin",
+                    UpdatedBy = "Admin",
+                    DeletedBy = "Admin",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    DeletedAt = DateTime.Now
+
+                };
+
+                db.Lecturers.Add(lecturer);
+                db.SaveChanges();
+            }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                throw;
+
+            }
+            return View(model);
         }
 
 

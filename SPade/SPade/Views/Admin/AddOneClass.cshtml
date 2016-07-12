@@ -14,13 +14,10 @@
         <!--Select Course-->
         <div class="form-group">
             <div class="col-md-12">
-                <label for="lecturerSelect" class="control-label">Course</label>
-                <select class="form-control" id="courseSelect">
-                    <option>Select a course...</option>
-                    <option>DIT</option>
-                    <option>DBIT</option>
-                    <option>DISM</option>
-                </select>
+                <label>Course</label>
+                @{
+                    @Html.DropDownListFor(c => Model.CourseID, new SelectList(Model.Courses, "CourseID", "CourseName"), new { @class = "form-control" })
+                }
             </div>
         </div>
 
@@ -35,14 +32,10 @@
         <!--Select lecturer-->
         <div class="form-group">
             <div class="col-md-12">
-                <label for="lecturerSelect" class="control-label">Lecturer</label>
-                <select class="form-control" id="lecturerSelect">
-                    <option>Select a lecturer...</option>
-                    <option>Peter Lim</option>
-                    <option>Bob Low</option>
-                    <option>Lim Keng</option>
-                    <option>John Tan</option>
-                </select>
+                <label >Lecturer</label>
+                @{
+                    @Html.DropDownListFor(c => Model.LecturerID, new SelectList(Model.Lecturers, "StaffID", "Name"), new { @class = "form-control" })
+                }    
             </div>
         </div>
 
