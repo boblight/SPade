@@ -14,7 +14,7 @@ namespace SPade.Controllers
     public class AdminController : Controller
     {
 
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
 
         // GET: Admin

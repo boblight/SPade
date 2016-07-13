@@ -52,6 +52,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -182,67 +184,70 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\DAL\Admin.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\AspNetRole.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\AspNetUser.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\AspNetUserClaim.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\AspNetUserLogin.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Assignment.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Class.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Class_Assgn.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Course.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\C__MigrationHistory.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Lecturer.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Lec_Class.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Module.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\ProgLanguage.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\DAL\SPadeModel.Context.cs">
+    <Compile Include="Models\DAL\SPadeDBModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SPadeModel.Context.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\DAL\SPadeModel.cs">
+    <Compile Include="Models\DAL\SPadeDBModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\DAL\SPadeModel.Designer.cs">
+    <Compile Include="Models\DAL\SPadeDBModel.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>SPadeModel.edmx</DependentUpon>
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Student.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Submission.cs">
-      <DependentUpon>SPadeModel.tt</DependentUpon>
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\sysdiagram.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -279,7 +284,9 @@
     <Content Include="App_Data\log.txt" />
     <Content Include="App_Data\Solutions\1solution.txt" />
     <Content Include="App_Data\Submissions\14314761solution.jar" />
-    <Content Include="App_Data\TestCase\1testcase.xml" />
+    <Content Include="App_Data\TestCase\1testcase.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -293,15 +300,15 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\DAL\SPadeModel.Context.tt">
+    <Content Include="Models\DAL\SPadeDBModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SPadeModel.edmx</DependentUpon>
-      <LastGenOutput>SPadeModel.Context.cs</LastGenOutput>
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeDBModel.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="Models\DAL\SPadeModel.tt">
+    <Content Include="Models\DAL\SPadeDBModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SPadeModel.edmx</DependentUpon>
-      <LastGenOutput>SPadeModel.cs</LastGenOutput>
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
     </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -309,12 +316,12 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
-    <EntityDeploy Include="Models\DAL\SPadeModel.edmx">
+    <EntityDeploy Include="Models\DAL\SPadeDBModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>SPadeModel.Designer.cs</LastGenOutput>
+      <LastGenOutput>SPadeDBModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Models\DAL\SPadeModel.edmx.diagram">
-      <DependentUpon>SPadeModel.edmx</DependentUpon>
+    <Content Include="Models\DAL\SPadeDBModel.edmx.diagram">
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
@@ -401,7 +408,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
   </ItemGroup>
@@ -415,6 +421,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

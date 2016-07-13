@@ -22,7 +22,7 @@ namespace SPade.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
         public AccountController()
         {
@@ -145,9 +145,8 @@ namespace SPade.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            List<Class> classList = db.Classes.ToList();
             RegisterViewModel rvm = new RegisterViewModel();
-            rvm.classList = classList;
+            rvm.classList = db.Classes.ToList();
             return View(rvm);
         }
 
