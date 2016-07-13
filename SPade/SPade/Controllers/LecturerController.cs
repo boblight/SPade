@@ -213,7 +213,7 @@ namespace SPade.Controllers
         }
 
 
-        class DBass
+        private class DBass
         {
             public int ClassID { get; set; }
             public int AssignmentID { get; set; }
@@ -221,7 +221,7 @@ namespace SPade.Controllers
             public string AssgnTitle { get; set; }
         }
 
-        class DBres
+        private class DBres
         {
             public int submissionid { get; set; }
             public string adminno { get; set; }
