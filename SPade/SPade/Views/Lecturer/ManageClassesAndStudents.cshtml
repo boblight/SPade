@@ -46,7 +46,8 @@
                                 @Html.DisplayFor(model => item.NumberOfStudents)
                             </td>
                             <td>
-                                <a href="ViewStudentsByClass" class="btn btn-primary">View Class</a>
+                                <!--<a href="ViewStudentsByClass" class="btn btn-primary">View Class</a> -->
+                                @Html.ActionLink("Update", "ViewStudentsByClass", "Lecturer", new { @id = item.Id, @class = "btn btn-danger" })
                             </td>
                         </tr>
                     }

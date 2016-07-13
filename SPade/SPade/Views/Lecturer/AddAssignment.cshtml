@@ -6,6 +6,7 @@
 }
 
 @Scripts.Render("~/bundles/addassignmentscripts")
+@Scripts.Render("~/bundles/jqueryval")
 
 @using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
@@ -30,7 +31,8 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label>Assignment Name</label>
-                        @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control" })
+                        @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control", @required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("AssgnTitle", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -48,7 +50,8 @@
                         <label>
                             Question
                         </label>
-                        @Html.TextAreaFor(m => Model.Describe, new { @class = "col-md-12- form-control", @row = "4" })
+                        @Html.TextAreaFor(m => Model.Describe, new { @class = "col-md-12- form-control", @row = "4", @required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("Describe", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -69,7 +72,6 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="daterange">Select start and end date</label>
-                        <!--<input type="text" class="form-control" name="daterange" value="" />-->
                         @Html.TextBox("daterange", "", new { @class = "form-control" })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
@@ -90,7 +92,8 @@
                         <label class="control-label">
                             Select maximum attempts allowed
                         </label>
-                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @type = "number" })
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @type = "number" })\
+                        <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -113,17 +116,12 @@
                                 }
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                                <button name="modalSelect" id="modalSelect" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <script>
-                    $("#classSelect").click(function () {
-                        $("#classModal").modal("show");
-                    })
-                </script>
 
                 <div class="form-group">
                     <div class="col-md-12">
