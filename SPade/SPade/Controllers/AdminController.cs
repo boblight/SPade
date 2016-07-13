@@ -203,13 +203,15 @@ namespace SPade.Controllers
         public ActionResult UpdateClass()
         {
             UpdateClassViewModel model = new UpdateClassViewModel();
-            string x = "1";
+            int x = 3;
             //Get all classes
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
+
+            //Get all lecturer
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
-            return View(model);
+            
 
             //Get Class           
             List<Class> Classes = db.Classes.ToList();
@@ -220,6 +222,7 @@ namespace SPade.Controllers
                 {
                     model.CourseID = C.CourseID;
                     model.ClassID = C.ClassID;
+                    model.ClassName = C.ClassName;
                 }
 
             }
@@ -228,7 +231,40 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateClass(UpdateClassViewModel model)
         {
-            return View();
+            int x = 3;
+            //Get all classes
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+
+            //Get all lecturer
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+            
+
+            //Get Class           
+            List<Class> Classes = db.Classes.ToList();
+
+            foreach (Class C in Classes)
+            {
+                if (C.ClassID.Equals(x))
+                {
+                    if (TryUpdateModel(C, "", new string[] { "CourseID", "ClassName"}))
+                    {
+                        try
+                        {
+
+                            db.SaveChanges();
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                        }
+                    }
+                }
+
+            }
+            return View(model);
         }
         public ActionResult UpdateStudent()
         {
