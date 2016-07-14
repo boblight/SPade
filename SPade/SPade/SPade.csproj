@@ -246,9 +246,6 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\DAL\sysdiagram.cs">
-      <DependentUpon>SPadeDBModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -311,6 +308,7 @@
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
       <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
     </Content>
+    <Content Include="Scripts\addassignmentscript.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\bootstrap-theme.css.map" />
