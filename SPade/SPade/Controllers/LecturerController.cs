@@ -284,6 +284,27 @@ namespace SPade.Controllers
             return Json(results);
         }
 
+        //[HttpPost]
+        //public FileResult Download(string url)
+        //{
+        //    //perform logic to see if user has access to this file
+        //    //if access, return the file
+        //    //else return a 404
+
+
+        //    //Qrcode Qrcode = DbO.getQrcodebyLinkId(linkid);
+        //    //string image = Server.MapPath("~") + "\\Qrcodes\\" + Qrcode.Image;
+        //    //string contentType = "image/jpg";
+
+        //    //return File(image, contentType, "Qrcode-" + Qrcode.QrcodeId);
+
+        //    return File(null);
+
+        //}
+
+
+
+
         class DBass
         {
             public int ClassID { get; set; }
