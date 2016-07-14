@@ -1,8 +1,13 @@
-﻿
+﻿@model SPade.ViewModels.Admin.UpdateStudentViewModel
+
 @{
     ViewBag.Title = "UpdateStudent";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+
+@using (Html.BeginForm("UpdateStudent", "Admin", FormMethod.Post))
+{
 
 <div class="container">
 
@@ -11,42 +16,49 @@
 
             <legend>Update Student</legend>
 
+            <!-- studentNameInput-->
             <div class="form-group">
                 <div class="col-md-12">
-                    <label for="inputName" class="control-label">Name</label>
-                    <input type="text" class="form-control" id="inputName" placeholder="Name" />
+                    @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md" })
                 </div>
             </div>
 
+            <!-- studentClass-->
             <div class="form-group">
-                <div class="col-md-12">
-                    <label for="" class="control-label">Class</label>
-                    <select class="form-control" id="select">
-                        <option>Select a class...</option>
-                        <option>DIT/1A/FT/21</option>
-                        <option>DIT/1A/FT/22</option>
-                        <option>DIT/1A/FT/23</option>
-                    </select>
+                <div>
+                    <div class="col-md-12">
+                        <label>Class</label>
+                        @{
+                            @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
+                        }
+                    </div>
                 </div>
             </div>
 
+            <!-- studentEmail-->
             <div class="form-group">
                 <div class="col-md-12">
-                    <label for="inputEmail" class="control-label">Email</label>
-                    <input type="text" class="form-control" id="inputEmail" placeholder="Email" />
+
+                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md" })
+
                 </div>
             </div>
 
+            <!-- studentContactNo-->
             <div class="form-group">
                 <div class="col-md-12">
-                    <label for="" class="control-label">Contact Number</label>
-                    <input type="text" class="form-control" id="inputContact" placeholder="Contact Number" />
+                    @Html.LabelFor(m => m.ContactNo, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md" })
                 </div>
             </div>
 
+
+
             <div class="form-group">
                 <div class="col-md-12">
-                    <a href="ManageStudent" class="btn btn-primary">Update</a>
+                    <input type="submit" value="Update" class="btn btn-primary" />
                     <a href="ManageStudent" class="btn btn-danger">Delete</a>
                     <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                 </div>
@@ -54,3 +66,4 @@
         </fieldset>
     </div>
 </div>
+}
