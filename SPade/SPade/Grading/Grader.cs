@@ -47,7 +47,7 @@ namespace SPade.Grading
 
             compile.WaitForExit();
 
-            //debugger for error
+            //////////////debugger for error
             int temp = compile.ExitCode;
             if (temp == 1)
             {
@@ -78,37 +78,39 @@ namespace SPade.Grading
                 foreach (XmlNode testcase in testcaseList)
                 {
                     proc = Process.Start(procInfo);
-
-                    /*
+                    
                     //check if program asking for input
+                    //incase user upload wrong type of program
                     foreach (ProcessThread thread in proc.Threads)
                     {
-                        if (thread.ThreadState != ThreadState.Wait
-                            && thread.WaitReason != ThreadWaitReason.UserRequest)
+                        if (thread.ThreadState == ThreadState.Wait
+                            && thread.WaitReason == ThreadWaitReason.UserRequest)
                         {
-                            programFailed = true;
+                            //programFailed = true;
                             break;
                         }
-                    }//*/
+                    }//end of loops
+
                     System.IO.StreamWriter sw = proc.StandardInput;
 
                     foreach (XmlNode input in testcase.ChildNodes)
                     {
                         sw.WriteLine(input.InnerText);
                         sw.Flush();
-                        subOut += proc.StandardOutput.ReadLine() + input.InnerText;
+                        subOut += proc.StandardOutput.ReadLine() + " " + input.InnerText + "\n";
                     }//end of inputs
                     //check if there is another error thrown by program
                     error = proc.StandardError.ReadToEnd();
 
                     if (error.Equals(""))
                     {
-                        subOut += proc.StandardOutput.ReadLine();
+                        //add output to list of outputs if there is no error
+                        subOut += proc.StandardOutput.ReadLine() + "\n";
                         subList.Add(subOut);
-                        testCasePassed++;
                     }
                     else
                     {
+                        //program given fail if an error was encountered
                         programFailed = true;
                         sw.Close();
                         proc.WaitForExit();
