@@ -79,6 +79,14 @@ namespace SPade.Controllers
             return View();
         }
 
+        public FileResult DownloadTestCase()
+        {
+            string f = Server.MapPath(@"~/App_Data/TestCase/testCase.xml");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "testCase.xml";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
         //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
