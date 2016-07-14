@@ -237,7 +237,7 @@ namespace SPade.Controllers
             string loggedInLecturer = "s1431489"; //temp 
 
 
-            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
 
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
@@ -265,7 +265,7 @@ namespace SPade.Controllers
         {
             string loggedInLecturer = "s1431489"; //temp 
 
-            var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator",
+            var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
     new SqlParameter("@inClass", Class),
     new SqlParameter("@inCreator", loggedInLecturer)).ToList();
 
