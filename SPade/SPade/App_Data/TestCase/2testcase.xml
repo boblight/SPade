@@ -9,7 +9,7 @@
   </testcase>
 
   <testcase>
-    <input>56</input>
-    <input>lmkmkl</input>
+    <input>Hallo</input>
+    <input>34</input>
   </testcase>
 </body>
