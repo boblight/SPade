@@ -12,6 +12,7 @@ using System.IO;
 using SPade.Grading;
 using System.Diagnostics;
 using Microsoft.AspNet.Identity;
+using System.Data.SqlClient;
 
 namespace SPade.Controllers
 {
@@ -39,10 +40,10 @@ namespace SPade.Controllers
             if (file.ContentLength > 0)
             {
                 var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                var zipLocation = Server.MapPath(@"~/App_Data/Submissions/" + file);
+                var zipLocation = Server.MapPath(@"~/Submissions/" + file);
                 file.SaveAs(zipLocation);
 
-                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
+                var filePath = Server.MapPath(@"~/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
                 System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
                 fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
@@ -50,7 +51,8 @@ namespace SPade.Controllers
 
                 //grading parts
                 Grader grader = new Grader(filePath, fileName, assgnId);
-                Decimal result = Decimal.Parse(grader.grade().ToString());
+                //Decimal result = Decimal.Parse(grader.grade().ToString());
+                Decimal result = grader.grade();
 
                 if (result != 2)
                 {
@@ -128,17 +130,76 @@ namespace SPade.Controllers
         }
 
         // GET: ViewResult
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult ViewResult()
         {
-            return View();
+
+            ViewResultViewModel vrvm = new ViewResultViewModel();
+
+            string loggedInStudent = "p123456"; //temp 
+
+
+            var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, s1.assignmentid, a.assignmentid, a.assgntitle, a.startdate, a.duedate, s1.grade, s1.filepath, s1.timestamp from submission s1 inner join( select max(submissionid) submissionid, adminno, assignmentid, max(timestamp) timestamp from submission group by adminno, assignmentid ) s2 on s1.submissionid = s2.submissionid inner join( select * from assignment where deletedat is null ) a on s1.assignmentid = a.assignmentid where s1.adminno = @inStudent",
+    new SqlParameter("@inStudent", loggedInStudent)).ToList();
+
+            List<String> Assignment = new List<String>();
+            List<String> IssuedOn = new List<String>();
+            List<String> DueDate = new List<String>();
+            List<String> Result = new List<String>();
+            List<String> Overall = new List<String>();
+            List<String> SubmittedOn = new List<String>();
+            List<String> Submission = new List<String>();
+
+            foreach (var r in results)
+            {
+                Assignment.Add(r.assgntitle);
+                IssuedOn.Add(r.startdate.ToString());
+                DueDate.Add(r.duedate.ToString());
+                Result.Add((int)Math.Round(r.grade * 100) + "%");
+
+                if (r.grade >= 0.5M)
+                    Overall.Add("Pass");
+                else
+                    Overall.Add("Fail");
+
+                SubmittedOn.Add(r.timestamp.ToString());
+                Submission.Add(r.filepath);
+
+            }
+
+            vrvm.Assignment = Assignment;
+            vrvm.IssuedOn = IssuedOn;
+            vrvm.DueDate = DueDate;
+            vrvm.Result = Result;
+            vrvm.Overall = Overall;
+            vrvm.SubmittedOn = SubmittedOn;
+            vrvm.Submission = Submission;
+
+            return View(vrvm);
         }
 
+
         // GET: PostSubmission
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult PostSubmission()
         {
-            return View(Session["Submission"]);
+            ////temporary arrangement for me to self validate output - TL
+            //SubmissionViewModel svm = new SubmissionViewModel();
+            //svm = (SubmissionViewModel)Session["Submission"];
+            //svm.submission = (Submission)Session["submission"];
+            return View(Session["submission"]);
         }
+
+
+        private class DBres
+        {
+            public string assgntitle { get; set; }
+            public DateTime startdate { get; set; }
+            public DateTime duedate { get; set; }
+            public decimal grade { get; set; }
+            public string filepath { get; set; }
+            public DateTime timestamp { get; set; }
+        }
+
     }//end of controller
 }
