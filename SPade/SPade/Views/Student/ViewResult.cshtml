@@ -1,4 +1,5 @@
-﻿
+﻿@model SPade.ViewModels.Student.ViewResultViewModel
+
 @{
     ViewBag.Title = "View Result";
 }
@@ -22,52 +23,34 @@
                 <thead>
                     <tr>
                         <th>Assignment</th>
-                        <th>Issued By</th>
-                        <th>Issued on</th>
-                        <th>Submitted on</th>
+                        <th>Issued On</th>
+                        <th>Due Date</th>
                         <th>Result</th>
                         <th>Overall</th>
-                        <th class="sorter-false">Download Submission</th>
+                        <th>Submitted On</th>
+                        <th class="sorter-false">Download Latest Submission</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Sample-->
-                    <tr>
-                        <td>Java Intro Practical 1</td>
-                        <td>Mr Low</td>
-                        <td>5/5/2016</td>
-                        <td>10/5/2016</td>
-                        <td>4/5</td>
-                        <td>P</td>
-                        <td><a href="#" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td>Java Intro Practical 2</td>
-                        <td>Mr Low </td>
-                        <td>6/5/2016</td>
-                        <td>10/5/2016</td>
-                        <td>3/5</td>
-                        <td>P</td>
-                        <td><a href="#" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td>Java Practical 3</td>
-                        <td>Mr Tan </td>
-                        <td>7/5/2016</td>
-                        <td>11/5/2016</td>
-                        <td>1/2</td>
-                        <td>P</td>
-                        <td><a href="#" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td>Java Practical 4</td>
-                        <td>Mr Chong </td>
-                        <td>8/5/2016</td>
-                        <td>12/5/2016</td>
-                        <td>2/3</td>
-                        <td>P</td>
-                        <td><a href="#" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span></a></td>
-                    </tr>
+
+                    @{
+                        int n = 0;
+                        foreach (var i in Model.Assignment)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@Model.IssuedOn[n]</td>
+                                <td>@Model.DueDate[n]</td>
+                                <td>@Model.Result[n]</td>
+                                <td>@Model.Overall[n]</td>
+                                <td>@Model.SubmittedOn[n]</td>
+                                <td><a href="@Model.Submission[n]" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span></a></td>
+                            </tr>
+
+                            n++;
+                        }
+                    }
+
                 </tbody>
             </table>
         </div>

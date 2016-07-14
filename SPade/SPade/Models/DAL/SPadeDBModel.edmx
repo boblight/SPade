@@ -207,6 +207,16 @@
           <Property Name="FilePath" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="Timestamp" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
         <Association Name="assgn_fk">
           <End Role="Assignment" Type="Self.Assignment" Multiplicity="1" />
           <End Role="Class_Assgn" Type="Self.Class_Assgn" Multiplicity="*" />
@@ -252,42 +262,6 @@
             </Principal>
             <Dependent Role="Class">
               <PropertyRef Name="CourseID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AspNetUsers_ToTable">
-          <End Role="Student" Type="Self.Student" Multiplicity="1" />
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="AdminNo" />
-            </Principal>
-            <Dependent Role="AspNetUsers">
-              <PropertyRef Name="UserName" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AspNetUsers_ToTable_1">
-          <End Role="Lecturer" Type="Self.Lecturer" Multiplicity="1" />
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lecturer">
-              <PropertyRef Name="StaffID" />
-            </Principal>
-            <Dependent Role="AspNetUsers">
-              <PropertyRef Name="UserName" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AspNetUsers_ToTable_2">
-          <End Role="Admin" Type="Self.Admin" Multiplicity="1" />
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Admin">
-              <PropertyRef Name="AdminID" />
-            </Principal>
-            <Dependent Role="AspNetUsers">
-              <PropertyRef Name="UserName" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -437,6 +411,7 @@
           <EntitySet Name="ProgLanguage" EntityType="Self.ProgLanguage" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Submission" EntityType="Self.Submission" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="assgn_fk" Association="Self.assgn_fk">
             <End Role="Assignment" EntitySet="Assignment" />
             <End Role="Class_Assgn" EntitySet="Class_Assgn" />
@@ -452,18 +427,6 @@
           <AssociationSet Name="classcrse_fk" Association="Self.classcrse_fk">
             <End Role="Course" EntitySet="Course" />
             <End Role="Class" EntitySet="Class" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AspNetUsers_ToTable" Association="Self.FK_AspNetUsers_ToTable">
-            <End Role="Student" EntitySet="Student" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AspNetUsers_ToTable_1" Association="Self.FK_AspNetUsers_ToTable_1">
-            <End Role="Lecturer" EntitySet="Lecturer" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AspNetUsers_ToTable_2" Association="Self.FK_AspNetUsers_ToTable_2">
-            <End Role="Admin" EntitySet="Admin" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
@@ -529,7 +492,6 @@
           <Property Name="ContactNo" Type="Int32" Nullable="false" />
           <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="FullName" Type="String" MaxLength="60" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="AspNetUsers" Relationship="Self.FK_AspNetUsers_ToTable_2" FromRole="Admin" ToRole="AspNetUsers" />
         </EntityType>
         <EntityType Name="AspNetRole">
           <Key>
@@ -576,11 +538,8 @@
           <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
           <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
           <Property Name="UserName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Admin" Relationship="Self.FK_AspNetUsers_ToTable_2" FromRole="AspNetUsers" ToRole="Admin" />
           <NavigationProperty Name="AspNetUserClaims" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserClaims" />
           <NavigationProperty Name="AspNetUserLogins" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserLogins" />
-          <NavigationProperty Name="Student" Relationship="Self.FK_AspNetUsers_ToTable" FromRole="AspNetUsers" ToRole="Student" />
-          <NavigationProperty Name="Lecturer" Relationship="Self.FK_AspNetUsers_ToTable_1" FromRole="AspNetUsers" ToRole="Lecturer" />
           <NavigationProperty Name="AspNetRoles" Relationship="Self.AspNetUserRoles" FromRole="AspNetUsers" ToRole="AspNetRoles" />
         </EntityType>
         <EntityType Name="Assignment">
@@ -672,7 +631,6 @@
           <Property Name="UpdatedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="DeletedAt" Type="DateTime" Precision="3" />
           <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="AspNetUsers" Relationship="Self.FK_AspNetUsers_ToTable_1" FromRole="Lecturer" ToRole="AspNetUsers" />
           <NavigationProperty Name="Lec_Class" Relationship="Self.staff_fk" FromRole="Lecturer" ToRole="Lec_Class" />
           <NavigationProperty Name="Lec_Class1" Relationship="Self.staff_fkk" FromRole="Lecturer" ToRole="Lec_Class" />
         </EntityType>
@@ -721,7 +679,6 @@
           <Property Name="UpdatedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="DeletedAt" Type="DateTime" Precision="3" />
           <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="AspNetUsers" Relationship="Self.FK_AspNetUsers_ToTable" FromRole="Student" ToRole="AspNetUsers" />
           <NavigationProperty Name="Submissions" Relationship="Self.substud_fk" FromRole="Student" ToRole="Submission" />
         </EntityType>
         <EntityType Name="Submission">
@@ -737,18 +694,16 @@
           <NavigationProperty Name="Assignment" Relationship="Self.FK_Submission_ToTable" FromRole="Submission" ToRole="Assignment" />
           <NavigationProperty Name="Student" Relationship="Self.substud_fk" FromRole="Submission" ToRole="Student" />
         </EntityType>
-        <Association Name="FK_AspNetUsers_ToTable_2">
-          <End Role="Admin" Type="Self.Admin" Multiplicity="1" />
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Admin">
-              <PropertyRef Name="AdminID" />
-            </Principal>
-            <Dependent Role="AspNetUsers">
-              <PropertyRef Name="UserName" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -774,30 +729,6 @@
             </Principal>
             <Dependent Role="AspNetUserLogins">
               <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AspNetUsers_ToTable">
-          <End Role="Student" Type="Self.Student" Multiplicity="1" />
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Student">
-              <PropertyRef Name="AdminNo" />
-            </Principal>
-            <Dependent Role="AspNetUsers">
-              <PropertyRef Name="UserName" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_AspNetUsers_ToTable_1">
-          <End Role="Lecturer" Type="Self.Lecturer" Multiplicity="1" />
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lecturer">
-              <PropertyRef Name="StaffID" />
-            </Principal>
-            <Dependent Role="AspNetUsers">
-              <PropertyRef Name="UserName" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -942,10 +873,7 @@
           <EntitySet Name="ProgLanguages" EntityType="Self.ProgLanguage" />
           <EntitySet Name="Students" EntityType="Self.Student" />
           <EntitySet Name="Submissions" EntityType="Self.Submission" />
-          <AssociationSet Name="FK_AspNetUsers_ToTable_2" Association="Self.FK_AspNetUsers_ToTable_2">
-            <End Role="Admin" EntitySet="Admins" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-          </AssociationSet>
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -953,14 +881,6 @@
           <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserLogins" EntitySet="AspNetUserLogins" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AspNetUsers_ToTable" Association="Self.FK_AspNetUsers_ToTable">
-            <End Role="Student" EntitySet="Students" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-          </AssociationSet>
-          <AssociationSet Name="FK_AspNetUsers_ToTable_1" Association="Self.FK_AspNetUsers_ToTable_1">
-            <End Role="Lecturer" EntitySet="Lecturers" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
           </AssociationSet>
           <AssociationSet Name="assgn_fk" Association="Self.assgn_fk">
             <End Role="Assignment" EntitySet="Assignments" />
@@ -1217,6 +1137,17 @@
                 <ScalarProperty Name="Grade" ColumnName="Grade" />
                 <ScalarProperty Name="FilePath" ColumnName="FilePath" />
                 <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="SPadeDBModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

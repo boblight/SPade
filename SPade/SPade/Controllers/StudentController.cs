@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 using System.IO;
 using SPade.Grading;
 using System.Diagnostics;
+using Microsoft.AspNet.Identity;
 
 namespace SPade.Controllers
 {
     public class StudentController : Controller
     {
         private SPadeDBEntities db = new SPadeDBEntities();
-        private Grader grader = new Grader();
 
         // GET: Dashboard
         //[Authorize(Roles = "")]
@@ -32,37 +32,44 @@ namespace SPade.Controllers
         public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
             Submission submission = new Submission();
-            int assgnId = (int)Session["id"];
+            int assgnId = (int)Session["assignmentId"];
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
 
             //getting file path
             if (file.ContentLength > 0)
             {
-                var fileName = Path.GetFileName(file.FileName);
-                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + "1431476" /*student id temp, to get from session*/ + "1" /*assignment id*/ + "solution.jar");
+                var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                var zipLocation = Server.MapPath(@"~/App_Data/Submissions/" + file);
+                file.SaveAs(zipLocation);
+
+                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
                 System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
                 fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
-                file.SaveAs(filePath);
+                System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
+                //file.SaveAs(filePath);
 
-                //grading hardcoded assignment id to be changed
-                Decimal result = Decimal.Parse(grader.grade("14314761solution.jar", 1).ToString());
+                //grading parts
+                Grader grader = new Grader(filePath, fileName, assgnId);
+                Decimal result = Decimal.Parse(grader.grade().ToString());
+
                 if (result != 2)
                 {
                     submission.Grade = result;
                     submission.AssignmentID = assgnId;
-                    submission.AdminNo = "1431476";
+                    //submission.AdminNo = User.Identity.GetUserName().ToString();
+                    submission.AdminNo = User.Identity.GetUserName();
                     submission.FilePath = filePath.ToString();
                     submission.Timestamp = DateTime.Now;
                 }
                 else if (result == 2)
                 {
-                    //if error
-                    return Redirect("/Student/ViewAssignment");
+                    //if grading encounters error
+                    return Redirect("/Student/ViewAssignment"); //to implement proper handling soon
                 }
             }
 
             db.Submissions.Add(submission);
-            assignment.MaxAttempt -= 1; //updating the max attempt
+            //assignment.MaxAttempt -= 1; //updating the max attempt
             db.SaveChanges();
 
             Session["submission"] = submission;
@@ -79,7 +86,7 @@ namespace SPade.Controllers
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
 
             //start a session to check which assignment student is viewing
-            Session["id"] = id;
+            Session["assignmentId"] = id;
 
             svm.assignment = assignment;
 

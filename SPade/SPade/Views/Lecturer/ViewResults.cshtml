@@ -52,6 +52,7 @@
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Result</th>
+                        <th>Overall</th>
                         <th class="sorter-false">Student's Solution</th>
                     </tr>
                 </thead>
@@ -78,7 +79,10 @@
         $.ajax({
             url: getAssgn(),
             success: function () {
-                fillTable();
+
+                setTimeout(function () {
+                    fillTable();
+                }, 300);
             }
         });
 
@@ -107,7 +111,16 @@
 
                     $.each(data, function (key, val) {
 
-                        tableContents += '<tr><td>' + val.adminno.toUpperCase() + '</td><td>' + val.name + '</td><td>' + val.grade * 100 + '%</td><td><a href=\"' + val.filepath + '\"><span class=\"glyphicon glyphicon-download-alt btn btn-primary\"></span></a></td></tr>';
+                        var overall;
+
+                        if (val.grade >= 0.5) {
+                            overall = "Pass";
+                        }
+                        else {
+                            overall = "Fail";
+                        }
+
+                        tableContents += '<tr><td>' + val.adminno.toUpperCase() + '</td><td>' + val.name + '</td><td>' + val.grade * 100 + '%</td><td>' +overall +'</td><td><a href=\"' + val.filepath + '\"><span class=\"glyphicon glyphicon-download-alt btn btn-primary\"></span></a></td></tr>';
 
                     });
 
