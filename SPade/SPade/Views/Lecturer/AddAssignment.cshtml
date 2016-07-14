@@ -59,6 +59,7 @@
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
                         <input id="solutionsFile" name="fileList[0]" class="form-control" type="file" style="border: solid 1px red" />
+                        <span class="help-block">@Html.ValidationMessage("Soution", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -72,9 +73,11 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="daterange">Select start and end date</label>
-                        @Html.TextBox("daterange", "", new { @class = "form-control" })
+                        @Html.TextBox("daterange", "", new { @class = "form-control", @placeholder = "Select start and end date..." })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
+                        <span class="help-block">@Html.ValidationMessage("StartDate", new { @class = "text-danger" })</span>
+                        <span class="help-block">@Html.ValidationMessage("EndDate", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -92,7 +95,7 @@
                         <label class="control-label">
                             Select maximum attempts allowed
                         </label>
-                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @type = "number" })\
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @max = "10", @type = "number" })
                         <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
                     </div>
                 </div>

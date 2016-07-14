@@ -1,30 +1,50 @@
-﻿$(function () {
-    $('input[name="daterange"]').daterangepicker();
-});
+﻿$(document).ready(function () {
 
-$("#daterange").on('apply.daterangepicker', function (ev, picker) {
+    $(function () {
+        $('input[name="daterange"]').daterangepicker({
 
-    console.log(picker.startDate.format('YYYY-MM-DD'));
-    console.log(picker.endDate.format('YYYY-MM-DD'));
-    var currentTime = moment().format('HH:mm:ss');
-    console.log(currentTime);
-    var sd = picker.startDate.format('YYYY-MM-DD');
-    var ed = picker.endDate.format('YYYY-MM-DD');
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
 
-    $('#StartDate').val(sd)
-    $('#DueDate').val(ed)
+        })
+    });
 
-})
+    $("#daterange").on('apply.daterangepicker', function (ev, picker) {
 
-$("#classSelect").click(function () {
+        var sd = picker.startDate.format('YYYY-MM-DD')
+        var ed = picker.endDate.format('YYYY-MM-DD')
 
-    $("#classModal").modal("show");
+        $("#daterange").val(sd + " - " + ed)
+        $('#StartDate').val(sd)
+        $('#DueDate').val(ed)
+    })
 
-})
+    $("#daterange").on("cancel.daterangepicker", function (ev, picker) {
 
-$(document).on("click", "#classSelect", function (e) {
+        $("#daterange").val("");
 
-    $("classModal").modal("show");
+    })
 
+    $("#classSelect").click(function () {
+
+        $("#classModal").modal("show");
+
+    })
+
+    $("#modalSelect").click(function () {
+
+        var selectedClasses = $("#ClassList option:checked").text();
+        $("#classSelect").val(selectedClasses);
+
+
+
+    })
+    function selectedClass() {
+
+        var selectedClasses = $("#ClassList option:checked").text();
+        $("#classSelect").val(selectedClasses);
+    }
 
 })

@@ -260,7 +260,6 @@ namespace SPade.Controllers
 
         }
 
-
         [HttpPost]
         public ActionResult GetAssignment(string Class)
         {
@@ -270,7 +269,6 @@ namespace SPade.Controllers
 
             return Json(assignments);
         }
-
 
         [HttpPost]
         public ActionResult ViewResults(string Class, string Assignment)
@@ -283,7 +281,6 @@ namespace SPade.Controllers
 
             return Json(results);
         }
-
 
         class DBass
         {
