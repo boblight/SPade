@@ -275,16 +275,17 @@
     <Compile Include="ViewModels\Lecturer\UpdateStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ViewResultsViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ViewStudentsByClassViewModel.cs" />
+    <Compile Include="ViewModels\Student\SubmissionViewModel.cs" />
     <Compile Include="ViewModels\Student\SubmitAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\LecturerSolution\14314761solution.jar" />
+    <Content Include="LecturerSolution\14314761solution.jar" />
     <Content Include="App_Data\log.txt" />
-    <Content Include="App_Data\Solutions\1solution.txt" />
-    <Content Include="App_Data\Submissions\14314761solution.jar" />
-    <Content Include="App_Data\TestCase\1testcase.xml">
+    <Content Include="Solutions\1solution.txt" />
+    <Content Include="Submissions\14314761solution.jar" />
+    <Content Include="TestCase\1testcase.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\animate.min.css" />

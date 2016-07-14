@@ -39,10 +39,10 @@ namespace SPade.Controllers
             if (file.ContentLength > 0)
             {
                 var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                var zipLocation = Server.MapPath(@"~/App_Data/Submissions/" + file);
+                var zipLocation = Server.MapPath(@"~/Submissions/" + file);
                 file.SaveAs(zipLocation);
 
-                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
+                var filePath = Server.MapPath(@"~/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
                 System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
                 fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
@@ -50,7 +50,8 @@ namespace SPade.Controllers
 
                 //grading parts
                 Grader grader = new Grader(filePath, fileName, assgnId);
-                Decimal result = Decimal.Parse(grader.grade().ToString());
+                //Decimal result = Decimal.Parse(grader.grade().ToString());
+                Decimal result = grader.grade();
 
                 if (result != 2)
                 {
@@ -138,7 +139,11 @@ namespace SPade.Controllers
        // [Authorize(Roles = "")]
         public ActionResult PostSubmission()
         {
-            return View(Session["Submission"]);
+            ////temporary arrangement for me to self validate output - TL
+            //SubmissionViewModel svm = new SubmissionViewModel();
+            //svm = (SubmissionViewModel)Session["Submission"];
+            //svm.submission = (Submission)Session["submission"];
+            return View(Session["submission"]);
         }
     }//end of controller
 }
