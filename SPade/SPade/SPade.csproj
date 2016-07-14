@@ -52,6 +52,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -279,7 +281,9 @@
     <Content Include="App_Data\log.txt" />
     <Content Include="App_Data\Solutions\1solution.txt" />
     <Content Include="App_Data\Submissions\14314761solution.jar" />
-    <Content Include="App_Data\TestCase\1testcase.xml" />
+    <Content Include="App_Data\TestCase\1testcase.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -303,6 +307,7 @@
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
       <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
     </Content>
+    <Content Include="Scripts\addassignmentscript.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\bootstrap-theme.css.map" />
@@ -401,7 +406,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
   </ItemGroup>
@@ -415,6 +419,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

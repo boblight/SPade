@@ -42,9 +42,10 @@ namespace SPade
                         "~/Scripts/jquery-1.10.2.min.js",
                         "~/Scripts/bootstrap.min.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/daterangescripts").Include(
+            bundles.Add(new ScriptBundle("~/bundles/addassignmentscripts").Include(
                         "~/Scripts/moment.min.js",
-                        "~/Scripts/daterangepicker.js"));
+                        "~/Scripts/daterangepicker.js",
+                        "~/Scripts/addassignmentscript.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/tablescript").Include(
                     "~/Scripts/jquery.tablesorter.combined.js",

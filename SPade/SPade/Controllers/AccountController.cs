@@ -145,9 +145,8 @@ namespace SPade.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            List<Class> classList = db.Classes.ToList();
             RegisterViewModel rvm = new RegisterViewModel();
-            rvm.classList = classList;
+            rvm.classList = db.Classes.ToList();
             return View(rvm);
         }
 

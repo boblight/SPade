@@ -41,7 +41,9 @@ namespace SPade.Controllers
                 //match the class ID of student wit hthe class ID of the managed Classes
                 var count = db.Students.Where(s => s.ClassID == c.ClassID).Count();
 
-                e.ClassName = c.ClassName;
+                Course cs = db.Courses.Where(cx => cx.CourseID == c.CourseID).First();
+
+                e.ClassName = cs.CourseAbbr + "/" + c.ClassName;
                 e.Id = c.ClassID;
                 e.NumberOfStudents = count;
 
@@ -84,7 +86,7 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            string x = "1431489"; //temp 
+            string x = "s1431489"; //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -112,9 +114,7 @@ namespace SPade.Controllers
         //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
-            //insert data into db 
-
-            foreach (var file in fileList)
+            foreach (var file in fileList) //renaming files
             {
                 if (file != null && file.ContentLength > 0)
                 {
@@ -125,30 +125,102 @@ namespace SPade.Controllers
                     if (ext == ".xml") //test case 
                     {
                         //this is for the testcase 
-
-                        //i put inside the testcase -> this is temporary. will be renamed after inserted into the DB
                         var fileName = Path.GetFileName(file.FileName);
                         var filePath = Server.MapPath(@"~/App_Data/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
-
                     }
                     else
                     {
-                        //for the solution file  
-
+                        //for the solution file 
                         var fileName = Path.GetFileName(file.FileName);
                         //extension at the back is dynamic. cater for other language also 
-                        var filePath = Server.MapPath(@"~/App_Data/Submissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
+                        var filePath = Server.MapPath(@"~/App_Data/Solutions/" + addAssgn.AssgnTitle + "_Solution" + ext);
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
                     }
-                    //file.SaveAs(Path.Combine(Server.MapPath("/App_Data/Temp"), Guid.NewGuid() + Path.GetExtension(file.FileName)));
                 }
             }
-            return View();
+            //run the solution and get the result 
+
+            //now to add into the DB 
+            Assignment newAssignment = new Assignment();
+            Class_Assgn classAssgn = new Class_Assgn();
+            List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
+
+            newAssignment.AssgnTitle = addAssgn.AssgnTitle;
+            newAssignment.Describe = addAssgn.Describe;
+            newAssignment.MaxAttempt = addAssgn.MaxAttempt;
+            newAssignment.StartDate = addAssgn.StartDate;
+            newAssignment.DueDate = addAssgn.DueDate;
+            newAssignment.ModuleCode = addAssgn.ModuleId;
+            newAssignment.CreateBy = "1431485"; //temp
+            newAssignment.CreateAt = DateTime.Now;
+            newAssignment.UpdatedBy = "1431485"; //temp
+            newAssignment.UpdatedAt = DateTime.Now;
+            db.Assignments.Add(newAssignment);
+            //   db.SaveChanges();
+
+            var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First(); //get the ID
+
+            //insert into Class_Assgn
+            foreach (AssignmentClass a in addAssgn.ClassList)
+            {
+                if (a.isSelected == true)
+                {
+                    classAssgn.ClassID = a.ClassId;
+                    classAssgn.AssignmentID = assgnID;
+                    db.Class_Assgn.Add(classAssgn);
+                    //  db.SaveChanges();
+                }
+            }
+
+            //then we rename the files and UPDATE the DB 
+            string testCasePath = Server.MapPath(@"~/App_Data/TestCase/");
+            string solutionPath = Server.MapPath(@"~/App_Data/Solutions/");
+
+            //rename the TestCase
+            foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+            {
+                if (f.Name == addAssgn.AssgnTitle + "_TestCase.xml")
+                {
+                    var sourcePath = testCasePath + f.Name;
+                    var destPath = testCasePath + assgnID + "_TestCase.xml";
+                    FileInfo info = new FileInfo(sourcePath);
+                    info.MoveTo(destPath);
+                }
+            }
+
+            //rename the solution
+            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
+            {
+                if (f.Name == addAssgn.AssgnTitle + "_Solution.txt") //to be renamed
+                {
+                    var sourcePath = solutionPath + f.Name;
+                    var destPath = solutionPath + assgnID + "_Solution.txt";
+                    FileInfo info = new FileInfo(sourcePath);
+                    info.MoveTo(destPath);
+
+                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
+
+                    foreach (Assignment a in query)
+                    {
+                        a.Solution = destPath;
+                    }
+
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            return View("ManageAssignments");
         }
 
         //  [Authorize(Roles = "")]
@@ -165,7 +237,7 @@ namespace SPade.Controllers
             string loggedInLecturer = "s1431489"; //temp 
 
 
-            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
 
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
@@ -188,30 +260,29 @@ namespace SPade.Controllers
 
         }
 
-
         [HttpPost]
         public ActionResult GetAssignment(string Class)
         {
+            string loggedInLecturer = "s1431489"; //temp 
 
-            var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass",
-    new SqlParameter("@inClass", Class)).ToList();
+            var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
+    new SqlParameter("@inClass", Class),
+    new SqlParameter("@inCreator", loggedInLecturer)).ToList();
 
             return Json(assignments);
         }
-
 
         [HttpPost]
         public ActionResult ViewResults(string Class, string Assignment)
         {
 
 
-            var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid from submission group by adminno) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
+            var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
     new SqlParameter("@inClass", Class),
     new SqlParameter("@inAssignment", Assignment)).ToList();
 
             return Json(results);
         }
-
 
         class DBass
         {

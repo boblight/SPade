@@ -9,7 +9,6 @@ namespace SPade.ViewModels.Lecturer
 {
     public class ViewResultsViewModel
     {
-
         public List<String> classIds { get; set; }
         public List<String> classNames { get; set; }
 
