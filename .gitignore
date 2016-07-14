@@ -11,7 +11,7 @@
 *.userprefs
 
 # Custom gitignore
-DAL
+DAL/
 
 # Build results
 [Dd]ebug/
