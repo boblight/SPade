@@ -263,9 +263,11 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult GetAssignment(string Class)
         {
+            string loggedInLecturer = "s1431489"; //temp 
 
-            var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass",
-    new SqlParameter("@inClass", Class)).ToList();
+            var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator",
+    new SqlParameter("@inClass", Class),
+    new SqlParameter("@inCreator", loggedInLecturer)).ToList();
 
             return Json(assignments);
         }
@@ -275,7 +277,7 @@ namespace SPade.Controllers
         {
 
 
-            var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid from submission group by adminno) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
+            var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
     new SqlParameter("@inClass", Class),
     new SqlParameter("@inAssignment", Assignment)).ToList();
 
