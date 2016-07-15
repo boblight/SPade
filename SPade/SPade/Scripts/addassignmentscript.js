@@ -16,9 +16,9 @@
         var sd = picker.startDate.format('YYYY-MM-DD')
         var ed = picker.endDate.format('YYYY-MM-DD')
 
-        $("#daterange").val(sd + " - " + ed)
-        $('#StartDate').val(sd)
-        $('#DueDate').val(ed)
+        $("#daterange").val(sd + " - " + ed);
+        $('#StartDate').val(sd);
+        $('#DueDate').val(ed);
     })
 
     $("#daterange").on("cancel.daterangepicker", function (ev, picker) {
@@ -35,16 +35,12 @@
 
     $("#modalSelect").click(function () {
 
-        var selectedClasses = $("#ClassList option:checked").text();
-        $("#classSelect").val(selectedClasses);
+        var t = $("#cL").data("class-name");
 
-
+        $("#classSelect").val(t)
 
     })
-    function selectedClass() {
 
-        var selectedClasses = $("#ClassList option:checked").text();
-        $("#classSelect").val(selectedClasses);
-    }
+ 
 
 })
