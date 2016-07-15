@@ -82,6 +82,7 @@
                             <tr>
                                 <th>Assignment</th>
                                 <th>Issued By</th>
+                                <th>Number of Attempts</th>
                                 <th>Start Date</th>
                                 <th>Due Date</th>
                                 <th class="sorter-false">View Assignment</th>
@@ -96,6 +97,7 @@
                                     <tr>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.AssignmentID)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.assignment.MaxAttempt)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.StartDate)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
                                         <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssignmentID)" class="btn btn-primary">View</a></td>
@@ -138,7 +140,7 @@
                                         <td>@Html.DisplayFor(modelItem => item.assignment.AssignmentID)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.assignment.MaxAttempt)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.RetryRemaining)</td>
                                         <td>@Html.DisplayFor(modelItem => item.timestamp)</td>
                                         <td><a href="/Student/SubmitAssignment/@Html.DisplayFor(modelItem => item.assignment.AssignmentID)" class="btn btn-primary">View</a></td>
                                     </tr>
