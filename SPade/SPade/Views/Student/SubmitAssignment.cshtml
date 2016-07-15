@@ -26,11 +26,11 @@
                     <label>Start date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.StartDate)<br />
                     <label>Due date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.DueDate)<br />
                     <label>Posted by: </label>@Html.DisplayFor(modelItem => modelItem.assignment.CreateBy)<br />
-                    <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => modelItem.assignment.MaxAttempt)
+                    <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => modelItem.RetryRemaining)
                 </div>
             </div>
 
-            if (Model.assignment.MaxAttempt == 0)
+            if (Model.RetryRemaining <= 0)
             {
                 <h4>You have ran out of retries. Click <a href="/Student/ViewAssignment">here</a> to go back.</h4>
             }
@@ -48,7 +48,6 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="AssignmentFile">Upload Solution</label>
-                        <!--<input id="AssignmentFile" class="glyphicon-upload" style="border: solid 1px red" type="file" />-->
                         @Html.TextBoxFor(m => m.File, new { type = "file" })
                         @Html.ValidationMessageFor(m => m.File)
                     </div>

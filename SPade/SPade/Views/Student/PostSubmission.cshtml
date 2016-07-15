@@ -1,4 +1,4 @@
-﻿@model SPade.Models.Submission
+﻿@model SPade.Models.DAL.Submission
 
 @{
     ViewBag.Title = "Post Submission";
@@ -13,7 +13,7 @@
         <ul>
             <li>Completed By: @Html.DisplayFor(modelItem => modelItem.AdminNo)</li>
             <li>Submitted On: @Html.DisplayFor(modelItem => modelItem.Timestamp)</li>
-            <li>Grade: @Html.DisplayFor(modelItem => modelItem.Grade)</li>
+            <li>Grade: @Html.DisplayFor(modelItem => modelItem.Grade) </li>
             <li><a href="/Student/ViewAssignment" class="btn btn-default">Back to view Assignments</a></li>
         </ul>
 

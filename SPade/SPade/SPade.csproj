@@ -52,6 +52,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -244,6 +246,9 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\sysdiagram.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -270,16 +275,34 @@
     <Compile Include="ViewModels\Lecturer\UpdateStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ViewResultsViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ViewStudentsByClassViewModel.cs" />
+    <Compile Include="ViewModels\Student\SubmissionViewModel.cs" />
     <Compile Include="ViewModels\Student\SubmitAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\LecturerSolution\14314761solution.jar" />
     <Content Include="App_Data\log.txt" />
-    <Content Include="App_Data\Solutions\1solution.txt" />
-    <Content Include="App_Data\Submissions\14314761solution.jar" />
-    <Content Include="App_Data\TestCase\1testcase.xml" />
+    <Content Include="Models\DAL\SPadeDBModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeDBModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\DAL\SPadeDBModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="Solutions\1solution.xml" />
+    <Content Include="Solutions\2solution.xml" />
+    <Content Include="Solutions\3solution.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\build.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\FYPInputTestApp.jar" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\README.TXT" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\build-impl.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.java" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\testSomething.java" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -293,16 +316,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\DAL\SPadeDBModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
-      <LastGenOutput>SPadeDBModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Models\DAL\SPadeDBModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
-      <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
-    </Content>
+    <Content Include="Scripts\addassignmentscript.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\bootstrap-theme.css.map" />
@@ -337,6 +351,12 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\build.xml" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\build-impl.xml" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.xml" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.java" />
+    <Content Include="TestCase\2testcase.xml" />
+    <Content Include="TestCase\3testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -393,6 +413,16 @@
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\manifest.mf" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\genfiles.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.class" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\manifest.mf" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\genfiles.properties" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\private\private.properties" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.properties" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.class" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -401,9 +431,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DAL\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
+    <Folder Include="TempSubmissions\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -415,6 +445,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

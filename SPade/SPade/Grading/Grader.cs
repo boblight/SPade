@@ -6,26 +6,53 @@ using System.Web;
 using System.Text;
 using System.IO;
 using System.Xml;
+using SPade.ViewModels.Student;
+using System.Timers;
+using System.Threading;
 
 namespace SPade.Grading
 {
     public class Grader
     {
         private string ans, error, subOut, solOut;
+        private List<String> subList = new List<String>();
         private string[] output;
-        private int exitcode, testCaseFailed, noOfTestCase;
-        private ProcessStartInfo procInfo;
-        private Process proc;
+        private bool programFailed = false;
+        private decimal testCasePassed;
+        private int exitcode, assgnId;
+        private int noOfTestCase;
+        private ProcessStartInfo procInfo, compileInfo;
+        private Process proc, compile;
         private List<object> testcases = new List<object>();
+        public string filePath, fileName;
 
-        public Grader()
+        //Lecturer use this
+        public Grader(string filePath, string fileName)
         {
-
+            this.filePath = filePath;
         }//end of constructor
 
-        public double grade(string filePath, int assgnId)
+        //student use this
+        public Grader(string filePath, string fileName, int assgnId)
         {
-            procInfo = new ProcessStartInfo("java.exe", "-jar " + HttpContext.Current.Server.MapPath(@"~/App_Data/Submissions/" + filePath));
+            this.filePath = filePath;
+            this.fileName = fileName;
+            this.assgnId = assgnId;
+        }//end of overloaded constructor
+
+        public decimal grade()
+        {
+            //compile java program
+            compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/" + fileName + ".java");
+
+            compileInfo.CreateNoWindow = true;
+            compileInfo.UseShellExecute = false;
+            compile = Process.Start(compileInfo);
+
+            compile.WaitForExit();//compilation process ends
+
+            //run program with Java
+            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -34,147 +61,135 @@ namespace SPade.Grading
             procInfo.RedirectStandardOutput = true;
             procInfo.RedirectStandardInput = true;
 
-            proc = Process.Start(procInfo);
+            //load test cases if any
+            XmlDocument testCaseFile = new XmlDocument();
+            XmlDocument solutionFile = new XmlDocument();
 
-            //read test cases
-            using (XmlReader reader = XmlReader.Create(HttpContext.Current.Server.MapPath(@"C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/App_Data/TestCase/" + assgnId + "testcase.xml")))
+            try
             {
-                while (reader.Read())
-                {
-                    if (reader.Name == "input")
-                    {
-                        testcases.Add(reader.ReadString());
-                    }
-                }
-            }//end of xml reader
+                testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml"));
+                XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
 
-            System.IO.StreamWriter sw = proc.StandardInput;
-            foreach (object testcase in testcases)
-            {
-                noOfTestCase++;
-
-                if (testcase != null)
+                foreach (XmlNode testcase in testcaseList)
                 {
-                    try
+                    noOfTestCase++;
+                    proc = Process.Start(procInfo);
+                    subOut = "";
+
+                    System.IO.StreamWriter sw = proc.StandardInput;
+
+                    foreach (XmlNode input in testcase.ChildNodes)
                     {
-                        sw.WriteLine(testcase);
-                    }
-                    catch (Exception e)
-                    {
-                        testCaseFailed++;
-                        break;
-                    }
-                    finally
-                    {
+                        sw.WriteLine(input.InnerText);
                         sw.Flush();
+                        subOut += proc.StandardOutput.ReadLine() + input.InnerText;
+                    }//end of inputs
+
+                    //check if there is another error thrown by program
+                    error = proc.StandardError.ReadToEnd();
+
+                    if (error.Equals(""))
+                    {
+                        //add output to list of outputs if there is no error
+                        subOut += proc.StandardOutput.ReadLine();
                     }
-                }
-            }//end of input
+                    else
+                    {
+                        //program given fail if an error was encountered
+                        programFailed = true;
+                        sw.Close();
+                        proc.WaitForExit();
+                        break; //break out of loop
+                    }//check if error
 
-            sw.Close();
+                    if (programFailed == false) //method only run if no error/have proper error handling in submitted program
+                    {
+                        //get the output from solution
+                        solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
+                        XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
+                        //loop through all the solutions to find matching
+                        foreach (XmlNode solution in solutions)
+                        {
+                            if (subOut.Equals(solution.InnerText))
+                            {
+                                testCasePassed++;
+                            }
+                        }//end of foreach loop
+                    }//end of check
 
-            proc.WaitForExit();
+                    proc.WaitForExit();
+                }//end of test case loop
 
-            //read output and error
-            error = proc.StandardError.ReadToEnd();
-            exitcode = proc.ExitCode; //0 means success 1 means failure
-
-            //get output from submission
-            do
-            {
-                subOut = proc.StandardOutput.ReadLine();
-                ans += subOut;
-            } while (subOut != null);
-
-            //get the output from solution
-            output = File.ReadAllLines(HttpContext.Current.Server.MapPath(@"~/App_Data/Solutions/" + assgnId + "solution.txt"));
-
-            foreach (string s in output)
-            {
-                solOut += s;
-            }
-
-            if (exitcode == 0)
-            {
-                if (ans.Equals(solOut))
+                //read output 
+                if (programFailed == false)
                 {
-                    return 1;
+                    return (testCasePassed / noOfTestCase);
                 }
                 else
                 {
                     return 0;
                 }
             }
-            else //means fail
-            {
-                return 2; //debug
-            }
+            catch (Exception e) //when exception occures means failed to retrieve testcase
+            {//start catch, application does not accept input
+                proc = Process.Start(procInfo);
+
+                if (!proc.WaitForExit(10000))
+                {
+                    return 0;//fail program if program failed to produce feedback after 10 seconds
+                }
+
+                proc.WaitForExit();
+
+                //read output and error
+                error = proc.StandardError.ReadToEnd();
+                exitcode = proc.ExitCode; //0 means success 1 means failure
+
+                //get output from submission
+                do
+                {
+                    subOut = proc.StandardOutput.ReadLine();
+                    ans += subOut;
+                } while (subOut != null);
+
+                //get the output from solution
+                output = File.ReadAllLines(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.txt"));
+
+                foreach (string s in output)
+                {
+                    solOut += s;
+                }
+
+                if (exitcode == 0 && error.Equals("")) //if submission properly ran and produced desired outcome
+                {
+                    if (ans.Equals(solOut))
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+                else //means fail
+                {
+                    return 0; //debug
+                }
+            }//end of catch
+
         }//end of grade method
 
-        //to run the lecturer's solution and get the output 
-        public Boolean LecturerOutput(string slnFilePath, string testCaseFilePath)
+        public void RunLecturerSolution()
         {
-            //stuff i need to do: 
-            //what if no test cases for that solution -> need to cater to that
-
-            bool isSlnValid = false; //to be returned to the controller 
-
-            //lecturer solution
-            procInfo = new ProcessStartInfo("java.exe", "-jar" + HttpContext.Current.Server.MapPath(@"~/App_Data/LecturerSolution/" + slnFilePath));
-
-            procInfo.RedirectStandardError = true;
-            procInfo.RedirectStandardOutput = true;
-            procInfo.RedirectStandardInput = true;
-
-            proc = Process.Start(procInfo);
-
-            //read the testcases
-            using (XmlReader reader = XmlReader.Create(HttpContext.Current.Server.MapPath(@"~/App_Data/TestCase/" + testCaseFilePath)))
-            {
-                while (reader.Read())
-                {
-                    if (reader.Name == "input")
-                    {
-                        testcases.Add(reader.ReadString());
-                    }
-                }
-            };
-
-            //insert the testcases into the sln 
-            StreamWriter sw = proc.StandardInput;
-            foreach (object testcase in testcases)
-            {
-                noOfTestCase++;
-
-                if (testcases != null)
-                {
-                    try
-                    {
-                        sw.WriteLine(testcases);
-                    }
-                    catch (Exception e)
-                    {
-                        testCaseFailed++;
-                        break;
-                    }
-                    finally
-                    {
-                        sw.Flush();
-                    }
-                }
-            }
-
-            if (testCaseFailed > 0) //break immeditely 
-            {
-                return isSlnValid; 
-            }
+            //method to run lecturer solution. 
+            timer = new Timer(1000);
 
 
 
 
 
-            return false;
+
+
         }
-
     }//end of class
 }

@@ -5,7 +5,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Scripts.Render("~/bundles/daterangescripts")
+@Scripts.Render("~/bundles/addassignmentscripts")
+@Scripts.Render("~/bundles/jqueryval")
 
 @using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
@@ -21,7 +22,7 @@
                     solution uploaded.
                 </p>
                 <p>
-                    3. <a href="XMLdownload/testcase.xml">
+                    3. <a href="DownloadTestCase">
                         <i class="glyphicon glyphicon-file"></i>Download
                         this .xml file
                     </a> and input the test cases in a similar format as presented inside.
@@ -30,18 +31,17 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label>Assignment Name</label>
-                        @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control" })
+                        @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control", @required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("AssgnTitle", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <div>
-                        <label></label>
-
+                    <div class="col-md-12">
+                        <label>Assignment Module</label>
                         @{
                             @Html.DropDownListFor(c => Model.ModuleId, new SelectList(Model.Modules, "ModuleCode", "ModuleName"), new { @class = "form-control" })
                         }
-
                     </div>
                 </div>
 
@@ -50,7 +50,8 @@
                         <label>
                             Question
                         </label>
-                        @Html.TextAreaFor(m => Model.Describe, new { @class = "col-md-12- form-control", @row = "4" })
+                        @Html.TextAreaFor(m => Model.Describe, new { @class = "col-md-12- form-control", @row = "4", @required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("Describe", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -58,6 +59,7 @@
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
                         <input id="solutionsFile" name="fileList[0]" class="form-control" type="file" style="border: solid 1px red" />
+                        <span class="help-block">@Html.ValidationMessage("Soution", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -71,33 +73,11 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="daterange">Select start and end date</label>
-                        <!--<input type="text" class="form-control" name="daterange" value="" />-->
-                        @Html.TextBox("daterange", "", new { @class = "form-control" })
+                        @Html.TextBox("daterange", "", new { @class = "form-control", @placeholder = "Select start and end date..." })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
-
-                        <script type="text/javascript">
-                            $(function () {
-                                $('input[name="daterange"]').daterangepicker();
-                            });
-
-                            var range = $("#daterange").data("daterangepicker");
-
-                            $("#daterange").on('apply.daterangepicker', function (ev, picker) {
-
-                                console.log(picker.startDate.format('YYYY-MM-DD'));
-                                console.log(picker.endDate.format('YYYY-MM-DD'));
-                                var currentTime = moment().format('HH:mm:ss');
-                                console.log(currentTime);
-                                var sd = picker.startDate.format('YYYY-MM-DD') + " " + currentTime;
-                                var ed = picker.endDate.format('YYYY-MM-DD') + " " + currentTime;
-
-                                $('#StartDate').val(sd)
-                                $('#DueDate').val(ed)
-
-                            })
-                        </script>
-
+                        <span class="help-block">@Html.ValidationMessage("StartDate", new { @class = "text-danger" })</span>
+                        <span class="help-block">@Html.ValidationMessage("EndDate", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -106,7 +86,7 @@
                         <label class="control-label">
                             Select classes to allocate assignment to
                         </label>
-                        <input type="text" class="form-control" id="classSelect" placeholder="Select classes..." />
+                        <input type="text" class="form-control" id="classSelect" name="classSelect" placeholder="Select classes..." />
                     </div>
                 </div>
 
@@ -115,12 +95,12 @@
                         <label class="control-label">
                             Select maximum attempts allowed
                         </label>
-                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @type = "number" })
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @max = "10", @type = "number" })
+                        <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
-                <!-- Modal for choosing class-->
-                <div id="classModal" class="modal fade" role="dialog">
+                <div name="classModal" id="classModal" class="modal fade" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -133,30 +113,22 @@
                                     for (var i = 0; i < Model.ClassList.Count(); i++)
                                     {
                                         @Html.HiddenFor(m => Model.ClassList[i].ClassId)
-                                        @Html.CheckBoxFor(m => Model.ClassList[i].isSelected)
+                                        @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
                                         @Model.ClassList[i].ClassName
                                     }
                                 }
                             </div>
-
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                                <button name="modalSelect" id="modalSelect" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <script>
-                    $("#classSelect").click(function () {
-
-                        $("#classModal").modal("show");
-
-                    })
-                </script>
 
                 <div class="form-group">
                     <div class="col-md-12">
-                        <input type="submit" value="Submit" class="btn btn-primary" />
+                        <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
                         <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                     </div>
                 </div>

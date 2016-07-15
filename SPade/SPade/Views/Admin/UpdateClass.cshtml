@@ -1,9 +1,13 @@
-﻿
+﻿@model SPade.ViewModels.Admin.UpdateClassViewModel
+
 @{
     ViewBag.Title = "UpdateClass";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
+@using (Html.BeginForm("UpdateClass", "Admin", FormMethod.Post))
+{
 <div class="container">
 
     <div class="col-md-6 col-md-offset-3 form-horizontal">
@@ -14,39 +18,34 @@
             <!--Select Course-->
             <div class="form-group">
                 <div class="col-md-12">
-                    <label for="lecturerSelect" class="control-label">Course</label>
-                    <select class="form-control" id="courseSelect">
-                        <option>Select a course...</option>
-                        <option>DIT</option>
-                        <option>DBIT</option>
-                        <option>DISM</option>
-                    </select>
+                    <label>Course</label>
+                    @{
+                        @Html.DropDownListFor(c => Model.CourseID, new SelectList(Model.Courses, "CourseID", "CourseName"), new { @class = "form-control" })
+                    }
                 </div>
             </div>
 
-
+            <!-- classNameInput-->
             <div class="form-group">
                 <div class="col-md-12">
-                    <label for="" class="control-label">Class name</label>
-                    <input type="text" class="form-control" placeholder="E.g. 1A/21" />
+                    @Html.LabelFor(m => m.ClassName, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md" })
                 </div>
             </div>
 
+            <!--Select lecturer-->
             <div class="form-group">
                 <div class="col-md-12">
-                    <label for="" class="control-label">Lecturer</label>
-                    <select class="form-control">
-                        <option>Select a lecturer...</option>
-                        <option>Peter Lim</option>
-                        <option>David Tan</option>
-                        <option>Ronald Keng</option>
-                    </select>
+                    <label>Lecturer</label>
+                    @{
+                        @Html.DropDownListFor(c => Model.LecturerID, new SelectList(Model.Lecturers, "StaffID", "Name"), new { @class = "form-control" })
+                    }
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="col-md-12">
-                    <a href="ManageClass" class="btn btn-primary">Update</a>
+                    <input type="submit" value="Save" class="btn btn-primary" />
                     <a href="ManageClass" class="btn btn-danger">Delete</a>
                     <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                 </div>
@@ -55,3 +54,4 @@
         </fieldset>
     </div>
 </div>
+}
