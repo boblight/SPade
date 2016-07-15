@@ -246,6 +246,9 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\sysdiagram.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -279,6 +282,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\log.txt" />
+    <Content Include="Models\DAL\SPadeDBModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeDBModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\DAL\SPadeDBModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
+      <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
+    </Content>
     <Content Include="Solutions\1solution.txt" />
     <Content Include="Submissions\14314761solution.jar" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\build.xml" />
@@ -305,16 +318,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\DAL\SPadeDBModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
-      <LastGenOutput>SPadeDBModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Models\DAL\SPadeDBModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>SPadeDBModel.edmx</DependentUpon>
-      <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
-    </Content>
     <Content Include="Scripts\addassignmentscript.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />

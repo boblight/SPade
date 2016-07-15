@@ -8,6 +8,7 @@ using System.IO;
 using System.Xml;
 using SPade.ViewModels.Student;
 using System.Timers;
+using System.Threading;
 
 namespace SPade.Grading
 {
@@ -17,13 +18,13 @@ namespace SPade.Grading
         private List<String> subList = new List<String>();
         private string[] output;
         private bool programFailed = false;
-        private decimal testCaseFailed, testCasePassed;
-        private int exitcode, noOfTestCase = 2/*hardcoded*/, assgnId;
+        private decimal testCasePassed;
+        private int exitcode, assgnId;
+        private int noOfTestCase;
         private ProcessStartInfo procInfo, compileInfo;
         private Process proc, compile;
         private List<object> testcases = new List<object>();
         public string filePath, fileName;
-        public Timer timer;
 
         //Lecturer use this
         public Grader(string filePath, string fileName)
@@ -39,10 +40,8 @@ namespace SPade.Grading
             this.assgnId = assgnId;
         }//end of overloaded constructor
 
-        public Decimal grade()
+        public decimal grade()
         {
-            timer = new Timer(10000);
-
             //compile java program
             compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/" + fileName + ".java");
 
@@ -50,15 +49,7 @@ namespace SPade.Grading
             compileInfo.UseShellExecute = false;
             compile = Process.Start(compileInfo);
 
-            compile.WaitForExit();
-
-            //////////////debugger for error
-            int temp = compile.ExitCode;
-            if (temp == 1)
-            {
-                return 2;
-            }
-            ///////////////////////////////////
+            compile.WaitForExit();//compilation process ends
 
             //run program with Java
             procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
@@ -75,12 +66,13 @@ namespace SPade.Grading
             XmlDocument solutionFile = new XmlDocument();
 
             try
-            {//start try*/
+            {
                 testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml"));
                 XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
 
                 foreach (XmlNode testcase in testcaseList)
                 {
+                    noOfTestCase++;
                     proc = Process.Start(procInfo);
                     subOut = "";
 
@@ -92,6 +84,7 @@ namespace SPade.Grading
                         sw.Flush();
                         subOut += proc.StandardOutput.ReadLine() + input.InnerText;
                     }//end of inputs
+
                     //check if there is another error thrown by program
                     error = proc.StandardError.ReadToEnd();
 
@@ -99,7 +92,6 @@ namespace SPade.Grading
                     {
                         //add output to list of outputs if there is no error
                         subOut += proc.StandardOutput.ReadLine();
-                        //subList.Add(subOut);
                     }
                     else
                     {
@@ -110,21 +102,23 @@ namespace SPade.Grading
                         break; //break out of loop
                     }//check if error
 
-                    //get the output from solution
-                    solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
-                    XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
-
-                    //loop through all the solutions to find matching
-                    foreach (XmlNode solution in solutions)
+                    if (programFailed == false) //method only run if no error/have proper error handling in submitted program
                     {
-                        if (subOut.Equals(solution.InnerText))
+                        //get the output from solution
+                        solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
+                        XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
+                        //loop through all the solutions to find matching
+                        foreach (XmlNode solution in solutions)
                         {
-                            testCasePassed++;
-                        }
-                    }//end of foreach loop
+                            if (subOut.Equals(solution.InnerText))
+                            {
+                                testCasePassed++;
+                            }
+                        }//end of foreach loop
+                    }//end of check
 
                     proc.WaitForExit();
-                }//loop through all test cases
+                }//end of test case loop
 
                 //read output 
                 if (programFailed == false)
@@ -135,20 +129,14 @@ namespace SPade.Grading
                 {
                     return 0;
                 }
-            }//end of try
-            catch (Exception e)
+            }
+            catch (Exception e) //when exception occures means failed to retrieve testcase
             {//start catch, application does not accept input
                 proc = Process.Start(procInfo);
 
-                //check if program freezes
-                foreach (ProcessThread thread in proc.Threads)
+                if (!proc.WaitForExit(10000))
                 {
-                    if (thread.ThreadState == ThreadState.Wait
-                        && thread.WaitReason == ThreadWaitReason.UserRequest)
-                    {
-                        proc.Kill();
-                        return 0;
-                    }
+                    return 0;//fail program if program failed to produce feedback after 10 seconds
                 }
 
                 proc.WaitForExit();
@@ -172,7 +160,7 @@ namespace SPade.Grading
                     solOut += s;
                 }
 
-                if (exitcode == 0)
+                if (exitcode == 0 && error.Equals("")) //if submission properly ran and produced desired outcome
                 {
                     if (ans.Equals(solOut))
                     {
@@ -185,7 +173,7 @@ namespace SPade.Grading
                 }
                 else //means fail
                 {
-                    return 2; //debug
+                    return 0; //debug
                 }
             }//end of catch
 

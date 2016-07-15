@@ -14,5 +14,7 @@ namespace SPade.ViewModels.Student
         public Assignment assignment { get; set; }
 
         public DateTime timestamp { get; set; }
+
+        public int RetryRemaining { get; set; }
     }//end of class
 }

@@ -26,10 +26,10 @@ namespace SPade.Controllers
         {
             return View();
         }
-        
+
         //POST: SubmitAssignment
         [HttpPost]
-        //[Authorize(Roles = "")]
+        //[Authorize(Roles = "Student")]
         public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
             Submission submission = new Submission();
@@ -39,39 +39,41 @@ namespace SPade.Controllers
             //getting file path
             if (file.ContentLength > 0)
             {
+                //save zip file in submissions directory temporarily
+                //next unzip it into the same folder while replacing existing submissions
                 var fileName = Path.GetFileNameWithoutExtension(file.FileName);
                 var zipLocation = Server.MapPath(@"~/Submissions/" + file);
                 file.SaveAs(zipLocation);
 
                 var filePath = Server.MapPath(@"~/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
-                System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
-                fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
+                System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
+
+                if (fileDirectory.Exists)
+                {
+                    foreach (FileInfo files in fileDirectory.GetFiles())
+                    {
+                        files.Delete();//delete all files in directory
+                    }
+                    foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+                }
+                fileDirectory.Create(); // Recreates directory to update latest submission
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
-                //file.SaveAs(filePath);
 
-                //grading parts
+                //grade submission
                 Grader grader = new Grader(filePath, fileName, assgnId);
-                //Decimal result = Decimal.Parse(grader.grade().ToString());
-                Decimal result = grader.grade();
+                decimal result = grader.grade();
 
-                if (result != 2)
-                {
-                    submission.Grade = result;
-                    submission.AssignmentID = assgnId;
-                    //submission.AdminNo = User.Identity.GetUserName().ToString();
-                    submission.AdminNo = User.Identity.GetUserName();
-                    submission.FilePath = filePath.ToString();
-                    submission.Timestamp = DateTime.Now;
-                }
-                else if (result == 2)
-                {
-                    //if grading encounters error
-                    return Redirect("/Student/ViewAssignment"); //to implement proper handling soon
-                }
+                submission.Grade = result;
+                submission.AssignmentID = assgnId;
+                submission.AdminNo = User.Identity.GetUserName();
+                submission.FilePath = filePath.ToString();
+                submission.Timestamp = DateTime.Now;
             }
 
             db.Submissions.Add(submission);
-            //assignment.MaxAttempt -= 1; //updating the max attempt
             db.SaveChanges();
 
             Session["submission"] = submission;
@@ -83,9 +85,10 @@ namespace SPade.Controllers
         //[Authorize(Roles = "")]
         public ActionResult SubmitAssignment(int id)
         {
-            List<Assignment> pass = new List<Assignment>();
+            //List<Assignment> pass = new List<Assignment>();
             SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
+            svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
 
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
@@ -106,15 +109,16 @@ namespace SPade.Controllers
             List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == 1);
 
             foreach (Class_Assgn i in ca)
-            { 
+            {
                 assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssignmentID == i.AssignmentID);
 
-                foreach(Assignment a in assignments)
+                foreach (Assignment a in assignments)
                 {
                     ViewAssignmentViewModel v = new ViewAssignmentViewModel();
+                    v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID).Count();
                     v.assignment = a;
                     //check if the assignment has been attempted before
-                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == "1431476" && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
+                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == User.Identity.GetUserName() && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
                     {
                         v.timestamp = db.Submissions.ToList().Find(s => s.AssignmentID == a.AssignmentID).Timestamp;
                         v.submitted = true;
@@ -183,11 +187,9 @@ namespace SPade.Controllers
         // [Authorize(Roles = "")]
         public ActionResult PostSubmission()
         {
-            ////temporary arrangement for me to self validate output - TL
-            //SubmissionViewModel svm = new SubmissionViewModel();
-            //svm = (SubmissionViewModel)Session["Submission"];
-            //svm.submission = (Submission)Session["submission"];
-            return View(Session["submission"]);
+            Submission submission = (Submission)Session["submission"];
+            //submission.Grade = (submission.Grade * 100);
+            return View(submission);
         }
 
 
