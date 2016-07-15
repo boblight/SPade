@@ -8,13 +8,15 @@ using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
 using System.IO;
+using System.Data.Entity.Validation;
+using System.Net;
 
 namespace SPade.Controllers
 {
     public class LecturerController : Controller
     {
         //init the db
-        private SPadeEntities db = new SPadeEntities();
+        private SPadeDBEntities db = new SPadeDBEntities();
 
         // [Authorize(Roles = "")]
         // GET: Lecturer
@@ -57,6 +59,22 @@ namespace SPade.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public ActionResult BulkAddStudent(AddStudentViewModel[] model)
+        {
+            if ()
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Created);
+            }
+            else
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
+            }
+            
+            
+        }
+
 
         // [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass()

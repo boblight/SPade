@@ -33,7 +33,7 @@ namespace SPade.Controllers
             return View();
         }
 
-
+       
         [HttpPost]
         public ActionResult AddOneStudent(AddStudentViewModel model)
         {
@@ -176,6 +176,26 @@ namespace SPade.Controllers
         public ActionResult ManageClass()
         {
             return View();
+        }
+
+        public JsonResult ManageAllClass()
+        {
+            List<Class> allClass = new List<Class>();
+            using (db)
+            {
+                allClass = db.Classes.ToList();
+            }
+            return new JsonResult { Data = allClass, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
+        public JsonResult ManageClassWithParameter(string prefix)
+        {
+            List<Class> allClass = new List<Class>();
+            using (db)
+            {
+                allClass = db.Classes.Where(a => a.ClassName.Contains(prefix)).ToList();
+            }
+            return new JsonResult { Data = allClass, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         public ActionResult ManageStudent()
