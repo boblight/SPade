@@ -14,18 +14,9 @@ namespace SPade.Models.DAL
     
     public partial class Admin
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Admin()
-        {
-            this.AspNetUsers = new HashSet<AspNetUser>();
-        }
-    
         public string AdminID { get; set; }
         public int ContactNo { get; set; }
         public string Email { get; set; }
         public string FullName { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
     }
 }

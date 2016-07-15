@@ -1,4 +1,6 @@
-﻿
+﻿@model IEnumerable<SPade.ViewModels.Lecturer.ViewStudentsByClassViewModel>
+
+
 @{
     ViewBag.Title = "View Students by Class";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -31,6 +33,20 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @{
+                            foreach (var s in Model)
+                            {
+
+                                <tr>
+                                    <td></td>
+                                </tr>
+
+
+
+                            }
+                        }
+
+
                         <tr>
                             <td>1431897</td>
                             <td>Bob Chan</td>
