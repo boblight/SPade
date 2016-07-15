@@ -44,6 +44,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -282,6 +286,14 @@
     <Content Include="App_Data\log.txt" />
     <Content Include="Solutions\1solution.txt" />
     <Content Include="Submissions\14314761solution.jar" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\build.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\FYPInputTestApp.jar" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\README.TXT" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\build-impl.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.java" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\testSomething.java" />
     <Content Include="TestCase\1testcase.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -399,6 +411,11 @@
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\manifest.mf" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\genfiles.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.class" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

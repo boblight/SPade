@@ -9,6 +9,8 @@ using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
 using System.IO;
 using System.Data.SqlClient;
+using Ionic.Zip;
+
 
 namespace SPade.Controllers
 {
@@ -292,23 +294,26 @@ namespace SPade.Controllers
             return Json(results);
         }
 
-        //[HttpPost]
-        //public FileResult Download(string url)
-        //{
-        //    //perform logic to see if user has access to this file
-        //    //if access, return the file
-        //    //else return a 404
+        [HttpGet]
+        public ActionResult Download(string file)
+        {
+          
+            string path = "~/Submissions/" + file;
+            string zipname = file + ".zip";
+
+            var memoryStream = new MemoryStream();
+            using (var zip = new ZipFile())
+            {
+                
+                zip.AddDirectory(Server.MapPath(path));
+                zip.Save(memoryStream);
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", zipname);
 
 
-        //    //Qrcode Qrcode = DbO.getQrcodebyLinkId(linkid);
-        //    //string image = Server.MapPath("~") + "\\Qrcodes\\" + Qrcode.Image;
-        //    //string contentType = "image/jpg";
-
-        //    //return File(image, contentType, "Qrcode-" + Qrcode.QrcodeId);
-
-        //    return File(null);
-
-        //}
+        }
 
 
 
