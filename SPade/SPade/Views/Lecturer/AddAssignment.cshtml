@@ -73,7 +73,7 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="daterange">Select start and end date</label>
-                        @Html.TextBox("daterange", "", new { @class = "-controlform", @placeholder = "Select start and end date..." })
+                        @Html.TextBox("daterange", "", new { @class = "form-control", @placeholder = "Select start and end date..." })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
                         <span class="help-block">@Html.ValidationMessage("StartDate", new { @class = "text-danger" })</span>

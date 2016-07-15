@@ -26,7 +26,7 @@ namespace SPade.Grading
         public Timer timer;
 
         //Lecturer use this
-        public Grader(string filePath)
+        public Grader(string filePath, string fileName)
         {
             this.filePath = filePath;
         }//end of constructor
@@ -190,5 +190,18 @@ namespace SPade.Grading
             }//end of catch
 
         }//end of grade method
+
+        public void RunLecturerSolution()
+        {
+            //method to run lecturer solution. 
+            timer = new Timer(1000);
+
+
+
+
+
+
+
+        }
     }//end of class
 }

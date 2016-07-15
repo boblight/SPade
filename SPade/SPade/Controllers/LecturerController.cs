@@ -9,6 +9,7 @@ using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
 using System.IO;
 using System.Data.SqlClient;
+using System.IO.Compression;
 
 namespace SPade.Controllers
 {
@@ -64,6 +65,28 @@ namespace SPade.Controllers
         // [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass()
         {
+            return View();
+        }
+
+        public ActionResult ViewStudentsByClass(int classID)
+        {
+            List<ViewStudentsByClassViewModel> vs = new List<ViewStudentsByClassViewModel>();
+            List<Student> studList = new List<Student>();
+
+            studList = db.Students.Where(s => s.ClassID == classID && s.DeletedAt == null).ToList();
+            var cs = db.Classes.Where(c => c.ClassID == classID).First();
+
+            foreach (Student s in studList)
+            {
+                ViewStudentsByClassViewModel v = new ViewStudentsByClassViewModel();
+                v.ClassName = cs.Course + "/" + cs.ClassName;
+                v.AdminNo = s.AdminNo;
+                v.Name = s.Name;
+                v.Email = s.Email;
+                v.ContactNo = s.ContactNo;
+                vs.Add(v);
+            }
+
             return View();
         }
 
@@ -134,17 +157,21 @@ namespace SPade.Controllers
                     {
                         //this is for the testcase 
                         var fileName = Path.GetFileName(file.FileName);
-                        var filePath = Server.MapPath(@"~/App_Data/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
+                        var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
                     }
-                    else
+                    if (ext == ".zip")
                     {
                         //for the solution file 
-                        var fileName = Path.GetFileName(file.FileName);
-                        //extension at the back is dynamic. cater for other language also 
-                        var filePath = Server.MapPath(@"~/App_Data/Solutions/" + addAssgn.AssgnTitle + "_Solution" + ext);
+                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        //extension at the back is dynamic. cater for other language also
+
+                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                        file.SaveAs(zipLocation);
+
+                        var filePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
@@ -245,7 +272,7 @@ namespace SPade.Controllers
             string loggedInLecturer = "s1431489"; //temp 
 
 
-            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
 
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
