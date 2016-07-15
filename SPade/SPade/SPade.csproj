@@ -292,8 +292,9 @@
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
       <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
     </Content>
-    <Content Include="Solutions\1solution.txt" />
-    <Content Include="Submissions\14314761solution.jar" />
+    <Content Include="Solutions\1solution.xml" />
+    <Content Include="Solutions\2solution.xml" />
+    <Content Include="Solutions\3solution.xml" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\build.xml" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\FYPInputTestApp.jar" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\README.TXT" />
@@ -302,9 +303,6 @@
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.xml" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.java" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\testSomething.java" />
-    <Content Include="TestCase\1testcase.xml">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -353,6 +351,12 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\build.xml" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\build-impl.xml" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.xml" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.java" />
+    <Content Include="TestCase\2testcase.xml" />
+    <Content Include="TestCase\3testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -414,6 +418,11 @@
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.properties" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.properties" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.class" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\manifest.mf" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\genfiles.properties" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\private\private.properties" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.properties" />
+    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.class" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
