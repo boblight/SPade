@@ -169,7 +169,7 @@ namespace SPade.Controllers
                     Overall.Add("Fail");
 
                 SubmittedOn.Add(r.timestamp.ToString());
-                Submission.Add("/Student/Download/?file=" +r.assgntitle +r.assignmentid);
+                Submission.Add("/Student/Download/?file=" + r.assgntitle + r.assignmentid);
 
             }
 
@@ -183,7 +183,6 @@ namespace SPade.Controllers
 
             return View(vrvm);
         }
-
 
         // GET: PostSubmission
         // [Authorize(Roles = "")]
@@ -199,8 +198,8 @@ namespace SPade.Controllers
         public ActionResult Download(string file)
         {
 
-            string path = "~/Submissions/" + "p1431476"+ file; //temp
-            string zipname = "p1431476" +file + ".zip"; //temp
+            string path = "~/Submissions/" + "p1431476" + file; //temp
+            string zipname = "p1431476" + file + ".zip"; //temp
 
             var memoryStream = new MemoryStream();
             using (var zip = new ZipFile())
