@@ -22,7 +22,7 @@
                     solution uploaded.
                 </p>
                 <p>
-                    3. <a href="XMLdownload/testcase.xml">
+                    3. <a href="DownloadTestCase">
                         <i class="glyphicon glyphicon-file"></i>Download
                         this .xml file
                     </a> and input the test cases in a similar format as presented inside.
@@ -113,7 +113,7 @@
                                     for (var i = 0; i < Model.ClassList.Count(); i++)
                                     {
                                         @Html.HiddenFor(m => Model.ClassList[i].ClassId)
-                                        @Html.CheckBoxFor(m => Model.ClassList[i].isSelected)
+                                        @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
                                         @Model.ClassList[i].ClassName
                                     }
                                 }
@@ -128,7 +128,7 @@
 
                 <div class="form-group">
                     <div class="col-md-12">
-                        <input type="submit" value="Submit" class="btn btn-primary" />
+                        <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
                         <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                     </div>
                 </div>

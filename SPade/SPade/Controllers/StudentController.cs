@@ -12,6 +12,8 @@ using System.IO;
 using SPade.Grading;
 using System.Diagnostics;
 using Microsoft.AspNet.Identity;
+using System.Data.SqlClient;
+using Ionic.Zip;
 
 namespace SPade.Controllers
 {
@@ -25,10 +27,10 @@ namespace SPade.Controllers
         {
             return View();
         }
-        
+
         //POST: SubmitAssignment
         [HttpPost]
-        //[Authorize(Roles = "")]
+        //[Authorize(Roles = "Student")]
         public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
             Submission submission = new Submission();
@@ -38,38 +40,41 @@ namespace SPade.Controllers
             //getting file path
             if (file.ContentLength > 0)
             {
+                //save zip file in submissions directory temporarily
+                //next unzip it into the same folder while replacing existing submissions
                 var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                var zipLocation = Server.MapPath(@"~/App_Data/Submissions/" + file);
+                var zipLocation = Server.MapPath(@"~/Submissions/" + file);
                 file.SaveAs(zipLocation);
 
-                var filePath = Server.MapPath(@"~/App_Data/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
-                System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
-                fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
+                var filePath = Server.MapPath(@"~/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
+                System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
+
+                if (fileDirectory.Exists)
+                {
+                    foreach (FileInfo files in fileDirectory.GetFiles())
+                    {
+                        files.Delete();//delete all files in directory
+                    }
+                    foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+                }
+                fileDirectory.Create(); // Recreates directory to update latest submission
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
-                //file.SaveAs(filePath);
 
-                //grading parts
+                //grade submission
                 Grader grader = new Grader(filePath, fileName, assgnId);
-                Decimal result = Decimal.Parse(grader.grade().ToString());
+                decimal result = grader.grade();
 
-                if (result != 2)
-                {
-                    submission.Grade = result;
-                    submission.AssignmentID = assgnId;
-                    //submission.AdminNo = User.Identity.GetUserName().ToString();
-                    submission.AdminNo = User.Identity.GetUserName();
-                    submission.FilePath = filePath.ToString();
-                    submission.Timestamp = DateTime.Now;
-                }
-                else if (result == 2)
-                {
-                    //if grading encounters error
-                    return Redirect("/Student/ViewAssignment"); //to implement proper handling soon
-                }
+                submission.Grade = result;
+                submission.AssignmentID = assgnId;
+                submission.AdminNo = User.Identity.GetUserName();
+                submission.FilePath = filePath.ToString();
+                submission.Timestamp = DateTime.Now;
             }
 
             db.Submissions.Add(submission);
-            //assignment.MaxAttempt -= 1; //updating the max attempt
             db.SaveChanges();
 
             Session["submission"] = submission;
@@ -81,9 +86,10 @@ namespace SPade.Controllers
         //[Authorize(Roles = "")]
         public ActionResult SubmitAssignment(int id)
         {
-            List<Assignment> pass = new List<Assignment>();
+            //List<Assignment> pass = new List<Assignment>();
             SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
+            svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
 
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
@@ -104,15 +110,16 @@ namespace SPade.Controllers
             List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == 1);
 
             foreach (Class_Assgn i in ca)
-            { 
+            {
                 assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssignmentID == i.AssignmentID);
 
-                foreach(Assignment a in assignments)
+                foreach (Assignment a in assignments)
                 {
                     ViewAssignmentViewModel v = new ViewAssignmentViewModel();
+                    v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID).Count();
                     v.assignment = a;
                     //check if the assignment has been attempted before
-                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == "1431476" && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
+                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == User.Identity.GetUserName() && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
                     {
                         v.timestamp = db.Submissions.ToList().Find(s => s.AssignmentID == a.AssignmentID).Timestamp;
                         v.submitted = true;
@@ -128,17 +135,96 @@ namespace SPade.Controllers
         }
 
         // GET: ViewResult
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult ViewResult()
         {
-            return View();
+
+            ViewResultViewModel vrvm = new ViewResultViewModel();
+
+            string loggedInStudent = "p1431476"; //temp 
+
+
+            var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, s1.assignmentid, a.assignmentid, a.assgntitle, a.startdate, a.duedate, s1.grade, s1.filepath, s1.timestamp from submission s1 inner join( select max(submissionid) submissionid, adminno, assignmentid, max(timestamp) timestamp from submission group by adminno, assignmentid ) s2 on s1.submissionid = s2.submissionid inner join( select * from assignment where deletedat is null ) a on s1.assignmentid = a.assignmentid where s1.adminno = @inStudent",
+    new SqlParameter("@inStudent", loggedInStudent)).ToList();
+
+            List<String> Assignment = new List<String>();
+            List<String> AssignmentId = new List<String>();
+            List<String> IssuedOn = new List<String>();
+            List<String> DueDate = new List<String>();
+            List<String> Result = new List<String>();
+            List<String> Overall = new List<String>();
+            List<String> SubmittedOn = new List<String>();
+            List<String> Submission = new List<String>();
+
+            foreach (var r in results)
+            {
+                Assignment.Add(r.assgntitle);
+                IssuedOn.Add(r.startdate.ToString());
+                DueDate.Add(r.duedate.ToString());
+                Result.Add((int)Math.Round(r.grade * 100) + "%");
+
+                if (r.grade >= 0.5M)
+                    Overall.Add("Pass");
+                else
+                    Overall.Add("Fail");
+
+                SubmittedOn.Add(r.timestamp.ToString());
+                Submission.Add("/Student/Download/?file=" +r.assgntitle +r.assignmentid);
+
+            }
+
+            vrvm.Assignment = Assignment;
+            vrvm.IssuedOn = IssuedOn;
+            vrvm.DueDate = DueDate;
+            vrvm.Result = Result;
+            vrvm.Overall = Overall;
+            vrvm.SubmittedOn = SubmittedOn;
+            vrvm.Submission = Submission;
+
+            return View(vrvm);
         }
 
+
         // GET: PostSubmission
-       // [Authorize(Roles = "")]
+        // [Authorize(Roles = "")]
         public ActionResult PostSubmission()
         {
-            return View(Session["Submission"]);
+            Submission submission = (Submission)Session["submission"];
+            //submission.Grade = (submission.Grade * 100);
+            return View(submission);
         }
+
+
+        [HttpGet]
+        public ActionResult Download(string file)
+        {
+
+            string path = "~/Submissions/" + "p1431476"+ file; //temp
+            string zipname = "p1431476" +file + ".zip"; //temp
+
+            var memoryStream = new MemoryStream();
+            using (var zip = new ZipFile())
+            {
+                zip.AddDirectory(Server.MapPath(path));
+                zip.Save(memoryStream);
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", zipname);
+
+
+        }
+
+        private class DBres
+        {
+            public string assgntitle { get; set; }
+            public int assignmentid { get; set; }
+            public DateTime startdate { get; set; }
+            public DateTime duedate { get; set; }
+            public decimal grade { get; set; }
+            public string filepath { get; set; }
+            public DateTime timestamp { get; set; }
+        }
+
     }//end of controller
 }

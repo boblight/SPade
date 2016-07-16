@@ -9,6 +9,8 @@ using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
 using System.IO;
 using System.Data.SqlClient;
+using Ionic.Zip;
+
 
 namespace SPade.Controllers
 {
@@ -77,6 +79,14 @@ namespace SPade.Controllers
         public ActionResult ManageAssignments()
         {
             return View();
+        }
+
+        public FileResult DownloadTestCase()
+        {
+            string f = Server.MapPath(@"~/App_Data/TestCase/testCase.xml");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "testCase.xml";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
         //   [Authorize(Roles = "")]
@@ -283,6 +293,30 @@ namespace SPade.Controllers
 
             return Json(results);
         }
+
+        [HttpGet]
+        public ActionResult Download(string file)
+        {
+          
+            string path = "~/Submissions/" + file;
+            string zipname = file + ".zip";
+
+            var memoryStream = new MemoryStream();
+            using (var zip = new ZipFile())
+            {
+                
+                zip.AddDirectory(Server.MapPath(path));
+                zip.Save(memoryStream);
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", zipname);
+
+
+        }
+
+
+
 
         class DBass
         {
