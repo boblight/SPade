@@ -44,6 +44,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip, Version=1.10.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.10.0\lib\net20\Ionic.Zip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -352,6 +356,12 @@
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\build-impl.xml" />
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.xml" />
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.java" />
+    <Content Include="Submissions\p1431476Pyramid1\Test - Copy - Copy - Copy - Copy.txt" />
+    <Content Include="Submissions\p1431476Pyramid1\Test - Copy - Copy - Copy.txt" />
+    <Content Include="Submissions\p1431476Pyramid1\Test - Copy - Copy.txt" />
+    <Content Include="Submissions\p1431476Pyramid1\Test - Copy.txt" />
+    <Content Include="Submissions\p1431476Pyramid1\Test.txt" />
+    <Content Include="TestCase\5testcase.xml" />
     <Content Include="TestCase\2testcase.xml" />
     <Content Include="TestCase\3testcase.xml" />
     <Content Include="TestCase\testcase.xml" />

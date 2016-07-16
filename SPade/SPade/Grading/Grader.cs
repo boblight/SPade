@@ -54,7 +54,7 @@ namespace SPade.Grading
             compile.WaitForExit();//compilation process ends
 
             //run program with Java
-            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
+            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() +  "." + fileName);
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 

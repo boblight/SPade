@@ -251,7 +251,7 @@ namespace SPade.Controllers
             string loggedInLecturer = "s1431489"; //temp 
 
 
-            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
 
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
@@ -301,14 +301,14 @@ namespace SPade.Controllers
         [HttpGet]
         public ActionResult Download(string file)
         {
-          
+
             string path = "~/Submissions/" + file;
             string zipname = file + ".zip";
 
             var memoryStream = new MemoryStream();
             using (var zip = new ZipFile())
             {
-                
+
                 zip.AddDirectory(Server.MapPath(path));
                 zip.Save(memoryStream);
             }
@@ -318,9 +318,6 @@ namespace SPade.Controllers
 
 
         }
-
-
-
 
         class DBass
         {
