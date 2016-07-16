@@ -13,6 +13,7 @@ using SPade.Grading;
 using System.Diagnostics;
 using Microsoft.AspNet.Identity;
 using System.Data.SqlClient;
+using Ionic.Zip;
 
 namespace SPade.Controllers
 {
@@ -140,13 +141,14 @@ namespace SPade.Controllers
 
             ViewResultViewModel vrvm = new ViewResultViewModel();
 
-            string loggedInStudent = "p123456"; //temp 
+            string loggedInStudent = "p1431476"; //temp 
 
 
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, s1.assignmentid, a.assignmentid, a.assgntitle, a.startdate, a.duedate, s1.grade, s1.filepath, s1.timestamp from submission s1 inner join( select max(submissionid) submissionid, adminno, assignmentid, max(timestamp) timestamp from submission group by adminno, assignmentid ) s2 on s1.submissionid = s2.submissionid inner join( select * from assignment where deletedat is null ) a on s1.assignmentid = a.assignmentid where s1.adminno = @inStudent",
     new SqlParameter("@inStudent", loggedInStudent)).ToList();
 
             List<String> Assignment = new List<String>();
+            List<String> AssignmentId = new List<String>();
             List<String> IssuedOn = new List<String>();
             List<String> DueDate = new List<String>();
             List<String> Result = new List<String>();
@@ -167,7 +169,7 @@ namespace SPade.Controllers
                     Overall.Add("Fail");
 
                 SubmittedOn.Add(r.timestamp.ToString());
-                Submission.Add(r.filepath);
+                Submission.Add("/Student/Download/?file=" +r.assgntitle +r.assignmentid);
 
             }
 
@@ -192,9 +194,30 @@ namespace SPade.Controllers
         }
 
 
+        [HttpGet]
+        public ActionResult Download(string file)
+        {
+
+            string path = "~/Submissions/" + "p1431476"+ file; //temp
+            string zipname = "p1431476" +file + ".zip"; //temp
+
+            var memoryStream = new MemoryStream();
+            using (var zip = new ZipFile())
+            {
+                zip.AddDirectory(Server.MapPath(path));
+                zip.Save(memoryStream);
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", zipname);
+
+
+        }
+
         private class DBres
         {
             public string assgntitle { get; set; }
+            public int assignmentid { get; set; }
             public DateTime startdate { get; set; }
             public DateTime duedate { get; set; }
             public decimal grade { get; set; }

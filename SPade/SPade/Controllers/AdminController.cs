@@ -8,6 +8,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using SPade.Models.DAL;
+using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
 
 namespace SPade.Controllers
 {
@@ -95,12 +97,19 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult AddOneClass(AddClassViewModel model)
         {
+
+            //Get all classes
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+
             try
             {
                 var class1 = new Class()
                 {
                     ClassName = model.ClassName,
-                    CourseID = 1,
+                    CourseID = model.CourseID,
                     CreatedBy = "Admin",
                     UpdatedBy = "Admin",
                     CreatedAt = DateTime.Now,
@@ -110,6 +119,7 @@ namespace SPade.Controllers
 
                 db.Classes.Add(class1);
                 db.SaveChanges();
+                
             }
             catch (DbEntityValidationException e)
             {
@@ -227,6 +237,47 @@ namespace SPade.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public ActionResult UpdateClass(UpdateClassViewModel model)
+        {
+            int x = 3;
+            //Get all courses
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+
+            //Get all lecturer
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+
+            //Get Class           
+            List<Class> Classes = db.Classes.ToList();
+
+            foreach (Class C in Classes)
+            {
+                if (C.ClassID.Equals(x))
+                {
+                    if (TryUpdateModel(C, "", new string[] { "CourseID", "ClassName" }))
+                    {
+                        try
+                        {
+
+                            db.SaveChanges();
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                        }
+                    }
+                };
+
+            }
+            return View(model);
+
+
+
+
+        }
 
         public ActionResult UpdateStudent()
         {

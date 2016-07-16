@@ -119,7 +119,13 @@
                             overall = "Fail";
                         }
 
-                        tableContents += '<tr><td>' + val.adminno.toUpperCase() + '</td><td>' + val.name + '</td><td>' + val.grade * 100 + '%</td><td>' +overall +'</td><td><a href=\"' + val.filepath + '\"><span class=\"glyphicon glyphicon-download-alt btn btn-primary\"></span></a></td></tr>';
+                        //tableContents += '<tr><td>' + val.adminno.toUpperCase() + '</td><td>' + val.name + '</td><td>' + val.grade * 100 + '%</td><td>' + overall + '</td><td><a href=\"' + val.filepath + '\"><span class=\"glyphicon glyphicon-download-alt btn btn-primary\"></span></a></td></tr>';
+
+                        tableContents += '<tr><td>' + val.adminno.toUpperCase() + '</td><td>' + val.name + '</td><td>' + val.grade * 100 + '%</td><td>' + overall + '</td><td><a href=\"/Lecturer/Download/?file=' + val.filepath + '"><span class=\"glyphicon glyphicon-download-alt btn btn-primary\"></span></a></td></tr>';
+
+
+                        //tableContents += '<tr><td>' + val.adminno.toUpperCase() + '</td><td>' + val.name + '</td><td>' + val.grade * 100 + '%</td><td>' + overall + '</td><td>' + '' + '</td></tr>';
+
 
                     });
 
@@ -137,7 +143,7 @@
             error: function () {
             }
         });
-        
+
 
     }
 
