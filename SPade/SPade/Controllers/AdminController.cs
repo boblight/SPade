@@ -211,7 +211,7 @@ namespace SPade.Controllers
         public ActionResult UpdateClass()
         {
             UpdateClassViewModel model = new UpdateClassViewModel();
-            int x = 3;
+            int x = 1;
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -240,7 +240,9 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateClass(UpdateClassViewModel model)
         {
-            int x = 3;
+            int x = 1;
+
+
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -249,6 +251,7 @@ namespace SPade.Controllers
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
 
+
             //Get Class           
             List<Class> Classes = db.Classes.ToList();
 
@@ -256,19 +259,17 @@ namespace SPade.Controllers
             {
                 if (C.ClassID.Equals(x))
                 {
-                    if (TryUpdateModel(C, "", new string[] { "CourseID", "ClassName" }))
+                    try
                     {
-                        try
-                        {
-
-                            db.SaveChanges();
-                        }
-                        catch (DataException /* dex */)
-                        {
-                            //Log the error (uncomment dex variable name and add a line here to write a log.
-                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                        }
+                        TryUpdateModel(C, "", new string[] { "CourseID", "ClassName" });
+                        db.SaveChanges();
                     }
+                    catch(DataException /* dex */)
+                        {
+                        //Log the error (uncomment dex variable name and add a line here to write a log.
+                        ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                    }
+
                 };
 
             }
