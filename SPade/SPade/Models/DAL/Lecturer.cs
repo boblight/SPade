@@ -17,6 +17,7 @@ namespace SPade.Models.DAL
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Lecturer()
         {
+            this.AspNetUsers = new HashSet<AspNetUser>();
             this.Lec_Class = new HashSet<Lec_Class>();
             this.Lec_Class1 = new HashSet<Lec_Class>();
         }
@@ -32,6 +33,8 @@ namespace SPade.Models.DAL
         public Nullable<System.DateTime> DeletedAt { get; set; }
         public string DeletedBy { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Lec_Class> Lec_Class { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
