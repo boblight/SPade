@@ -182,7 +182,6 @@ namespace SPade.Controllers
             return View(vrvm);
         }
 
-
         // GET: PostSubmission
         // [Authorize(Roles = "")]
         public ActionResult PostSubmission()

@@ -104,7 +104,7 @@ namespace SPade.Controllers
 
         public FileResult DownloadTestCase()
         {
-            string f = Server.MapPath(@"~/App_Data/TestCase/testCase.xml");
+            string f = Server.MapPath(@"~/TestCase/testcase.xml");
             byte[] fileBytes = System.IO.File.ReadAllBytes(f);
             string fileName = "testCase.xml";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
@@ -157,7 +157,7 @@ namespace SPade.Controllers
                     {
                         //this is for the testcase 
                         var fileName = Path.GetFileName(file.FileName);
-                        var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
+                        var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + "testcase.xml");
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
@@ -165,16 +165,38 @@ namespace SPade.Controllers
                     if (ext == ".zip")
                     {
                         //for the solution file 
-                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var fileName = Path.GetFileName(file.FileName);
                         //extension at the back is dynamic. cater for other language also
 
                         var zipLocation = Server.MapPath(@"~/TempSubmissions/" + fileName);
                         file.SaveAs(zipLocation);
+                        
 
-                        var filePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
-                        fileInfo = new FileInfo(filePath);
-                        fileInfo.Directory.Create();
-                        file.SaveAs(filePath);
+                        var filePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution");
+                        DirectoryInfo fD = new DirectoryInfo(filePath);
+
+                        if (fD.Exists)
+                        {
+                            foreach (FileInfo f in fD.GetFiles())
+                            {
+                                f.Delete();
+                            }
+                            foreach (DirectoryInfo dr in fD.GetDirectories())
+                            {
+                                dr.Delete(true);
+                            }
+                        }
+                        ZipFile.ExtractToDirectory(zipLocation, filePath);
+
+                        //note to self; 
+
+                    //file path -> full file path of the project 
+                    //file name -> original name of hte submitted solution
+
+
+                        //fileInfo = new FileInfo(filePath);
+                        //fileInfo.Directory.Create();
+                        //file.SaveAs(filePath);
                     }
                 }
             }
