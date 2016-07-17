@@ -9,6 +9,8 @@ using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
 using System.IO;
 using System.Data.SqlClient;
+using Ionic.Zip;
+
 
 namespace SPade.Controllers
 {
@@ -81,7 +83,7 @@ namespace SPade.Controllers
 
         public FileResult DownloadTestCase()
         {
-            string f = Server.MapPath(@"~/App_Data/TestCase/testCase.xml");
+            string f = Server.MapPath(@"~/TestCase/testcase.xml");
             byte[] fileBytes = System.IO.File.ReadAllBytes(f);
             string fileName = "testCase.xml";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
@@ -134,7 +136,7 @@ namespace SPade.Controllers
                     {
                         //this is for the testcase 
                         var fileName = Path.GetFileName(file.FileName);
-                        var filePath = Server.MapPath(@"~/App_Data/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
+                        var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
@@ -142,9 +144,13 @@ namespace SPade.Controllers
                     else
                     {
                         //for the solution file 
-                        var fileName = Path.GetFileName(file.FileName);
-                        //extension at the back is dynamic. cater for other language also 
-                        var filePath = Server.MapPath(@"~/App_Data/Solutions/" + addAssgn.AssgnTitle + "_Solution" + ext);
+                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        //extension at the back is dynamic. cater for other language also
+
+                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                        file.SaveAs(zipLocation);
+
+                        var filePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
@@ -245,7 +251,7 @@ namespace SPade.Controllers
             string loggedInLecturer = "s1431489"; //temp 
 
 
-            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
 
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
@@ -290,6 +296,27 @@ namespace SPade.Controllers
     new SqlParameter("@inAssignment", Assignment)).ToList();
 
             return Json(results);
+        }
+
+        [HttpGet]
+        public ActionResult Download(string file)
+        {
+
+            string path = "~/Submissions/" + file;
+            string zipname = file + ".zip";
+
+            var memoryStream = new MemoryStream();
+            using (var zip = new ZipFile())
+            {
+
+                zip.AddDirectory(Server.MapPath(path));
+                zip.Save(memoryStream);
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", zipname);
+
+
         }
 
         class DBass

@@ -41,6 +41,17 @@
 
     })
 
+    $("#classSelect").validate({
+
+        rules: {
+
+            classSelect: "required"
+        },
+        messages: {
+            classSelect: "Please select a class"
+        }
+    })
+
  
 
 })
