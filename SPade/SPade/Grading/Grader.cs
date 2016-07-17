@@ -54,7 +54,7 @@ namespace SPade.Grading
             compile.WaitForExit();//compilation process ends
 
             //run program with Java
-            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() +  "." + fileName);
+            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -118,7 +118,6 @@ namespace SPade.Grading
                             }
                         }//end of foreach loop
                     }//end of check
-
                     proc.WaitForExit();
                 }//end of test case loop
 
@@ -132,7 +131,7 @@ namespace SPade.Grading
                     return 0;
                 }
             }
-            catch (Exception e) //when exception occures means failed to retrieve testcase
+            catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
             {//start catch, application does not accept input
                 proc = Process.Start(procInfo);
 
@@ -148,19 +147,13 @@ namespace SPade.Grading
                 exitcode = proc.ExitCode; //0 means success 1 means failure
 
                 //get output from submission
-                do
-                {
-                    subOut = proc.StandardOutput.ReadLine();
-                    ans += subOut;
-                } while (subOut != null);
+
+                ans = proc.StandardOutput.ReadToEnd();
 
                 //get the output from solution
-                output = File.ReadAllLines(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.txt"));
-
-                foreach (string s in output)
-                {
-                    solOut += s;
-                }
+                // get the output from solution
+                solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
+                solOut = solutionFile.SelectSingleNode("/body/solution").InnerText;
 
                 if (exitcode == 0 && error.Equals("")) //if submission properly ran and produced desired outcome
                 {
@@ -271,7 +264,7 @@ namespace SPade.Grading
                         using (XmlWriter slnWriter = XmlWriter.Create(slnPath))
                         {
                             //loop through the output
-                            
+
 
 
 
