@@ -24,6 +24,7 @@ namespace SPade.Grading
         private ProcessStartInfo procInfo, compileInfo;
         private Process proc, compile;
         private List<object> testcases = new List<object>();
+        private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle;
 
         //Lecturer use this
@@ -54,7 +55,7 @@ namespace SPade.Grading
             compile.WaitForExit();//compilation process ends
 
             //run program with Java
-            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() +  "." + fileName);
+            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -271,7 +272,7 @@ namespace SPade.Grading
                         using (XmlWriter slnWriter = XmlWriter.Create(slnPath))
                         {
                             //loop through the output
-                            
+
 
 
 
