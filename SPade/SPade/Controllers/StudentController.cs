@@ -46,7 +46,8 @@ namespace SPade.Controllers
                 var zipLocation = Server.MapPath(@"~/Submissions/" + file);
                 file.SaveAs(zipLocation);
 
-                var filePath = Server.MapPath(@"~/Submissions/" + User.Identity.GetUserName() + assgnId + fileName);
+                string submissionName = User.Identity.GetUserName() + assignment.AssgnTitle + assignment.AssignmentID;
+                var filePath = Server.MapPath(@"~/Submissions/" + submissionName);
                 System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
 
                 if (fileDirectory.Exists)
@@ -70,7 +71,7 @@ namespace SPade.Controllers
                 submission.Grade = result;
                 submission.AssignmentID = assgnId;
                 submission.AdminNo = User.Identity.GetUserName();
-                submission.FilePath = filePath.ToString();
+                submission.FilePath = submissionName;
                 submission.Timestamp = DateTime.Now;
             }
 
@@ -189,7 +190,6 @@ namespace SPade.Controllers
         public ActionResult PostSubmission()
         {
             Submission submission = (Submission)Session["submission"];
-            //submission.Grade = (submission.Grade * 100);
             return View(submission);
         }
 
