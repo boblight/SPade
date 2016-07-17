@@ -26,6 +26,8 @@ namespace SPade.Grading
         private List<object> testcases = new List<object>();
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle;
+        XmlNode docNode, bodyNode, solutionsNode;
+        XmlDocument slnDoc = new XmlDocument();
 
         //Lecturer use this
         public Grader(string filePath, string fileName, string assignmentTitle)
@@ -208,7 +210,6 @@ namespace SPade.Grading
 
                 foreach (XmlNode testcase in testcaseList)
                 {
-                    noOfTestCase++;
                     proc = Process.Start(procInfo);
                     subOut = "";
 
@@ -226,8 +227,8 @@ namespace SPade.Grading
 
                     if (error.Equals(""))
                     {
-                        //add output to list of outputs if there is no error
                         subOut += proc.StandardOutput.ReadLine();
+                        subList.Add(subOut); //add to list of answers 
                     }
                     else
                     {
@@ -238,63 +239,35 @@ namespace SPade.Grading
                         break; //break out of loop
                     }//check if error
 
-                    if (programFailed == false) //method only run if no error/have proper error handling in submitted program
-                    {
-                        //get the output from solution
-                        solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + "_solution.xml")); //will be ranamed 
-                        XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
-                        //loop through all the solutions to find matching
-                        foreach (XmlNode solution in solutions)
-                        {
-                            if (subOut.Equals(solution.InnerText))
-                            {
-                                testCasePassed++;
-                            }
-                        }//end of foreach loop
-                    }//end of check
-
-                    if (programFailed == false)
-                    {
-                        //program can run 
-                        //save the output to XML file 
-
-
-                        //create the solution file 
-                        string slnPath = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + "_solution.xml");
-
-                        using (XmlWriter slnWriter = XmlWriter.Create(slnPath))
-                        {
-                            //loop through the output
-
-
-
-
-
-                        }
-
-
-
-                    }
-
-
                     proc.WaitForExit();
-                }//end of test case loop
+                }
 
-                //read output 
+                //create the solution file 
                 if (programFailed == false)
                 {
-                    //return (testCasePassed / noOfTestCase);
-                }
-                else
-                {
-                    //return 0;
+                    docNode = slnDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                    slnDoc.AppendChild(docNode);
+
+                    bodyNode = slnDoc.CreateElement("body");
+                    slnDoc.AppendChild(bodyNode);
+
+                    //loop through the answers and append into the xml file 
+                    foreach (string s in subList)
+                    {
+                        solutionsNode = slnDoc.CreateElement("solution");
+                        solutionsNode.AppendChild(slnDoc.CreateTextNode(s));
+                        bodyNode.AppendChild(solutionsNode);
+                    }
+
+                    //save the XML file
+                    var fP = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
+                    slnDoc.Save(fP);
                 }
             }
             catch (Exception ex)
             {
 
             }
-
 
         }
     }//end of class
