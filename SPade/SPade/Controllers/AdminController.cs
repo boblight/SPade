@@ -273,6 +273,7 @@ namespace SPade.Controllers
                         {
                             //Log the error (uncomment dex variable name and add a line here to write a log.
                             ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Updated unsuccessful');</script>";
                         }
 
                     };
@@ -291,11 +292,13 @@ namespace SPade.Controllers
                         {
                             TryUpdateModel(C, "", new string[] { "DeletedBy", "DeletedAt" });
                             db.SaveChanges();
+                            TempData["msg"] = "<script>alert('Deleted successfully');</script>";
                         }
                         catch (DataException /* dex */)
                         {
                             //Log the error (uncomment dex variable name and add a line here to write a log.
                             ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Unable to delete successfully');</script>";
                         }
 
                     };
