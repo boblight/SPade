@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using SPade.Grading;
 using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
@@ -11,13 +12,13 @@ using System.IO;
 using System.Data.SqlClient;
 using Ionic.Zip;
 
-
 namespace SPade.Controllers
 {
     public class LecturerController : Controller
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
+
 
         // [Authorize(Roles = "")]
         // GET: Lecturer
@@ -124,6 +125,8 @@ namespace SPade.Controllers
         //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
+            string slnFilePath = "", slnFileName = "";
+
             foreach (var file in fileList) //renaming files
             {
                 if (file != null && file.ContentLength > 0)
@@ -144,20 +147,24 @@ namespace SPade.Controllers
                     else
                     {
                         //for the solution file 
-                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        slnFileName = Path.GetFileNameWithoutExtension(file.FileName);
                         //extension at the back is dynamic. cater for other language also
 
-                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + slnFileName);
                         file.SaveAs(zipLocation);
 
-                        var filePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
-                        fileInfo = new FileInfo(filePath);
+                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution");
+                        fileInfo = new FileInfo(slnFilePath);
                         fileInfo.Directory.Create();
-                        file.SaveAs(filePath);
+                        file.SaveAs(slnFilePath);
                     }
                 }
             }
+
+
             //run the solution and get the result 
+            Grader g = new Grader(slnFilePath, slnFileName, addAssgn.AssgnTitle);
+            g.RunLecturerSolution();
 
             //now to add into the DB 
             Assignment newAssignment = new Assignment();

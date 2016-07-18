@@ -4,14 +4,13 @@
     ViewBag.Title = "Log in";
 }
 
-<div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        <h2>@ViewBag.Title.</h2>
-        <section id="loginForm">
-            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+<div class="col-md-4 col-md-offset-4 form-horizontal">
+    <h2>@ViewBag.Title.</h2>
+    <section id="loginForm">
+        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
-                @Html.AntiForgeryToken()
-                <h4>Use your user account to log in.</h4>
+            @Html.AntiForgeryToken()
+            <h4>Use your user account to log in.</h4>
                 <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="form-group">
@@ -48,9 +47,8 @@
                     <p>
                         @Html.ActionLink("Forgot your password?", "ForgotPassword")
                     </p>*@
-            }
-        </section>
-    </div>
+        }
+    </section>
 </div>
 
 @section Scripts {
