@@ -3,19 +3,22 @@
 {
 
 
-        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
-        {
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
         @Html.AntiForgeryToken()
 
         string dashboardUrl = "";
         if (User.IsInRole("Admin"))
         {
-        dashboardUrl = "/Admin/Dashboard";
-        } else if (User.IsInRole("Lecturer")) {
-        dashboardUrl = "/Lecturer/Dashboard";
-        } else if (User.IsInRole("Student"))
+            dashboardUrl = "/Admin/Dashboard";
+        }
+        else if (User.IsInRole("Lecturer"))
         {
-        dashboardUrl = "/Student/Dashboard";
+            dashboardUrl = "/Lecturer/Dashboard";
+        }
+        else if (User.IsInRole("Student"))
+        {
+            dashboardUrl = "/Student/Dashboard";
         }
 
         <ul class="nav navbar-nav navbar-right">
@@ -29,16 +32,18 @@
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                     <li class="divider"></li>
+                    <li>@Html.ActionLink("Change Password", "ChangePassword", "Manage")</li>
+                    <li class="divider"></li>
                     <li><a href="javascript:document.getElementById('logoutForm').submit()"><i class="glyphicon glyphicon-log-out"></i> Log out</a></li>
                 </ul>
             </li>
         </ul>
-        }
-        }
-        else
-        {
-        <ul class="nav navbar-nav navbar-right">
-            <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
-            <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
-        </ul>
-        }
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}
