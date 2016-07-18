@@ -13,7 +13,7 @@ using System.Data.Entity.Core.Objects;
 
 namespace SPade.Controllers
 {
-
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
       //  { UserID = Request.QueryString["UserID"]
