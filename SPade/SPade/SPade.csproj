@@ -254,6 +254,7 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GmailService.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -421,6 +422,7 @@
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.properties" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.properties" />
     <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.class" />
+    <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

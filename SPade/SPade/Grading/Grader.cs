@@ -171,7 +171,6 @@ namespace SPade.Grading
                     return 0; //debug
                 }
             }//end of catch
-
         }//end of grade method
 
         public void RunLecturerSolution()

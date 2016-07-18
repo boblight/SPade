@@ -15,7 +15,7 @@ namespace SPade.Controllers
 {
     public class AdminController : Controller
     {
-      //  { UserID = Request.QueryString["UserID"]
+        //  { UserID = Request.QueryString["UserID"]
 
         private SPadeDBEntities db = new SPadeDBEntities();
 
@@ -119,7 +119,7 @@ namespace SPade.Controllers
 
                 db.Classes.Add(class1);
                 db.SaveChanges();
-                
+
             }
             catch (DbEntityValidationException e)
             {
@@ -159,9 +159,9 @@ namespace SPade.Controllers
                 var lecturer = new Lecturer()
                 {
                     StaffID = model.StaffID,
-                    Name = model.Name, 
+                    Name = model.Name,
                     ContactNo = model.ContactNo,
-                    Email = model.Email,                   
+                    Email = model.Email,
                     CreatedBy = "Admin",
                     UpdatedBy = "Admin",
                     DeletedBy = "Admin",
@@ -219,7 +219,7 @@ namespace SPade.Controllers
             //Get all lecturer
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
-            
+
 
             //Get Class           
             List<Class> Classes = db.Classes.ToList();
@@ -264,8 +264,8 @@ namespace SPade.Controllers
                         TryUpdateModel(C, "", new string[] { "CourseID", "ClassName" });
                         db.SaveChanges();
                     }
-                    catch(DataException /* dex */)
-                        {
+                    catch (DataException /* dex */)
+                    {
                         //Log the error (uncomment dex variable name and add a line here to write a log.
                         ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
                     }
