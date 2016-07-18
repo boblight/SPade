@@ -348,6 +348,7 @@
     <Content Include="Solutions\6solution.xml" />
     <Content Include="Solutions\7solution.xml" />
     <Content Include="Solutions\8solution.xml" />
+    <Content Include="Solutions\9solution.xml" />
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\build.xml" />
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\build-impl.xml" />
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.xml" />
@@ -367,11 +368,18 @@
     <Content Include="Submissions\TestDownload\Test - Copy - Copy.txt" />
     <Content Include="Submissions\TestDownload\Test - Copy.txt" />
     <Content Include="Submissions\TestDownload\Test.txt" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\build.xml" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\dist\README.TXT" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\dist\SampleQns1.jar" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\nbproject\build-impl.xml" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\nbproject\project.xml" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\src\sampleqns1\SampleQns1.java" />
     <Content Include="TestCase\3testcase.xml" />
-    <Content Include="TestCase\5_testcase.xml" />
     <Content Include="TestCase\2testcase.xml" />
     <Content Include="TestCase\5testcase.xml" />
     <Content Include="TestCase\8testcase.xml" />
+    <Content Include="TestCase\9testcase.xml" />
+    <Content Include="TestCase\testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -431,6 +439,14 @@
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.class" />
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <Content Include="Web.Config" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\build\built-jar.properties" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\build\classes\sampleqns1\SampleQns1.class" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\manifest.mf" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\nbproject\genfiles.properties" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\nbproject\private\private.properties" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\nbproject\project.properties" />
+    <Content Include="TempSubmissions\TestAdd\SampleQns1\src\sampleqns1\SampleQns1.class" />
+    <Content Include="TempSubmissions\System.Web.HttpPostedFileWrapper" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -441,7 +457,8 @@
   <ItemGroup>
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
-    <Folder Include="TempSubmissions\" />
+    <Folder Include="TempSubmissions\TestAdd\SampleQns1\build\empty\" />
+    <Folder Include="TempSubmissions\TestAdd\SampleQns1\build\generated-sources\ap-source-output\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

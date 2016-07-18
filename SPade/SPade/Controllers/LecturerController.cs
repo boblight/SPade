@@ -86,7 +86,7 @@ namespace SPade.Controllers
         {
             string f = Server.MapPath(@"~/TestCase/testcase.xml");
             byte[] fileBytes = System.IO.File.ReadAllBytes(f);
-            string fileName = "testCase.xml";
+            string fileName = "testcase.xml";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
@@ -175,7 +175,6 @@ namespace SPade.Controllers
             //runs the lecturer solution
             if (g.RunLecturerSolution() == true)
             {
-
                 //now to add into the DB 
                 Assignment newAssignment = new Assignment();
                 Class_Assgn classAssgn = new Class_Assgn();
@@ -362,8 +361,6 @@ namespace SPade.Controllers
             public decimal grade { get; set; }
             public string filepath { get; set; }
         }
-
-
 
     }//end of controller
 
