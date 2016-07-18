@@ -14,6 +14,7 @@ using System.Diagnostics;
 using Microsoft.AspNet.Identity;
 using System.Data.SqlClient;
 using Ionic.Zip;
+using System.Text.RegularExpressions;
 
 namespace SPade.Controllers
 {
@@ -45,7 +46,8 @@ namespace SPade.Controllers
                 var zipLocation = Server.MapPath(@"~/Submissions/" + file);
                 file.SaveAs(zipLocation);
 
-                string submissionName = User.Identity.GetUserName() + assignment.AssgnTitle + assignment.AssignmentID;
+                string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
+                string submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
                 var filePath = Server.MapPath(@"~/Submissions/" + submissionName);
                 System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
 

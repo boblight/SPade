@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "Message";
+}
+
+<div class="col-md-4 col-md-offset-4 form-horizontal">
+    <h2 class="text-danger">@ViewBag.Title</h2>
+    @{
+        if (String.IsNullOrEmpty(ViewBag.errorMessage))
+        {
+            <h3 class="text-danger">An error occurred while processing your request.</h3>
+        }
+        else
+        {
+            <h3 class="text-danger">@ViewBag.errorMessage</h3>
+        }
+    }
+
+</div>

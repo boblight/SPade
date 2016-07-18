@@ -9,7 +9,7 @@ namespace SPade.ViewModels.Lecturer
 {
     public class AddAssignmentViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Please provide a valid assignment title")]
         [Display(Name = "Assignment Title")]
         public string AssgnTitle { get; set; }
         public string ModuleId { get; set; }
@@ -26,12 +26,20 @@ namespace SPade.ViewModels.Lecturer
         public DateTime StartDate { get; set; }
 
         [Required]
-        [Display(Name ="Due Date")]
+        [Display(Name = "Due Date")]
         public DateTime DueDate { get; set; }
 
         [Required]
-        [Display(Name ="Max Attempts")]
+        [Display(Name = "Max Attempts")]
         public int MaxAttempt { get; set; }
+
+        [Required]
+        [Display(Name = "Assignment date range")]
+        public string DateRange { get; set; }
+
+        [Required]
+        [Display(Name = "assigned classes")]
+        public string SelectedClasses { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
