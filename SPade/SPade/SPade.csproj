@@ -427,7 +427,9 @@
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.properties" />
     <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.class" />
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
