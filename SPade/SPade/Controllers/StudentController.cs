@@ -23,7 +23,7 @@ namespace SPade.Controllers
         private SPadeDBEntities db = new SPadeDBEntities();
 
         // GET: Dashboard
-        //[Authorize(Roles = "")]
+        [Authorize(Roles = "Student")]
         public ActionResult Dashboard()
         {
             return View();
@@ -31,7 +31,7 @@ namespace SPade.Controllers
 
         //POST: SubmitAssignment
         [HttpPost]
-        //[Authorize(Roles = "Student")]
+        [Authorize(Roles = "Student")]
         public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
         {
             Submission submission = new Submission();
@@ -86,7 +86,7 @@ namespace SPade.Controllers
         }//end of submit assignment
 
         // GET: SubmitAssignment
-        //[Authorize(Roles = "")]
+        [Authorize(Roles = "Student")]
         public ActionResult SubmitAssignment(int id)
         {
             //List<Assignment> pass = new List<Assignment>();
@@ -103,7 +103,7 @@ namespace SPade.Controllers
         }
 
         // GET: ViewAssignment
-        //[Authorize(Roles = "")]
+        [Authorize(Roles = "Student")]
         public ActionResult ViewAssignment()
         {
             List<ViewAssignmentViewModel> vm = new List<ViewAssignmentViewModel>();
@@ -138,7 +138,7 @@ namespace SPade.Controllers
         }
 
         // GET: ViewResult
-        // [Authorize(Roles = "")]
+        [Authorize(Roles = "Student")]
         public ActionResult ViewResult()
         {
 
@@ -188,7 +188,7 @@ namespace SPade.Controllers
         }
 
         // GET: PostSubmission
-        // [Authorize(Roles = "")]
+        [Authorize(Roles = "Student")]
         public ActionResult PostSubmission()
         {
             Submission submission = (Submission)Session["submission"];
@@ -197,6 +197,7 @@ namespace SPade.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Student")]
         public ActionResult Download(string file)
         {
 

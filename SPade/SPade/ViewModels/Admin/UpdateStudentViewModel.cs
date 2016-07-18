@@ -18,5 +18,6 @@ namespace SPade.ViewModels.Admin
         public string ClassName { get; set; }
         public int ClassID { get; set; }
 
+
     }
 }

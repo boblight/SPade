@@ -13,9 +13,10 @@ using System.Data.Entity.Core.Objects;
 
 namespace SPade.Controllers
 {
+
     public class AdminController : Controller
     {
-        //  { UserID = Request.QueryString["UserID"]
+      //  { UserID = Request.QueryString["UserID"]
 
         private SPadeDBEntities db = new SPadeDBEntities();
 
@@ -51,10 +52,8 @@ namespace SPade.Controllers
                     ClassID = '1',
                     CreatedBy = "Admin",
                     UpdatedBy = "Admin",
-                    DeletedBy = "Admin",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
-                    DeletedAt = DateTime.Now
 
                 };
 
@@ -119,7 +118,7 @@ namespace SPade.Controllers
 
                 db.Classes.Add(class1);
                 db.SaveChanges();
-
+                
             }
             catch (DbEntityValidationException e)
             {
@@ -159,15 +158,13 @@ namespace SPade.Controllers
                 var lecturer = new Lecturer()
                 {
                     StaffID = model.StaffID,
-                    Name = model.Name,
+                    Name = model.Name, 
                     ContactNo = model.ContactNo,
-                    Email = model.Email,
+                    Email = model.Email,                   
                     CreatedBy = "Admin",
                     UpdatedBy = "Admin",
-                    DeletedBy = "Admin",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
-                    DeletedAt = DateTime.Now
 
                 };
 
@@ -219,7 +216,7 @@ namespace SPade.Controllers
             //Get all lecturer
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
-
+            
 
             //Get Class           
             List<Class> Classes = db.Classes.ToList();
@@ -238,7 +235,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateClass(UpdateClassViewModel model)
+        public ActionResult UpdateClass(UpdateClassViewModel model, string command)
         {
             int x = 1;
 
@@ -255,24 +252,67 @@ namespace SPade.Controllers
             //Get Class           
             List<Class> Classes = db.Classes.ToList();
 
-            foreach (Class C in Classes)
+            if (command.Equals("Update"))
             {
-                if (C.ClassID.Equals(x))
+                foreach (Class C in Classes)
                 {
-                    try
+                    if (C.ClassID.Equals(x))
                     {
-                        TryUpdateModel(C, "", new string[] { "CourseID", "ClassName" });
-                        db.SaveChanges();
-                    }
-                    catch (DataException /* dex */)
-                    {
-                        //Log the error (uncomment dex variable name and add a line here to write a log.
-                        ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                    }
+                        C.UpdatedBy = "ADMIN";
+                        C.UpdatedAt = DateTime.Now;
 
-                };
+                        try
+                        {
+                            TryUpdateModel(C, "", new string[] { "CourseID", "ClassName", "UpdatedBy", "UpdatedAt" });
+                            db.SaveChanges();
+                            //Show alert
+                            TempData["msg"] = "<script>alert('Updated successfully');</script>";
+
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Updated unsuccessful');</script>";
+                        }
+
+                    };
+
+                }
+            }else
+            {
+                foreach (Class C in Classes)
+                {
+                    if (C.ClassID.Equals(x))
+                    {
+                        C.DeletedBy = "ADMIN";
+                        C.DeletedAt = DateTime.Now;
+
+                        try
+                        {
+                            TryUpdateModel(C, "", new string[] { "DeletedBy", "DeletedAt" });
+                            db.SaveChanges();
+                            TempData["msg"] = "<script>alert('Deleted successfully');</script>";
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Unable to delete successfully');</script>";
+                        }
+
+                    };
+
+                }
+
+
+
 
             }
+
+
+
+
             return View(model);
 
 
@@ -308,38 +348,75 @@ namespace SPade.Controllers
 
         }
         [HttpPost]
-        public ActionResult UpdateStudent(UpdateStudentViewModel model)
+        public ActionResult UpdateStudent(UpdateStudentViewModel model, string command)
         {
             string x = "p1234567";
-
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
 
             //Get Student           
             List<Student> Students = db.Students.ToList();
-
-            foreach (Student S in Students)
+            //Udate Student information
+            if (command.Equals("Update"))
             {
-                if (S.AdminNo == x)
+                foreach (Student S in Students)
                 {
-                    if (TryUpdateModel(S, "",
-                       new string[] { "Name", "ClassID", "Email", "ContactNo" }))
+                    if (S.AdminNo == x)
                     {
-                        try
-                        {
+                        S.UpdatedBy = "ADMIN";
+                        S.UpdatedAt = DateTime.Now;
 
-                            db.SaveChanges();
-                        }
-                        catch (DataException /* dex */)
+                        if (TryUpdateModel(S, "",
+                           new string[] { "Name", "ClassID", "Email", "ContactNo","UpdatedAt","UpdatedBy" }))
                         {
-                            //Log the error (uncomment dex variable name and add a line here to write a log.
-                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            try
+                            {
+
+                                db.SaveChanges();
+                            }
+                            catch (DataException /* dex */)
+                            {
+                                //Log the error (uncomment dex variable name and add a line here to write a log.
+                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            }
                         }
                     }
-                }
 
+                }
             }
+            //Delete Student
+            else  
+            {
+                foreach (Student S in Students)
+                {
+                    if (S.AdminNo == x)
+                    {
+                        S.DeletedBy = "ADMIN";
+                        S.DeletedAt = DateTime.Now;
+
+                        if (TryUpdateModel(S, "",
+                           new string[] { "DeletedBy", "DeletedAt" }))
+                        {                          
+                            try
+                            {
+                                db.SaveChanges();
+                            }
+                            catch (DataException /* dex */)
+                            {
+                                //Log the error (uncomment dex variable name and add a line here to write a log.
+                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            }
+                        }
+                    }
+
+                }
+            }
+
+
+
+
+
             return View(model);
         }
         public ActionResult UpdateLecturer()
@@ -364,32 +441,63 @@ namespace SPade.Controllers
             return View(model);
         }
         [HttpPost]
-        public ActionResult UpdateLecturer(UpdateLecturerViewModel model)
+        public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command)
         {
             string x = "s1431489";
             List<Lecturer> Lecturers = db.Lecturers.ToList();
-
-            foreach (Lecturer L in Lecturers)
+            if (command.Equals("Update"))
             {
-                if (L.StaffID == x)
+                foreach (Lecturer L in Lecturers)
                 {
-                    //Update Lecturer
-                    if (TryUpdateModel(L, "",
-                       new string[] { "Name", "Email", "ContactNo" }))
+                    if (L.StaffID == x)
                     {
-                        try
+                        //Update Lecturer
+                        if (TryUpdateModel(L, "",
+                           new string[] { "Name", "Email", "ContactNo" }))
                         {
-                            db.SaveChanges();
+                            try
+                            {
+                                db.SaveChanges();
+                            }
+                            catch (DataException /* dex */)
+                            {
+                                //Log the error (uncomment dex variable name and add a line here to write a log.
+                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            }
                         }
-                        catch (DataException /* dex */)
-                        {
-                            //Log the error (uncomment dex variable name and add a line here to write a log.
-                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                        }
+
                     }
 
                 }
+            }
+            else
+            {
 
+                foreach (Lecturer L in Lecturers)
+                {
+                    if (L.StaffID == x)
+                    {
+                        //Update Lecturer
+                        L.DeletedBy = "ADMIN";
+                        L.DeletedAt = DateTime.Now;
+
+                        if (TryUpdateModel(L, "",
+                           new string[] { "DeletedBy", "DeletedAt" }))
+                        {
+                            try
+                            {
+                                db.SaveChanges();
+                            }
+                            catch (DataException /* dex */)
+                            {
+                                //Log the error (uncomment dex variable name and add a line here to write a log.
+                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            }
+                        }
+
+                    }
+
+                }
             }
 
             return View(model);

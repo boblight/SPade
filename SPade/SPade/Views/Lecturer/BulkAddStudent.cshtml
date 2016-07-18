@@ -24,41 +24,41 @@
             @*Adding of Relevant Fields*@
 
             <div class="form-group">
-                
-                <fieldset id="studentInput">     
 
-                <div class="col-md-2">
-                    <input type="text" name="adminInput[]" id="adminInput" placeholder="Admin No" class="form-control" />
-                </div>
+                <fieldset id="studentInput">
+                    <div class="studentInputGroup">
+                        <div class="col-md-2">
+                            <input type="text" name="adminInput[]" id="adminInput" placeholder="Admin No" class="form-control" />
+                        </div>
 
-                <div class="col-md-3">
-                    <input type="text" name="nameInput[]" id="nameInput" placeholder="Name" class="form-control" />
-                </div>
+                        <div class="col-md-3">
+                            <input type="text" name="nameInput[]" id="nameInput" placeholder="Name" class="form-control" />
+                        </div>
 
-                <div class="col-md-3">
-                    <input type="text" name="emailInput[]" id="emailInput" placeholder="Email" class="form-control" />
-                </div>
+                        <div class="col-md-3">
+                            <input type="text" name="emailInput[]" id="emailInput" placeholder="Email" class="form-control" />
+                        </div>
 
-                <div class="col-md-3">
-                    <input type="text" name="contactInput[]" id="contactInput" placeholder="Contact" class="form-control" />
-                </div>
+                        <div class="col-md-3">
+                            <input type="text" name="contactInput[]" id="contactInput" placeholder="Contact" class="form-control" />
+                        </div>
 
-                <div class="col-md-1">
-                    <button class="btn btn-default removeButton" id="removeButton" type="button">
-                        <span class="glyphicon-minus"></span>
-                    </button>
-                </div>
-                    
+                        <div class="col-md-1">
+                            <button class="btn btn-default removeButton" id="removeButton" type="button">
+                                <span class="glyphicon-minus"></span>
+                            </button>
+                        </div>
+                    </div>
                 </fieldset> @*end of studentInput*@
 
             </div> @*End of Fields form group*@
-    
-    <div id="errorStudentMessage"></div>
-            
-            
+
+            <div id="errorStudentMessage"></div>
 
 
-            @*Add Button*@ 
+
+
+            @*Add Button*@
             <div class="form-group">
                 <div class="col-md-12">
                     <button class="btn btn-default" id="addButton" placeholder="Add Row">Add Row</button>
@@ -67,19 +67,62 @@
 
             <div class="form-group">
                 <div class="col-md-12">
-                    <a href="ManageClassesAndStudents" class="btn btn-primary">Submit</a>
+                    <a class="btn btn-primary" id="submitButton">Submit</a>
                     <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                 </div>
             </div>
         </fieldset>
     </div>
 </div>
+<div id="dvImportSegments" class="fileupload ">
+    <fieldset>
+        <legend>Upload your CSV File</legend>
+        <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+    </fieldset>
+</div>
 
 <script>
+    $(document).ready(function () {
+        // The event listener for the file upload
+        document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+
+        // Method that checks that the browser supports the HTML5 File API
+        function browserSupportFileUpload() {
+            var isCompatible = false;
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                isCompatible = true;
+            }
+            return isCompatible;
+        }
+
+        // Method that reads and processes the selected file
+        function upload(evt) {
+            if (!browserSupportFileUpload()) {
+                alert('The File APIs are not fully supported in this browser!');
+            } else {
+                var data = null;
+                var file = evt.target.files[0];
+                var reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = function (event) {
+                    var csvData = event.target.result;
+                    console.log(csvData);
+                    // CSV to Array
+
+                    // obj to var
+                    // Ajax post
+                };
+                reader.onerror = function () {
+                    alert('Unable to read ' + file.fileName);
+                };
+            }
+        }
+    });
+    
 
     $('#addButton').on('click', function () {
 
-        $('#studentInput').append('<div class="hi">'
+        $('#studentInput').append('<div class="studentInputGroup">'
         + '<div class="col-md-2"><input type="text" name="adminInput[]" id="adminInput" placeholder="Admin No" class="form-control" /></div>'
         + '<div class="col-md-3"><input type="text" name="nameInput[]" id="nameInput" placeholder="Name" class="form-control" /></div>'
         + '<div class="col-md-3"><input type="text" name="emailInput[]" id="emailInput" placeholder="Email" class="form-control" /></div>'
@@ -89,11 +132,40 @@
         return false; // prevent form submission
     });
 
-    $('#studentInput').on('click', '.removeButton', function ()
-    {
-        console.log($(this));
-        console.log($(this).parent());
-        console.log($(this).parent().parent());
+    $('#studentInput').on('click', '.removeButton', function () {
         $(this).parent().parent().remove();
     });
+
+    // Reading through the array of data.
+
+    $('#submitButton').on('click', function () {
+        var studentArr = [];
+
+        $('.studentInputGroup').each(function (index, obj) {
+
+            var adminId, name, email, contact, student;
+            adminId = $(obj).find('#adminInput').val();
+            email = $(obj).find('#emailInput').val();
+            name = $(obj).find('#nameInput').val();
+            contact = $(obj).find('#contactInput').val();
+
+            student = {
+                "AdminNo": adminId,
+                "Email": email,
+                "Name": name,
+                "ContactNo": contact
+            };
+            studentArr.push(student);
+        });
+        $.ajax({
+            type: 'POST',
+            url: 'BulkAddStudent',
+            contentType: 'application/json',
+            data: JSON.stringify(studentArr) ,
+            success: function () {
+                alert("Successfully added/updated!")
+            }
+        });
+    });
+   
 </script>

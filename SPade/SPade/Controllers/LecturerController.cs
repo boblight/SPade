@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using SPade.Grading;
 using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
@@ -11,13 +12,13 @@ using System.IO;
 using System.Data.SqlClient;
 using Ionic.Zip;
 
-
 namespace SPade.Controllers
 {
     public class LecturerController : Controller
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
+
 
         // [Authorize(Roles = "")]
         // GET: Lecturer
@@ -124,6 +125,8 @@ namespace SPade.Controllers
         //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
+            string slnFilePath = "", slnFileName = "";
+
             foreach (var file in fileList) //renaming files
             {
                 if (file != null && file.ContentLength > 0)
@@ -136,7 +139,7 @@ namespace SPade.Controllers
                     {
                         //this is for the testcase 
                         var fileName = Path.GetFileName(file.FileName);
-                        var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + "_TestCase.xml");
+                        var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + ".xml");
                         fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
@@ -144,96 +147,119 @@ namespace SPade.Controllers
                     else
                     {
                         //for the solution file 
-                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                        //extension at the back is dynamic. cater for other language also
-
-                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                        slnFileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + file);
                         file.SaveAs(zipLocation);
-
-                        var filePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
-                        fileInfo = new FileInfo(filePath);
-                        fileInfo.Directory.Create();
-                        file.SaveAs(filePath);
+                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle);
+                        DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+                        if (fileDirectory.Exists)
+                        {
+                            foreach (FileInfo files in fileDirectory.GetFiles())
+                            {
+                                files.Delete();
+                            }
+                            foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                            {
+                                dir.Delete(true);
+                            }
+                        }
+                        fileDirectory.Create();
+                        System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
                     }
                 }
             }
+
             //run the solution and get the result 
+            Grader g = new Grader(slnFilePath, slnFileName, addAssgn.AssgnTitle);
 
-            //now to add into the DB 
-            Assignment newAssignment = new Assignment();
-            Class_Assgn classAssgn = new Class_Assgn();
-            List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
-
-            newAssignment.AssgnTitle = addAssgn.AssgnTitle;
-            newAssignment.Describe = addAssgn.Describe;
-            newAssignment.MaxAttempt = addAssgn.MaxAttempt;
-            newAssignment.StartDate = addAssgn.StartDate;
-            newAssignment.DueDate = addAssgn.DueDate;
-            newAssignment.ModuleCode = addAssgn.ModuleId;
-            newAssignment.CreateBy = "1431485"; //temp
-            newAssignment.CreateAt = DateTime.Now;
-            newAssignment.UpdatedBy = "1431485"; //temp
-            newAssignment.UpdatedAt = DateTime.Now;
-            db.Assignments.Add(newAssignment);
-            //   db.SaveChanges();
-
-            var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First(); //get the ID
-
-            //insert into Class_Assgn
-            foreach (AssignmentClass a in addAssgn.ClassList)
+            //runs the lecturer solution
+            if (g.RunLecturerSolution() == true)
             {
-                if (a.isSelected == true)
+
+                //now to add into the DB 
+                Assignment newAssignment = new Assignment();
+                Class_Assgn classAssgn = new Class_Assgn();
+                List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
+
+                addAssgn.Solution = addAssgn.AssgnTitle + ".xml";
+
+                newAssignment.AssgnTitle = addAssgn.AssgnTitle;
+                newAssignment.Describe = addAssgn.Describe;
+                newAssignment.MaxAttempt = addAssgn.MaxAttempt;
+                newAssignment.StartDate = addAssgn.StartDate;
+                newAssignment.DueDate = addAssgn.DueDate;
+                newAssignment.Solution = addAssgn.Solution;
+                newAssignment.ModuleCode = addAssgn.ModuleId;
+                newAssignment.CreateBy = "1431485"; //temp
+                newAssignment.CreateAt = DateTime.Now;
+                newAssignment.UpdatedBy = "1431485"; //temp
+                newAssignment.UpdatedAt = DateTime.Now;
+                db.Assignments.Add(newAssignment);
+                db.SaveChanges();
+
+                var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First(); //get the ID
+
+                //insert into Class_Assgn
+                foreach (AssignmentClass a in addAssgn.ClassList)
                 {
-                    classAssgn.ClassID = a.ClassId;
-                    classAssgn.AssignmentID = assgnID;
-                    db.Class_Assgn.Add(classAssgn);
-                    //  db.SaveChanges();
-                }
-            }
-
-            //then we rename the files and UPDATE the DB 
-            string testCasePath = Server.MapPath(@"~/App_Data/TestCase/");
-            string solutionPath = Server.MapPath(@"~/App_Data/Solutions/");
-
-            //rename the TestCase
-            foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
-            {
-                if (f.Name == addAssgn.AssgnTitle + "_TestCase.xml")
-                {
-                    var sourcePath = testCasePath + f.Name;
-                    var destPath = testCasePath + assgnID + "_TestCase.xml";
-                    FileInfo info = new FileInfo(sourcePath);
-                    info.MoveTo(destPath);
-                }
-            }
-
-            //rename the solution
-            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
-            {
-                if (f.Name == addAssgn.AssgnTitle + "_Solution.txt") //to be renamed
-                {
-                    var sourcePath = solutionPath + f.Name;
-                    var destPath = solutionPath + assgnID + "_Solution.txt";
-                    FileInfo info = new FileInfo(sourcePath);
-                    info.MoveTo(destPath);
-
-                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
-
-                    foreach (Assignment a in query)
+                    if (a.isSelected == true)
                     {
-                        a.Solution = destPath;
-                    }
-
-                    try
-                    {
+                        classAssgn.ClassID = a.ClassId;
+                        classAssgn.AssignmentID = assgnID;
+                        db.Class_Assgn.Add(classAssgn);
                         db.SaveChanges();
                     }
-                    catch (Exception ex)
-                    {
+                }
 
+                //then we rename the files and UPDATE the DB 
+                string testCasePath = Server.MapPath(@"~/TestCase/");
+                string solutionPath = Server.MapPath(@"~/Solutions/");
+
+                //rename the TestCase
+                foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                {
+                    if (f.Name == addAssgn.AssgnTitle + ".xml")
+                    {
+                        var sourcePath = testCasePath + f.Name;
+                        var destPath = testCasePath + assgnID + "testcase.xml";
+                        FileInfo info = new FileInfo(sourcePath);
+                        info.MoveTo(destPath);
+                    }
+                }
+
+                //rename the solution
+                foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
+                {
+                    if (f.Name == addAssgn.AssgnTitle + ".xml") //to be renamed
+                    {
+                        var sourcePath = solutionPath + f.Name;
+                        var destPath = solutionPath + assgnID + "solution.xml";
+                        FileInfo info = new FileInfo(sourcePath);
+                        info.MoveTo(destPath);
+
+                        var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
+
+                        foreach (Assignment a in query)
+                        {
+                            a.Solution = assgnID + "solution.xml";
+                        }
+
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
                     }
                 }
             }
+            else
+            {
+                //this part means that their stuff got problem. need to show some feedback
+            }
+
             return View("ManageAssignments");
         }
 

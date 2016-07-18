@@ -1,44 +1,44 @@
 ﻿@using Microsoft.AspNet.Identity
 @if (Request.IsAuthenticated)
 {
-    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
-    {
+
+
+        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
         @Html.AntiForgeryToken()
 
         string dashboardUrl = "";
         if (User.IsInRole("Admin"))
         {
-            dashboardUrl = "/admin/dashboard";
+        dashboardUrl = "/Admin/Dashboard";
         } else if (User.IsInRole("Lecturer")) {
-            dashboardUrl = "/lecturer/dashboard";
+        dashboardUrl = "/Lecturer/Dashboard";
         } else if (User.IsInRole("Student"))
         {
-            dashboardUrl = "/student/dashboard";
+        dashboardUrl = "/Student/Dashboard";
         }
 
         <ul class="nav navbar-nav navbar-right">
             <li><a href="@dashboardUrl"><i class="glyphicon glyphicon-th"></i> Dashboard</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                    <i class="glyphicon glyphicon-user"></i>@User.Identity.GetUserName()<span class="caret"></span>
+                    <i class="glyphicon glyphicon-user"></i> @User.Identity.GetUserName().ToUpper() <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                     <li class="divider"></li>
-                    <li>@Html.ActionLink("Change Password", "ChangePassword", "Manage")</li>
-                    <li class="divider"></li>
-                    <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+                    <li><a href="javascript:document.getElementById('logoutForm').submit()"><i class="glyphicon glyphicon-log-out"></i> Log out</a></li>
                 </ul>
             </li>
         </ul>
-    }
-}
-else
-{
-    <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
-        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
-    </ul>
-}
+        }
+        }
+        else
+        {
+        <ul class="nav navbar-nav navbar-right">
+            <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+            <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        </ul>
+        }
