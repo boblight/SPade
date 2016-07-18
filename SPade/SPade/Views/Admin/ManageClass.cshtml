@@ -14,7 +14,6 @@
             <div class="form-group">
                 <div>
                     <a href="AddOneClass" class="btn btn-primary">Add Class </a>
-                    <input type="button" value="Get All Class" class="btn btn-primary" id="btnAllClass"/>
                 </div>
             </div>
 
@@ -28,58 +27,20 @@
 
             <div class="form-group">
                 <table class="table table-striped table-hover tablesorter">
-                    @*<thead>*@
+                    <thead>
                         <tr>
                             <th>Class</th>
                             <th>Lecturer In-Charge</th>
                             <th>No. of Students</th>
                             <th class="sorter-false">Update</th>
-                            <td>
-                                <div id="UpdatePanel"></div>
-                            </td>
+                            <
                         </tr>
-                    @*</thead>*@
+                    </thead>
                 </table>
             </div>
         </fieldset>
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
-        $('#btnAllClass').click(function () {
 
-            $.ajax({
-                url: "ManageAllClass",
-                data: "",
-                type: "GET",
-                dataType: "json",
-                success: function (data) {
-                    loadData(data);
-                },
-                error: function () {
-                    alert("Failed! Please try again!");
-                }
-            });
-        });
-
-        function loadData(data) {
-            //To show the data out.
-            var tab = $('<table class="table table-striped table-hover tablesorter"></table>');
-            var thead = $('<thead></thead>');
-
-            $.each(data, function (i, val) {
-                //Append database data here.
-                var trow = $('<tr></tr>');
-                trow.append('<td></td>');
-                trow.append('<td>' + val.ClassName + '</td>');
-                trow.append('<td>' + '</td>');
-                trow.append('<td>' + '</td>');
-                tab.append(trow);
-            });
-
-            $(UpdatePanel).html(tab);
-        };
-    });
-</script>
 
