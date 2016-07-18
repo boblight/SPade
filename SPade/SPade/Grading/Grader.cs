@@ -177,8 +177,10 @@ namespace SPade.Grading
 
         }//end of grade method
 
-        public void RunLecturerSolution()
+        public bool RunLecturerSolution()
         {
+            bool isRun = false;
+
             //method to run lecturer solution. 
             compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/" + fileName + ".java");
 
@@ -205,7 +207,7 @@ namespace SPade.Grading
             try
             {
                 //load test case
-                testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assignmentTitle + "_testcase.xml"));
+                testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml"));
                 XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
 
                 foreach (XmlNode testcase in testcaseList)
@@ -262,12 +264,16 @@ namespace SPade.Grading
                     //save the XML file
                     var fP = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
                     slnDoc.Save(fP);
+
+                    isRun = true;
                 }
             }
             catch (Exception ex)
             {
 
             }
+
+            return isRun;
 
         }
     }//end of class
