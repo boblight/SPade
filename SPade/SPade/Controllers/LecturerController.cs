@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using SPade.Grading;
 using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
 using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Student;
 using System.IO;
 using System.Data.SqlClient;
-using System.IO.Compression;
+using Ionic.Zip;
 
 namespace SPade.Controllers
 {
@@ -17,6 +18,7 @@ namespace SPade.Controllers
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
+
 
         // [Authorize(Roles = "")]
         // GET: Lecturer
@@ -68,28 +70,6 @@ namespace SPade.Controllers
             return View();
         }
 
-        public ActionResult ViewStudentsByClass(int classID)
-        {
-            List<ViewStudentsByClassViewModel> vs = new List<ViewStudentsByClassViewModel>();
-            List<Student> studList = new List<Student>();
-
-            studList = db.Students.Where(s => s.ClassID == classID && s.DeletedAt == null).ToList();
-            var cs = db.Classes.Where(c => c.ClassID == classID).First();
-
-            foreach (Student s in studList)
-            {
-                ViewStudentsByClassViewModel v = new ViewStudentsByClassViewModel();
-                v.ClassName = cs.Course + "/" + cs.ClassName;
-                v.AdminNo = s.AdminNo;
-                v.Name = s.Name;
-                v.Email = s.Email;
-                v.ContactNo = s.ContactNo;
-                vs.Add(v);
-            }
-
-            return View();
-        }
-
         //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
@@ -104,7 +84,7 @@ namespace SPade.Controllers
 
         public FileResult DownloadTestCase()
         {
-            string f = Server.MapPath(@"~/App_Data/TestCase/testCase.xml");
+            string f = Server.MapPath(@"~/TestCase/testcase.xml");
             byte[] fileBytes = System.IO.File.ReadAllBytes(f);
             string fileName = "testCase.xml";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
@@ -145,6 +125,8 @@ namespace SPade.Controllers
         //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
+            string slnFilePath = "", slnFileName = "";
+
             foreach (var file in fileList) //renaming files
             {
                 if (file != null && file.ContentLength > 0)
@@ -162,23 +144,27 @@ namespace SPade.Controllers
                         fileInfo.Directory.Create();
                         file.SaveAs(filePath);
                     }
-                    if (ext == ".zip")
+                    else
                     {
                         //for the solution file 
-                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        slnFileName = Path.GetFileNameWithoutExtension(file.FileName);
                         //extension at the back is dynamic. cater for other language also
 
-                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + slnFileName);
                         file.SaveAs(zipLocation);
 
-                        var filePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution" + ext);
-                        fileInfo = new FileInfo(filePath);
+                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle + "_Solution");
+                        fileInfo = new FileInfo(slnFilePath);
                         fileInfo.Directory.Create();
-                        file.SaveAs(filePath);
+                        file.SaveAs(slnFilePath);
                     }
                 }
             }
+
+
             //run the solution and get the result 
+            Grader g = new Grader(slnFilePath, slnFileName, addAssgn.AssgnTitle);
+            g.RunLecturerSolution();
 
             //now to add into the DB 
             Assignment newAssignment = new Assignment();
@@ -317,6 +303,27 @@ namespace SPade.Controllers
     new SqlParameter("@inAssignment", Assignment)).ToList();
 
             return Json(results);
+        }
+
+        [HttpGet]
+        public ActionResult Download(string file)
+        {
+
+            string path = "~/Submissions/" + file;
+            string zipname = file + ".zip";
+
+            var memoryStream = new MemoryStream();
+            using (var zip = new ZipFile())
+            {
+
+                zip.AddDirectory(Server.MapPath(path));
+                zip.Save(memoryStream);
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", zipname);
+
+
         }
 
         class DBass
