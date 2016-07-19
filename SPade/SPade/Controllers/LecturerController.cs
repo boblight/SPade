@@ -11,6 +11,7 @@ using SPade.ViewModels.Student;
 using System.IO;
 using System.Data.SqlClient;
 using Ionic.Zip;
+using Microsoft.AspNet.Identity;
 
 namespace SPade.Controllers
 {
@@ -32,7 +33,7 @@ namespace SPade.Controllers
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
             ManageClassesViewModel e = new ManageClassesViewModel();
 
-            string x = "s1431489"; //temp 
+            string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -91,7 +92,7 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            string x = "s1431489"; //temp 
+            string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -264,7 +265,7 @@ namespace SPade.Controllers
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();
 
-            string loggedInLecturer = "s1431489"; //temp 
+            string loggedInLecturer = User.Identity.GetUserName(); //temp 
 
 
             List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
@@ -293,7 +294,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult GetAssignment(string Class)
         {
-            string loggedInLecturer = "s1431489"; //temp 
+            string loggedInLecturer = User.Identity.GetUserName(); //temp 
 
             var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
     new SqlParameter("@inClass", Class),

@@ -140,7 +140,7 @@ namespace SPade.Controllers
 
             ViewResultViewModel vrvm = new ViewResultViewModel();
 
-            string loggedInStudent = "p1431476"; //temp 
+            string loggedInStudent = User.Identity.GetUserName();
 
 
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, s1.assignmentid, a.assignmentid, a.assgntitle, a.startdate, a.duedate, s1.grade, s1.filepath, s1.timestamp from submission s1 inner join( select max(submissionid) submissionid, adminno, assignmentid, max(timestamp) timestamp from submission group by adminno, assignmentid ) s2 on s1.submissionid = s2.submissionid inner join( select * from assignment where deletedat is null ) a on s1.assignmentid = a.assignmentid where s1.adminno = @inStudent",
@@ -195,8 +195,8 @@ namespace SPade.Controllers
         public ActionResult Download(string file)
         {
 
-            string path = "~/Submissions/" + "p1431476" + file; //temp
-            string zipname = "p1431476" + file + ".zip"; //temp
+            string path = "~/Submissions/" + User.Identity.GetUserName() + file; //temp
+            string zipname = User.Identity.GetUserName() + file + ".zip"; //temp
 
             var memoryStream = new MemoryStream();
             using (var zip = new ZipFile())
