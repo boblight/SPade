@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
 
     $(function () {
-        $('input[name="daterange"]').daterangepicker({
+        $('input[name="DateRange"]').daterangepicker({
 
             autoUpdateInput: false,
             locale: {
@@ -11,23 +11,23 @@
         })
     });
 
-    $("#daterange").on('apply.daterangepicker', function (ev, picker) {
+    $("#DateRange").on('apply.daterangepicker', function (ev, picker) {
 
         var sd = picker.startDate.format('YYYY-MM-DD')
         var ed = picker.endDate.format('YYYY-MM-DD')
 
-        $("#daterange").val(sd + " - " + ed);
+        $("#DateRange").val(sd + " - " + ed);
         $('#StartDate').val(sd);
         $('#DueDate').val(ed);
     })
 
-    $("#daterange").on("cancel.daterangepicker", function (ev, picker) {
+    $("#DateRange").on("cancel.daterangepicker", function (ev, picker) {
 
-        $("#daterange").val("");
+        $("#DateRange").val("");
 
     })
 
-    $("#classSelect").click(function () {
+    $("#SelectedClasses").click(function () {
 
         $("#classModal").modal("show");
 
@@ -37,7 +37,7 @@
 
         var t = $("#cL").data("class-name");
 
-        $("#classSelect").val(t)
+        $("#SelectedClasses").val(t)
 
     })
 
@@ -52,6 +52,6 @@
         }
     })
 
- 
+
 
 })

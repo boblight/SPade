@@ -14,6 +14,7 @@ using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
 using SPade.ViewModels.Accounts;
+using System.Web.Security;
 
 namespace SPade.Controllers
 {
@@ -81,11 +82,22 @@ namespace SPade.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
+            var userid = UserManager.FindByName(model.UserName).Id;
+            ViewBag.errorMessage = "You have not confirmed your email. Please confirm your email before attempting to login.";
+            if (!UserManager.IsEmailConfirmed(userid))
+            {
+                return View("ConfirmEmailMessage");
+            }
             var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            
             switch (result)
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                case (SignInStatus.Success):
+                    {
+                        return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
+                        //return RedirectToLocal(returnUrl);
+                    }
+
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -95,6 +107,27 @@ namespace SPade.Controllers
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
+        }
+
+        public ActionResult RedirectLogin(string returnUrl)
+        {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToLocal("/Admin/Dashboard/");
+            }
+            else if (User.IsInRole("Lecturer"))
+            {
+                return RedirectToLocal("/Lecturer/Dashboard/");
+            }
+            else if (User.IsInRole("Student"))
+            {
+                return RedirectToLocal("/Student/Dashboard/");
+            }
+            else
+            {
+                return RedirectToLocal(returnUrl);
+            }
+
         }
 
         //
@@ -146,7 +179,27 @@ namespace SPade.Controllers
         public ActionResult Register()
         {
             RegisterViewModel rvm = new RegisterViewModel();
-            rvm.classList = db.Classes.ToList();
+
+
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
+
+            List<String> classIds = new List<String>();
+            List<String> classNames = new List<String>();
+
+            foreach (Class c in managedClasses)
+            {
+                Course course = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault();
+
+                String cId = c.ClassID.ToString();
+                String cName = course.CourseAbbr + "/" + c.ClassName.ToString();
+
+                classIds.Add(cId);
+                classNames.Add(cName);
+            }
+
+            rvm.classIds = classIds;
+            rvm.classNames = classNames;
+
             return View(rvm);
         }
 
@@ -154,7 +207,7 @@ namespace SPade.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model, FormCollection formCollection)
         {
             if (ModelState.IsValid)
             {
@@ -162,9 +215,11 @@ namespace SPade.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    //getting current user
+                    var currentUser = UserManager.FindByName(user.UserName);
+                    UserManager.AddToRole(currentUser.Id, "Student");
 
-                    //store student data
+                    //store student particulars in student info
                     Student student = new Student();
                     student = model.student;
                     student.Email = model.Email;
@@ -172,18 +227,22 @@ namespace SPade.Controllers
                     student.CreatedBy = model.student.Name;
                     student.UpdatedAt = DateTime.Now;
                     student.UpdatedBy = model.student.Name;
-                    student.ClassID = 1; //this is temporary. added to stop error from coming out
+                    student.ClassID = Int32.Parse(formCollection.Get("ClassSelect")); //this is temporary. added to stop error from coming out
 
                     db.Students.Add(student);
+
+                    //update student account roles
+
                     db.SaveChanges();
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    ViewBag.errorMessage = "Please confirm the email was sent to you.";
+                    return View("ConfirmEmailMessage");
                 }
                 AddErrors(result);
             }
@@ -222,7 +281,14 @@ namespace SPade.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
+                var user = await UserManager.FindByEmailAsync(model.Email);
+
+                ViewBag.errorMessage = "You have not confirmed your email. Please confirm your email before attempting to login.";
+                if (!UserManager.IsEmailConfirmed(user.Id))
+                {
+                    return View("ConfirmEmailMessage");
+                }
+
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -231,10 +297,10 @@ namespace SPade.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // If we got this far, something failed, redisplay form
@@ -268,7 +334,7 @@ namespace SPade.Controllers
             {
                 return View(model);
             }
-            var user = await UserManager.FindByNameAsync(model.Email);
+            var user = await UserManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist

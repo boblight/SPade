@@ -18,7 +18,8 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44331</IISExpressSSLPort>
+    <IISExpressSSLPort>
+    </IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -44,8 +45,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zip, Version=1.10.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotNetZip.1.10.0\lib\net20\Ionic.Zip.dll</HintPath>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -54,7 +55,6 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
-    <Reference Include="System.Activities" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
@@ -251,6 +251,7 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GmailService.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -283,6 +284,8 @@
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Ionic.Zip.xml" />
+    <Content Include="LecturerSolution\14314761solution.jar" />
     <Content Include="App_Data\log.txt" />
     <Content Include="Models\DAL\SPadeDBModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -294,10 +297,19 @@
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
       <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
     </Content>
-    <Content Include="Solutions\1solution.xml" />
-    <Content Include="Solutions\2solution.xml" />
-    <Content Include="Solutions\5solution.xml" />
-    <Content Include="Solutions\3solution.xml" />
+    <Content Include="Solutions\1solution.txt" />
+    <Content Include="Submissions\14314761solution.jar" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\build.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\FYPInputTestApp.jar" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\dist\README.TXT" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\build-impl.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.xml" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.java" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\testSomething.java" />
+    <Content Include="TestCase\1testcase.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -346,29 +358,6 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\build.xml" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\build-impl.xml" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.xml" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.java" />
-    <Content Include="Submissions\p1431476Pyramid1\Test - Copy - Copy - Copy - Copy.txt" />
-    <Content Include="Submissions\p1431476Pyramid1\Test - Copy - Copy - Copy.txt" />
-    <Content Include="Submissions\p1431476Pyramid1\Test - Copy - Copy.txt" />
-    <Content Include="Submissions\p1431476Pyramid1\Test - Copy.txt" />
-    <Content Include="Submissions\p1431476Pyramid1\Test.txt" />
-    <Content Include="Submissions\p1431476Sum Machine.2\Test - Copy - Copy - Copy - Copy.txt" />
-    <Content Include="Submissions\p1431476Sum Machine.2\Test - Copy - Copy - Copy.txt" />
-    <Content Include="Submissions\p1431476Sum Machine.2\Test - Copy - Copy.txt" />
-    <Content Include="Submissions\p1431476Sum Machine.2\Test - Copy.txt" />
-    <Content Include="Submissions\p1431476Sum Machine.2\Test.txt" />
-    <Content Include="Submissions\TestDownload\Test - Copy - Copy - Copy - Copy.txt" />
-    <Content Include="Submissions\TestDownload\Test - Copy - Copy - Copy.txt" />
-    <Content Include="Submissions\TestDownload\Test - Copy - Copy.txt" />
-    <Content Include="Submissions\TestDownload\Test - Copy.txt" />
-    <Content Include="Submissions\TestDownload\Test.txt" />
-    <Content Include="TestCase\5_testcase.xml" />
-    <Content Include="TestCase\2testcase.xml" />
-    <Content Include="TestCase\5testcase.xml" />
-    <Content Include="TestCase\testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -411,6 +400,7 @@
     <Content Include="Views\Admin\AddOneStudent.cshtml" />
     <Content Include="Views\Admin\AddOneLecturer.cshtml" />
     <Content Include="Views\Lecturer\ViewStudentsByClass.cshtml" />
+    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <Content Include="Views\Lecturer\ManageClassesAndStudents.cshtml" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
     <Content Include="Views\Lecturer\ViewResults.cshtml" />
@@ -421,24 +411,25 @@
     <Content Include="Views\Admin\UpdateLecturer.cshtml" />
     <Content Include="Views\Admin\UpdateStudent.cshtml" />
     <Content Include="Views\Student\PostSubmission.cshtml" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\manifest.mf" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\genfiles.properties" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\private\private.properties" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\nbproject\project.properties" />
-    <Content Include="Submissions\p14314763SampleQns1\SampleQns1\src\sampleqns1\SampleQns1.class" />
-    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
-    <Content Include="Web.config" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
+    <Content Include="Web.Config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\manifest.mf" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\genfiles.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\private\private.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\nbproject\project.properties" />
+    <Content Include="Submissions\p14314761FYPInputTestApp\FYPInputTestApp\src\fypinputtestapp\FYPInputTestApp.class" />
+    <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
+    <None Include="Web.Debug.Config">
+      <DependentUpon>Web.Config</DependentUpon>
     </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
+    <None Include="Web.Release.Config">
+      <DependentUpon>Web.Config</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
-    <Folder Include="TempSubmissions\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -472,7 +463,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>62780</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44331/</IISUrl>
+          <IISUrl>http://localhost:62780/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

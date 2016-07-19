@@ -11,27 +11,27 @@
             {
             @Html.AntiForgeryToken()
             <h4>Log in to SPade.</h4>
-                <hr />
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                <div class="form-group">
-                    <label class="col-md-2 control-label">Admin No.</label>
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-                        <span class="help-block">With 'p' (e.g. p123456)</span>
-                        <span class="help-block">@Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })</span>
-</div>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <label class="col-md-2 control-label">Admin No. / Staff ID</label>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                    <span class="help-block">With 'P' (e.g. P1234567)</span>
+                    <span class="help-block">@Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })</span>
                 </div>
+            </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">Password</label>
                     <div class="col-md-10">
                         @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
                         <span class="help-block">@Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })</span>
-</div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
-                            <label>@Html.CheckBoxFor(m => m.RememberMe)Remember Me</label>
+                            <label>@Html.CheckBoxFor(m => m.RememberMe)Remember me?</label>
                         </div>
                     </div>
                 </div>
@@ -42,13 +42,11 @@
                 </div>
 
                 <hr />
-                <h4>
-                    @Html.ActionLink("Register for an account", "Register")
-                </h4>
-                @* Enable this once you have account confirmation enabled for password reset functionality
-                    <p>
-                        @Html.ActionLink("Forgot your password?", "ForgotPassword")
-                    </p>*@
+
+                <div class="form-group">
+                    <div class="col-sm-6">@Html.ActionLink("Register for an account", "Register")</div>
+                    <div class="col-sm-6"><span class="pull-right">@Html.ActionLink("Forgot your password?", "ForgotPassword")</span></div>
+                </div>
         }
     </section>
 </div>
