@@ -165,7 +165,7 @@ namespace SPade.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.student.AdminNo, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -173,20 +173,23 @@ namespace SPade.Controllers
                     var currentUser = UserManager.FindByName(user.UserName);
                     UserManager.AddToRole(currentUser.Id, "Student");
 
+                    string name = model.Name;
+
                     //store student particulars in student info
                     Student student = new Student();
-                    student = model.student;
+                    student.AdminNo = model.AdminNo;
+                    student.Name = name;
+                    student.ContactNo = model.ContactNo;
                     student.Email = model.Email;
                     student.CreatedAt = DateTime.Now;
-                    student.CreatedBy = model.student.Name;
+                    student.CreatedBy = name;
                     student.UpdatedAt = DateTime.Now;
-                    student.UpdatedBy = model.student.Name;
+                    student.UpdatedBy = name;
                     student.ClassID = 1; //this is temporary. added to stop error from coming out
 
                     db.Students.Add(student);
 
                     //update student account roles
-
                     db.SaveChanges();
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771

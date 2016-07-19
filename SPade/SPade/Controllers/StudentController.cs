@@ -39,42 +39,56 @@ namespace SPade.Controllers
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
 
             //getting file path
-            if (file.ContentLength > 0)
+            //first check if file us empty of is not zip file
+            if (file != null && Path.GetExtension(file.FileName) == ".zip")
             {
-                //save zip file in submissions directory temporarily
-                //next unzip it into the same folder while replacing existing submissions
-                var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                var zipLocation = Server.MapPath(@"~/Submissions/" + file);
-                file.SaveAs(zipLocation);
-
-                string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
-                string submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
-                var filePath = Server.MapPath(@"~/Submissions/" + submissionName);
-                System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
-
-                if (fileDirectory.Exists)
+                if (file.ContentLength > 0)
                 {
-                    foreach (FileInfo files in fileDirectory.GetFiles())
+                    //save zip file in submissions directory temporarily
+                    //next unzip it into the same folder while replacing existing submissions
+                    var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                    var zipLocation = Server.MapPath(@"~/Submissions/" + file);
+                    file.SaveAs(zipLocation);
+
+                    string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
+                    string submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
+                    var filePath = Server.MapPath(@"~/Submissions/" + submissionName);
+                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
+
+                    if (fileDirectory.Exists)
                     {
-                        files.Delete();//delete all files in directory
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            files.Delete();//delete all files in directory
+                        }
+                        foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                        {
+                            dir.Delete(true);
+                        }
                     }
-                    foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
-                    {
-                        dir.Delete(true);
-                    }
+                    fileDirectory.Create(); // Recreates directory to update latest submission
+                    System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
+
+                    //grade submission
+                    Grader grader = new Grader(filePath, fileName, assgnId);
+                    decimal result = grader.grade();
+
+                    submission.Grade = result;
+                    submission.AssignmentID = assgnId;
+                    submission.AdminNo = User.Identity.GetUserName();
+                    submission.FilePath = submissionName;
+                    submission.Timestamp = DateTime.Now;
                 }
-                fileDirectory.Create(); // Recreates directory to update latest submission
-                System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
-
-                //grade submission
-                Grader grader = new Grader(filePath, fileName, assgnId);
-                decimal result = grader.grade();
-
-                submission.Grade = result;
-                submission.AssignmentID = assgnId;
-                submission.AdminNo = User.Identity.GetUserName();
-                submission.FilePath = submissionName;
-                submission.Timestamp = DateTime.Now;
+            }
+            else if (file == null)
+            {
+                Session["UploadError"] = "Please select a file to upload.";
+                return RedirectToAction("SubmitAssignment", assgnId);
+            }
+            else if (Path.GetExtension(file.FileName) != ".zip")
+            {
+                Session["UploadError"] = "Only zip files are allowed. Please zip up your project before uploading.";
+                return RedirectToAction("SubmitAssignment", assgnId);
             }
 
             db.Submissions.Add(submission);
@@ -96,6 +110,12 @@ namespace SPade.Controllers
 
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
+
+            if (Session["UploadError"] != null)
+            {
+                ModelState.AddModelError("UploadError", Session["UploadError"].ToString());
+                Session["UploadError"] = null;
+            }
 
             svm.assignment = assignment;
 
