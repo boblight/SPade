@@ -68,12 +68,14 @@
             <label class="col-md-2 control-label" for="ClassName">Class</label>
             <div class="col-md-10">
 
-                <select class="form-control">
-
+                <select class="form-control" id="ClassSelect" name="ClassSelect">
                     @{
-                        foreach (var m in Model.classList)
+                        int n = 0;
+                        foreach (var i in Model.ClassID)
                         {
-                            <option value="@m.ClassID">@m.ClassName</option>
+
+                            <option value="@i">@Model.classNames[n]</option>
+                            n++;
                         }
                     }
 

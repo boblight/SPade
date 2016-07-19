@@ -50,7 +50,7 @@ namespace SPade.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "UserName")]
+        [Display(Name = "Admin No. / Staff ID")]
         public string UserName { get; set; }
 
         [Required]
@@ -97,9 +97,11 @@ namespace SPade.Models
         [Display(Name = "Contact Number")]
         public int ContactNo { get; set; }
 
-        public int ClassID { get; set; }
+        public List<string> ClassID  { get; set; }
 
         public List<Class> classList { get; set; }
+
+        public List<string> classNames { get; set; }
     }
 
     public class ResetPasswordViewModel
