@@ -50,7 +50,7 @@ namespace SPade.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "UserName")]
+        [Display(Name = "Admin No. / Staff ID")]
         public string UserName { get; set; }
 
         [Required]
@@ -80,9 +80,28 @@ namespace SPade.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
+        [Required]
+        [StringLength(8, ErrorMessage = "Please enter a valid Student number")]
+        [RegularExpression("^[^P]+$", ErrorMessage = "Please enter valid Student number")]
+        [Display(Name = "Administration Number")]
+        public string AdminNo { get; set; }
+
+        [Required]
+        [StringLength(50, ErrorMessage = "Do not exceed 50 characters")]
+        [Display(Name = "Full Name")]
+        public string Name { get; set; }
+
+        [Required]
+        //[DataType(DataType.PhoneNumber, ErrorMessage = "Please enter a proper Singapore-based phone number")]
+        [RegularExpression("^[0-9]{8,8}$", ErrorMessage = "Please enter a proper Singapore-based phone number")]
+        [Display(Name = "Contact Number")]
+        public int ContactNo { get; set; }
+
+        public List<string> ClassID  { get; set; }
+
         public List<Class> classList { get; set; }
 
-        public Student student { get; set; }
+        public List<string> classNames { get; set; }
     }
 
     public class ResetPasswordViewModel

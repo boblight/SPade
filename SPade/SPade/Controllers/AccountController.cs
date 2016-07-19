@@ -14,6 +14,7 @@ using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
 using SPade.ViewModels.Accounts;
+using System.Web.Security;
 
 namespace SPade.Controllers
 {
@@ -88,10 +89,15 @@ namespace SPade.Controllers
                 return View("ConfirmEmailMessage");
             }
             var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+
             switch (result)
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                case (SignInStatus.Success):
+                    {
+                        return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
+                        //return RedirectToLocal(returnUrl);
+                    }
+
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -101,6 +107,27 @@ namespace SPade.Controllers
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
+        }
+
+        public ActionResult RedirectLogin(string returnUrl)
+        {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToLocal("/Admin/Dashboard/");
+            }
+            else if (User.IsInRole("Lecturer"))
+            {
+                return RedirectToLocal("/Lecturer/Dashboard/");
+            }
+            else if (User.IsInRole("Student"))
+            {
+                return RedirectToLocal("/Student/Dashboard/");
+            }
+            else
+            {
+                return RedirectToLocal(returnUrl);
+            }
+
         }
 
         //
@@ -152,7 +179,31 @@ namespace SPade.Controllers
         public ActionResult Register()
         {
             RegisterViewModel rvm = new RegisterViewModel();
-            rvm.classList = db.Classes.ToList();
+
+            if (Session["RegisterError"] != null)
+            {
+                ModelState.AddModelError("RegisterErrorRegisterError", Session["RegisterError"].ToString());
+                Session["RegisterError"] = null;
+            }
+
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
+
+            List<String> classIds = new List<String>();
+            List<String> classNames = new List<String>();
+
+            foreach (Class c in managedClasses)
+            {
+                Course course = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault();
+
+                String cId = c.ClassID.ToString();
+                String cName = course.CourseAbbr + "/" + c.ClassName.ToString();
+
+                classIds.Add(cId);
+                classNames.Add(cName);
+            }
+
+            rvm.ClassID = classIds;
+            rvm.classNames = classNames;
 
             return View(rvm);
         }
@@ -161,48 +212,74 @@ namespace SPade.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model, FormCollection formCollection)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.student.AdminNo, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                List<Student> studlist = db.Students.ToList();
+
+                //check if email and admin no. has alr been used
+                //if (db.Students.ToList().Find(a => a.Email == model.Email).Equals(null))
+                if (studlist.FindAll(s => s.Email == model.Email).Count == 0)
                 {
-                    //getting current user
-                    var currentUser = UserManager.FindByName(user.UserName);
-                    UserManager.AddToRole(currentUser.Id, "Student");
+                    if (db.Students.ToList().FindAll(s => s.AdminNo == model.AdminNo).Count == 0)
+                    {
+                        var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
+                        var result = await UserManager.CreateAsync(user, model.Password);
+                        if (result.Succeeded)
+                        {
+                            //getting current user
+                            var currentUser = UserManager.FindByName(user.UserName);
+                            UserManager.AddToRole(currentUser.Id, "Student");
+                            string name = model.Name;
 
-                    //store student particulars in student info
-                    Student student = new Student();
-                    student = model.student;
-                    student.Email = model.Email;
-                    student.CreatedAt = DateTime.Now;
-                    student.CreatedBy = model.student.Name;
-                    student.UpdatedAt = DateTime.Now;
-                    student.UpdatedBy = model.student.Name;
-                    student.ClassID = 1; //this is temporary. added to stop error from coming out
+                            //store student particulars in student info
+                            Student student = new Student();
+                            student.AdminNo = model.AdminNo;
+                            student.Name = name;
+                            student.ContactNo = model.ContactNo;
+                            student.Email = model.Email;
+                            student.CreatedAt = DateTime.Now;
+                            student.CreatedBy = name;
+                            student.UpdatedAt = DateTime.Now;
+                            student.UpdatedBy = name;
+                            student.ClassID = Int32.Parse(formCollection.Get("ClassSelect")); //this is temporary. added to stop error from coming out
 
-                    db.Students.Add(student);
+                            db.Students.Add(student);
 
-                    //update student account roles
+                            //update student account roles
 
-                    db.SaveChanges();
+                            db.SaveChanges();
 
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                            // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                            // Send an email with this link
+                            string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                            await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    ViewBag.errorMessage = "Please confirm the email was sent to you.";
-                    return View("ConfirmEmailMessage");
+                            ViewBag.errorMessage = "Please confirm the email was sent to you.";
+                            return View("ConfirmEmailMessage");
+                        }
+
+                        AddErrors(result);
+                        // If we got this far, something failed, redisplay form
+                        return View(model);
+                    }
+                    else
+                    {
+                        Session["RegisterError"] = "Administrative number has already been registered. Please check with your lecturer if you are sure that" +
+                            " you have entered the correct administrative number.";
+                        return RedirectToAction("Register");
+                    }
                 }
-                AddErrors(result);
+                else
+                {
+                    Session["RegisterError"] = "Email has already been registered. Please check with your lecturer if you are sure that" +
+                        " you have entered the correct email.";
+                    return RedirectToAction("Register");
+                }
             }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            return View("ConfirmEmailMessage");
         }
 
         //

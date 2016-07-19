@@ -10,6 +10,7 @@
     {
         @Html.AntiForgeryToken()
         <h4>Create a new account.</h4>
+        <h5 class="text-danger">@Html.ValidationMessage("RegisterError")</h5>
         <hr />
         @Html.ValidationSummary("", new { @class = "text-danger" })
         <div class="form-group">
@@ -26,7 +27,7 @@
                 <span class="help-block">@Html.ValidationMessage("Password", new { @class = "text-danger" })</span>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group">    
             <label class="col-md-2 control-label" for="ConfirmPassword">Confirm Password</label>
             <div class="col-md-10">
                 @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", required = "required" })
@@ -40,7 +41,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="AdminNo">Admin No.</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.student.AdminNo, new { @class = "form-control" })
+                @Html.TextBoxFor(m => m.AdminNo, new { @class = "form-control" })
                 <span class="help-block">With 'p' (e.g. p123456)</span>
                 <span class="help-block">@Html.ValidationMessage("AdminNo", new { @class = "text-danger" })</span>
             </div>
@@ -49,7 +50,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="Name">Full Name</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.student.Name, new { @class = "form-control" })
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
                 <span class="help-block">As stated in Student Card</span>
                 <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
             </div>
@@ -58,7 +59,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="ContactNo">Contact Number</label>
             <div class="col-md-10">
-                @Html.TextBoxFor(m => m.student.ContactNo, new { @class = "form-control" })
+                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control" })
                 <span class="help-block">For emergency contact</span>
                 <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
             </div>
@@ -68,12 +69,14 @@
             <label class="col-md-2 control-label" for="ClassName">Class</label>
             <div class="col-md-10">
 
-                <select class="form-control">
-
+                <select class="form-control" id="ClassSelect" name="ClassSelect">
                     @{
-                        foreach (var m in Model.classList)
+                        int n = 0;
+                        foreach (var i in Model.ClassID)
                         {
-                            <option value="@m.ClassID">@m.ClassName</option>
+
+                            <option value="@i">@Model.classNames[n]</option>
+                            n++;
                         }
                     }
 
