@@ -19,7 +19,6 @@ namespace SPade.Controllers
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
 
-
         // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
@@ -65,7 +64,7 @@ namespace SPade.Controllers
         }
 
         // [Authorize(Roles = "")]
-        public ActionResult ViewStudentsByClass()
+        public ActionResult ViewStudentsByClass(string classID)
         {
             return View();
         }
@@ -126,6 +125,9 @@ namespace SPade.Controllers
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
             string slnFilePath = "", slnFileName = "";
+
+            var asd = addAssgn.SolutionsFile.FileName;
+            var ttt = addAssgn.TestCaseFile.FileName;
 
             foreach (var file in fileList) //renaming files
             {
