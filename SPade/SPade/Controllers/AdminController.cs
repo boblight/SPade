@@ -116,7 +116,17 @@ namespace SPade.Controllers
 
                 };
 
+
+                var lec_class = new Lec_Class()
+                {
+                    ClassID = model.ClassID,
+                    StaffID = model.StaffID,
+
+                };
+
+
                 db.Classes.Add(class1);
+                db.Lec_Class.Add(lec_class);
                 db.SaveChanges();
                 
             }
@@ -208,7 +218,7 @@ namespace SPade.Controllers
         public ActionResult UpdateClass()
         {
             UpdateClassViewModel model = new UpdateClassViewModel();
-            int x = 1;
+            int x = 6;
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -216,6 +226,9 @@ namespace SPade.Controllers
             //Get all lecturer
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
+
+            List<Lec_Class> all_Lec_Class = db.Lec_Class.ToList();
+            model.Lec_Classes = all_Lec_Class;
             
 
             //Get Class           
@@ -227,17 +240,27 @@ namespace SPade.Controllers
                 {
                     model.CourseID = C.CourseID;
                     model.ClassID = C.ClassID;
-                    model.ClassName = C.ClassName;
+                    model.ClassName = C.ClassName;                   
                 }
 
             }
+            foreach (Lec_Class LC in all_Lec_Class)
+            {
+                if (LC.ClassID.Equals(x))
+                {
+                    model.StaffID = LC.StaffID;
+                }
+
+            }
+
+
             return View(model);
         }
 
         [HttpPost]
         public ActionResult UpdateClass(UpdateClassViewModel model, string command)
         {
-            int x = 1;
+            int x = 6;
 
 
             //Get all courses
@@ -248,6 +271,9 @@ namespace SPade.Controllers
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
 
+            //Get all lec_class
+            List<Lec_Class> all_Lec_Class = db.Lec_Class.ToList();
+            model.Lec_Classes = all_Lec_Class;
 
             //Get Class           
             List<Class> Classes = db.Classes.ToList();
@@ -265,8 +291,6 @@ namespace SPade.Controllers
                         {
                             TryUpdateModel(C, "", new string[] { "CourseID", "ClassName", "UpdatedBy", "UpdatedAt" });
                             db.SaveChanges();
-                            //Show alert
-                            TempData["msg"] = "<script>alert('Updated successfully');</script>";
 
                         }
                         catch (DataException /* dex */)
@@ -279,7 +303,29 @@ namespace SPade.Controllers
                     };
 
                 }
-            }else
+
+                foreach (Lec_Class LC in all_Lec_Class)
+                {
+                    if (LC.ClassID.Equals(x))
+                    {
+
+                        try
+                        {
+                            TryUpdateModel(LC, "", new string[] { "StaffID", "ClassID"});
+                            db.SaveChanges();
+                            //Show alert
+                            TempData["msg"] = "<script>alert('Updated successfully');</script>";
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Updated unsuccessful');</script>";
+                        }
+                    };
+                }
+            }
+            else
             {
                 foreach (Class C in Classes)
                 {
