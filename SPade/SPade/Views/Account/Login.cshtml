@@ -42,12 +42,11 @@
                 </div>
 
                 <hr />
-                <h4>
-                    @Html.ActionLink("Register for an account", "Register")
-                </h4>
-                <h4>
-                    @Html.ActionLink("Forgot your password?", "ForgotPassword")
-                </h4>
+
+                <div class="form-group">
+                    <div class="col-sm-6">@Html.ActionLink("Register for an account", "Register")</div>
+                    <div class="col-sm-6"><span class="pull-right">@Html.ActionLink("Forgot your password?", "ForgotPassword")</span></div>
+                </div>
         }
     </section>
 </div>

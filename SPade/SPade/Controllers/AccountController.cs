@@ -14,6 +14,7 @@ using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
 using SPade.ViewModels.Accounts;
+using System.Web.Security;
 
 namespace SPade.Controllers
 {
@@ -88,10 +89,15 @@ namespace SPade.Controllers
                 return View("ConfirmEmailMessage");
             }
             var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            
             switch (result)
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                case (SignInStatus.Success):
+                    {
+                        return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
+                        //return RedirectToLocal(returnUrl);
+                    }
+
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -101,6 +107,27 @@ namespace SPade.Controllers
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
+        }
+
+        public ActionResult RedirectLogin(string returnUrl)
+        {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToLocal("/Admin/Dashboard/");
+            }
+            else if (User.IsInRole("Lecturer"))
+            {
+                return RedirectToLocal("/Lecturer/Dashboard/");
+            }
+            else if (User.IsInRole("Student"))
+            {
+                return RedirectToLocal("/Student/Dashboard/");
+            }
+            else
+            {
+                return RedirectToLocal(returnUrl);
+            }
+
         }
 
         //
