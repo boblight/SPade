@@ -15,19 +15,19 @@ using Microsoft.AspNet.Identity;
 
 namespace SPade.Controllers
 {
-    [Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
 
-
+        // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
             return View();
         }
 
+        //[Authorize(Roles = "")]
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -58,21 +58,25 @@ namespace SPade.Controllers
 
         }
 
+        // [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
-        public ActionResult ViewStudentsByClass()
+        // [Authorize(Roles = "")]
+        public ActionResult ViewStudentsByClass(string classID)
         {
             return View();
         }
 
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
+        //   [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
@@ -86,6 +90,7 @@ namespace SPade.Controllers
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
+        //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
@@ -117,9 +122,13 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
+        //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
             string slnFilePath = "", slnFileName = "";
+
+            var asd = addAssgn.SolutionsFile.FileName;
+            var ttt = addAssgn.TestCaseFile.FileName;
 
             foreach (var file in fileList) //renaming files
             {
@@ -256,11 +265,13 @@ namespace SPade.Controllers
             return View("ManageAssignments");
         }
 
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
+        //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();

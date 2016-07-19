@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<SPade.ViewModels.Admin.ManageStudentViewModel>
+@{
     ViewBag.Title = "Manage Student";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -39,34 +40,22 @@
                     </thead>
                     <tbody>
 
-                        <!-- Sample-->
-                        <tr>
-                            <td>1431897</td>
-                            <td>Bob Chan</td>
-                            <td>bob@gmail.com</td>
-                            <td>98875869</td>
-                            <td>
-                                <a href="UpdateStudent" class="btn btn-primary">Update</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1431954</td>
-                            <td>Jenny Tan</td>
-                            <td>jantan@outlook.sg</td>
-                            <td>96043576</td>
-                            <td>
-                                <a href="UpdateStudent" class="btn btn-primary">Update</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>146454</td>
-                            <td>Johnatan Chia</td>
-                            <td>jon.chia@yahoo.com.sg</td>
-                            <td>97837545</td>
-                            <td>
-                                <a href="UpdateStudent" class="btn btn-primary">Update</a>
-                            </td>
-                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.AdminNo</td>
+                            
+                            
+                                <td>@Html.DisplayFor(modelItem => item.Name</td>
+                            
+                                <td>@Html.DisplayFor(modelItem => item.Email</td>
+                            
+                                <td>@Html.DisplayFor (modelItem => item.ContactNo</td>
+
+                                <td><a href="" class="btn btn-primary">Update</a></td>
+                            </tr>
+                            
+                        }
 
                     </tbody>
                 </table>
