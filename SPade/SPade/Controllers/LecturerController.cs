@@ -11,28 +11,29 @@ using SPade.ViewModels.Student;
 using System.IO;
 using System.Data.SqlClient;
 using Ionic.Zip;
+using Microsoft.AspNet.Identity;
 
 namespace SPade.Controllers
 {
-    [Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
 
-
+        // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
             return View();
         }
 
+        //[Authorize(Roles = "")]
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
             ManageClassesViewModel e = new ManageClassesViewModel();
 
-            string x = "s1431489"; //temp 
+            string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -57,21 +58,25 @@ namespace SPade.Controllers
 
         }
 
+        // [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
-        public ActionResult ViewStudentsByClass()
+        // [Authorize(Roles = "")]
+        public ActionResult ViewStudentsByClass(string classID)
         {
             return View();
         }
 
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
+        //   [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
@@ -85,13 +90,14 @@ namespace SPade.Controllers
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
+        //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            string x = "s1431489"; //temp 
+            string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -116,9 +122,13 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
+        //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
             string slnFilePath = "", slnFileName = "";
+
+            var asd = addAssgn.SolutionsFile.FileName;
+            var ttt = addAssgn.TestCaseFile.FileName;
 
             foreach (var file in fileList) //renaming files
             {
@@ -255,16 +265,18 @@ namespace SPade.Controllers
             return View("ManageAssignments");
         }
 
+        //  [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
+        //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();
 
-            string loggedInLecturer = "s1431489"; //temp 
+            string loggedInLecturer = User.Identity.GetUserName(); //temp 
 
 
             List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
@@ -293,7 +305,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult GetAssignment(string Class)
         {
-            string loggedInLecturer = "s1431489"; //temp 
+            string loggedInLecturer = User.Identity.GetUserName(); //temp 
 
             var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
     new SqlParameter("@inClass", Class),

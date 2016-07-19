@@ -41,17 +41,32 @@
 
     })
 
-    $("#classSelect").validate({
+    //$("#testCase").validate({
 
-        rules: {
+    //    rules: {
+    //        testCase: {
+    //            required: true,
+    //            extension: "zip"
+    //        }
+    //    }
 
-            classSelect: "required"
-        },
-        messages: {
-            classSelect: "Please select a class"
+    //});
+    //$("#testCase").removeAttr('novalidate');
+
+    $("body").on("click", "#submitBtn", function () {
+
+        var allowedFiles = [".xml"];
+        var uploadedTestCaseFile = $("#fileList");
+        var spanMsg = $("#testCaseError");
+        var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(" + allowedFiles.join('|') + ")$");
+
+        if (!regex.test(uploadedTestCaseFile.val().toLowerCase())) {
+            spanMsg.html("Please upload your test case in .xml format !");
+            return false
         }
+        spanMsg.html("");
+        return true;
     })
-
 
 
 })

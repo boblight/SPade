@@ -10,11 +10,14 @@ namespace SPade.ViewModels.Lecturer
     public class AddAssignmentViewModel
     {
         [Required(ErrorMessage = "Please provide a valid assignment title")]
+        [StringLength(100, ErrorMessage = "Please keep the title below 100 characters", MinimumLength = 1)]
         [Display(Name = "Assignment Title")]
         public string AssgnTitle { get; set; }
+
         public string ModuleId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Please provide a valid question")]
+        [StringLength(500, ErrorMessage = "Please keep your question below 5000 characters", MinimumLength = 1)]
         [Display(Name = "Assignment Question")]
         public string Describe { get; set; }
 
@@ -33,13 +36,21 @@ namespace SPade.ViewModels.Lecturer
         [Display(Name = "Max Attempts")]
         public int MaxAttempt { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Please select  a date range")]
         [Display(Name = "Assignment date range")]
         public string DateRange { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Please select classes to assign to")]
         [Display(Name = "assigned classes")]
         public string SelectedClasses { get; set; }
+
+        [Required]
+        [Display(Name = "Solution")]
+        public HttpPostedFile SolutionsFile { get; set; }
+
+        [Required]
+        [Display(Name = "TestCase")]
+        public HttpPostedFile TestCaseFile { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
