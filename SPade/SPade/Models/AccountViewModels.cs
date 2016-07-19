@@ -50,7 +50,7 @@ namespace SPade.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "UserName")]
+        [Display(Name = "Admin No. / Staff ID")]
         public string UserName { get; set; }
 
         [Required]
@@ -78,9 +78,11 @@ namespace SPade.Models
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; }
 
-        public List<Class> classList { get; set; }
+        [Required]
+        public string ConfirmPassword { get; set; }
+        public List<string> classIds { get; set; }
+        public List<string> classNames { get; set; }
 
         public Student student { get; set; }
     }

@@ -14,10 +14,10 @@
             <hr />
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             <div class="form-group">
-                <label class="col-md-2 control-label">Admin No.</label>
+                <label class="col-md-2 control-label">Admin No. / Staff ID</label>
                 <div class="col-md-10">
                     @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-                    <span class="help-block">With 'p' (e.g. p123456)</span>
+                    <span class="help-block">With 'P' (e.g. P1234567)</span>
                     <span class="help-block">@Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })</span>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
-                            <label>@Html.CheckBoxFor(m => m.RememberMe)Remember Me</label>
+                            <label>@Html.CheckBoxFor(m => m.RememberMe)Remember me?</label>
                         </div>
                     </div>
                 </div>

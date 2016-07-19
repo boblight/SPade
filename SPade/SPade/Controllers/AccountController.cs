@@ -179,7 +179,26 @@ namespace SPade.Controllers
         public ActionResult Register()
         {
             RegisterViewModel rvm = new RegisterViewModel();
-            rvm.classList = db.Classes.ToList();
+
+
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
+
+            List<String> classIds = new List<String>();
+            List<String> classNames = new List<String>();
+
+            foreach (Class c in managedClasses)
+            {
+                Course course = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault();
+
+                String cId = c.ClassID.ToString();
+                String cName = course.CourseAbbr + "/" + c.ClassName.ToString();
+
+                classIds.Add(cId);
+                classNames.Add(cName);
+            }
+
+            rvm.classIds = classIds;
+            rvm.classNames = classNames;
 
             return View(rvm);
         }
@@ -188,7 +207,7 @@ namespace SPade.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model, FormCollection formCollection)
         {
             if (ModelState.IsValid)
             {
@@ -208,7 +227,7 @@ namespace SPade.Controllers
                     student.CreatedBy = model.student.Name;
                     student.UpdatedAt = DateTime.Now;
                     student.UpdatedBy = model.student.Name;
-                    student.ClassID = 1; //this is temporary. added to stop error from coming out
+                    student.ClassID = Int32.Parse(formCollection.Get("ClassSelect")); //this is temporary. added to stop error from coming out
 
                     db.Students.Add(student);
 
