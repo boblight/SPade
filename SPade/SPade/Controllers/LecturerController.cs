@@ -14,20 +14,19 @@ using Ionic.Zip;
 
 namespace SPade.Controllers
 {
+    [Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
 
 
-        // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
             return View();
         }
 
-        //[Authorize(Roles = "")]
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -58,25 +57,21 @@ namespace SPade.Controllers
 
         }
 
-        // [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
-        // [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass()
         {
             return View();
         }
 
-        //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
-        //   [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
@@ -86,11 +81,10 @@ namespace SPade.Controllers
         {
             string f = Server.MapPath(@"~/TestCase/testcase.xml");
             byte[] fileBytes = System.IO.File.ReadAllBytes(f);
-            string fileName = "testCase.xml";
+            string fileName = "testcase.xml";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
-        //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
@@ -122,7 +116,6 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
         {
             string slnFilePath = "", slnFileName = "";
@@ -175,7 +168,6 @@ namespace SPade.Controllers
             //runs the lecturer solution
             if (g.RunLecturerSolution() == true)
             {
-
                 //now to add into the DB 
                 Assignment newAssignment = new Assignment();
                 Class_Assgn classAssgn = new Class_Assgn();
@@ -263,13 +255,11 @@ namespace SPade.Controllers
             return View("ManageAssignments");
         }
 
-        //  [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
-        //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();
@@ -362,8 +352,6 @@ namespace SPade.Controllers
             public decimal grade { get; set; }
             public string filepath { get; set; }
         }
-
-
 
     }//end of controller
 

@@ -3,13 +3,12 @@
 <body>
 
   <!-- This is a test case. Surround it with the testcase tags and put the test inputs inside-->
-  <testcase>
+
+<!-- Example --> 
+
+ <!-- <testcase>
     <input>2</input>
     <input>5</input>
-  </testcase>
+  </testcase> --> 
 
-  <testcase>
-    <input>Hallo</input>
-    <input>34</input>
-  </testcase>
 </body>

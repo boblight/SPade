@@ -73,11 +73,10 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="daterange">Select start and end date</label>
-                        @Html.TextBox("daterange", "", new { @class = "form-control", @placeholder = "Select start and end date..." })
+                        @Html.TextBoxFor(m => Model.DateRange, new { @class = "form-control", @placeholder = "Select start and end date" })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
-                        <span class="help-block">@Html.ValidationMessage("StartDate", new { @class = "text-danger" })</span>
-                        <span class="help-block">@Html.ValidationMessage("EndDate", new { @class = "text-danger" })</span>
+                        <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
@@ -86,7 +85,8 @@
                         <label class="control-label">
                             Select classes to allocate assignment to
                         </label>
-                        <input type="text" class="form-control" id="classSelect" name="classSelect" placeholder="Select classes..." />
+                        @Html.TextBoxFor(m => m.SelectedClasses, new { @class = "form-control", @placeholder = "Select classes..." })
+                        <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 

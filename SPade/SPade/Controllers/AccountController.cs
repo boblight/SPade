@@ -14,6 +14,7 @@ using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
 using SPade.ViewModels.Accounts;
+using System.Web.Security;
 
 namespace SPade.Controllers
 {
@@ -88,10 +89,15 @@ namespace SPade.Controllers
                 return View("ConfirmEmailMessage");
             }
             var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            
             switch (result)
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                case (SignInStatus.Success):
+                    {
+                        return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
+                        //return RedirectToLocal(returnUrl);
+                    }
+
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -101,6 +107,27 @@ namespace SPade.Controllers
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
+        }
+
+        public ActionResult RedirectLogin(string returnUrl)
+        {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToLocal("/Admin/Dashboard/");
+            }
+            else if (User.IsInRole("Lecturer"))
+            {
+                return RedirectToLocal("/Lecturer/Dashboard/");
+            }
+            else if (User.IsInRole("Student"))
+            {
+                return RedirectToLocal("/Student/Dashboard/");
+            }
+            else
+            {
+                return RedirectToLocal(returnUrl);
+            }
+
         }
 
         //
@@ -152,7 +179,26 @@ namespace SPade.Controllers
         public ActionResult Register()
         {
             RegisterViewModel rvm = new RegisterViewModel();
-            rvm.classList = db.Classes.ToList();
+
+
+            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
+
+            List<String> classIds = new List<String>();
+            List<String> classNames = new List<String>();
+
+            foreach (Class c in managedClasses)
+            {
+                Course course = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault();
+
+                String cId = c.ClassID.ToString();
+                String cName = course.CourseAbbr + "/" + c.ClassName.ToString();
+
+                classIds.Add(cId);
+                classNames.Add(cName);
+            }
+
+            rvm.classIds = classIds;
+            rvm.classNames = classNames;
 
             return View(rvm);
         }
@@ -161,11 +207,11 @@ namespace SPade.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model, FormCollection formCollection)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.student.AdminNo, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -173,23 +219,20 @@ namespace SPade.Controllers
                     var currentUser = UserManager.FindByName(user.UserName);
                     UserManager.AddToRole(currentUser.Id, "Student");
 
-                    string name = model.Name;
-
                     //store student particulars in student info
                     Student student = new Student();
-                    student.AdminNo = model.AdminNo;
-                    student.Name = name;
-                    student.ContactNo = model.ContactNo;
+                    student = model.student;
                     student.Email = model.Email;
                     student.CreatedAt = DateTime.Now;
-                    student.CreatedBy = name;
+                    student.CreatedBy = model.student.Name;
                     student.UpdatedAt = DateTime.Now;
-                    student.UpdatedBy = name;
-                    student.ClassID = 1; //this is temporary. added to stop error from coming out
+                    student.UpdatedBy = model.student.Name;
+                    student.ClassID = Int32.Parse(formCollection.Get("ClassSelect")); //this is temporary. added to stop error from coming out
 
                     db.Students.Add(student);
 
                     //update student account roles
+
                     db.SaveChanges();
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
