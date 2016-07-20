@@ -97,7 +97,7 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            string x = User.Identity.GetUserName(); //temp 
+            string x = "s1431489"; //temp 
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -123,147 +123,284 @@ namespace SPade.Controllers
 
         [HttpPost]
         //  [Authorize(Roles = "")]
-        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, IEnumerable<HttpPostedFileBase> fileList)
+        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, HttpPostedFileBase solutionsFilUpload, HttpPostedFileBase testCaseUpload)
         {
             string slnFilePath = "", slnFileName = "";
 
-            var asd = addAssgn.SolutionsFile.FileName;
-            var ttt = addAssgn.TestCaseFile.FileName;
+            //  var asd = addAssgn.SolutionsFile.FileName;
+            // var ttt = addAssgn.TestCaseFile.FileName;
 
-            foreach (var file in fileList) //renaming files
+            //check the solutions file and the testcase file 
+            if ((solutionsFilUpload != null && Path.GetExtension(solutionsFilUpload.FileName) == ".zip") && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
             {
-                if (file != null && file.ContentLength > 0)
+                if (solutionsFilUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                 {
-                    FileInfo fileInfo;
-                    string fp = file.FileName;
-                    string ext = Path.GetExtension(fp);
-
-                    if (ext == ".xml") //test case 
+                    //unzip and save the solution 
+                    slnFileName = Path.GetFileNameWithoutExtension(solutionsFilUpload.FileName);
+                    var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFilUpload);
+                    solutionsFilUpload.SaveAs(zipLocation);
+                    slnFilePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle);
+                    DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+                    if (fileDirectory.Exists)
                     {
-                        //this is for the testcase 
-                        var fileName = Path.GetFileName(file.FileName);
-                        var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + ".xml");
-                        fileInfo = new FileInfo(filePath);
-                        fileInfo.Directory.Create();
-                        file.SaveAs(filePath);
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            files.Delete();
+                        }
+                        foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                        {
+                            dir.Delete(true);
+                        }
+                    }
+                    fileDirectory.Create();
+                    System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+
+                    //save the testcase
+                    var fileName = Path.GetFileName(testCaseUpload.FileName);
+                    var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + ".xml");
+                    var fileInfo = new FileInfo(filePath);
+                    fileInfo.Directory.Create();
+                    testCaseUpload.SaveAs(filePath);
+
+                    //run the lecturer solution + generate solution file 
+                    Grader g = new Grader(slnFilePath, slnFileName, addAssgn.AssgnTitle);
+                    if (g.RunLecturerSolution() == true)
+                    {
+                        //now to add into the DB 
+                        Assignment newAssignment = new Assignment();
+                        Class_Assgn classAssgn = new Class_Assgn();
+                        List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
+
+                        addAssgn.Solution = addAssgn.AssgnTitle + ".xml";
+
+                        newAssignment.AssgnTitle = addAssgn.AssgnTitle;
+                        newAssignment.Describe = addAssgn.Describe;
+                        newAssignment.MaxAttempt = addAssgn.MaxAttempt;
+                        newAssignment.StartDate = addAssgn.StartDate;
+                        newAssignment.DueDate = addAssgn.DueDate;
+                        newAssignment.Solution = addAssgn.Solution;
+                        newAssignment.ModuleCode = addAssgn.ModuleId;
+                        newAssignment.CreateBy = "1431485"; //temp
+                        newAssignment.CreateAt = DateTime.Now;
+                        newAssignment.UpdatedBy = "1431485"; //temp
+                        newAssignment.UpdatedAt = DateTime.Now;
+                        db.Assignments.Add(newAssignment);
+                        db.SaveChanges();
+
+                        var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First(); //get the ID
+
+                        //insert into Class_Assgn
+                        foreach (AssignmentClass a in addAssgn.ClassList)
+                        {
+                            if (a.isSelected == true)
+                            {
+                                classAssgn.ClassID = a.ClassId;
+                                classAssgn.AssignmentID = assgnID;
+                                db.Class_Assgn.Add(classAssgn);
+                                db.SaveChanges();
+                            }
+                        }
+
+                        //rename the file
+                        string testCasePath = Server.MapPath(@"~/TestCase/");
+                        string solutionPath = Server.MapPath(@"~/Solutions/");
+
+                        foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
+                        {
+                            if (f.Name == addAssgn.AssgnTitle + ".xml") //to be renamed
+                            {
+                                var sourcePath = solutionPath + f.Name;
+                                var destPath = solutionPath + assgnID + "solution.xml";
+                                FileInfo info = new FileInfo(sourcePath);
+                                info.MoveTo(destPath);
+
+                                var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
+
+                                foreach (Assignment a in query)
+                                {
+                                    a.Solution = assgnID + "solution.xml";
+                                }
+
+                                try
+                                {
+                                    db.SaveChanges();
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            }
+                        }
+
+                        //rename the testcase
+                        foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                        {
+                            if (f.Name == addAssgn.AssgnTitle + ".xml")
+                            {
+                                var sourcePath = testCasePath + f.Name;
+                                var destPath = testCasePath + assgnID + "testcase.xml";
+                                FileInfo info = new FileInfo(sourcePath);
+                                info.MoveTo(destPath);
+                            }
+                        }
+
                     }
                     else
                     {
-                        //for the solution file 
-                        slnFileName = Path.GetFileNameWithoutExtension(file.FileName);
-                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + file);
-                        file.SaveAs(zipLocation);
-                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle);
-                        DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
-                        if (fileDirectory.Exists)
-                        {
-                            foreach (FileInfo files in fileDirectory.GetFiles())
-                            {
-                                files.Delete();
-                            }
-                            foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
-                            {
-                                dir.Delete(true);
-                            }
-                        }
-                        fileDirectory.Create();
-                        System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+                        //this part means that their stuff got problem. need to show some feedback
                     }
+
+                }
+                else
+                {
+                    //failed to run 
+                    addAssgn.Modules = db.Modules.ToList();
+                    TempData["RunFailed"] = "Failed to run solution. Please reupload and try again.";
+                    return View(addAssgn);
                 }
             }
-
-            //run the solution and get the result 
-            Grader g = new Grader(slnFilePath, slnFileName, addAssgn.AssgnTitle);
-
-            //runs the lecturer solution
-            if (g.RunLecturerSolution() == true)
+            else //the uploaded file got sumthing wong
             {
-                //now to add into the DB 
-                Assignment newAssignment = new Assignment();
-                Class_Assgn classAssgn = new Class_Assgn();
-                List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
-
-                addAssgn.Solution = addAssgn.AssgnTitle + ".xml";
-
-                newAssignment.AssgnTitle = addAssgn.AssgnTitle;
-                newAssignment.Describe = addAssgn.Describe;
-                newAssignment.MaxAttempt = addAssgn.MaxAttempt;
-                newAssignment.StartDate = addAssgn.StartDate;
-                newAssignment.DueDate = addAssgn.DueDate;
-                newAssignment.Solution = addAssgn.Solution;
-                newAssignment.ModuleCode = addAssgn.ModuleId;
-                newAssignment.CreateBy = "1431485"; //temp
-                newAssignment.CreateAt = DateTime.Now;
-                newAssignment.UpdatedBy = "1431485"; //temp
-                newAssignment.UpdatedAt = DateTime.Now;
-                db.Assignments.Add(newAssignment);
-                db.SaveChanges();
-
-                var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First(); //get the ID
-
-                //insert into Class_Assgn
-                foreach (AssignmentClass a in addAssgn.ClassList)
-                {
-                    if (a.isSelected == true)
-                    {
-                        classAssgn.ClassID = a.ClassId;
-                        classAssgn.AssignmentID = assgnID;
-                        db.Class_Assgn.Add(classAssgn);
-                        db.SaveChanges();
-                    }
-                }
-
-                //then we rename the files and UPDATE the DB 
-                string testCasePath = Server.MapPath(@"~/TestCase/");
-                string solutionPath = Server.MapPath(@"~/Solutions/");
-
-                //rename the TestCase
-                foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
-                {
-                    if (f.Name == addAssgn.AssgnTitle + ".xml")
-                    {
-                        var sourcePath = testCasePath + f.Name;
-                        var destPath = testCasePath + assgnID + "testcase.xml";
-                        FileInfo info = new FileInfo(sourcePath);
-                        info.MoveTo(destPath);
-                    }
-                }
-
-                //rename the solution
-                foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
-                {
-                    if (f.Name == addAssgn.AssgnTitle + ".xml") //to be renamed
-                    {
-                        var sourcePath = solutionPath + f.Name;
-                        var destPath = solutionPath + assgnID + "solution.xml";
-                        FileInfo info = new FileInfo(sourcePath);
-                        info.MoveTo(destPath);
-
-                        var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
-
-                        foreach (Assignment a in query)
-                        {
-                            a.Solution = assgnID + "solution.xml";
-                        }
-
-                        try
-                        {
-                            db.SaveChanges();
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                }
+                addAssgn.Modules = db.Modules.ToList();
+                TempData["Warning"] = "Uploaded file is invalid ! Please try again.";
+                return View(addAssgn);
             }
-            else
-            {
-                //this part means that their stuff got problem. need to show some feedback
-            }
-
             return View("ManageAssignments");
         }
+
+
+
+        //foreach (var file in fileList) //renaming files
+        //{
+        //    if (file != null && file.ContentLength > 0)
+        //    {
+        //        FileInfo fileInfo;
+        //        string fp = file.FileName;
+        //        string ext = Path.GetExtension(fp);
+
+        //        if (ext == ".xml") //test case 
+        //        {
+        //            //this is for the testcase 
+        //            var fileName = Path.GetFileName(file.FileName);
+        //            var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + ".xml");
+        //            fileInfo = new FileInfo(filePath);
+        //            fileInfo.Directory.Create();
+        //            file.SaveAs(filePath);
+        //        }
+        //        else
+        //        {
+        //            //for the solution file 
+        //            slnFileName = Path.GetFileNameWithoutExtension(file.FileName);
+        //            var zipLocation = Server.MapPath(@"~/TempSubmissions/" + file);
+        //            file.SaveAs(zipLocation);
+        //            slnFilePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle);
+        //            DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+        //            if (fileDirectory.Exists)
+        //            {
+        //                foreach (FileInfo files in fileDirectory.GetFiles())
+        //                {
+        //                    files.Delete();
+        //                }
+        //                foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+        //                {
+        //                    dir.Delete(true);
+        //                }
+        //            }
+        //            fileDirectory.Create();
+        //            System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+        //        }
+        //    }
+        //}
+
+        //run the solution and get the result 
+
+
+        //runs the lecturer solution
+        //if (g.RunLecturerSolution() == true)
+        //{
+        //    //now to add into the DB 
+        //    Assignment newAssignment = new Assignment();
+        //    Class_Assgn classAssgn = new Class_Assgn();
+        //    List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
+
+        //    addAssgn.Solution = addAssgn.AssgnTitle + ".xml";
+
+        //    newAssignment.AssgnTitle = addAssgn.AssgnTitle;
+        //    newAssignment.Describe = addAssgn.Describe;
+        //    newAssignment.MaxAttempt = addAssgn.MaxAttempt;
+        //    newAssignment.StartDate = addAssgn.StartDate;
+        //    newAssignment.DueDate = addAssgn.DueDate;
+        //    newAssignment.Solution = addAssgn.Solution;
+        //    newAssignment.ModuleCode = addAssgn.ModuleId;
+        //    newAssignment.CreateBy = "1431485"; //temp
+        //    newAssignment.CreateAt = DateTime.Now;
+        //    newAssignment.UpdatedBy = "1431485"; //temp
+        //    newAssignment.UpdatedAt = DateTime.Now;
+        //    db.Assignments.Add(newAssignment);
+        //    db.SaveChanges();
+
+        //    var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First(); //get the ID
+
+        //    //insert into Class_Assgn
+        //    foreach (AssignmentClass a in addAssgn.ClassList)
+        //    {
+        //        if (a.isSelected == true)
+        //        {
+        //            classAssgn.ClassID = a.ClassId;
+        //            classAssgn.AssignmentID = assgnID;
+        //            db.Class_Assgn.Add(classAssgn);
+        //            db.SaveChanges();
+        //        }
+        //    }
+
+        //    //then we rename the files and UPDATE the DB 
+        //    string testCasePath = Server.MapPath(@"~/TestCase/");
+        //    string solutionPath = Server.MapPath(@"~/Solutions/");
+
+        //    //rename the TestCase
+        //    foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+        //    {
+        //        if (f.Name == addAssgn.AssgnTitle + ".xml")
+        //        {
+        //            var sourcePath = testCasePath + f.Name;
+        //            var destPath = testCasePath + assgnID + "testcase.xml";
+        //            FileInfo info = new FileInfo(sourcePath);
+        //            info.MoveTo(destPath);
+        //        }
+        //    }
+
+        //    //rename the solution
+        //    foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
+        //    {
+        //        if (f.Name == addAssgn.AssgnTitle + ".xml") //to be renamed
+        //        {
+        //            var sourcePath = solutionPath + f.Name;
+        //            var destPath = solutionPath + assgnID + "solution.xml";
+        //            FileInfo info = new FileInfo(sourcePath);
+        //            info.MoveTo(destPath);
+
+        //            var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
+
+        //            foreach (Assignment a in query)
+        //            {
+        //                a.Solution = assgnID + "solution.xml";
+        //            }
+
+        //            try
+        //            {
+        //                db.SaveChanges();
+        //            }
+        //            catch (Exception ex)
+        //            {
+
+        //            }
+        //        }
+        //    }
+        // }
+        //else
+        //{
+        //    //this part means that their stuff got problem. need to show some feedback
+        //}
 
         //  [Authorize(Roles = "")]
         public ActionResult UpdateAssignment()
