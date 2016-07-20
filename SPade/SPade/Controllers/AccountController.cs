@@ -202,7 +202,7 @@ namespace SPade.Controllers
                 classNames.Add(cName);
             }
 
-            rvm.ClassID = classIds;
+            rvm.classID = classIds;
             rvm.classNames = classNames;
 
             return View(rvm);
