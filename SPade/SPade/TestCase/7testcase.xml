@@ -1,7 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <body>
   <!-- This is a test case. Surround it with the testcase tags and put the test inputs inside-->
-  <testcase>
-    <input>1</input>
-    <input>1</input>
-  </testcase>
-</body>
+  </body>
