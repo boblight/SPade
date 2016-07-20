@@ -97,7 +97,7 @@ namespace SPade.Models
         [Display(Name = "Contact Number")]
         public int ContactNo { get; set; }
 
-        public List<string> ClassID  { get; set; }
+        public List<string> classID  { get; set; }
 
         public List<Class> classList { get; set; }
 
