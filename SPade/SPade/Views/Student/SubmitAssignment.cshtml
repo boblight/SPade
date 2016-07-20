@@ -13,7 +13,7 @@
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
             <!-- To change assignment id to assignment title when database updated -->
-            <legend>@Html.DisplayFor(modelItem => modelItem.assignment.ModuleCode):  @Html.DisplayFor(modelItem => modelItem.assignment.AssgnTitle)</legend>
+            <legend>@Html.DisplayFor(modelItem => modelItem.assignment.AssgnTitle)</legend>
 
             <!-- QuestionTextArea -->
             <div class="form-group">
@@ -23,6 +23,7 @@
                             @Html.DisplayFor(modelItem => modelItem.assignment.Describe)
                         </p>
                     </div>
+                    <label>Module: </label>@Html.DisplayFor(modelItem => modelItem.Module)<br />
                     <label>Start date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.StartDate)<br />
                     <label>Due date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.DueDate)<br />
                     <label>Posted by: </label>@Html.DisplayFor(modelItem => modelItem.assignment.CreateBy)<br />
@@ -58,7 +59,7 @@
                 <div class="form-group">
                     <div class="col-md-10 ">
                         <input type="submit" class="btn btn-primary" value="Submit" />
-                        <a id="btnCancel" href="#" class="btn btn-default">Cancel</a>
+                        <a id="btnCancel" href="/Student/ViewAssignment" class="btn btn-default">Cancel</a>
                     </div>
                 </div>
             }

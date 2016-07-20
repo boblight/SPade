@@ -36,6 +36,9 @@ namespace SPade.Controllers
             Submission submission = new Submission();
             int assgnId = (int)Session["assignmentId"];
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
+            //query for which programming language needed to be used for this assignment
+            //for "Scalability sake"
+            ProgLanguage langUsed = db.ProgLanguages.ToList().Find(p => p.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode).LanguageId);
 
             //getting file path
             //first check if file us empty of is not zip file
@@ -69,7 +72,7 @@ namespace SPade.Controllers
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
                     //grade submission
-                    Grader grader = new Grader(filePath, fileName, assgnId);
+                    Grader grader = new Grader(filePath, fileName, assgnId, langUsed.LangageType);
                     decimal result = grader.grade();
 
                     submission.Grade = result;
@@ -106,6 +109,9 @@ namespace SPade.Controllers
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
             svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
 
+            Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
+            svm.Module = module.ModuleCode + " " + module.ModuleName;
+
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
 
@@ -118,7 +124,7 @@ namespace SPade.Controllers
             svm.assignment = assignment;
 
             return View(svm);
-        }
+        }//end of get SubmitAssignment
 
         // GET: ViewAssignment
         public ActionResult ViewAssignment()
@@ -138,6 +144,10 @@ namespace SPade.Controllers
                     ViewAssignmentViewModel v = new ViewAssignmentViewModel();
                     v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID).Count();
                     v.assignment = a;
+
+                    Module module = db.Modules.ToList().Find(m => m.ModuleCode == a.ModuleCode);
+                    v.Module = module.ModuleCode + " " + module.ModuleName;
+
                     //check if the assignment has been attempted before
                     if (db.Submissions.ToList().FindAll(s => s.AdminNo == User.Identity.GetUserName() && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
                     {

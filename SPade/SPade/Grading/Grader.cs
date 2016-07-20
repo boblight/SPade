@@ -16,7 +16,6 @@ namespace SPade.Grading
     {
         private string ans, error, subOut, solOut;
         private List<String> subList = new List<String>();
-        private string[] output;
         private bool programFailed = false;
         private decimal testCasePassed;
         private int exitcode, assgnId;
@@ -25,7 +24,7 @@ namespace SPade.Grading
         private Process proc, compile;
         private List<object> testcases = new List<object>();
         private List<string> answers = new List<string>();
-        public string filePath, fileName, assignmentTitle;
+        public string filePath, fileName, assignmentTitle, language;
         XmlNode docNode, bodyNode, solutionsNode;
         XmlDocument slnDoc = new XmlDocument();
 
@@ -38,14 +37,15 @@ namespace SPade.Grading
         }//end of constructor
 
         //student use this
-        public Grader(string filePath, string fileName, int assgnId)
+        public Grader(string filePath, string fileName, int assgnId, string language)
         {
             this.filePath = filePath;
             this.fileName = fileName;
             this.assgnId = assgnId;
+            this.language = language;
         }//end of overloaded constructor
 
-        public decimal grade()
+        public void processForJava()
         {
             //compile java program
             compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/" + fileName + ".java");
@@ -58,6 +58,28 @@ namespace SPade.Grading
 
             //run program with Java
             procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
+        }//end of processForJava
+
+        public void processForCS()
+        {
+            procInfo = new ProcessStartInfo("cmd", filePath + "/" + fileName + "/bin/Debug/" + fileName + ".exe");
+        }//end of processForCS
+
+        public decimal grade()
+        {
+            //decide which process to use
+            switch (language)
+            {
+                case "Java":
+                    processForJava();
+                    break;
+                case "C#":
+                    processForCS();
+                    break;
+                default:
+                    break;
+            }
+
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
