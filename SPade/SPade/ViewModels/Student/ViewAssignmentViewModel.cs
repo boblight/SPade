@@ -16,5 +16,7 @@ namespace SPade.ViewModels.Student
         public DateTime timestamp { get; set; }
 
         public int RetryRemaining { get; set; }
+
+        public string Module { get; set; }
     }//end of class
 }
