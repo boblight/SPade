@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SPade.ViewModels.Admin.ManageStudentViewModel>
+﻿@model IEnumerable<SPade.Models.DAL.Student>
 @{
     ViewBag.Title = "Manage Student";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -43,16 +43,11 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(modelItem => item.AdminNo</td>
-                            
-                            
-                                <td>@Html.DisplayFor(modelItem => item.Name</td>
-                            
-                                <td>@Html.DisplayFor(modelItem => item.Email</td>
-                            
-                                <td>@Html.DisplayFor (modelItem => item.ContactNo</td>
-
-                                <td><a href="" class="btn btn-primary">Update</a></td>
+                                <td>@Html.DisplayFor(Model => item.AdminNo)</td>
+                                <td>@Html.DisplayFor(Model => item.Name)</td>
+                                <td>@Html.DisplayFor(Model => item.ContactNo)</td>
+                                <td>@Html.DisplayFor(Model => item.Email)</td>
+                                <td><a href="/Admin/UpdateStudent/@Html.DisplayFor(Model => item.AdminNo)" class="btn btn-primary">View</a></td>
                             </tr>
                             
                         }
