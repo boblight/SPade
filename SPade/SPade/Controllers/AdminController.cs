@@ -16,7 +16,7 @@ namespace SPade.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
-      //  { UserID = Request.QueryString["UserID"]
+        //  { UserID = Request.QueryString["UserID"]
 
         private SPadeDBEntities db = new SPadeDBEntities();
 
@@ -128,7 +128,7 @@ namespace SPade.Controllers
                 db.Classes.Add(class1);
                 db.Lec_Class.Add(lec_class);
                 db.SaveChanges();
-                
+
             }
             catch (DbEntityValidationException e)
             {
@@ -168,9 +168,9 @@ namespace SPade.Controllers
                 var lecturer = new Lecturer()
                 {
                     StaffID = model.StaffID,
-                    Name = model.Name, 
+                    Name = model.Name,
                     ContactNo = model.ContactNo,
-                    Email = model.Email,                   
+                    Email = model.Email,
                     CreatedBy = "Admin",
                     UpdatedBy = "Admin",
                     CreatedAt = DateTime.Now,
@@ -209,7 +209,13 @@ namespace SPade.Controllers
         }
         public ActionResult ManageStudent()
         {
-            return View();
+            ManageStudentViewModel ms = new ManageStudentViewModel();
+
+            List<Student> students = new List<Student>();
+
+            students = db.Students.ToList();
+
+            return View(students);
         }
         public ActionResult ManageLecturer()
         {
@@ -229,7 +235,7 @@ namespace SPade.Controllers
 
             List<Lec_Class> all_Lec_Class = db.Lec_Class.ToList();
             model.Lec_Classes = all_Lec_Class;
-            
+
 
             //Get Class           
             List<Class> Classes = db.Classes.ToList();
@@ -240,7 +246,7 @@ namespace SPade.Controllers
                 {
                     model.CourseID = C.CourseID;
                     model.ClassID = C.ClassID;
-                    model.ClassName = C.ClassName;                   
+                    model.ClassName = C.ClassName;
                 }
 
             }
@@ -305,7 +311,7 @@ namespace SPade.Controllers
                     {
                         try
                         {
-                            TryUpdateModel(LC, "", new string[] { "StaffID", "ClassID"});
+                            TryUpdateModel(LC, "", new string[] { "StaffID", "ClassID" });
                             db.SaveChanges();
                             //Show alert
                             TempData["msg"] = "<script>alert('Updated successfully');</script>";
@@ -408,7 +414,7 @@ namespace SPade.Controllers
                         S.UpdatedAt = DateTime.Now;
 
                         if (TryUpdateModel(S, "",
-                           new string[] { "Name", "ClassID", "Email", "ContactNo","UpdatedAt","UpdatedBy" }))
+                           new string[] { "Name", "ClassID", "Email", "ContactNo", "UpdatedAt", "UpdatedBy" }))
                         {
                             try
                             {
@@ -426,7 +432,7 @@ namespace SPade.Controllers
                 }
             }
             //Delete Student
-            else  
+            else
             {
                 foreach (Student S in Students)
                 {
@@ -437,7 +443,7 @@ namespace SPade.Controllers
 
                         if (TryUpdateModel(S, "",
                            new string[] { "DeletedBy", "DeletedAt" }))
-                        {                          
+                        {
                             try
                             {
                                 db.SaveChanges();
