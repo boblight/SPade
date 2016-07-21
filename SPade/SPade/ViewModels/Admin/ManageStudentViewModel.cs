@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using SPade.Models.DAL;
 
 namespace SPade.ViewModels.Admin
 {
@@ -13,5 +14,6 @@ namespace SPade.ViewModels.Admin
         public List<string> Email
         { get; set; }
         public List<string> ContactNo { get; set; }
+        public List<SPade.Models.DAL.Student> stud { get; set; }
     }
 }
