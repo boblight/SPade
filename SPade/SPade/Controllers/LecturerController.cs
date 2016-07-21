@@ -74,6 +74,10 @@ namespace SPade.Controllers
 
         public ActionResult ManageAssignments()
         {
+
+
+
+
             return View();
         }
 

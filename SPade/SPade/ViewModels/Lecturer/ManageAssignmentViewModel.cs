@@ -7,5 +7,14 @@ namespace SPade.ViewModels.Lecturer
 {
     public class ManageAssignmentViewModel
     {
+        public int MyProperty { get; set; }
+        public int MyProperty { get; set; }
+        public int MyProperty { get; set; }
+        public int MyProperty { get; set; }
+        public int MyProperty { get; set; }
+
+
+
+
     }
 }
