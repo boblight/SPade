@@ -12,6 +12,7 @@ using System.IO;
 using System.Data.SqlClient;
 using Ionic.Zip;
 using Microsoft.AspNet.Identity;
+using System.Text.RegularExpressions;
 
 namespace SPade.Controllers
 {
@@ -20,14 +21,12 @@ namespace SPade.Controllers
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
 
-        // [Authorize(Roles = "")]
         // GET: Lecturer
         public ActionResult Dashboard()
         {
             return View();
         }
 
-        //[Authorize(Roles = "")]
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -58,25 +57,21 @@ namespace SPade.Controllers
 
         }
 
-        // [Authorize(Roles = "")]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
 
-        // [Authorize(Roles = "")]
         public ActionResult ViewStudentsByClass(string classID)
         {
             return View();
         }
 
-        //  [Authorize(Roles = "")]
         public ActionResult UpdateStudent()
         {
             return View();
         }
 
-        //   [Authorize(Roles = "")]
         public ActionResult ManageAssignments()
         {
             return View();
@@ -90,7 +85,6 @@ namespace SPade.Controllers
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
-        //   [Authorize(Roles = "")]
         public ActionResult AddAssignment()
         {
 
@@ -122,7 +116,6 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        //  [Authorize(Roles = "")]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload)
         {
             string slnFilePath = "", slnFileName = "";
@@ -132,11 +125,14 @@ namespace SPade.Controllers
             {
                 if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                 {
+                    //replace all white space
+                    var fN = (addAssgn.AssgnTitle).Replace(" ", "");
+
                     //unzip and save the solution 
                     slnFileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
                     var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
                     solutionsFileUpload.SaveAs(zipLocation);
-                    slnFilePath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle);
+                    slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fN);
                     DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
                     if (fileDirectory.Exists)
                     {
@@ -154,13 +150,13 @@ namespace SPade.Controllers
 
                     //save the testcase
                     var fileName = Path.GetFileName(testCaseUpload.FileName);
-                    var filePath = Server.MapPath(@"~/TestCase/" + addAssgn.AssgnTitle + ".xml");
+                    var filePath = Server.MapPath(@"~/TestCase/" + fN + ".xml");
                     var fileInfo = new FileInfo(filePath);
                     fileInfo.Directory.Create();
                     testCaseUpload.SaveAs(filePath);
 
                     //run the lecturer solution + generate solution file 
-                    Grader g = new Grader(slnFilePath, slnFileName, addAssgn.AssgnTitle);
+                    Grader g = new Grader(slnFilePath, slnFileName, fN);
                     if (g.RunLecturerSolution() == true)
                     {
                         //now to add into the DB 
@@ -168,7 +164,7 @@ namespace SPade.Controllers
                         Class_Assgn classAssgn = new Class_Assgn();
                         List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
 
-                        addAssgn.Solution = addAssgn.AssgnTitle + ".xml";
+                        addAssgn.Solution = fN + ".xml";
 
                         newAssignment.AssgnTitle = addAssgn.AssgnTitle;
                         newAssignment.Describe = addAssgn.Describe;
@@ -177,9 +173,9 @@ namespace SPade.Controllers
                         newAssignment.DueDate = addAssgn.DueDate;
                         newAssignment.Solution = addAssgn.Solution;
                         newAssignment.ModuleCode = addAssgn.ModuleId;
-                        newAssignment.CreateBy = "1431485"; //temp
+                        newAssignment.CreateBy = "s1431489"; //temp
                         newAssignment.CreateAt = DateTime.Now;
-                        newAssignment.UpdatedBy = "1431485"; //temp
+                        newAssignment.UpdatedBy = "s1431489"; //temp
                         newAssignment.UpdatedAt = DateTime.Now;
                         db.Assignments.Add(newAssignment);
 
@@ -211,6 +207,7 @@ namespace SPade.Controllers
                                 }
                                 catch (Exception ex)
                                 {
+                                    DeleteFileWhenError(fN);
                                     addAssgn.Modules = db.Modules.ToList();
                                     TempData["GeneralError"] = "Failed to add assignment. Please try again.";
                                     return View(addAssgn);
@@ -224,7 +221,7 @@ namespace SPade.Controllers
 
                         foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
                         {
-                            if (f.Name == addAssgn.AssgnTitle + ".xml") //to be renamed
+                            if (f.Name == fN + ".xml") //to be renamed
                             {
                                 var sourcePath = solutionPath + f.Name;
                                 var destPath = solutionPath + assgnID + "solution.xml";
@@ -244,7 +241,7 @@ namespace SPade.Controllers
                         //rename the testcase
                         foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
                         {
-                            if (f.Name == addAssgn.AssgnTitle + ".xml")
+                            if (f.Name == fN + ".xml")
                             {
                                 var sourcePath = testCasePath + f.Name;
                                 var destPath = testCasePath + assgnID + "testcase.xml";
@@ -254,33 +251,30 @@ namespace SPade.Controllers
                         }
 
                         //delete the uploaded sln
-                        string slnPath = Server.MapPath(@"~/TempSubmissions/" + addAssgn.AssgnTitle);
+                        string slnPath = Server.MapPath(@"~/TempSubmissions/" + fN);
 
                         DirectoryInfo slnDirectory = new DirectoryInfo(slnPath);
+
                         if (slnDirectory.Exists)
                         {
-                            foreach(FileInfo f in slnDirectory.GetFiles())
+                            foreach (FileInfo f in slnDirectory.GetFiles())
                             {
-                                f.Delete(); 
+                                f.IsReadOnly = false;
+                                f.Delete();
                             }
-                            foreach(DirectoryInfo dr in slnDirectory.GetDirectories())
+                            foreach (DirectoryInfo dr in slnDirectory.GetDirectories())
                             {
-                                dr.Delete(); 
+                                dr.Delete(true);
                             }
-                        } 
 
-                        //foreach (FileInfo f in new DirectoryInfo(slnPath).GetFiles())
-                        //{
-                        //    if (f.Name == addAssgn.AssgnTitle)
-                        //    {
-                        //        f.Delete();
-                        //    }
-                        //}
+                            slnDirectory.Delete();
+                        }
 
                     }
                     else
                     {
                         //failed to run their solution
+                        DeleteFileWhenError(fN);
                         addAssgn.Modules = db.Modules.ToList();
                         TempData["GeneralError"] = "Failed to run solution. Please reupload and try again.";
                         return View(addAssgn);
@@ -302,16 +296,51 @@ namespace SPade.Controllers
                 return View(addAssgn);
             }
 
+            //everything all okay 
             return View("ManageAssignments");
         }
 
-        //  [Authorize(Roles = "")]
+        //used to delete files when something goes wrong somewhere
+        private void DeleteFileWhenError(string assgnTitle)
+        {
+            //delete their solution + testcase 
+            var tempPath = Server.MapPath(@"~/TestCase/");
+            var tempPath2 = Server.MapPath(@"~/TempSubmissions/" + assgnTitle);
+            DirectoryInfo di;
+
+            if ((di = new DirectoryInfo(tempPath)).Exists)
+            {
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    if (f.Name == assgnTitle + ".xml")
+                    {
+                        f.IsReadOnly = false;
+                        f.Delete();
+                    }
+                }
+            }
+
+            if ((di = new DirectoryInfo(tempPath2)).Exists)
+            {
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    f.IsReadOnly = false;
+                    f.Delete();
+                }
+                foreach (DirectoryInfo dr in di.GetDirectories())
+                {
+                    dr.Delete(true);
+                }
+
+                di.Delete();
+            }
+        }
+
         public ActionResult UpdateAssignment()
         {
             return View();
         }
 
-        //    [Authorize(Roles = "")]
         public ActionResult ViewResults()
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();

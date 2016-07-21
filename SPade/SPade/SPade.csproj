@@ -438,7 +438,7 @@
     <Folder Include="img\" />
     <Folder Include="Properties\" />
     <Folder Include="Solutions\" />
-    <Folder Include="TempSubmissions\" />
+    <Folder Include="TempSubmissions\yalam\" />
     <Folder Include="TestCase\" />
   </ItemGroup>
   <ItemGroup>
