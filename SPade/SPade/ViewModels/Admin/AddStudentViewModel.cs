@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using SPade.Models.DAL;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace SPade.ViewModels.Admin
 {
     public class AddStudentViewModel
     {
-
+        
+        [Required(ErrorMessage = "Name is required.")]
+        [Display(Name = "Assignment Title")]
         public string AdminNo { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }

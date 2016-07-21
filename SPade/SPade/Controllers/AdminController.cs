@@ -286,12 +286,10 @@ namespace SPade.Controllers
                     {
                         C.UpdatedBy = "ADMIN";
                         C.UpdatedAt = DateTime.Now;
-
                         try
                         {
                             TryUpdateModel(C, "", new string[] { "CourseID", "ClassName", "UpdatedBy", "UpdatedAt" });
                             db.SaveChanges();
-
                         }
                         catch (DataException /* dex */)
                         {
@@ -299,16 +297,12 @@ namespace SPade.Controllers
                             ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
                             TempData["msg"] = "<script>alert('Updated unsuccessful');</script>";
                         }
-
                     };
-
                 }
-
                 foreach (Lec_Class LC in all_Lec_Class)
                 {
                     if (LC.ClassID.Equals(x))
                     {
-
                         try
                         {
                             TryUpdateModel(LC, "", new string[] { "StaffID", "ClassID"});
