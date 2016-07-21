@@ -29,6 +29,10 @@
                     </a> and input the test cases in a similar format as presented inside.
                 </p>
 
+                <span class="help-block">
+                    <span class="text-danger" id="slnRunError">@TempData["GeneralError"]</span>
+                </span>
+
                 <div class="form-group">
                     <div class="col-md-12">
                         <label>Assignment Name</label>
@@ -56,20 +60,24 @@
                     </div>
                 </div>
 
+                <!--Upload solutions file-->
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
-                        <input id="solutionsFile" name="fileList[0]" class="form-control required" type="file" style="border: solid 1px red" />
-                        <span class="help-block">@Html.ValidationMessage("Soution", new { @class = "text-danger" })</span>
+                        <input id="solutionsFilUpload" name="solutionsFileUpload" class="form-control" type="file" style="border: solid 1px red" />
+                        <span class="help-block">
+                            <span class="text-danger" id="testCaseError">@TempData["Warning"]</span>
+                        </span>
                     </div>
                 </div>
 
+                <!--Upload test case-->
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Test Cases</label>
-                        <input id="fileList[1]" name="fileList[1]" class="form-control" type="file" style="border: solid 1px red" accept=".zip" />
+                        <input id="testCaseUpload" name="testCaseUpload" class="form-control" type="file" style="border: solid 1px red" />
                         <span class="help-block">
-                            <span class="text-danger" id="testCaseError"></span>
+                            <span class="text-danger" id="testCaseError">@TempData["Warning"]</span>
                         </span>
                     </div>
                 </div>
@@ -80,7 +88,7 @@
                         @Html.TextBoxFor(m => Model.DateRange, new { @class = "form-control", @placeholder = "Select start and end date", @readonly = "true" })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
-                        <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger" })</span>
+                        <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger", @id = "DateError", @name = "DateError" })</span>
                     </div>
                 </div>
 

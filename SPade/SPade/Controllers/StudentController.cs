@@ -198,7 +198,7 @@ namespace SPade.Controllers
                     Overall.Add("Fail");
 
                 SubmittedOn.Add(r.timestamp.ToString());
-                Submission.Add("/Student/Download/?file=" + r.assgntitle + r.assignmentid);
+                Submission.Add("/Student/Download/?file=" + Regex.Replace(r.assgntitle, @"\s+", "") + r.assignmentid);
 
             }
 
@@ -224,7 +224,6 @@ namespace SPade.Controllers
         [HttpGet]
         public ActionResult Download(string file)
         {
-
             string path = "~/Submissions/" + User.Identity.GetUserName() + file; //temp
             string zipname = User.Identity.GetUserName() + file + ".zip"; //temp
 

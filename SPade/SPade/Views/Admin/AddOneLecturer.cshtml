@@ -10,33 +10,41 @@
 
 <div class="col-md-4 col-md-offset-4 form-horizontal">
     <fieldset>
+        @Html.AntiForgeryToken()
         <legend>Add Lecturer</legend>
 
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputStaffNo" class="control-label">Staff ID</label>
-                @Html.TextBoxFor(m => m.StaffID, new { @class = "form-control input-md" })
+                @Html.TextBoxFor(m => m.StaffID, new { @class = "form-control input-md", required = "required" })
+                <span class="help-block">@Html.ValidationMessage("StaffID", new { @class = "text-danger" })</span>
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputLecturerName" class="control-label">Lecturer Name</label>
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md" })
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md", required = "required" })
+                <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
+
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputContact" class="control-label">Contact</label>
-                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md" })
+                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
+                <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-12">
                 <label for="inputEmail" class="control-label">Email</label>
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md", required = "required" })
+                <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
+
             </div>
         </div>
 
@@ -48,4 +56,9 @@
         </div>
     </fieldset>
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
 }
