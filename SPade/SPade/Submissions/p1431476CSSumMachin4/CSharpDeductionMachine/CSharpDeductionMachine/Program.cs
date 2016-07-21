@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSharpSumMachine
+namespace CSharpDeductionMachine
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to sum machine.\nPlease enter 1st number: ");
+            Console.WriteLine("Enter number 1: ");
             int i = Int32.Parse(Console.ReadLine());
-            Console.WriteLine("Please enter 2nd number: ");
+            Console.WriteLine("Enter number 1: ");
             int j = Int32.Parse(Console.ReadLine());
-            Console.WriteLine("Sum of 2 numbers is: " + (i + j));
-            Console.ReadKey();
-        }//end of main method
+            Console.WriteLine("Deduction of both number is: " + (i - j));
+        }
     }
 }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CSharpSumMachine")]
+[assembly: AssemblyTitle("CSharpDeductionMachine")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CSharpSumMachine")]
+[assembly: AssemblyProduct("CSharpDeductionMachine")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b0ed8270-9e15-4e55-aa53-69aae13947b4")]
+[assembly: Guid("24ce7c2f-551d-4124-a4d3-329ef8bb0e1d")]
 
 // Version information for an assembly consists of the following four values:
 //

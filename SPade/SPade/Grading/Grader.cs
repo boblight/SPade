@@ -62,7 +62,7 @@ namespace SPade.Grading
 
         public void processForCS()
         {
-            procInfo = new ProcessStartInfo("cmd", filePath + "/" + fileName + "/bin/Debug/" + fileName + ".exe");
+            procInfo = new ProcessStartInfo(filePath + "\\" + fileName + "\\" + fileName + "\\bin\\Debug\\" + fileName + ".exe");
         }//end of processForCS
 
         public decimal grade()
@@ -79,7 +79,7 @@ namespace SPade.Grading
                 default:
                     break;
             }
-
+            File.AppendAllText("C:/Users/tongliang/Desktop/filepath.txt", filePath + "/" + fileName + "/" + fileName + "/bin/Debug/" + fileName + ".exe");
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -99,6 +99,7 @@ namespace SPade.Grading
 
                 foreach (XmlNode testcase in testcaseList)
                 {
+                    List<string> inputs = new List<string>();
                     noOfTestCase++;
                     proc = Process.Start(procInfo);
                     subOut = "";
@@ -107,9 +108,9 @@ namespace SPade.Grading
 
                     foreach (XmlNode input in testcase.ChildNodes)
                     {
+                        inputs.Add(input.InnerText);
                         sw.WriteLine(input.InnerText);
                         sw.Flush();
-                        subOut += proc.StandardOutput.ReadLine() + input.InnerText;
                     }//end of inputs
 
                     //check if there is another error thrown by program
@@ -117,15 +118,24 @@ namespace SPade.Grading
 
                     if (error.Equals(""))
                     {
-                        //add output to list of outputs if there is no error
-                        subOut += proc.StandardOutput.ReadLine();
+                        //scan through all lines of standard output to retrieve anything
+                        string checkEmpty;
+                        do
+                        {
+                            checkEmpty = proc.StandardOutput.ReadLine();
+                            subOut += checkEmpty;
+                        } while (checkEmpty != null);
+
+                        foreach (string input in inputs)
+                        {
+                            subOut += input;
+                        }
                     }
                     else
                     {
                         //program given fail if an error was encountered
                         programFailed = true;
                         sw.Close();
-                        proc.WaitForExit();
                         break; //break out of loop
                     }//check if error
 
@@ -134,17 +144,22 @@ namespace SPade.Grading
                         //get the output from solution
                         solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
                         XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
-                        //loop through all the solutions to find matching
+                        //loop through all the solutions to find matching                        
                         foreach (XmlNode solution in solutions)
                         {
                             if (subOut.Equals(solution.InnerText))
                             {
+                                File.AppendAllText("C:/Users/tongliang/Desktop/sol.txt", "Sub: " + subOut + " Sol: " + solution.InnerText + "   ");
                                 testCasePassed++;
                             }
                         }//end of foreach loop
-                    }//end of check
+                    }//end of checkW
+
                     proc.WaitForExit();
                 }//end of test case loop
+
+                File.AppendAllText("C:/Users/tongliang/Desktop/sub.txt", subOut);
+                File.AppendAllText("C:/Users/tongliang/Desktop/debug.txt", "No. of testcase: " + noOfTestCase + "\nNo. of passed: " + testCasePassed);
 
                 //read output 
                 if (programFailed == false)
