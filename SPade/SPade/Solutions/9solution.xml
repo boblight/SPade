@@ -1,15 +1,2 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<body>
-  <solution>Enter years of service: 9Enter salary: 999Increment for staff is: 100</solution>
-  <solution>Enter years of service: 9Enter salary: 1999Increment for staff is: 200</solution>
-  <solution>Enter years of service: 9Enter salary: 2000Increment for staff is: 300</solution>
-  <solution>Enter years of service: 9Enter salary: 2001Increment for staff is: 300</solution>
-  <solution>Enter years of service: 10Enter salary: 999Increment for staff is: 200</solution>
-  <solution>Enter years of service: 10Enter salary: 1999Increment for staff is: 300</solution>
-  <solution>Enter years of service: 10Enter salary: 2000Increment for staff is: 400</solution>
-  <solution>Enter years of service: 10Enter salary: 2001Increment for staff is: 400</solution>
-  <solution>Enter years of service: 11Enter salary: 999Increment for staff is: 200</solution>
-  <solution>Enter years of service: 11Enter salary: 1999Increment for staff is: 300</solution>
-  <solution>Enter years of service: 11Enter salary: 2000Increment for staff is: 400</solution>
-  <solution>Enter years of service: 11Enter salary: 2001Increment for staff is: 400</solution>
-</body>
+<body />

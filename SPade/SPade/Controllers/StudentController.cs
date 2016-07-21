@@ -36,6 +36,9 @@ namespace SPade.Controllers
             Submission submission = new Submission();
             int assgnId = (int)Session["assignmentId"];
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
+            //query for which programming language needed to be used for this assignment
+            //for "Scalability sake"
+            ProgLanguage langUsed = db.ProgLanguages.ToList().Find(p => p.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode).LanguageId);
 
             //getting file path
             //first check if file us empty of is not zip file
@@ -69,7 +72,7 @@ namespace SPade.Controllers
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
                     //grade submission
-                    Grader grader = new Grader(filePath, fileName, assgnId);
+                    Grader grader = new Grader(filePath, fileName, assgnId, langUsed.LangageType);
                     decimal result = grader.grade();
 
                     submission.Grade = result;
@@ -106,6 +109,9 @@ namespace SPade.Controllers
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
             svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
 
+            Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
+            svm.Module = module.ModuleCode + " " + module.ModuleName;
+
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
 
@@ -118,7 +124,7 @@ namespace SPade.Controllers
             svm.assignment = assignment;
 
             return View(svm);
-        }
+        }//end of get SubmitAssignment
 
         // GET: ViewAssignment
         public ActionResult ViewAssignment()
@@ -138,6 +144,10 @@ namespace SPade.Controllers
                     ViewAssignmentViewModel v = new ViewAssignmentViewModel();
                     v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID).Count();
                     v.assignment = a;
+
+                    Module module = db.Modules.ToList().Find(m => m.ModuleCode == a.ModuleCode);
+                    v.Module = module.ModuleCode + " " + module.ModuleName;
+
                     //check if the assignment has been attempted before
                     if (db.Submissions.ToList().FindAll(s => s.AdminNo == User.Identity.GetUserName() && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
                     {
@@ -160,7 +170,7 @@ namespace SPade.Controllers
 
             ViewResultViewModel vrvm = new ViewResultViewModel();
 
-            string loggedInStudent = "p1431476"; //temp 
+            string loggedInStudent = User.Identity.GetUserName();
 
 
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, s1.assignmentid, a.assignmentid, a.assgntitle, a.startdate, a.duedate, s1.grade, s1.filepath, s1.timestamp from submission s1 inner join( select max(submissionid) submissionid, adminno, assignmentid, max(timestamp) timestamp from submission group by adminno, assignmentid ) s2 on s1.submissionid = s2.submissionid inner join( select * from assignment where deletedat is null ) a on s1.assignmentid = a.assignmentid where s1.adminno = @inStudent",
@@ -188,7 +198,7 @@ namespace SPade.Controllers
                     Overall.Add("Fail");
 
                 SubmittedOn.Add(r.timestamp.ToString());
-                Submission.Add("/Student/Download/?file=" + r.assgntitle + r.assignmentid);
+                Submission.Add("/Student/Download/?file=" + Regex.Replace(r.assgntitle, @"\s+", "") + r.assignmentid);
 
             }
 
@@ -214,9 +224,8 @@ namespace SPade.Controllers
         [HttpGet]
         public ActionResult Download(string file)
         {
-
-            string path = "~/Submissions/" + "p1431476" + file; //temp
-            string zipname = "p1431476" + file + ".zip"; //temp
+            string path = "~/Submissions/" + User.Identity.GetUserName() + file; //temp
+            string zipname = User.Identity.GetUserName() + file + ".zip"; //temp
 
             var memoryStream = new MemoryStream();
             using (var zip = new ZipFile())

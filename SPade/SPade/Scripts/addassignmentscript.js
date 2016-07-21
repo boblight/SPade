@@ -1,20 +1,26 @@
 ﻿$(document).ready(function () {
 
     $(function () {
-        $('input[name="DateRange"]').daterangepicker({
 
+        var currentDate = moment().format('MM/DD/YYYY');
+
+        $('input[name="DateRange"]').daterangepicker({
+            opens: "center",
+            startDate: currentDate,
+            endDate: currentDate,
+            minDate: currentDate,
             autoUpdateInput: false,
             locale: {
                 cancelLabel: 'Clear'
             }
-
         })
     });
 
     $("#DateRange").on('apply.daterangepicker', function (ev, picker) {
 
-        var sd = picker.startDate.format('YYYY-MM-DD')
-        var ed = picker.endDate.format('YYYY-MM-DD')
+        var sd = picker.startDate.format('DD-MM-YYYY');
+        var ed = picker.endDate.format('DD-MM-YYYY');
+        var currentDate = moment().format('DD-MM-YYYY');
 
         $("#DateRange").val(sd + " - " + ed);
         $('#StartDate').val(sd);
@@ -40,18 +46,4 @@
         $("#SelectedClasses").val(t)
 
     })
-
-    $("#classSelect").validate({
-
-        rules: {
-
-            classSelect: "required"
-        },
-        messages: {
-            classSelect: "Please select a class"
-        }
-    })
-
-
-
 })

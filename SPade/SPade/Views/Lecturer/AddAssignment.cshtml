@@ -5,10 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Scripts.Render("~/bundles/addassignmentscripts")
-@Scripts.Render("~/bundles/jqueryval")
 
-@using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/addassignmentscripts")
+
+@using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data", id = "submitAssignmentForm" }))
 {
     <div class="container">
 
@@ -27,6 +28,10 @@
                         this .xml file
                     </a> and input the test cases in a similar format as presented inside.
                 </p>
+
+                <span class="help-block">
+                    <span class="text-danger" id="slnRunError">@TempData["GeneralError"]</span>
+                </span>
 
                 <div class="form-group">
                     <div class="col-md-12">
@@ -55,28 +60,35 @@
                     </div>
                 </div>
 
+                <!--Upload solutions file-->
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
-                        <input id="solutionsFile" name="fileList[0]" class="form-control" type="file" style="border: solid 1px red" />
-                        <span class="help-block">@Html.ValidationMessage("Soution", new { @class = "text-danger" })</span>
+                        <input id="solutionsFilUpload" name="solutionsFileUpload" class="form-control" type="file" style="border: solid 1px red" />
+                        <span class="help-block">
+                            <span class="text-danger" id="testCaseError">@TempData["Warning"]</span>
+                        </span>
                     </div>
                 </div>
 
+                <!--Upload test case-->
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="SolutionsFile">Upload Test Cases</label>
-                        <input id="testCase" name="fileList[1]" class="form-control" type="file" style="border: solid 1px red" />
+                        <input id="testCaseUpload" name="testCaseUpload" class="form-control" type="file" style="border: solid 1px red" />
+                        <span class="help-block">
+                            <span class="text-danger" id="testCaseError">@TempData["Warning"]</span>
+                        </span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="col-md-12">
                         <label class="control-label" for="daterange">Select start and end date</label>
-                        @Html.TextBoxFor(m => Model.DateRange, new { @class = "form-control", @placeholder = "Select start and end date" })
+                        @Html.TextBoxFor(m => Model.DateRange, new { @class = "form-control", @placeholder = "Select start and end date", @readonly = "true" })
                         @Html.HiddenFor(m => Model.StartDate)
                         @Html.HiddenFor(m => Model.DueDate)
-                        <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger" })</span>
+                        <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger", @id = "DateError", @name = "DateError" })</span>
                     </div>
                 </div>
 
@@ -95,7 +107,7 @@
                         <label class="control-label">
                             Select maximum attempts allowed
                         </label>
-                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "0", @max = "10", @type = "number" })
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "1", @max = "10", @type = "number" })
                         <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
                     </div>
                 </div>

@@ -18,5 +18,7 @@ namespace SPade.ViewModels.Student
 
         public int RetryRemaining { get; set; }
 
+        public string Module { get; set; }
+
     }//end of class
 }
