@@ -149,7 +149,7 @@ namespace SPade.Grading
                         {
                             if (subOut.Equals(solution.InnerText))
                             {
-                                File.AppendAllText("C:/Users/tongliang/Desktop/sol.txt", "Sub: " + subOut + " Sol: " + solution.InnerText + "   ");
+                                //File.AppendAllText("C:/Users/tongliang/Desktop/sol.txt", "Sub: " + subOut + " Sol: " + solution.InnerText + "   ");
                                 testCasePassed++;
                             }
                         }//end of foreach loop
@@ -158,8 +158,8 @@ namespace SPade.Grading
                     proc.WaitForExit();
                 }//end of test case loop
 
-                File.AppendAllText("C:/Users/tongliang/Desktop/sub.txt", subOut);
-                File.AppendAllText("C:/Users/tongliang/Desktop/debug.txt", "No. of testcase: " + noOfTestCase + "\nNo. of passed: " + testCasePassed);
+                //File.AppendAllText("C:/Users/tongliang/Desktop/sub.txt", subOut);
+                //File.AppendAllText("C:/Users/tongliang/Desktop/debug.txt", "No. of testcase: " + noOfTestCase + "\nNo. of passed: " + testCasePassed);
 
                 //read output 
                 if (programFailed == false)
