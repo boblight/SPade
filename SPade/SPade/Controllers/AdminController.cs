@@ -219,6 +219,9 @@ namespace SPade.Controllers
         }
         public ActionResult ManageLecturer()
         {
+            ManageLecturerViewModel ms = new ManageLecturerViewModel();
+            List<Lecturer> lecturer = new List<Lecturer>();
+            lecturer = db.Lecturers.ToList();
             return View();
         }
         public ActionResult UpdateClass()
