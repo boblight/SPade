@@ -74,11 +74,55 @@ namespace SPade.Controllers
 
         public ActionResult ManageAssignments()
         {
+            List<ManageAssignmentViewModel> manageAssgn = new List<ManageAssignmentViewModel>();
+            List<Assignment> lecAssgn = new List<Assignment>();
+            //ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
 
+            //to store the classes assigned that assignment 
+            List<string> classAssgn = new List<string>();
 
+            string lecturerID = "s1431489"; //temp 
 
+            //get the assignments that this lecturer created
+            lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
 
-            return View();
+            //get the name of the classes assigned to an assignment 
+            foreach (Assignment a in lecAssgn)
+            {
+                ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
+
+                //get all the classes that are assigned the particular assignment under this lecturer + the classes they manage only ! 
+                var query = from c in db.Classes
+                            join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+                            where ca.AssignmentID.Equals(a.AssignmentID)
+                            join cl in db.Lec_Class on c.ClassID equals cl.ClassID
+                            where cl.StaffID.Equals(lecturerID)
+                            select c.ClassName;
+
+                classAssgn = query.ToList();
+
+                var o = classAssgn.Last();
+                string jc = "";
+
+                foreach (string s in classAssgn)
+                {
+                    if (s.Equals(o))
+                    {
+                        jc += s;
+                    }
+                    else
+                    {
+                        jc += s + ",";
+                    }
+                }
+
+                mmvm.Assignment = a;
+                mmvm.classList = classAssgn;
+                mmvm.Classes = jc;
+                manageAssgn.Add(mmvm);
+            }
+
+            return View(manageAssgn);
         }
 
         public FileResult DownloadTestCase()
@@ -340,7 +384,7 @@ namespace SPade.Controllers
             }
         }
 
-        public ActionResult UpdateAssignment()
+        public ActionResult UpdateAssignment(int AssignmentId)
         {
             return View();
         }

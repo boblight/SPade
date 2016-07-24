@@ -1,4 +1,5 @@
-﻿
+﻿@model List<SPade.ViewModels.Lecturer.ManageAssignmentViewModel>
+
 @{
     ViewBag.Title = "Manage Assignments";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -31,38 +32,29 @@
                         <th>Assignment</th>
                         <th>Issued On</th>
                         <th>Issued To</th>
+                        <th>Start Date</th>
                         <th>Due Date</th>
                         <th class="sorter-false">Update</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Java Practical 1</td>
-                        <td>9/5/2016</td>
-                        <td>DIT/1A/FT/21, DIT/1A/FT/23</td>
-                        <td>12/5/2016</td>
-                        <td>
-                            <a href="UpdateAssignment" class="btn btn-primary btn-sm">Update Assignment</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Java Practical 2</td>
-                        <td>10/5/2016</td>
-                        <td>DIT/1A/FT/22, DIT/1A/FT/23, DIT/1A/FT/23</td>
-                        <td>12/5/2016</td>
-                        <td>
-                            <a href="UpdateAssignment" class="btn btn-primary btn-sm">Update Assignment</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Java Practical 3</td>
-                        <td>11/5/2016</td>
-                        <td>DIT/1A/FT/22, DIT/1A/FT/24</td>
-                        <td>13/5/2016</td>
-                        <td>
-                            <a href="UpdateAssignment" class="btn btn-primary btn-sm">Update Assignment</a>
-                        </td>
-                    </tr>
+
+                    @{
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <th>@Html.DisplayFor(Model => item.Assignment.AssgnTitle)</th>
+                                <th>@Html.DisplayFor(Model => item.Assignment.CreateAt)</th>
+                                <th>@Html.DisplayFor(Model => item.Classes)</th>
+                                <th>@Html.DisplayFor(Model => item.Assignment.StartDate)</th>
+                                <th>@Html.DisplayFor(Model => item.Assignment.DueDate)</th>
+                                <th>
+                                    @Html.ActionLink("Update", "UpdateAssignment", "Lecturer", new { AssignmentId = item.Assignment.AssignmentID }, new { id = "UpdateAssignment", @class = "btn btn-primary" })
+                                </th>
+                            </tr>
+                        }
+                    }
+
                 </tbody>
             </table>
         </fieldset>
