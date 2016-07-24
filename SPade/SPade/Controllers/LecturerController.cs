@@ -1,21 +1,20 @@
-﻿using System;
+﻿using Ionic.Zip;
+using Microsoft.AspNet.Identity;
+using SPade.Grading;
+using SPade.Models.DAL;
+using SPade.ViewModels.Lecturer;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using SPade.Grading;
-using SPade.Models.DAL;
-using SPade.ViewModels.Admin;
-using SPade.ViewModels.Lecturer;
-using SPade.ViewModels.Student;
-using System.IO;
-using System.Data.SqlClient;
-using Ionic.Zip;
-using Microsoft.AspNet.Identity;
-using System.Text.RegularExpressions;
 
 namespace SPade.Controllers
 {
+
+    [Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
@@ -164,7 +163,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload)
+        public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload, FormCollection formCollection)
         {
             string slnFilePath = "", slnFileName = "";
 
@@ -203,8 +202,11 @@ namespace SPade.Controllers
                     fileInfo.Directory.Create();
                     testCaseUpload.SaveAs(filePath);
 
+                    //get language and pass it into the grader
+                    ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+
                     //run the lecturer solution + generate solution file 
-                    Grader g = new Grader(slnFilePath, slnFileName, fN);
+                    Grader g = new Grader(slnFilePath, slnFileName, fN, lang.LangageType);
                     if (g.RunLecturerSolution() == true)
                     {
                         //now to add into the DB 
@@ -221,9 +223,9 @@ namespace SPade.Controllers
                         newAssignment.DueDate = addAssgn.DueDate;
                         newAssignment.Solution = addAssgn.Solution;
                         newAssignment.ModuleCode = addAssgn.ModuleId;
-                        newAssignment.CreateBy = "s1431489"; //temp
+                        newAssignment.CreateBy = User.Identity.GetUserName(); //temp
                         newAssignment.CreateAt = DateTime.Now;
-                        newAssignment.UpdatedBy = "s1431489"; //temp
+                        newAssignment.UpdatedBy = User.Identity.GetUserName(); //temp
                         newAssignment.UpdatedAt = DateTime.Now;
                         db.Assignments.Add(newAssignment);
 
