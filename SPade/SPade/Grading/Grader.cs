@@ -25,11 +25,12 @@ namespace SPade.Grading
         XmlDocument slnDoc = new XmlDocument();
 
         //Lecturer use this
-        public Grader(string filePath, string fileName, string assignmentTitle)
+        public Grader(string filePath, string fileName, string assignmentTitle, string language)
         {
             this.filePath = filePath;
             this.fileName = fileName;
             this.assignmentTitle = assignmentTitle;
+            this.language = language;
         }//end of constructor
 
         //student use this
@@ -264,19 +265,35 @@ namespace SPade.Grading
 
         public bool RunLecturerSolution()
         {
+            switch (language)
+            {
+                case "Java":
+                    processForJava();
+                    break;
+                case "C#":
+                    processForCS();
+                    break;
+                default:
+                    processForJava();
+                    break;
+            }
+
             bool isRun = false;
 
-            //method to run lecturer solution. 
-            compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/" + fileName + ".java");
+            ////method to run lecturer solution. 
+            //compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/" + fileName + ".java");
 
-            compileInfo.CreateNoWindow = true;
-            compileInfo.UseShellExecute = false;
-            compile = Process.Start(compileInfo);
+            //compileInfo.CreateNoWindow = true;
+            //compileInfo.UseShellExecute = false;
+            //compile = Process.Start(compileInfo);
 
-            compile.WaitForExit();//compilation process ends
+            //compile.WaitForExit();//compilation process ends
 
-            //run program with Java
-            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
+            ////run program with Java
+            //procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
+
+
+
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -295,8 +312,16 @@ namespace SPade.Grading
                 testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml"));
                 XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
 
+                //create part of the solution file first
+                docNode = slnDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                slnDoc.AppendChild(docNode);
+                bodyNode = slnDoc.CreateElement("body");
+                slnDoc.AppendChild(bodyNode);
+
                 foreach (XmlNode testcase in testcaseList)
                 {
+                    List<string> inputs = new List<string>();
+                    noOfTestCase++;
                     proc = Process.Start(procInfo);
                     subOut = "";
 
@@ -304,9 +329,9 @@ namespace SPade.Grading
 
                     foreach (XmlNode input in testcase.ChildNodes)
                     {
+                        inputs.Add(input.InnerText);
                         sw.WriteLine(input.InnerText);
                         sw.Flush();
-                        subOut += proc.StandardOutput.ReadLine() + input.InnerText;
                     }//end of inputs
 
                     //check if there is another error thrown by program
@@ -314,38 +339,36 @@ namespace SPade.Grading
 
                     if (error.Equals(""))
                     {
-                        subOut += proc.StandardOutput.ReadLine();
-                        subList.Add(subOut); //add to list of answers 
+                        //scan through all lines of standard output to retrieve anything
+                        string checkEmpty;
+                        do
+                        {
+                            checkEmpty = proc.StandardOutput.ReadLine();
+                            subOut += checkEmpty;
+                        } while (checkEmpty != null);
+
+                        foreach (string input in inputs)
+                        {
+                            subOut += input;
+                        }
+
+                        solutionsNode = slnDoc.CreateElement("solution");
+                        solutionsNode.AppendChild(slnDoc.CreateTextNode(subOut));
+                        bodyNode.AppendChild(solutionsNode);
                     }
                     else
                     {
                         //program given fail if an error was encountered
                         programFailed = true;
                         sw.Close();
-                        proc.WaitForExit();
                         break; //break out of loop
                     }//check if error
-
                     proc.WaitForExit();
                 }
 
                 //create the solution file 
                 if (programFailed == false)
                 {
-                    docNode = slnDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
-                    slnDoc.AppendChild(docNode);
-
-                    bodyNode = slnDoc.CreateElement("body");
-                    slnDoc.AppendChild(bodyNode);
-
-                    //loop through the answers and append into the xml file 
-                    foreach (string s in subList)
-                    {
-                        solutionsNode = slnDoc.CreateElement("solution");
-                        solutionsNode.AppendChild(slnDoc.CreateTextNode(s));
-                        bodyNode.AppendChild(solutionsNode);
-                    }
-
                     //save the XML file
                     var fP = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
                     slnDoc.Save(fP);
@@ -354,8 +377,41 @@ namespace SPade.Grading
                 }
             }
             catch (Exception ex)
-            {
+            {//when there is no testcase
+                proc = Process.Start(procInfo);
 
+                if (!proc.WaitForExit(10000))
+                {
+                    isRun = false;//fail program if program failed to produce feedback after 10 seconds
+                }
+
+                proc.WaitForExit();
+
+                //read output and error
+                error = proc.StandardError.ReadToEnd();
+                exitcode = proc.ExitCode; //0 means success 1 means failure
+
+                //get output from submission
+                if (programFailed == false)
+                {
+                    ans = proc.StandardOutput.ReadToEnd();
+
+                    docNode = slnDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                    slnDoc.AppendChild(docNode);
+
+                    bodyNode = slnDoc.CreateElement("body");
+                    slnDoc.AppendChild(bodyNode);
+
+                    solutionsNode = slnDoc.CreateElement("solution");
+                    solutionsNode.AppendChild(slnDoc.CreateTextNode(ans));
+                    bodyNode.AppendChild(solutionsNode);
+
+                    //save the XML file
+                    var fP = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
+                    slnDoc.Save(fP);
+
+                    isRun = true;
+                }
             }
 
             return isRun;
