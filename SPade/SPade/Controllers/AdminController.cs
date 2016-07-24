@@ -41,6 +41,9 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult AddOneStudent(AddStudentViewModel model)
         {
+
+
+
             try
             {
                 var student = new Student()

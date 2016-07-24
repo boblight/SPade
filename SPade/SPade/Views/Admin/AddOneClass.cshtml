@@ -8,15 +8,17 @@
 {
 
 <div class="col-md-4 col-md-offset-4 form-horizontal">
-    <fieldset>      
+    <fieldset> 
+        @Html.AntiForgeryToken()
         <legend>Add Class</legend>
+
 
         <!--Select Course-->
         <div class="form-group">
             <div class="col-md-12">
                 <label>Course</label>
                 @{
-                    @Html.DropDownListFor(c => Model.CourseID, new SelectList(Model.Courses, "CourseID", "CourseName"), new { @class = "form-control" })
+                    @Html.DropDownListFor(c => Model.CourseID, new SelectList(Model.Courses, "CourseID", "CourseName"), "--Select a Course--", new { @class = "form-control" })
                 }
             </div>
         </div>
@@ -24,8 +26,9 @@
         <!-- classNameInput-->
         <div class="form-group">
             <div class="col-md-12">
-                @Html.LabelFor(m => m.ClassName, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md" })
+                <label for="inputStaffNo" class="control-label">Class Name</label>
+                @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md", required = "required" })
+            <span class="help-block">@Html.ValidationMessage("ClassName", new { @class = "text-danger" })</span>
             </div>
         </div>
 
@@ -34,7 +37,7 @@
             <div class="col-md-12">
                 <label >Lecturer</label>
                 @{
-                    @Html.DropDownListFor(c => Model.StaffID, new SelectList(Model.Lecturers, "StaffID", "Name"), new { @class = "form-control" })
+                    @Html.DropDownListFor(c => Model.StaffID, new SelectList(Model.Lecturers, "StaffID", "Name"), "--Select a Lecturer--", new { @class = "form-control"} )
                 }    
             </div>
         </div>
@@ -48,7 +51,10 @@
         </div>
     </fieldset>
 </div>
-
-
-
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
 }
+
+
+
+    }

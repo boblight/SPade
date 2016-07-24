@@ -10,8 +10,7 @@ namespace SPade.ViewModels.Admin
     public class AddStudentViewModel
     {
         
-        [Required(ErrorMessage = "Name is required.")]
-        [Display(Name = "Assignment Title")]
+
         public string AdminNo { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
