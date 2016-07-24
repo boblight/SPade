@@ -26,7 +26,7 @@
                     <label>Module: </label>@Html.DisplayFor(modelItem => modelItem.Module)<br />
                     <label>Start date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.StartDate)<br />
                     <label>Due date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.DueDate)<br />
-                    <label>Posted by: </label>@Html.DisplayFor(modelItem => modelItem.assignment.CreateBy)<br />
+                    <label>Issued by: </label>@Html.DisplayFor(modelItem => modelItem.assignment.CreateBy)<br />
                     <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => modelItem.RetryRemaining)
                 </div>
             </div>
@@ -59,7 +59,8 @@
                 <div class="form-group">
                     <div class="col-md-10 ">
                         <input type="submit" class="btn btn-primary" value="Submit" />
-                        <a id="btnCancel" href="/Student/ViewAssignment" class="btn btn-default">Cancel</a>
+                        @*<a id="btnCancel" href="/Student/ViewAssignment" class="btn btn-default">Cancel</a>*@
+                        <button onClick="goBack()" class="btn btn-default">Cancel</button>
                     </div>
                 </div>
             }
@@ -73,9 +74,7 @@
         </div>
 
         <script>
-            function showResult() {
-                $('#resultModal').modal('toggle');
-            }
+            function goBack() { window.history.back(); }
         </script>
 
     </fieldset>
