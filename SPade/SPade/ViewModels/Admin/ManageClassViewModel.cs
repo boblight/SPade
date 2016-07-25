@@ -7,5 +7,11 @@ namespace SPade.ViewModels.Admin
 {
     public class ManageClassViewModel
     {
+        public List<string> ClassID { get; set; }
+        public List<string> StaffID { get; set; }
+        public int Count { get; set; }
+        public List<string> Name { get; set; }
+        public SPade.Models.DAL.Lecturer lecturer { get; set; }
+        public SPade.Models.DAL.Class classes { get; set; }
     }
 }

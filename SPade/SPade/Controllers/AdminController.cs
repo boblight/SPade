@@ -208,6 +208,20 @@ namespace SPade.Controllers
         }
         public ActionResult ManageClass()
         {
+            List<Lecturer> lecturer = new List<Lecturer>();
+            List<Class> classes = new List<Class>();
+            List<Lec_Class> lc = db.Lec_Class.ToList().FindAll(c => c.ClassID == 1);
+
+            foreach (Lec_Class i in lc)
+            {
+                lecturer = db.Lecturers.ToList().FindAll(lect => lect.StaffID == i.StaffID);
+            }
+
+
+
+
+
+            
             return View();
         }
         public ActionResult ManageStudent()
@@ -222,7 +236,7 @@ namespace SPade.Controllers
         }
         public ActionResult ManageLecturer()
         {
-            ManageLecturerViewModel ms = new ManageLecturerViewModel();
+            ManageLecturerViewModel ml = new ManageLecturerViewModel();
             List<Lecturer> lecturer = new List<Lecturer>();
             lecturer = db.Lecturers.ToList();
             return View();
