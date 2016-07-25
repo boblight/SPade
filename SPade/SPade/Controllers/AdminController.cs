@@ -20,24 +20,19 @@ namespace SPade.Controllers
 
         private SPadeDBEntities db = new SPadeDBEntities();
 
-
         // GET: Admin
         public ActionResult Dashboard()
         {
             return View();
         }
-
         public ActionResult BulkAddLecturer()
         {
             return View();
         }
-
         public ActionResult BulkAddStudent()
         {
             return View();
         }
-
-
         [HttpPost]
         public ActionResult AddOneStudent(AddStudentViewModel model)
         {
@@ -48,7 +43,7 @@ namespace SPade.Controllers
             {
                 var student = new Student()
                 {
-                    AdminNo = model.AdminNo,
+                    AdminNo = model.AdminNo.Trim(),
                     Name = model.Name,
                     Email = model.Email,
                     ContactNo = model.ContactNo,
@@ -81,7 +76,6 @@ namespace SPade.Controllers
             return View(model);
 
         }
-
         public ActionResult AddOneStudent()
         {
 
@@ -94,8 +88,6 @@ namespace SPade.Controllers
 
 
         }
-
-
         [HttpPost]
         public ActionResult AddOneClass(AddClassViewModel model)
         {
@@ -150,7 +142,6 @@ namespace SPade.Controllers
             }
             return View(model);
         }
-
         public ActionResult AddOneClass()
         {
             AddClassViewModel model = new AddClassViewModel();
@@ -162,7 +153,6 @@ namespace SPade.Controllers
             return View(model);
 
         }
-
         [HttpPost]
         public ActionResult AddOneLecturer(AddLecturerViewMode model)
         {
@@ -201,7 +191,6 @@ namespace SPade.Controllers
             }
             return View(model);
         }
-
         public ActionResult AddOneLecturer()
         {
             return View();
@@ -265,7 +254,6 @@ namespace SPade.Controllers
 
             return View(model);
         }
-
         [HttpPost]
         public ActionResult UpdateClass(UpdateClassViewModel model, string command)
         {
@@ -368,7 +356,6 @@ namespace SPade.Controllers
 
 
         }
-
         public ActionResult UpdateStudent()
         {
             UpdateStudentViewModel model = new UpdateStudentViewModel();
