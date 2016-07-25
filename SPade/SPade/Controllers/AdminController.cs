@@ -36,9 +36,6 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult AddOneStudent(AddStudentViewModel model)
         {
-
-
-
             try
             {
                 var student = new Student()
@@ -52,7 +49,6 @@ namespace SPade.Controllers
                     UpdatedBy = "Admin",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
-
                 };
 
                 db.Students.Add(student);
@@ -110,8 +106,6 @@ namespace SPade.Controllers
                     UpdatedAt = DateTime.Now,
 
                 };
-
-
                 var lec_class = new Lec_Class()
                 {
                     ClassID = model.ClassID,
@@ -219,7 +213,7 @@ namespace SPade.Controllers
         public ActionResult UpdateClass()
         {
             UpdateClassViewModel model = new UpdateClassViewModel();
-            int x = 6;
+            int x = 3;
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -260,7 +254,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateClass(UpdateClassViewModel model, string command)
         {
-            int x = 6;
+            int x = 3;
 
 
             //Get all courses
@@ -362,7 +356,7 @@ namespace SPade.Controllers
         public ActionResult UpdateStudent()
         {
             UpdateStudentViewModel model = new UpdateStudentViewModel();
-            string x = "p1234567";
+            string x = "p3333333";
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -389,7 +383,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateStudent(UpdateStudentViewModel model, string command)
         {
-            string x = "p1234567";
+            string x = "p3333333";
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -463,7 +457,7 @@ namespace SPade.Controllers
             UpdateLecturerViewModel model = new UpdateLecturerViewModel();
             //Get Lecturer
 
-            string x = "s1431489";
+            string x = "s4444444";
             List<Lecturer> Lecturers = db.Lecturers.ToList();
 
             foreach (Lecturer L in Lecturers)
@@ -482,7 +476,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command)
         {
-            string x = "s1431489";
+            string x = "s4444444";
             List<Lecturer> Lecturers = db.Lecturers.ToList();
             if (command.Equals("Update"))
             {

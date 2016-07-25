@@ -28,7 +28,8 @@
             <div class="col-md-12">
                 <label for="inputStaffNo" class="control-label">Class Name</label>
                 @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md", required = "required" })
-            <span class="help-block">@Html.ValidationMessage("ClassName", new { @class = "text-danger" })</span>
+                <span class="help-block">e.g. 2A22 </span>
+                 <span class="help-block">@Html.ValidationMessage("ClassName", new { @class = "text-danger" })</span>
             </div>
         </div>
 

@@ -17,6 +17,7 @@
                 <div class="col-md-12">
                     <label>Admin No</label>
                     @Html.TextBoxFor(m => m.AdminNo, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">With 'p' (e.g. p1234567)</span>
                     <span class="help-block">@Html.ValidationMessage("AdminNo", new { @class = "text-danger" })</span>
                 </div>
             </div>
@@ -26,6 +27,7 @@
                 <div class="col-md-12">
                     @Html.LabelFor(m => m.Name, new { @class = "control-label" })
                     @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">e.g. John Tan</span>
                     <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
                 </div>
             </div>
@@ -48,6 +50,7 @@
 
                     @Html.LabelFor(m => m.Email, new { @class = "control-label" })
                     @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">e.g. abc@hotmail.com</span>
                     <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
 
                 </div>
@@ -59,6 +62,7 @@
                     <label for="passwordInput" class="control-label">Password</label>
                     <input id="passwordInput" name="passwordInput" type="password" 
                            placeholder="Password" class="form-control input-md", required ="required"/>
+                    <span class="help-block">Password must have at least 1 uppercase, lowercase, number and special character</span>
                     <span class="help-block">@Html.ValidationMessage("Password", new { @class = "text-danger" })</span>
                 </div>
             </div>
