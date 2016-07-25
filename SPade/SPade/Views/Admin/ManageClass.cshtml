@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<SPade.ViewModels.Admin.ManageClassViewModel>
+
+@{
     ViewBag.Title = "ManageClass";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -37,8 +39,16 @@
                         </tr>
                     </thead>
                     <tbody>
-
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>@Html.DisplayFor(Model => item.classes.ClassName)</td>
+                            <td>@Html.DisplayFor(Model => item.lecturer.StaffID)</td>
+                            
+                        </tr>
+                        }
                     </tbody>
+                    <a href="~/Views/Admin/ManageStudent.cshtml">~/Views/Admin/ManageStudent.cshtml</a>
                 </table>
             </div>
         </fieldset>
