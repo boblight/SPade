@@ -342,18 +342,6 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\build.xml" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\dist\README.TXT" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\dist\SampleQns1.jar" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\nbproject\build-impl.xml" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\nbproject\project.xml" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\src\sampleqns1\SampleQns1.java" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\build.xml" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\dist\README.TXT" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\dist\SampleQns1.jar" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\build-impl.xml" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\project.xml" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\src\sampleqns1\SampleQns1.java" />
     <Content Include="TestCase\testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
@@ -397,7 +385,6 @@
     <Content Include="Views\Admin\AddOneStudent.cshtml" />
     <Content Include="Views\Admin\AddOneLecturer.cshtml" />
     <Content Include="Views\Lecturer\ViewStudentsByClass.cshtml" />
-    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <Content Include="Views\Lecturer\ManageClassesAndStudents.cshtml" />
     <Content Include="Views\Lecturer\ViewResults.cshtml" />
     <Content Include="Views\Admin\ManageClass.cshtml" />
@@ -411,21 +398,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\build\built-jar.properties" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\build\classes\sampleqns1\SampleQns1.class" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\manifest.mf" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\nbproject\genfiles.properties" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\nbproject\private\private.properties" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\nbproject\project.properties" />
-    <Content Include="Submissions\Pyramid1\SampleQns1\src\sampleqns1\SampleQns1.class" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\build\built-jar.properties" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\build\classes\sampleqns1\SampleQns1.class" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\manifest.mf" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\genfiles.properties" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\private\private.properties" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\project.properties" />
-    <Content Include="Submissions\SumMachine2\SampleQns1\src\sampleqns1\SampleQns1.class" />
-    <Content Include="Submissions\System.Web.HttpPostedFileWrapper" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
@@ -439,15 +411,7 @@
     <Folder Include="img\" />
     <Folder Include="Properties\" />
     <Folder Include="Solutions\" />
-    <Folder Include="Submissions\p1431476Payincrement3\SampleQns1\nbproject\private\" />
-    <Folder Include="Submissions\p1431476Payincrement3\SampleQns1\src\sampleqns1\" />
-    <Folder Include="Submissions\p1431476Summachine.2\FYPInputTestApp\dist\" />
-    <Folder Include="Submissions\p1431476Summachine.2\FYPInputTestApp\nbproject\private\" />
-    <Folder Include="Submissions\p1431476Summachine.2\FYPInputTestApp\src\fypinputtestapp\" />
-    <Folder Include="Submissions\Pyramid1\SampleQns1\build\empty\" />
-    <Folder Include="Submissions\Pyramid1\SampleQns1\build\generated-sources\ap-source-output\" />
-    <Folder Include="Submissions\SumMachine2\SampleQns1\build\empty\" />
-    <Folder Include="Submissions\SumMachine2\SampleQns1\build\generated-sources\ap-source-output\" />
+    <Folder Include="Submissions\" />
     <Folder Include="TempSubmissions\" />
   </ItemGroup>
   <ItemGroup>

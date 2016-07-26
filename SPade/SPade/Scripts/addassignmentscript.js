@@ -41,13 +41,20 @@
 
     $("#modalSelect").click(function () {
 
-        //var l = [];
+       // var l = [];
 
-        //$("input[id='cL']:checked"), function () {
+        //$("input:checked").each(function () {
 
-        //    l.push($(this).data("class-name"));
+        //    //var t = $("#cL").data("class-name");
+        //    console.log($(this).attr("class-name"));
 
-        //}
+        //})
+
+    //    $('input[type="checkbox"][id="c]).each(function () {
+    //if (this.checked) { //do something }
+    //});
+        
+
 
         //console.log(l);
 
