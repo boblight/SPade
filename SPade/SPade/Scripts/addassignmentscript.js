@@ -41,7 +41,7 @@
 
     $("#modalSelect").click(function () {
 
-        $('input[type="checkbox"] [id="cL"]').each(function () {
+        $('input[type="checkbox"][name*="isSelected"]').each(function () {
             if (this.checked) {
                 console.log($(this).data("class-name"));
             }

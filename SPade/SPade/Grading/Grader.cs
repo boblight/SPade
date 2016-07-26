@@ -54,7 +54,7 @@ namespace SPade.Grading
 
             compileInfo.CreateNoWindow = true;
             compileInfo.UseShellExecute = false;
-            compileInfo.WorkingDirectory = filePath;
+            compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
             compile = Process.Start(compileInfo);
 
             compile.WaitForExit();//compilation process ends
