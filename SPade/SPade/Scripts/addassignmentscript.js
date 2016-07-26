@@ -46,4 +46,27 @@
         $("#SelectedClasses").val(t)
 
     })
+
+    $("#testCaseGroup").hide();
+
+    $("#IsTestCasePresent").click(function () {
+
+        if ($(this).is(":checked")) {
+
+            $("#testCaseGroup").fadeIn();
+
+        } else {
+
+            $("#testCaseGroup").fadeOut();
+
+        }
+    })
+
+    if($("#IsTestCasePresent").is(":checked")){
+
+        $("#testCaseGroup").show();
+
+    }
+
+
 })
