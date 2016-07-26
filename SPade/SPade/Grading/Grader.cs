@@ -291,9 +291,7 @@ namespace SPade.Grading
 
             ////run program with Java
             //procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
-
-
-
+            
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
