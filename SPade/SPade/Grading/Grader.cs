@@ -384,11 +384,7 @@ namespace SPade.Grading
                         sw.Close();
                         break; //break out of loop
 
-                    }//check if error
-                    //if (!proc.WaitForExit(10000))
-                    //{
-                    //    proc.Kill();
-                    //}
+                    }
                     proc.WaitForExit();
                 }
 
@@ -419,7 +415,7 @@ namespace SPade.Grading
                 //error = proc.StandardError.ReadToEnd();
                 //exitcode = proc.ExitCode; //0 means success 1 means failure
                 //proc.WaitForExit();
-                File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", ex.Message);
+                // File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", ex.Message);
             }
 
             return isRun;

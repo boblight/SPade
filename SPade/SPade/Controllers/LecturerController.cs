@@ -178,11 +178,13 @@ namespace SPade.Controllers
                         string slnFilePath = "";
                         string slnName = (addAssgn.AssgnTitle).Replace(" ", "");
                         string actualFileName = "";
+                        string fileName = "";
 
                         //save the solution
+                        fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
                         var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
                         solutionsFileUpload.SaveAs(zipLocation);
-                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + slnName);
+                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
                         DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
                         if (fileDirectory.Exists)
                         {
@@ -198,14 +200,25 @@ namespace SPade.Controllers
                         fileDirectory.Create();
                         System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
 
-                        //get the actual folder name containing the submission
-                        string[] subDirectries = Directory.GetDirectories(slnFilePath);
+                        //access the solution + move the classname.java into a folder 
+                        var toLowerPath = fileName.ToLower();
+                        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                        Directory.CreateDirectory(path);
 
-                        foreach (string s in subDirectries)
-                        {
-                            var ew = s.Remove(0, slnFilePath.Length);
-                            actualFileName = ew.Replace(@"\", "");
-                        }
+                        var ogPath = slnFilePath + "/" + fileName + ".java";
+                        var newPath = path + "/" + fileName + ".java";
+                        System.IO.File.Move(ogPath, newPath);
+
+
+
+                        //get the actual folder name containing the submission
+                        //string[] subDirectries = Directory.GetDirectories(slnFilePath);
+
+                        //foreach (string s in subDirectries)
+                        //{
+                        //    var ew = s.Remove(0, slnFilePath.Length);
+                        //    actualFileName = ew.Replace(@"\", "");
+                        //}
 
                         //save the testcase
                         var filePath = Server.MapPath(@"~/TestCase/" + slnName + ".xml");
@@ -216,7 +229,7 @@ namespace SPade.Controllers
                         ////get the language and pass into grader
                         ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
 
-                        Grader g = new Grader(slnFilePath, actualFileName, slnName, lang.LangageType, true);
+                        Grader g = new Grader(slnFilePath, fileName, slnName, lang.LangageType, true);
 
                         if (g.RunLecturerSolution() == true)
                         {
