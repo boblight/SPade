@@ -14,7 +14,7 @@ using System.Web.Mvc;
 namespace SPade.Controllers
 {
 
-    //  [Authorize(Roles = "Lecturer")]
+    [Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
@@ -80,7 +80,8 @@ namespace SPade.Controllers
             //to store the classes assigned that assignment 
             List<string> classAssgn = new List<string>();
 
-            string lecturerID = "s1431489"; //temp 
+            //string lecturerID = "s1431489"; //temp 
+            var lecturerID = User.Identity.GetUserName();
 
             //get the assignments that this lecturer created
             lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
@@ -397,7 +398,7 @@ namespace SPade.Controllers
             }
 
             //everything all okay 
-            return RedirectToAction("ManageAssignments", "Lecturer");
+            return RedirectToAction("Dashboard", "Lecturer");
         }
 
         //used to insert the data into DB. 
@@ -409,7 +410,7 @@ namespace SPade.Controllers
             List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
             string slnName = (addAssgn.AssgnTitle).Replace(" ", "");
 
-            addAssgn.Solution = slnName + ".xml";
+            addAssgn.Solution = "~/Solutions/" + slnName + ".xml";
 
             newAssignment.AssgnTitle = addAssgn.AssgnTitle;
             newAssignment.Describe = addAssgn.Describe;
@@ -418,11 +419,11 @@ namespace SPade.Controllers
             newAssignment.DueDate = addAssgn.DueDate;
             newAssignment.Solution = addAssgn.Solution;
             newAssignment.ModuleCode = addAssgn.ModuleId;
-            newAssignment.CreateBy = "s1431489";
-            //   newAssignment.CreateBy = User.Identity.GetUserName(); //temp
+            // newAssignment.CreateBy = "s1431489";
+            newAssignment.CreateBy = User.Identity.GetUserName();
             newAssignment.CreateAt = DateTime.Now;
-            newAssignment.UpdatedBy = "s1431489";
-            //  newAssignment.UpdatedBy = User.Identity.GetUserName(); //temp
+            //newAssignment.UpdatedBy = "s1431489";
+            newAssignment.UpdatedBy = User.Identity.GetUserName();
             newAssignment.UpdatedAt = DateTime.Now;
             db.Assignments.Add(newAssignment);
 
