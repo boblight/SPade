@@ -41,30 +41,19 @@
 
     $("#modalSelect").click(function () {
 
-       // var l = [];
+        $('input[type="checkbox"] [id="cL"]').each(function () {
+            if (this.checked) {
+                console.log($(this).data("class-name"));
+            }
+        })
 
-        //$("input:checked").each(function () {
-
-        //    //var t = $("#cL").data("class-name");
-        //    console.log($(this).attr("class-name"));
-
-        //})
-
-    //    $('input[type="checkbox"][id="c]).each(function () {
-    //if (this.checked) { //do something }
-    //});
-        
-
-
-        //console.log(l);
+        console.log("cyka");
 
         var t = $("#cL").data("class-name");
 
         $("#SelectedClasses").val(t)
 
     })
-
-    $("#testCaseGroup").hide();
 
     $("#IsTestCasePresent").click(function () {
 

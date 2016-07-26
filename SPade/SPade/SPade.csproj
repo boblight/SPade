@@ -399,6 +399,7 @@
     </Content>
     <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
+    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

@@ -81,7 +81,7 @@ namespace SPade.Controllers
             List<string> classAssgn = new List<string>();
 
             //string lecturerID = "s1431489"; //temp 
-            var lecturerID = User.Identity.GetUserId();
+            var lecturerID = User.Identity.GetUserName();
 
             //get the assignments that this lecturer created
             //lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
