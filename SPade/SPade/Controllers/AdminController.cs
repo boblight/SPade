@@ -195,6 +195,7 @@ namespace SPade.Controllers
             List<Class> classes = new List<Class>();
             List<Lec_Class> lc = db.Lec_Class.ToList().FindAll(c => c.ClassID == 1);
 
+
             foreach (Lec_Class i in lc)
             {
                 lecturer = db.Lecturers.ToList().FindAll(lect => lect.StaffID == i.StaffID);
