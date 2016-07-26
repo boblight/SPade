@@ -66,6 +66,7 @@
                     <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                 </div>
             </div>
+            @Request.QueryString["AdminNo"]
         </fieldset>
     </div>
 </div>
@@ -73,4 +74,8 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+
+
+
+
     }
