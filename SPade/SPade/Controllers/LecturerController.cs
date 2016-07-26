@@ -136,7 +136,6 @@ namespace SPade.Controllers
 
         public ActionResult AddAssignment()
         {
-
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
