@@ -19,6 +19,12 @@ namespace SPade
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
 
+            routes.MapRoute(
+                "UpdateAssignment",
+                "Lecturer/UpdateAssignment/{AssignmentId}",
+                new { controller = "Lecturer", action = "UpdateAssignment", AssignmentId = "" }
+                );
+
         }
     }
 }

@@ -10,7 +10,7 @@ namespace SPade.ViewModels.Lecturer
         public string ClassName { get; set; }
         public int ClassId { get; set; }
         public bool isSelected { get; set; }
-
+        public string testClassAssgn { get; set; }
 
     }
 }

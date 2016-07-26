@@ -48,9 +48,10 @@ namespace SPade.ViewModels.Lecturer
         [Display(Name = "Solution")]
         public HttpPostedFile SolutionsFile { get; set; }
 
-        [Required]
         [Display(Name = "TestCase")]
         public HttpPostedFile TestCaseFile { get; set; }
+
+        public bool IsTestCasePresent { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
