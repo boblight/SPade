@@ -1,0 +1,62 @@
+﻿@model List<SPade.ViewModels.Lecturer.ManageAssignmentViewModel>
+
+@{
+    ViewBag.Title = "Manage Assignments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Scripts.Render("~/bundles/tablescript")
+@Styles.Render("~/bundles/tablestyle")
+
+<div class="container">
+    <div class="col-md-10 col-md-offset-1">
+        <fieldset>
+            <legend>Assignments</legend>
+
+            <div class="form-group">
+                <div>
+                    <a href="AddAssignment" class="btn btn-primary">Add Assignment</a>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                    <input id="search" name="search" class="form-control" placeholder="Search" type="text" data-column="any" />
+                </div>
+            </div>
+
+            <table class="table table-striped table-hover tablesorter">
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Issued On</th>
+                        <th>Issued To</th>
+                        <th>Start Date</th>
+                        <th>Due Date</th>
+                        <th class="sorter-false">Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @{
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <th>@Html.DisplayFor(Model => item.Assignment.AssgnTitle)</th>
+                                <th>@Html.DisplayFor(Model => item.Assignment.CreateAt)</th>
+                                <th>@Html.DisplayFor(Model => item.Classes)</th>
+                                <th>@Html.DisplayFor(Model => item.Assignment.StartDate)</th>
+                                <th>@Html.DisplayFor(Model => item.Assignment.DueDate)</th>
+                                <th>
+                                    @Html.ActionLink("Update", "UpdateAssignment", "Lecturer", new { AssignmentId = item.Assignment.AssignmentID }, new { id = "UpdateAssignment", @class = "btn btn-primary" })
+                                </th>
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
+</div>

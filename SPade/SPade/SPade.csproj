@@ -354,6 +354,7 @@
     <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\build-impl.xml" />
     <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\project.xml" />
     <Content Include="Submissions\SumMachine2\SampleQns1\src\sampleqns1\SampleQns1.java" />
+    <Content Include="TestCase\testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -425,6 +426,7 @@
     <Content Include="Submissions\SumMachine2\SampleQns1\nbproject\project.properties" />
     <Content Include="Submissions\SumMachine2\SampleQns1\src\sampleqns1\SampleQns1.class" />
     <Content Include="Submissions\System.Web.HttpPostedFileWrapper" />
+    <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -447,7 +449,6 @@
     <Folder Include="Submissions\SumMachine2\SampleQns1\build\empty\" />
     <Folder Include="Submissions\SumMachine2\SampleQns1\build\generated-sources\ap-source-output\" />
     <Folder Include="TempSubmissions\" />
-    <Folder Include="TestCase\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

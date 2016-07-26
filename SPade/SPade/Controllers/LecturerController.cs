@@ -14,7 +14,7 @@ using System.Web.Mvc;
 namespace SPade.Controllers
 {
 
-    [Authorize(Roles = "Lecturer")]
+   //[Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
