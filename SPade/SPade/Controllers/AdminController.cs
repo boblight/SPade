@@ -217,6 +217,7 @@ namespace SPade.Controllers
             students = db.Students.ToList();
 
             return View(students);
+
         }
         public ActionResult ManageLecturer()
         {
@@ -368,10 +369,11 @@ namespace SPade.Controllers
 
 
         }
+        [HttpGet]
         public ActionResult UpdateStudent()
         {
             UpdateStudentViewModel model = new UpdateStudentViewModel();
-            string x = "p3333333";
+            string x = Request.QueryString["AdminNo"];
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;

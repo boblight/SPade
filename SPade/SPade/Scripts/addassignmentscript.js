@@ -41,9 +41,38 @@
 
     $("#modalSelect").click(function () {
 
-        var t = $("#cL").data("class-name");
+        var l = [];
 
-        $("#SelectedClasses").val(t)
+        $("input[id='cL']:checked"), function () {
+
+            l.push($(this).val());
+
+        }
+
+        console.log(l);
 
     })
+
+    $("#testCaseGroup").hide();
+
+    $("#IsTestCasePresent").click(function () {
+
+        if ($(this).is(":checked")) {
+
+            $("#testCaseGroup").fadeIn();
+
+        } else {
+
+            $("#testCaseGroup").fadeOut();
+
+        }
+    })
+
+    if ($("#IsTestCasePresent").is(":checked")) {
+
+        $("#testCaseGroup").show();
+
+    }
+
+
 })

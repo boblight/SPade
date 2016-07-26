@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 
 namespace SPade.Controllers
 {
-    [Authorize(Roles = "Student")]
+  //  [Authorize(Roles = "Student")]
     public class StudentController : Controller
     {
         private SPadeDBEntities db = new SPadeDBEntities();
