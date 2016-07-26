@@ -52,11 +52,9 @@ namespace SPade.Grading
             //compile java program
             compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
 
-            File.AppendAllText("C:/Users/tongliang/Desktop/debugging.txt", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/");
-
             compileInfo.CreateNoWindow = true;
             compileInfo.UseShellExecute = false;
-            compileInfo.WorkingDirectory = filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/";
+            compileInfo.WorkingDirectory = filePath;
             compile = Process.Start(compileInfo);
 
             compile.WaitForExit();//compilation process ends
@@ -65,7 +63,8 @@ namespace SPade.Grading
             //pathToExecutable = "java -cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName;
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/Grade.exe");
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", "/hide_window " + "java -cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
-            procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
+            //procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
+            procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " +  fileName.ToLower() + "." + fileName);
         }//end of processForJava
 
         public void processForCS()
@@ -74,7 +73,7 @@ namespace SPade.Grading
             compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", "Program.cs");
             compileInfo.CreateNoWindow = true;
             compileInfo.UseShellExecute = false;
-            compileInfo.WorkingDirectory = filePath + "/" + fileName + "/" + fileName;
+            compileInfo.WorkingDirectory = filePath;
             compile = Process.Start(compileInfo);
 
             compile.WaitForExit();//compilation process ends
@@ -82,7 +81,8 @@ namespace SPade.Grading
             //pathToExecutable = filePath + "/" + fileName + "/" + fileName + "/bin/Debug/" + fileName + ".exe";
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", HttpContext.Current.Server.MapPath(@"~/Grading/Grade.exe"));
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\" ", "/hide_window " + filePath + "/" + fileName + "/" + fileName + "/bin/Debug/" + fileName + ".exe");
-            procInfo = new ProcessStartInfo(filePath + "/" + fileName + "/" + fileName + "/Program.exe");
+            //procInfo = new ProcessStartInfo(filePath + "/" + fileName + "/" + fileName + "/Program.exe");
+            procInfo = new ProcessStartInfo(filePath + "/" + fileName + ".exe");
         }//end of processForCS
 
         public decimal grade()
