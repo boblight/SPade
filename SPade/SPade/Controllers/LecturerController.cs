@@ -14,7 +14,7 @@ using System.Web.Mvc;
 namespace SPade.Controllers
 {
 
-   //[Authorize(Roles = "Lecturer")]
+    [Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
@@ -139,7 +139,8 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            string x = "s1431489"; //temp 
+            //  string x = "s1431489"; //temp 
+            var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
