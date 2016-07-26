@@ -81,10 +81,11 @@ namespace SPade.Controllers
             List<string> classAssgn = new List<string>();
 
             //string lecturerID = "s1431489"; //temp 
-            var lecturerID = User.Identity.GetUserName();
+            var lecturerID = User.Identity.GetUserId();
 
             //get the assignments that this lecturer created
-            lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
+            //lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
+            lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedBy == null);
 
             //get the name of the classes assigned to an assignment 
             foreach (Assignment a in lecAssgn)

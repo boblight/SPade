@@ -41,15 +41,15 @@
 
     $("#modalSelect").click(function () {
 
-        var l = [];
+        //var l = [];
 
-        $("input[id='cL']:checked"), function () {
+        //$("input[id='cL']:checked"), function () {
 
-            l.push($(this).val());
+        //    l.push($(this));
 
-        }
-
-        console.log(l);
+        //}
+        var t = $("#cL").data("class-name");
+        $("#SelectedClasses").val(t);
 
     })
 
