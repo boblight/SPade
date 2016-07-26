@@ -433,13 +433,8 @@ namespace SPade.Grading
                 //read the output from the program
                 if (error.Equals(""))
                 {
-                    string checkEmpty;
-                    do
-                    {
-                        checkEmpty = proc.StandardOutput.ReadLine();
-                        subOut += checkEmpty;
 
-                    } while (checkEmpty != null);
+                    subOut = proc.StandardOutput.ReadToEnd();
 
                     solutionsNode = slnDoc.CreateElement("solution");
                     solutionsNode.AppendChild(slnDoc.CreateTextNode(subOut));
@@ -465,19 +460,7 @@ namespace SPade.Grading
             }
             catch (Exception e)
             {
-                proc = Process.Start(procInfo);
-
-                if (!proc.WaitForExit(10000))
-                {
-                    isRun = false;//fail program if program failed to produce feedback after 10 seconds
-                    return isRun;
-                }
-
-                proc.WaitForExit();
-
-                //read output and error
-                error = proc.StandardError.ReadToEnd();
-                exitcode = proc.ExitCode; //0 means success 1 means failure
+                File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", e.Message);
             }
             return isRun;
         }
