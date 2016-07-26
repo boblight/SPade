@@ -52,6 +52,8 @@ namespace SPade.Grading
             //compile java program
             compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
 
+            File.AppendAllText("C:/Users/tongliang/Desktop/debugging.txt", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/");
+
             compileInfo.CreateNoWindow = true;
             compileInfo.UseShellExecute = false;
             compileInfo.WorkingDirectory = filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/";
