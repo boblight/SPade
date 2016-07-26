@@ -13,5 +13,7 @@ namespace SPade.ViewModels.Admin
         public List<string> Name { get; set; }
         public SPade.Models.DAL.Lecturer lecturer { get; set; }
         public SPade.Models.DAL.Class classes { get; set; }
+
+        
     }
 }

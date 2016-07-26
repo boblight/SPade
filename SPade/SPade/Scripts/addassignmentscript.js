@@ -45,11 +45,15 @@
 
         //$("input[id='cL']:checked"), function () {
 
-        //    l.push($(this));
+        //    l.push($(this).data("class-name"));
 
         //}
+
+        //console.log(l);
+
         var t = $("#cL").data("class-name");
-        $("#SelectedClasses").val(t);
+
+        $("#SelectedClasses").val(t)
 
     })
 
