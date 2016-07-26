@@ -54,7 +54,8 @@ namespace SPade.Controllers
 
                     string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
                     string submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
-                    var filePath = Server.MapPath(@"~/Submissions/" + submissionName);
+                    var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower());
+                    var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName + "/");
                     System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
 
                     if (fileDirectory.Exists)
@@ -72,7 +73,7 @@ namespace SPade.Controllers
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
                     //grade submission
-                    Grader grader = new Grader(filePath, fileName, assgnId, langUsed.LangageType);
+                    Grader grader = new Grader(filePathForGrade, fileName, assgnId, langUsed.LangageType);
                     decimal result = grader.grade();
 
                     submission.Grade = result;
