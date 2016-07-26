@@ -52,6 +52,8 @@ namespace SPade.Grading
             //compile java program
             compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
 
+            File.AppendAllText("C:/Users/tongliang/Desktop/debugging.txt", filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/");
+
             compileInfo.CreateNoWindow = true;
             compileInfo.UseShellExecute = false;
             compileInfo.WorkingDirectory = filePath + "/" + fileName + "/src/" + fileName.ToLower() + "/";
@@ -201,6 +203,10 @@ namespace SPade.Grading
                         }//end of foreach loop
                     }//end of checkW
 
+                    //if (!proc.WaitForExit(10000))
+                    //{
+                    //    proc.Kill();
+                    //}
                     proc.WaitForExit();
                 }//end of test case loop
 
@@ -379,6 +385,10 @@ namespace SPade.Grading
                         break; //break out of loop
 
                     }//check if error
+                    //if (!proc.WaitForExit(10000))
+                    //{
+                    //    proc.Kill();
+                    //}
                     proc.WaitForExit();
                 }
 
@@ -395,21 +405,21 @@ namespace SPade.Grading
             }
             catch (Exception ex)
             {
-                proc = Process.Start(procInfo);
+                //proc = Process.Start(procInfo);
 
-                if (!proc.WaitForExit(10000))
-                {
-                    isRun = false;//fail program if program failed to produce feedback after 10 seconds
-                    return isRun;
-                }
+                //if (!proc.WaitForExit(10000))
+                //{
+                //    isRun = false;//fail program if program failed to produce feedback after 10 seconds
+                //    return isRun;
+                //}
 
-                proc.WaitForExit();
+                //proc.WaitForExit();
 
-                //read output and error
-                error = proc.StandardError.ReadToEnd();
-                exitcode = proc.ExitCode; //0 means success 1 means failure
-                proc.WaitForExit();
-
+                ////read output and error
+                //error = proc.StandardError.ReadToEnd();
+                //exitcode = proc.ExitCode; //0 means success 1 means failure
+                //proc.WaitForExit();
+                File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", ex.Message);
             }
 
             return isRun;

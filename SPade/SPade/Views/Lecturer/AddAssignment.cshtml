@@ -1,0 +1,157 @@
+﻿@model SPade.ViewModels.Lecturer.AddAssignmentViewModel
+
+@{
+    ViewBag.Title = "Add Assignment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/addassignmentscripts")
+
+@using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data", id = "submitAssignmentForm" }))
+{
+    <div class="container">
+
+        <div class="col-md-4 col-md-offset-4 form-horizontal">
+            <fieldset>
+                <legend>Add Assignment</legend>
+
+                <p>1. To set a question, please type the question into the text area below.</p>
+                <p>
+                    2. Please ensure that solutions uploaded are working as the system will compile the
+                    solution uploaded.
+                </p>
+                <p>
+                    3. <a href="DownloadTestCase">
+                        <i class="glyphicon glyphicon-file"></i>Download
+                        this .xml file
+                    </a> and input the test cases in a similar format as presented inside.
+                </p>
+
+                <span class="help-block">
+                    <span class="text-danger" id="slnRunError">@TempData["GeneralError"]</span>
+                </span>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Assignment Name</label>
+                        @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control", @required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("AssgnTitle", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Assignment Module</label>
+                        @{
+                            @Html.DropDownListFor(c => Model.ModuleId, new SelectList(Model.Modules, "ModuleCode", "ModuleName"), new { @class = "form-control" })
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>
+                            Question
+                        </label>
+                        @Html.TextAreaFor(m => Model.Describe, new { @class = "col-md-12- form-control", @row = "4", @required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("Describe", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <!--Upload solutions file-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
+                        <input id="solutionsFilUpload" name="solutionsFileUpload" class="form-control" type="file" style="border: solid 1px red" />
+                        <span class="help-block">
+                            <span class="text-danger" id="testCaseError">@TempData["SlnWarning"]</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.CheckBoxFor(m => Model.IsTestCasePresent)
+                        This assignment requires testcases
+                        <input name="IsTestCasePresent" type="hidden" value="false" />
+                    </div>
+                </div>
+
+                <!--Upload test case-->
+                <div class="form-group" id="testCaseGroup">
+                    <div class="col-md-12">
+                        <label class="control-label" for="SolutionsFile">Upload Test Cases</label>
+                        <input id="testCaseUpload" name="testCaseUpload" class="form-control" type="file" style="border: solid 1px red" />
+                        <span class="help-block">
+                            <span class="text-danger" id="testCaseError">@TempData["TcWarning"]</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label" for="daterange">Select start and end date</label>
+                        @Html.TextBoxFor(m => Model.DateRange, new { @class = "form-control", @placeholder = "Select start and end date", @readonly = "true" })
+                        @Html.HiddenFor(m => Model.StartDate)
+                        @Html.HiddenFor(m => Model.DueDate)
+                        <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger", @id = "DateError", @name = "DateError" })</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">
+                            Select classes to allocate assignment to
+                        </label>
+                        @Html.TextBoxFor(m => m.SelectedClasses, new { @class = "form-control", @placeholder = "Select classes...", @readonly = "true" })
+                        <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">
+                            Select maximum attempts allowed
+                        </label>
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "1", @max = "10", @type = "number" })
+                        <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <div name="classModal" id="classModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Choose classes to allocate assignment to</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                @{
+                                    for (var i = 0; i < Model.ClassList.Count(); i++)
+                                    {
+                                        @Html.HiddenFor(m => Model.ClassList[i].ClassId)
+                                        @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
+                                        @Model.ClassList[i].ClassName
+                                    }
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button name="modalSelect" id="modalSelect" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
+                        <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+                                    }            
