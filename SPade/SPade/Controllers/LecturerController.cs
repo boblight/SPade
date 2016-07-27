@@ -14,7 +14,7 @@ using System.Web.Mvc;
 namespace SPade.Controllers
 {
 
-   //[Authorize(Roles = "Lecturer")]
+    [Authorize(Roles = "Lecturer")]
     public class LecturerController : Controller
     {
         //init the db
@@ -84,7 +84,8 @@ namespace SPade.Controllers
             var lecturerID = User.Identity.GetUserName();
 
             //get the assignments that this lecturer created
-            lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
+            //lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
+            lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedBy == null);
 
             //get the name of the classes assigned to an assignment 
             foreach (Assignment a in lecAssgn)
@@ -135,11 +136,11 @@ namespace SPade.Controllers
 
         public ActionResult AddAssignment()
         {
-
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            string x = "s1431489"; //temp 
+            //  string x = "s1431489"; //temp 
+            var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
@@ -177,11 +178,13 @@ namespace SPade.Controllers
                         string slnFilePath = "";
                         string slnName = (addAssgn.AssgnTitle).Replace(" ", "");
                         string actualFileName = "";
+                        string fileName = "";
 
                         //save the solution
+                        fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
                         var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
                         solutionsFileUpload.SaveAs(zipLocation);
-                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + slnName);
+                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
                         DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
                         if (fileDirectory.Exists)
                         {
@@ -197,14 +200,38 @@ namespace SPade.Controllers
                         fileDirectory.Create();
                         System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
 
-                        //get the actual folder name containing the submission
-                        string[] subDirectries = Directory.GetDirectories(slnFilePath);
+                        //access the solution + move the classname.java into a folder 
+                        var toLowerPath = fileName.ToLower();
+                        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                        Directory.CreateDirectory(path);
 
-                        foreach (string s in subDirectries)
+                        ////get the language and pass into grader
+                        ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+
+                        var ogPath = "";
+                        var newPath = "";
+
+                        if (lang.LangageType.Equals("Java"))
                         {
-                            var ew = s.Remove(0, slnFilePath.Length);
-                            actualFileName = ew.Replace(@"\", "");
+                            ogPath = slnFilePath + "/" + fileName + ".java";
+                            newPath = path + "/" + fileName + ".java";
                         }
+                        else if (lang.LangageType.Equals("C#"))
+                        {
+                            ogPath = slnFilePath + "/" + fileName + ".cs";
+                            newPath = path + "/" + fileName + ".cs";
+                        }
+
+                        System.IO.File.Move(ogPath, newPath);
+
+                        //get the actual folder name containing the submission
+                        //string[] subDirectries = Directory.GetDirectories(slnFilePath);
+
+                        //foreach (string s in subDirectries)
+                        //{
+                        //    var ew = s.Remove(0, slnFilePath.Length);
+                        //    actualFileName = ew.Replace(@"\", "");
+                        //}
 
                         //save the testcase
                         var filePath = Server.MapPath(@"~/TestCase/" + slnName + ".xml");
@@ -213,11 +240,18 @@ namespace SPade.Controllers
                         testCaseUpload.SaveAs(filePath);
 
                         ////get the language and pass into grader
-                        ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+                        //ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
 
-                        Grader g = new Grader(slnFilePath, actualFileName, slnName, lang.LangageType, true);
+                        Grader g = new Grader(slnFilePath, fileName, slnName, lang.LangageType, true);
 
-                        if (g.RunLecturerSolution() == true)
+                        //change running of lecturer from checking boolean to checking exitcode
+                        //1 is successfully done everything
+                        //2 is test case submitted could not be read
+                        //3 is program has failed to run
+                        //4 is program was caught in an infinite loop
+                        int exitCode = g.RunLecturerSolution();
+
+                        if (exitCode == 1)
                         {
                             //save to DB 
                             AddAssignmentToDB(addAssgn, true);
@@ -261,14 +295,31 @@ namespace SPade.Controllers
                             }
 
                             //delete the uploaded sln
+                            //DeleteFileWhenError(fileName, false);
                             DeleteFileWhenError(slnName, false);
                         }
-                        else
+                        else if (exitCode == 2)
                         {
                             //solution failed to run 
-                            DeleteFileWhenError(slnName, true);
+                            DeleteFileWhenError(fileName, true);
                             addAssgn.Modules = db.Modules.ToList();
-                            TempData["GeneralError"] = "Failed to run solution. Please reupload and try again.";
+                            TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
+                            return View(addAssgn);
+                        }
+                        else if (exitCode == 3)
+                        {
+                            //solution failed to run 
+                            DeleteFileWhenError(fileName, true);
+                            addAssgn.Modules = db.Modules.ToList();
+                            TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                            return View(addAssgn);
+                        }
+                        else if (exitCode == 4)
+                        {
+                            //solution failed to run 
+                            DeleteFileWhenError(fileName, true);
+                            addAssgn.Modules = db.Modules.ToList();
+                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
                             return View(addAssgn);
                         }
                     }
@@ -337,7 +388,7 @@ namespace SPade.Controllers
 
                         Grader g = new Grader(slnFilePath, actualFileName, slnName, lang.LangageType, false);
 
-                        if (g.RunLecturerSolution() == true)
+                        if (g.RunLecturerSolution() == 1)
                         {
                             //save to DB 
                             AddAssignmentToDB(addAssgn, false);

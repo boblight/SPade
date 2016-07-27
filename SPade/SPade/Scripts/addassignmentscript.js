@@ -41,19 +41,19 @@
 
     $("#modalSelect").click(function () {
 
-        var l = [];
+        $('input[type="checkbox"][name*="isSelected"]').each(function () {
+            if (this.checked) {
+                console.log($(this).data("class-name"));
+            }
+        })
 
-        $("input[id='cL']:checked"), function () {
+        console.log("cyka");
 
-            l.push($(this).val());
+        var t = $("#cL").data("class-name");
 
-        }
-
-        console.log(l);
+        $("#SelectedClasses").val(t)
 
     })
-
-    $("#testCaseGroup").hide();
 
     $("#IsTestCasePresent").click(function () {
 
