@@ -205,11 +205,24 @@ namespace SPade.Controllers
                         var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
                         Directory.CreateDirectory(path);
 
-                        var ogPath = slnFilePath + "/" + fileName + ".java";
-                        var newPath = path + "/" + fileName + ".java";
+                        ////get the language and pass into grader
+                        ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+
+                        var ogPath = "";
+                        var newPath = "";
+
+                        if (lang.LangageType.Equals("Java"))
+                        {
+                            ogPath = slnFilePath + "/" + fileName + ".java";
+                            newPath = path + "/" + fileName + ".java";
+                        }
+                        else if (lang.LangageType.Equals("C#"))
+                        {
+                            ogPath = slnFilePath + "/" + fileName + ".cs";
+                            newPath = path + "/" + fileName + ".cs";
+                        }
+
                         System.IO.File.Move(ogPath, newPath);
-
-
 
                         //get the actual folder name containing the submission
                         //string[] subDirectries = Directory.GetDirectories(slnFilePath);
@@ -227,11 +240,18 @@ namespace SPade.Controllers
                         testCaseUpload.SaveAs(filePath);
 
                         ////get the language and pass into grader
-                        ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+                        //ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
 
                         Grader g = new Grader(slnFilePath, fileName, slnName, lang.LangageType, true);
 
-                        if (g.RunLecturerSolution() == true)
+                        //change running of lecturer from checking boolean to checking exitcode
+                        //1 is successfully done everything
+                        //2 is test case submitted could not be read
+                        //3 is program has failed to run
+                        //4 is program was caught in an infinite loop
+                        int exitCode = g.RunLecturerSolution();
+
+                        if (exitCode == 1)
                         {
                             //save to DB 
                             AddAssignmentToDB(addAssgn, true);
@@ -275,14 +295,31 @@ namespace SPade.Controllers
                             }
 
                             //delete the uploaded sln
+                            //DeleteFileWhenError(fileName, false);
                             DeleteFileWhenError(slnName, false);
                         }
-                        else
+                        else if (exitCode == 2)
                         {
                             //solution failed to run 
-                            DeleteFileWhenError(slnName, true);
+                            DeleteFileWhenError(fileName, true);
                             addAssgn.Modules = db.Modules.ToList();
-                            TempData["GeneralError"] = "Failed to run solution. Please reupload and try again.";
+                            TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
+                            return View(addAssgn);
+                        }
+                        else if (exitCode == 3)
+                        {
+                            //solution failed to run 
+                            DeleteFileWhenError(fileName, true);
+                            addAssgn.Modules = db.Modules.ToList();
+                            TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                            return View(addAssgn);
+                        }
+                        else if (exitCode == 4)
+                        {
+                            //solution failed to run 
+                            DeleteFileWhenError(fileName, true);
+                            addAssgn.Modules = db.Modules.ToList();
+                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
                             return View(addAssgn);
                         }
                     }
@@ -351,7 +388,7 @@ namespace SPade.Controllers
 
                         Grader g = new Grader(slnFilePath, actualFileName, slnName, lang.LangageType, false);
 
-                        if (g.RunLecturerSolution() == true)
+                        if (g.RunLecturerSolution() == 1)
                         {
                             //save to DB 
                             AddAssignmentToDB(addAssgn, false);
