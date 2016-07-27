@@ -63,8 +63,7 @@ namespace SPade.Grading
             //pathToExecutable = "java -cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName;
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/Grade.exe");
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", "/hide_window " + "java -cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
-            //procInfo = new ProcessStartInfo("java", "-cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
-            procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " +  fileName.ToLower() + "." + fileName);
+            procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
         }//end of processForJava
 
         public void processForCS()
@@ -73,7 +72,7 @@ namespace SPade.Grading
             compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", "Program.cs");
             compileInfo.CreateNoWindow = true;
             compileInfo.UseShellExecute = false;
-            compileInfo.WorkingDirectory = filePath;
+            compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
             compile = Process.Start(compileInfo);
 
             compile.WaitForExit();//compilation process ends
@@ -82,7 +81,7 @@ namespace SPade.Grading
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", HttpContext.Current.Server.MapPath(@"~/Grading/Grade.exe"));
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\" ", "/hide_window " + filePath + "/" + fileName + "/" + fileName + "/bin/Debug/" + fileName + ".exe");
             //procInfo = new ProcessStartInfo(filePath + "/" + fileName + "/" + fileName + "/Program.exe");
-            procInfo = new ProcessStartInfo(filePath + "/" + fileName + ".exe");
+            procInfo = new ProcessStartInfo(filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe");
         }//end of processForCS
 
         public decimal grade()
@@ -128,6 +127,8 @@ namespace SPade.Grading
 
             ////once Grading process is done, retrive output and return to controller
             //return Decimal.Parse(File.ReadAllText(filePath + "/output.txt"));
+
+
 
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
@@ -203,11 +204,11 @@ namespace SPade.Grading
                         }//end of foreach loop
                     }//end of checkW
 
-                    //if (!proc.WaitForExit(10000))
-                    //{
-                    //    proc.Kill();
-                    //}
-                    proc.WaitForExit();
+                    if (!proc.WaitForExit(10000))
+                    {
+                        proc.Kill();
+                    }
+                    //proc.WaitForExit();
                 }//end of test case loop
 
                 //read output 
@@ -234,7 +235,14 @@ namespace SPade.Grading
             }
             catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
             {//start catch, application does not accept input
-                proc = Process.Start(procInfo);
+                try
+                {
+                    proc = Process.Start(procInfo);
+                }
+                catch (Exception exc)
+                {
+                    return 0;
+                }
 
                 if (!proc.WaitForExit(10000))
                 {
@@ -274,10 +282,8 @@ namespace SPade.Grading
             }//end of catch
         }//end of grade method
 
-        public bool RunLecturerSolution()
+        public int RunLecturerSolution()
         {
-            bool runSuccesfully = false;
-
             switch (language)
             {
                 case "Java":
@@ -299,28 +305,17 @@ namespace SPade.Grading
             procInfo.RedirectStandardOutput = true;
             procInfo.RedirectStandardInput = true;
 
-            //will run the appropriate method based on if they have testcases or not
             if (isTestCasePresnt == true)
             {
-                runSuccesfully = RunWithTestCase();
-            }
-            else if (isTestCasePresnt == false)
-            {
-                runSuccesfully = RunWithoutTestCase();
-            }
-
-            //to return to the controller if the solution has been ran successfully anot 
-            if (runSuccesfully == true)
-            {
-                return true;
+                return RunWithTestCase();
             }
             else
             {
-                return false;
+                return RunWithoutTestCase();
             }
-        }
+        }//
 
-        public bool RunWithTestCase()
+        public int RunWithTestCase()
         {
             //load test cases if any
             XmlDocument testCaseFile = new XmlDocument();
@@ -385,7 +380,12 @@ namespace SPade.Grading
                         break; //break out of loop
 
                     }
-                    proc.WaitForExit();
+                    if (!proc.WaitForExit(10000))
+                    {
+                        proc.Kill();
+                        return 4;
+                    }
+                    //proc.WaitForExit();
                 }
 
                 //create the solution file 
@@ -396,32 +396,21 @@ namespace SPade.Grading
                     slnDoc.Save(fP);
 
                     //solution has run successfully
-                    isRun = true;
+                    return 1;
+                }
+                else
+                {
+                    return 3;
                 }
             }
             catch (Exception ex)
             {
-                //proc = Process.Start(procInfo);
-
-                //if (!proc.WaitForExit(10000))
-                //{
-                //    isRun = false;//fail program if program failed to produce feedback after 10 seconds
-                //    return isRun;
-                //}
-
-                //proc.WaitForExit();
-
-                ////read output and error
-                //error = proc.StandardError.ReadToEnd();
-                //exitcode = proc.ExitCode; //0 means success 1 means failure
-                //proc.WaitForExit();
-                // File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", ex.Message);
+                //cannot load xml
+                return 2;
             }
-
-            return isRun;
         }
 
-        private bool RunWithoutTestCase()
+        private int RunWithoutTestCase()
         {
             try
             {
@@ -461,14 +450,14 @@ namespace SPade.Grading
                     slnDoc.Save(fP);
 
                     //solution has run successfully
-                    isRun = true;
+                    return 1;
                 }
             }
             catch (Exception e)
             {
                 File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", e.Message);
             }
-            return isRun;
+            return 1;
         }
 
     }//end of class
