@@ -235,7 +235,14 @@ namespace SPade.Grading
             }
             catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
             {//start catch, application does not accept input
-                proc = Process.Start(procInfo);
+                try
+                {
+                    proc = Process.Start(procInfo);
+                }
+                catch (Exception exc)
+                {
+                    return 0;
+                }
 
                 if (!proc.WaitForExit(10000))
                 {
