@@ -5,6 +5,8 @@ using SPade.Models.DAL;
 using SPade.ViewModels.Lecturer;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -56,10 +58,63 @@ namespace SPade.Controllers
 
         }
 
+        [HttpGet]
         public ActionResult BulkAddStudent()
         {
             return View();
         }
+
+        [HttpPost]
+        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        {
+            //Upload and save the file
+            // extract only the filename
+            var fileName = Path.GetFileName(file.FileName);
+            // store the file inside ~/App_Data/uploads folder
+            var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+            file.SaveAs(path);
+
+            //DataTable dt = new DataTable();
+            //dt.Columns.AddRange(new DataColumn[5] {
+            //new DataColumn("ClassID", typeof(int)),
+            //new DataColumn("AdminNo", typeof(string)),
+            //new DataColumn("Name",typeof(string)),
+            //new DataColumn("Email", typeof(string)),
+            //new DataColumn("Contact",typeof(string)) });
+
+            string[] lines = System.IO.File.ReadAllLines(path);
+            List<Student> slist = new List<Student>();
+            for (int i = 1; i < lines.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(lines[i]))
+                {
+                    Student s = new Student();
+                    s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
+                    s.AdminNo = lines[i].Split(',')[1];
+                    s.Name = lines[i].Split(',')[2];
+                    s.Email = lines[i].Split(',')[3];
+                    s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                    s.CreatedAt = DateTime.Now;
+                    s.CreatedBy = User.Identity.GetUserName();
+                    s.UpdatedAt = DateTime.Now;
+                    s.UpdatedBy = User.Identity.GetUserName();
+
+                    slist.Add(s);
+                    //dt.Rows.Add();
+                    //int i = 0;
+                    //foreach (string cell in row.Split(','))
+                    //{
+                    //    dt.Rows[dt.Rows.Count - 1][i] = cell;
+                    //    i++;
+                    //}
+                }
+            }
+            db.Students.AddRange(slist);
+            db.SaveChanges();
+
+            return View("ManageClassesAndStudents");
+        }
+
 
         public ActionResult ViewStudentsByClass(string classID)
         {
