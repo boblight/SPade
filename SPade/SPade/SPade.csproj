@@ -408,6 +408,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\Uploads\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="img\" />
     <Folder Include="Properties\" />
