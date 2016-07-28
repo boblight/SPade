@@ -408,7 +408,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="fonts\font-awesome\" />
-    <Folder Include="img\" />
+    <Folder Include="Migrations\img\" />
     <Folder Include="Properties\" />
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />

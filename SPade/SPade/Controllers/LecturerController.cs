@@ -583,6 +583,44 @@ namespace SPade.Controllers
             }
         }
 
+        public ActionResult UpdateAssignment()
+        {
+
+            //create model to store info to display
+            UpdateAssignmentViewModel model = new UpdateAssignmentViewModel();
+            //load lecAssgn list with assignments.
+            List<Assignment> lecAssgn = db.Assignments.ToList();
+            List<Class_Assgn> classList = db.Class_Assgn.ToList();
+
+            int x=2;
+
+            List<string> classAssgn = new List<string>();
+
+            //get the name of the classes assigned to an assignment 
+            foreach (Assignment a in lecAssgn)
+            {
+                if (a.AssignmentID.Equals(x))
+                {
+                    model.Assignment = a;
+                    model.AssgnTitle = a.AssgnTitle;
+                    model.Describe = a.Describe;
+                    model.Solution = a.Solution;
+                    model.ModuleId = a.ModuleCode;
+                    model.StartDate = a.StartDate;
+                    model.DueDate = a.DueDate;
+                    model.MaxAttempt = a.MaxAttempt;                    
+                   
+                }
+
+            }
+
+
+
+
+            return View(model);
+        }
+
+        [HttpPost]
         public ActionResult UpdateAssignment(int AssignmentId)
         {
             return View();
