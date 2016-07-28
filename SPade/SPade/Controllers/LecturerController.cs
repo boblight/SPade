@@ -213,6 +213,7 @@ namespace SPade.Controllers
                 ac.Add(a);
             }
 
+            aaVM.IsTestCasePresent = true;
             aaVM.ClassList = ac;
             aaVM.Modules = allModules;
 
@@ -231,9 +232,8 @@ namespace SPade.Controllers
                     {
                         //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
                         string slnFilePath = "";
-                        string slnName = (addAssgn.AssgnTitle).Replace(" ", "");
-                        string actualFileName = "";
-                        string fileName = "";
+                        string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
+                        string fileName = ""; //name of the solution uploaded
 
                         //save the solution
                         fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
@@ -255,7 +255,7 @@ namespace SPade.Controllers
                         fileDirectory.Create();
                         System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
 
-                        //access the solution + move the classname.java into a folder 
+                        //access the solution + move the classname.java/.cs into a folder 
                         var toLowerPath = fileName.ToLower();
                         var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
                         Directory.CreateDirectory(path);
@@ -279,25 +279,15 @@ namespace SPade.Controllers
 
                         System.IO.File.Move(ogPath, newPath);
 
-                        //get the actual folder name containing the submission
-                        //string[] subDirectries = Directory.GetDirectories(slnFilePath);
-
-                        //foreach (string s in subDirectries)
-                        //{
-                        //    var ew = s.Remove(0, slnFilePath.Length);
-                        //    actualFileName = ew.Replace(@"\", "");
-                        //}
-
                         //save the testcase
-                        var filePath = Server.MapPath(@"~/TestCase/" + slnName + ".xml");
+                        var filePath = Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
                         var fileInfo = new FileInfo(filePath);
                         fileInfo.Directory.Create();
                         testCaseUpload.SaveAs(filePath);
 
-                        ////get the language and pass into grader
-                        //ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+                        //get the language and pass into grader
 
-                        Grader g = new Grader(slnFilePath, fileName, slnName, lang.LangageType, true);
+                        Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
 
                         //change running of lecturer from checking boolean to checking exitcode
                         //1 is successfully done everything
@@ -308,71 +298,34 @@ namespace SPade.Controllers
 
                         if (exitCode == 1)
                         {
-                            //save to DB 
-                            AddAssignmentToDB(addAssgn, true);
-
-                            //get the ID to rename the files
-                            var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First();
-
-                            // rename the file
-                            string testCasePath = Server.MapPath(@"~/TestCase/");
-                            string solutionPath = Server.MapPath(@"~/Solutions/");
-
-                            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
-                            {
-                                if (f.Name == slnName + ".xml") //to be renamed
-                                {
-                                    var sourcePath = solutionPath + f.Name;
-                                    var destPath = solutionPath + assgnID + "solution.xml";
-                                    FileInfo info = new FileInfo(sourcePath);
-                                    info.MoveTo(destPath);
-
-                                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
-
-                                    foreach (Assignment a in query)
-                                    {
-                                        a.Solution = assgnID + "solution.xml";
-                                    }
-                                    db.SaveChanges();
-                                }
-                            }
-
-                            //rename the testcase
-                            foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
-                            {
-                                if (f.Name == slnName + ".xml")
-                                {
-                                    var sourcePath = testCasePath + f.Name;
-                                    var destPath = testCasePath + assgnID + "testcase.xml";
-                                    FileInfo info = new FileInfo(sourcePath);
-                                    info.MoveTo(destPath);
-                                }
-                            }
+                            //save to DB + rename solution/testcase
+                            AddAssignmentToDB(addAssgn, fileName, true);
 
                             //delete the uploaded sln
-                            //DeleteFileWhenError(fileName, false);
-                            DeleteFileWhenError(slnName, false);
-                        }
+                            DeleteFile(fileName, assignmentTitle, false);
+
+                        }//end of run succesfully method 
+
                         else if (exitCode == 2)
                         {
-                            //solution failed to run 
-                            DeleteFileWhenError(fileName, true);
+                            DeleteFile(fileName, assignmentTitle, true);
                             addAssgn.Modules = db.Modules.ToList();
                             TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
                             return View(addAssgn);
                         }
+
                         else if (exitCode == 3)
                         {
                             //solution failed to run 
-                            DeleteFileWhenError(fileName, true);
+                            DeleteFile(fileName, assignmentTitle, true);
                             addAssgn.Modules = db.Modules.ToList();
                             TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
                             return View(addAssgn);
                         }
                         else if (exitCode == 4)
                         {
-                            //solution failed to run 
-                            DeleteFileWhenError(fileName, true);
+                            //solution stuck in infinite loop
+                            DeleteFile(fileName, assignmentTitle, true);
                             addAssgn.Modules = db.Modules.ToList();
                             TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
                             return View(addAssgn);
@@ -397,7 +350,7 @@ namespace SPade.Controllers
                     TempData["TcWarning"] = err;
                     return View(addAssgn);
                 }
-            }
+            }//end of run with testcase
 
             //run without testcase 
             else if (addAssgn.IsTestCasePresent == false)
@@ -407,13 +360,14 @@ namespace SPade.Controllers
                     if (solutionsFileUpload.ContentLength > 0)
                     {
                         string slnFilePath = "";
-                        string slnName = (addAssgn.AssgnTitle).Replace(" ", "");
-                        string actualFileName = "";
+                        string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
+                        string fileName = "";
 
                         //save the solution
+                        fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
                         var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
                         solutionsFileUpload.SaveAs(zipLocation);
-                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + slnName);
+                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
                         DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
                         if (fileDirectory.Exists)
                         {
@@ -429,60 +383,50 @@ namespace SPade.Controllers
                         fileDirectory.Create();
                         System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
 
-                        //get the actual folder name containing the submission
-                        string[] subDirectries = Directory.GetDirectories(slnFilePath);
-
-                        foreach (string s in subDirectries)
-                        {
-                            var ew = s.Remove(0, slnFilePath.Length);
-                            actualFileName = ew.Replace(@"\", "");
-                        }
+                        //access the solution + move the classname.java/.cs into a folder 
+                        var toLowerPath = fileName.ToLower();
+                        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                        Directory.CreateDirectory(path);
 
                         //get the language and pass into grader
                         ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
 
-                        Grader g = new Grader(slnFilePath, actualFileName, slnName, lang.LangageType, false);
+                        //get the appropirate file and move the file accordingly
+                        var ogPath = "";
+                        var newPath = "";
 
-                        if (g.RunLecturerSolution() == 1)
+                        if (lang.LangageType.Equals("Java"))
                         {
-                            //save to DB 
-                            AddAssignmentToDB(addAssgn, false);
+                            ogPath = slnFilePath + "/" + fileName + ".java";
+                            newPath = path + "/" + fileName + ".java";
+                        }
+                        else if (lang.LangageType.Equals("C#"))
+                        {
+                            ogPath = slnFilePath + "/" + fileName + ".cs";
+                            newPath = path + "/" + fileName + ".cs";
+                        }
 
-                            //get the ID to rename the files
-                            var assgnID = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First();
+                        System.IO.File.Move(ogPath, newPath);
 
-                            // rename the file
-                            string solutionPath = Server.MapPath(@"~/Solutions/");
+                        Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
 
-                            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
-                            {
-                                if (f.Name == slnName + ".xml") //to be renamed
-                                {
-                                    var sourcePath = solutionPath + f.Name;
-                                    var destPath = solutionPath + assgnID + "solution.xml";
-                                    FileInfo info = new FileInfo(sourcePath);
-                                    info.MoveTo(destPath);
+                        int exitCode = g.RunLecturerSolution();
 
-                                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnID select Assignment;
-
-                                    foreach (Assignment a in query)
-                                    {
-                                        a.Solution = assgnID + "solution.xml";
-                                    }
-                                    db.SaveChanges();
-                                }
-                            }
+                        if (exitCode == 1)
+                        {
+                            //save to DB + rename solution file
+                            AddAssignmentToDB(addAssgn, fileName, false);
 
                             //delete the uploaded sln
-                            DeleteFileWhenError(slnName, false);
+                            DeleteFile(fileName, assignmentTitle, false);
 
                         }
-                        else
+                        else if (exitCode == 3)
                         {
                             //solution failed to run 
-                            DeleteFileWhenError(slnName, false);
+                            DeleteFile(fileName, assignmentTitle, false);
                             addAssgn.Modules = db.Modules.ToList();
-                            TempData["GeneralError"] = "Failed to run solution. Please reupload and try again.";
+                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
                             return View(addAssgn);
                         }
                     }
@@ -501,22 +445,60 @@ namespace SPade.Controllers
                     TempData["SlnWarning"] = "Uploaded file is invalid ! Please try again.";
                     return View(addAssgn);
                 }
-            }
+            }//end of run without testcase
 
             //everything all okay 
-            return RedirectToAction("Dashboard", "Lecturer");
+            return RedirectToAction("ManageAssignments", "Lecturer");
         }
 
+        //used to move the class file into the subfolder in order for it to be compiled
+        //THIS IS BROKEN. PAY NO MIND TO IT
+
+        //public bool MoveFileToSubFolder(string fileName, string slnFilePath, string assignmentTitle, ProgLanguage lang, bool isTestCasePresent)
+        //{
+        //    bool saveStatus = false;
+
+        //    try
+        //    {
+        //        //access the solution + move the classname.java/.cs into a folder 
+        //        var toLowerPath = fileName.ToLower();
+        //        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+        //        Directory.CreateDirectory(path);
+
+        //        //get the appropirate file and move the file accordingly
+        //        var ogPath = "";
+        //        var newPath = "";
+
+        //        if (lang.LangageType.Equals("Java"))
+        //        {
+        //            ogPath = slnFilePath + "/" + fileName + ".java";
+        //            newPath = path + "/" + fileName + ".java";
+        //        }
+        //        else if (lang.LangageType.Equals("C#"))
+        //        {
+        //            ogPath = slnFilePath + "/" + fileName + ".cs";
+        //            newPath = path + "/" + fileName + ".cs";
+        //        }
+
+        //        System.IO.File.Move(ogPath, newPath);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        saveStatus = true;
+        //    }
+        //    return saveStatus;
+        //}
+
         //used to insert the data into DB. 
-        public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, bool isTestCase)
+        public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
         {
             //now to add into the DB
             Assignment newAssignment = new Assignment();
             Class_Assgn classAssgn = new Class_Assgn();
             List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
-            string slnName = (addAssgn.AssgnTitle).Replace(" ", "");
+            string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
 
-            addAssgn.Solution = "~/Solutions/" + slnName + ".xml";
+            addAssgn.Solution = "~/Solutions/" + assignmentTitle + ".xml";
 
             newAssignment.AssgnTitle = addAssgn.AssgnTitle;
             newAssignment.Describe = addAssgn.Describe;
@@ -539,7 +521,7 @@ namespace SPade.Controllers
             }
             catch (Exception ex)
             {
-                DeleteFileWhenError(slnName, isTestCase);
+                DeleteFile(fileName, assignmentTitle, isTestCase);
                 addAssgn.Modules = db.Modules.ToList();
                 TempData["GeneralError"] = "Failed to add assignment. Please try again.";
                 return View(addAssgn);
@@ -563,21 +545,62 @@ namespace SPade.Controllers
                     }
                     catch (Exception ex)
                     {
-                        DeleteFileWhenError(slnName, isTestCase);
+                        DeleteFile(fileName, assignmentTitle, isTestCase);
                         addAssgn.Modules = db.Modules.ToList();
                         TempData["GeneralError"] = "Failed to add assignment. Please try again.";
-                        return View(addAssgn);
+                        return View("AddAssignment", addAssgn);
                     }
                 }
             }
+
+            //rename the solution here
+            var solutionPath = Server.MapPath(@"~/Solutions/");
+
+            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
+            {
+                if (f.Name == assignmentTitle + ".xml")
+                {
+                    var sourcePath = solutionPath + f.Name;
+                    var destPath = solutionPath + assgnId + "solution.xml";
+                    FileInfo info = new FileInfo(sourcePath);
+                    info.MoveTo(destPath);
+
+                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnId select Assignment;
+
+                    //update the DB to reflect the change of name for the solution
+                    foreach (Assignment a in query)
+                    {
+                        a.Solution = "~/Solutions/" + assgnId + "solution.xml";
+                    }
+                    db.SaveChanges();
+                }
+            }
+
+            //rename the testcase IF there is one 
+            if (isTestCase == true)
+            {
+                var testCasePath = Server.MapPath(@"~/TestCase/");
+
+                foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                {
+                    if (f.Name == assignmentTitle + ".xml")
+                    {
+                        var sourcePath = testCasePath + f.Name;
+                        var destPath = testCasePath + assgnId + "testcase.xml";
+                        FileInfo info = new FileInfo(sourcePath);
+                        info.MoveTo(destPath);
+                    }
+                }
+            }
+
             return null;
         }
 
         //used to delete files when something goes wrong somewhere
-        private void DeleteFileWhenError(string assgnTitle, bool isTestCase)
+        private void DeleteFile(string fileName, string assgnTitle, bool isTestCase)
         {
             //delete their solution + testcase 
-            var tempPath = Server.MapPath(@"~/TempSubmissions/" + assgnTitle);
+            var tempPath = Server.MapPath(@"~/TempSubmissions/" + fileName);
             var tempPath2 = Server.MapPath(@"~/TestCase/");
 
             DirectoryInfo di;

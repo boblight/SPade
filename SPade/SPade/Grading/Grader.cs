@@ -20,7 +20,7 @@ namespace SPade.Grading
         private List<object> testcases = new List<object>();
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
-        private bool isRun = false, isTestCasePresnt = false;
+        private bool isTestCasePresnt = false;
         private string[] arguments;
         XmlNode docNode, bodyNode, solutionsNode;
         XmlDocument slnDoc = new XmlDocument();
@@ -305,6 +305,7 @@ namespace SPade.Grading
             procInfo.RedirectStandardOutput = true;
             procInfo.RedirectStandardInput = true;
 
+            //run the appropirate method based off a testcase is present or not
             if (isTestCasePresnt == true)
             {
                 return RunWithTestCase();
@@ -313,7 +314,7 @@ namespace SPade.Grading
             {
                 return RunWithoutTestCase();
             }
-        }//
+        }
 
         public int RunWithTestCase()
         {
@@ -410,7 +411,7 @@ namespace SPade.Grading
             }
         }
 
-        private int RunWithoutTestCase()
+        public int RunWithoutTestCase()
         {
             try
             {
@@ -428,7 +429,6 @@ namespace SPade.Grading
                 //read the output from the program
                 if (error.Equals(""))
                 {
-
                     subOut = proc.StandardOutput.ReadToEnd();
 
                     solutionsNode = slnDoc.CreateElement("solution");
@@ -439,6 +439,7 @@ namespace SPade.Grading
                 {
                     //program given fail if an error was encountered
                     programFailed = true;
+                    exitcode = 3;
                 }
                 proc.WaitForExit();
 
@@ -450,14 +451,19 @@ namespace SPade.Grading
                     slnDoc.Save(fP);
 
                     //solution has run successfully
-                    return 1;
+                    exitcode = 1;
+
                 }
             }
             catch (Exception e)
             {
-                File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", e.Message);
+                //File.AppendAllText("C:/Users/tongliang/Desktop/Exception.txt", e.Message);
+
+                //any exception
+                exitcode = 3;
+
             }
-            return 1;
+            return exitcode;
         }
 
     }//end of class
