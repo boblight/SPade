@@ -237,8 +237,6 @@ namespace SPade.Controllers
 
             memoryStream.Seek(0, SeekOrigin.Begin);
             return File(memoryStream, "application/zip", zipname);
-
-
         }
 
         private class DBres
