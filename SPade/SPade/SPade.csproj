@@ -328,6 +328,7 @@
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.csv.min.js" />
     <Content Include="Scripts\jquery.tablesorter.combined.js" />
     <Content Include="Scripts\jquery.tablesorter.js" />
     <Content Include="Scripts\jquery.tablesorter.min.js" />
@@ -407,8 +408,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\Uploads\" />
     <Folder Include="fonts\font-awesome\" />
-    <Folder Include="img\" />
+    <Folder Include="Migrations\img\" />
     <Folder Include="Properties\" />
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />
