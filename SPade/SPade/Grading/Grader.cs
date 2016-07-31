@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Web;
-using System.IO;
 using System.Xml;
 
 namespace SPade.Grading
@@ -21,7 +20,7 @@ namespace SPade.Grading
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private bool isTestCasePresnt = false;
-        private string[] arguments;
+        private string[] arguments; //to be used for sandboxing
         XmlNode docNode, bodyNode, solutionsNode;
         XmlDocument slnDoc = new XmlDocument();
 
@@ -184,54 +183,42 @@ namespace SPade.Grading
                     else
                     {
                         //program given fail if an error was encountered
-                        programFailed = true;
-                        sw.Close();
-                        break; //break out of loop
+                        return 2; //program fails to run
                     }//check if error
 
-                    if (programFailed == false) //method only run if no error/have proper error handling in submitted program
+                    //get the output from solution
+                    solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
+                    XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
+                    //loop through all the solutions to find matching
+                    foreach (XmlNode solution in solutions)
                     {
-                        //get the output from solution
-                        solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
-                        XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
-                        //loop through all the solutions to find matching                        
-                        foreach (XmlNode solution in solutions)
+                        if (subOut.Equals(solution.InnerText))
                         {
-                            if (subOut.Equals(solution.InnerText))
-                            {
-                                testCasePassed++;
-                            }
-                        }//end of foreach loop
-                    }//end of checkW
+                            testCasePassed++;
+                        }
+                    }//end of foreach loop
 
                     if (!proc.WaitForExit(10000))
                     {
                         proc.Kill();
+                        return 3;//infinite loop
                     }
-                    //proc.WaitForExit();
                 }//end of test case loop
 
-                //read output 
-                if (programFailed == false)
-                {
-                    return (testCasePassed / noOfTestCase);
-                }
-                else
-                {
-                    //error logging
-                    //to be deleted at final product
-                    File.AppendAllText("C:/Users/tongliang/Desktop/error.txt", error);
+                //else
+                //{
+                //    //terminate sandboxie if program fails
+                //    Process terminateSandbox = new Process();
+                //    terminateSandbox.StartInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"  /terminate_all");
+                //    terminateSandbox.StartInfo.CreateNoWindow = true;
+                //    terminateSandbox.StartInfo.UseShellExecute = false;
+                //    terminateSandbox.Start();
+                //    terminateSandbox.WaitForExit();
 
-                    //terminate sandboxie if program fails
-                    Process terminateSandbox = new Process();
-                    terminateSandbox.StartInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"  /terminate_all");
-                    terminateSandbox.StartInfo.CreateNoWindow = true;
-                    terminateSandbox.StartInfo.UseShellExecute = false;
-                    terminateSandbox.Start();
-                    terminateSandbox.WaitForExit();
+                //    return 2; //program failure
+                //}
 
-                    return 0;
-                }
+                return (testCasePassed / noOfTestCase); //return results
             }
             catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
             {//start catch, application does not accept input
@@ -241,12 +228,12 @@ namespace SPade.Grading
                 }
                 catch (Exception exc)
                 {
-                    return 0;
+                    return 2; //return error code if program failed to run
                 }
 
                 if (!proc.WaitForExit(10000))
                 {
-                    return 0;//fail program if program failed to produce feedback after 10 seconds
+                    return 3; //return error code if program failed to produce feedback after 10 seconds
                 }
 
                 proc.WaitForExit();
@@ -260,7 +247,7 @@ namespace SPade.Grading
                 ans = proc.StandardOutput.ReadToEnd();
 
                 //get the output from solution
-                // get the output from solution
+                //get the output from solution
                 solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
                 solOut = solutionFile.SelectSingleNode("/body/solution").InnerText;
 
@@ -277,7 +264,7 @@ namespace SPade.Grading
                 }
                 else //means fail
                 {
-                    return 0; //debug
+                    return 2;//program failure
                 }
             }//end of catch
         }//end of grade method
