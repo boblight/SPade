@@ -263,6 +263,7 @@
     <Compile Include="ViewModels\Admin\ManageClassViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageStudentViewModel.cs" />
+    <Compile Include="ViewModels\Admin\PurgeViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateClassViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateStudentViewModel.cs" />
@@ -400,6 +401,7 @@
     <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
+    <Content Include="Views\Admin\Purge.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

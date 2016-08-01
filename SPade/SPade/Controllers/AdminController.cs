@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using SPade.Models.DAL;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
+using System.IO;
 
 namespace SPade.Controllers
 {
@@ -25,14 +26,17 @@ namespace SPade.Controllers
         {
             return View();
         }
+
         public ActionResult BulkAddLecturer()
         {
             return View();
         }
+
         public ActionResult BulkAddStudent()
         {
             return View();
         }
+
         [HttpPost]
         public ActionResult AddOneStudent(AddStudentViewModel model)
         {
@@ -205,7 +209,7 @@ namespace SPade.Controllers
 
 
 
-            
+
             return View();
         }
         public ActionResult ManageStudent()
@@ -544,19 +548,143 @@ namespace SPade.Controllers
                                 ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
                             }
                         }
-
                     }
-
                 }
             }
 
             return View(model);
-
         }
 
+        public ActionResult Purge()
+        {
+            PurgeViewModel pvm = new PurgeViewModel();
 
+            pvm.allAssignments = db.Assignments.ToList();
+            pvm.allSubmission = db.Submissions.ToList();
+            pvm.allClasses = db.Classes.ToList();
+            pvm.classAssgnRel = db.Class_Assgn.ToList();
 
+            return View(pvm);
+        }
 
+        [HttpPost]
+        public ActionResult Purge(PurgeViewModel pvm, FormCollection formCollection)
+        {
+            bool subCulled = false;
 
+            if (formCollection["assgnSelected"] != null)
+            {
+                string[] input = formCollection["assgnSelected"].Split(',');
+                foreach (string s in input)
+                {
+                    int assgnId = Int32.Parse(s);
+
+                    //each string is an id of assignment to be deleted
+                    //to purge assignment solutions and testcase
+                    //purge from db including relationship with classes
+
+                    //purge solutions
+                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(Server.MapPath(@"~/Solutions/"));
+                    if (fileDirectory.Exists)
+                    {
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            if (files.Name.Replace("solution.xml", "").Equals(s))
+                            {
+                                files.Delete();//delete all files in directory
+                            }
+                        }
+                    }//end of removing solutions
+
+                    //purge testcase
+                    fileDirectory = new DirectoryInfo(Server.MapPath(@"~/TestCase/"));
+                    if (fileDirectory.Exists)
+                    {
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            if (files.Name.Replace("testcase.xml", "").Equals(s))
+                            {
+                                files.Delete();//delete all files in directory
+                            }
+                        }
+                    }//end of removing testcases
+
+                    //remove assignments from db
+                    List<Class_Assgn> caToCull = db.Class_Assgn.ToList().FindAll(ca => ca.AssignmentID == assgnId);
+                    foreach (Class_Assgn ca in caToCull)
+                    {
+                        db.Class_Assgn.Remove(ca);
+                    }
+
+                    //cullsubmissions first
+                    List<Submission> subToCull = db.Submissions.ToList().FindAll(sub => sub.AssignmentID == assgnId);
+                    foreach (Submission sub in subToCull)
+                    {
+                        //purge submissions folder
+                        fileDirectory = new DirectoryInfo(Server.MapPath(@"~/Submissions/" + sub.FilePath));
+
+                        if (fileDirectory.Exists)
+                        {
+                            foreach (FileInfo files in fileDirectory.GetFiles())
+                            {
+                                files.Delete();//delete all files in directory
+                            }
+                            foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                            {
+                                dir.Delete(true);
+                            }
+                        }//end of removing submissions
+                        fileDirectory.Delete(true);
+                        db.Submissions.Remove(sub);
+                        subCulled = true;
+                    }
+
+                    //cull assignment
+                    List<Assignment> assgnToCull = db.Assignments.ToList().FindAll(a => a.AssignmentID == assgnId);
+                    foreach (Assignment a in assgnToCull)
+                    {
+                        db.Assignments.Remove(a);
+                    }
+
+                    db.SaveChanges();
+
+                }//end of foreach
+            }
+            else if (formCollection["subSelected"] != null && subCulled == false)
+            {
+                string[] subInput = formCollection["subSelected"].Split(',');
+                foreach (string s in subInput)
+                {
+                    int subId = Int32.Parse(s);
+
+                    //each string is submissions to be deleted
+                    //System.IO.File.AppendAllText("C:/Users/tongliang/Desktop/testSubOutput.txt", s + "\n");
+
+                    Submission sub = db.Submissions.ToList().Find(su => su.SubmissionID == subId);
+
+                    //purge submissions folder
+                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(Server.MapPath(@"~/Submissions/" + sub.FilePath));
+
+                    if (fileDirectory.Exists)
+                    {
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            files.Delete();//delete all files in directory
+                        }
+                        foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                        {
+                            dir.Delete(true);
+                        }
+                        fileDirectory.Delete(true);
+                    }//end of removing submissions
+
+                    //remove from db
+                    db.Submissions.Remove(sub);
+                    db.SaveChanges();
+                }//end of foreach
+            }
+
+            return RedirectToAction("Purge");
+        }//end of purge controller method
     }
 }
