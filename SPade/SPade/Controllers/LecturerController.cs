@@ -230,104 +230,114 @@ namespace SPade.Controllers
                 {
                     if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                     {
-                        //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
-                        string slnFilePath = "";
-                        string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
-                        string fileName = ""; //name of the solution uploaded
-
-                        //save the solution
-                        fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
-                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
-                        solutionsFileUpload.SaveAs(zipLocation);
-                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
-                        DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
-                        if (fileDirectory.Exists)
+                        if (solutionsFileUpload.ContentLength > 104857600)
                         {
-                            foreach (FileInfo files in fileDirectory.GetFiles())
+                            //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
+                            string slnFilePath = "";
+                            string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
+                            string fileName = ""; //name of the solution uploaded
+
+                            //save the solution
+                            fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
+                            var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
+                            solutionsFileUpload.SaveAs(zipLocation);
+                            slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                            DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+                            if (fileDirectory.Exists)
                             {
-                                files.Delete();
+                                foreach (FileInfo files in fileDirectory.GetFiles())
+                                {
+                                    files.Delete();
+                                }
+                                foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                {
+                                    dir.Delete(true);
+                                }
                             }
-                            foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                            fileDirectory.Create();
+                            System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+
+                            //access the solution + move the classname.java/.cs into a folder 
+                            var toLowerPath = fileName.ToLower();
+                            var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                            Directory.CreateDirectory(path);
+
+                            ////get the language and pass into grader
+                            ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+
+                            var ogPath = "";
+                            var newPath = "";
+
+                            if (lang.LangageType.Equals("Java"))
                             {
-                                dir.Delete(true);
+                                ogPath = slnFilePath + "/" + fileName + ".java";
+                                newPath = path + "/" + fileName + ".java";
+                            }
+                            else if (lang.LangageType.Equals("C#"))
+                            {
+                                ogPath = slnFilePath + "/" + fileName + ".cs";
+                                newPath = path + "/" + fileName + ".cs";
+                            }
+
+                            System.IO.File.Move(ogPath, newPath);
+
+                            //save the testcase
+                            var filePath = Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
+                            var fileInfo = new FileInfo(filePath);
+                            fileInfo.Directory.Create();
+                            testCaseUpload.SaveAs(filePath);
+
+                            //get the language and pass into grader
+
+                            Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
+
+                            //change running of lecturer from checking boolean to checking exitcode
+                            //1 is successfully done everything
+                            //2 is test case submitted could not be read
+                            //3 is program has failed to run
+                            //4 is program was caught in an infinite loop
+                            int exitCode = g.RunLecturerSolution();
+
+                            if (exitCode == 1)
+                            {
+                                //save to DB + rename solution/testcase
+                                AddAssignmentToDB(addAssgn, fileName, true);
+
+                                //delete the uploaded sln
+                                DeleteFile(fileName, assignmentTitle, false);
+
+                            }//end of run succesfully method 
+
+                            else if (exitCode == 2)
+                            {
+                                DeleteFile(fileName, assignmentTitle, true);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
+                                return View(addAssgn);
+                            }
+
+                            else if (exitCode == 3)
+                            {
+                                //solution failed to run 
+                                DeleteFile(fileName, assignmentTitle, true);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                                return View(addAssgn);
+                            }
+                            else if (exitCode == 4)
+                            {
+                                //solution stuck in infinite loop
+                                DeleteFile(fileName, assignmentTitle, true);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                return View(addAssgn);
                             }
                         }
-                        fileDirectory.Create();
-                        System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
-
-                        //access the solution + move the classname.java/.cs into a folder 
-                        var toLowerPath = fileName.ToLower();
-                        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
-                        Directory.CreateDirectory(path);
-
-                        ////get the language and pass into grader
-                        ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
-
-                        var ogPath = "";
-                        var newPath = "";
-
-                        if (lang.LangageType.Equals("Java"))
+                        else
                         {
-                            ogPath = slnFilePath + "/" + fileName + ".java";
-                            newPath = path + "/" + fileName + ".java";
-                        }
-                        else if (lang.LangageType.Equals("C#"))
-                        {
-                            ogPath = slnFilePath + "/" + fileName + ".cs";
-                            newPath = path + "/" + fileName + ".cs";
-                        }
-
-                        System.IO.File.Move(ogPath, newPath);
-
-                        //save the testcase
-                        var filePath = Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
-                        var fileInfo = new FileInfo(filePath);
-                        fileInfo.Directory.Create();
-                        testCaseUpload.SaveAs(filePath);
-
-                        //get the language and pass into grader
-
-                        Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
-
-                        //change running of lecturer from checking boolean to checking exitcode
-                        //1 is successfully done everything
-                        //2 is test case submitted could not be read
-                        //3 is program has failed to run
-                        //4 is program was caught in an infinite loop
-                        int exitCode = g.RunLecturerSolution();
-
-                        if (exitCode == 1)
-                        {
-                            //save to DB + rename solution/testcase
-                            AddAssignmentToDB(addAssgn, fileName, true);
-
-                            //delete the uploaded sln
-                            DeleteFile(fileName, assignmentTitle, false);
-
-                        }//end of run succesfully method 
-
-                        else if (exitCode == 2)
-                        {
-                            DeleteFile(fileName, assignmentTitle, true);
+                            //uploaded file is more than 150MB
                             addAssgn.Modules = db.Modules.ToList();
-                            TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
-                            return View(addAssgn);
-                        }
-
-                        else if (exitCode == 3)
-                        {
-                            //solution failed to run 
-                            DeleteFile(fileName, assignmentTitle, true);
-                            addAssgn.Modules = db.Modules.ToList();
-                            TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
-                            return View(addAssgn);
-                        }
-                        else if (exitCode == 4)
-                        {
-                            //solution stuck in infinite loop
-                            DeleteFile(fileName, assignmentTitle, true);
-                            addAssgn.Modules = db.Modules.ToList();
-                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                            TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
                             return View(addAssgn);
                         }
                     }
@@ -647,7 +657,7 @@ namespace SPade.Controllers
             List<Assignment> lecAssgn = db.Assignments.ToList();
             List<Class_Assgn> classList = db.Class_Assgn.ToList();
 
-            int x=2;
+            int x = 2;
 
             List<string> classAssgn = new List<string>();
 
@@ -663,8 +673,8 @@ namespace SPade.Controllers
                     model.ModuleId = a.ModuleCode;
                     model.StartDate = a.StartDate;
                     model.DueDate = a.DueDate;
-                    model.MaxAttempt = a.MaxAttempt;                    
-                   
+                    model.MaxAttempt = a.MaxAttempt;
+
                 }
 
             }

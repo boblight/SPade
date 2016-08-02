@@ -24,21 +24,16 @@ namespace SPade.ViewModels.Lecturer
         [Required]
         public string Solution { get; set; }
 
-        [Required]
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="Please select a due date !")]
         [Display(Name = "Due Date")]
         public DateTime DueDate { get; set; }
 
         [Required]
         [Display(Name = "Max Attempts")]
         public int MaxAttempt { get; set; }
-
-        [Required(ErrorMessage = "Please select  a date range")]
-        [Display(Name = "Assignment date range")]
-        public string DateRange { get; set; }
 
         [Required(ErrorMessage = "Please select classes to assign to")]
         [Display(Name = "assigned classes")]
