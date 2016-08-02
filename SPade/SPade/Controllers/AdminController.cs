@@ -11,6 +11,9 @@ using SPade.Models.DAL;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace SPade.Controllers
 {
@@ -602,7 +605,7 @@ namespace SPade.Controllers
             string x = "s4444444";
             List<Lecturer> Lecturers = db.Lecturers.ToList();
             if (command.Equals("Update"))
-            {   
+            {
                 //Update functionality
                 foreach (Lecturer L in Lecturers)
                 {
@@ -697,7 +700,7 @@ namespace SPade.Controllers
             string x = "a1111111";
             List<Admin> Admins = db.Admins.ToList();
             if (command.Equals("Update"))
-            {   
+            {
                 //Update Functionality
                 foreach (Admin A in Admins)
                 {
@@ -759,6 +762,141 @@ namespace SPade.Controllers
             return View(model);
         }
 
+        public ActionResult Purge()
+        {
+            PurgeViewModel pvm = new PurgeViewModel();
+
+            pvm.allAssignments = db.Assignments.ToList();
+            pvm.allSubmission = db.Submissions.ToList();
+            pvm.allClasses = db.Classes.ToList();
+            pvm.classAssgnRel = db.Class_Assgn.ToList();
+
+            return View(pvm);
+        }
+
+        [HttpPost]
+        public ActionResult Purge(PurgeViewModel pvm, FormCollection formCollection)
+        {
+            bool subCulled = false;
+            if (formCollection["assgnSelected"] != null)
+            {
+                string[] input = formCollection["assgnSelected"].Split(',');
+                foreach (string s in input)
+                {
+                    int assgnId = Int32.Parse(s);
+                    //each string is an id of assignment to be deleted
+                    //to purge assignment solutions and testcase
+                    //purge from db including relationship with classes
+
+                    //purge solutions
+                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(Server.MapPath(@"~/Solutions/"));
+                    if (fileDirectory.Exists)
+                    {
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            if (files.Name.Replace("solution.xml", "").Equals(s))
+                            {
+                                files.Delete();//delete all files in directory
+                            }
+                        }
+                    }//end of removing solutions
+
+                    //purge testcase
+                    fileDirectory = new DirectoryInfo(Server.MapPath(@"~/TestCase/"));
+                    if (fileDirectory.Exists)
+                    {
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            if (files.Name.Replace("testcase.xml", "").Equals(s))
+                            {
+                                files.Delete();//delete all files in directory
+                            }
+                        }
+                    }//end of removing testcases
+
+                    //remove assignments from db
+                    List<Class_Assgn> caToCull = db.Class_Assgn.ToList().FindAll(ca => ca.AssignmentID == assgnId);
+                    foreach (Class_Assgn ca in caToCull)
+                    {
+                        db.Class_Assgn.Remove(ca);
+                    }
+
+                    //cullsubmissions first
+                    List<Submission> subToCull = db.Submissions.ToList().FindAll(sub => sub.AssignmentID == assgnId);
+                    foreach (Submission sub in subToCull)
+                    {
+                        //purge submissions folder
+                        fileDirectory = new DirectoryInfo(Server.MapPath(@"~/Submissions/" + sub.FilePath));
+
+                        if (fileDirectory.Exists)
+                        {
+                            foreach (FileInfo files in fileDirectory.GetFiles())
+                            {
+                                files.Delete();//delete all files in directory
+                            }
+                            foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                            {
+                                dir.Delete(true);
+                            }
+                        }//end of removing submissions
+                        fileDirectory.Delete(true);
+                        db.Submissions.Remove(sub);
+                        subCulled = true;
+                    }
+
+                    //cull assignment
+                    List<Assignment> assgnToCull = db.Assignments.ToList().FindAll(a => a.AssignmentID == assgnId);
+                    foreach (Assignment a in assgnToCull)
+                    {
+                        db.Assignments.Remove(a);
+                    }
+
+                    db.SaveChanges();
+
+                }//end of foreach
+            }
+            else if (formCollection["subSelected"] != null && subCulled == false)
+            {
+                string[] subInput = formCollection["subSelected"].Split(',');
+                foreach (string s in subInput)
+                {
+                    int subId = Int32.Parse(s);
+
+                    //each string is submissions to be deleted
+                    //System.IO.File.AppendAllText("C:/Users/tongliang/Desktop/testSubOutput.txt", s + "\n");
+
+                    Submission sub = db.Submissions.ToList().Find(su => su.SubmissionID == subId);
+
+                    //purge submissions folder
+                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(Server.MapPath(@"~/Submissions/" + sub.FilePath));
+
+                    if (fileDirectory.Exists)
+                    {
+                        foreach (FileInfo files in fileDirectory.GetFiles())
+                        {
+                            files.Delete();//delete all files in directory
+                        }
+                        foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                        {
+                            dir.Delete(true);
+                        }
+                        fileDirectory.Delete(true);
+                    }//end of removing submissions
+
+                    //remove from db
+                    db.Submissions.Remove(sub);
+                    db.SaveChanges();
+                }//end of foreach
+            }
+
+            return RedirectToAction("Purge");
+        }//end of purge controller method
+
+        public ActionResult AddOneAdmin()
+        {
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> AddOneAdmin(AddAdminViewModel model)
@@ -769,29 +907,20 @@ namespace SPade.Controllers
             var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
             if (result.Succeeded)
             {
-                int contact = 0;
-                if (Int32.TryParse(model.ContactNo.ToString(), out contact))
-                {
-                    Admin admin = new Admin();
-                    admin.AdminID = model.AdminID;
-                    admin.FullName = model.FullName;
-                    admin.ContactNo = contact;
-                    admin.Email = model.Email;
-                    admin.CreatedAt = DateTime.Now;
-                    admin.CreatedBy = User.Identity.Name;
-                    admin.UpdatedAt = DateTime.Now;
-                    admin.UpdatedBy = User.Identity.Name;
+                Admin admin = new Admin();
+                admin.AdminID = model.AdminID;
+                admin.FullName = model.FullName;
+                admin.ContactNo = model.ContactNo;
+                admin.Email = model.Email;
+                admin.CreatedAt = DateTime.Now;
+                admin.CreatedBy = User.Identity.Name;
+                admin.UpdatedAt = DateTime.Now;
+                admin.UpdatedBy = User.Identity.Name;
 
-                    db.Admins.Add(admin);
-                    db.SaveChanges();
+                db.Admins.Add(admin);
+                db.SaveChanges();
 
-                    return RedirectToAction("Dashboard");
-                }
-                else
-                {
-                    ModelState.AddModelError("ContactNo", "Invalid contact no.");
-                    return View(model);
-                }
+                return RedirectToAction("Dashboard");
             }
             else
             {
