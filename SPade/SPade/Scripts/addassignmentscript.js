@@ -1,35 +1,61 @@
 ﻿$(document).ready(function () {
 
-    $(function () {
+    var currentDate = moment().format('DD/MM/YYYY h:mm:ss A');
 
-        var currentDate = moment().format('MM/DD/YYYY');
-
-        $('input[name="DateRange"]').daterangepicker({
-            opens: "center",
-            startDate: currentDate,
-            endDate: currentDate,
-            minDate: currentDate,
-            autoUpdateInput: false,
-            locale: {
-                cancelLabel: 'Clear'
-            }
-        })
-    });
-
-    $("#DateRange").on('apply.daterangepicker', function (ev, picker) {
-
-        var sd = picker.startDate.format('DD-MM-YYYY');
-        var ed = picker.endDate.format('DD-MM-YYYY');
-        var currentDate = moment().format('DD-MM-YYYY');
-
-        $("#DateRange").val(sd + " - " + ed);
-        $('#StartDate').val(sd);
-        $('#DueDate').val(ed);
+    //Start Date Selector JS
+    $('input[name="StartDate"]').daterangepicker({
+        opens: "center",
+        singleDatePicker: true,
+        timePicker: true,
+        startDate: currentDate,
+        minDate: currentDate,
+        autoUpdateInput: true,
+        locale: {
+            cancelLabel: 'Clear',
+            format: "DD/MM/YYYY h:mm:ss A"
+        }
     })
 
-    $("#DateRange").on("cancel.daterangepicker", function (ev, picker) {
+    $("#StartDate").on('apply.daterangepicker', function (ev, picker) {
 
-        $("#DateRange").val("");
+        //get the selected date
+        var selectedDate = $("#StartDate").val();
+        sDate = $("#StartDate").val();
+
+        //reinit the due date WITH the selected date
+        $('input[name="DueDate"]').daterangepicker({
+            opens: "center",
+            singleDatePicker: true,
+            timePicker: true,
+            startDate: selectedDate,
+            minDate: selectedDate,
+            autoUpdateInput: true,
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD/MM/YYYY h:mm:ss A'
+            }
+        })
+    })
+
+    $("#StartDate").on("cancel.daterangepicker", function (ev, picker) {
+
+    })
+
+    //Due Date Selector JS    
+    $('input[name="DueDate"]').daterangepicker({
+        opens: "center",
+        singleDatePicker: true,
+        timePicker: true,
+        startDate: currentDate,
+        minDate: currentDate,
+        autoUpdateInput: true,
+        locale: {
+            cancelLabel: 'Clear',
+            format: 'DD/MM/YYYY h:mm:ss A'
+        }
+    })
+
+    $("#DueDate").on("cancel.daterangepicker", function (ev, picker) {
 
     })
 
