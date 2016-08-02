@@ -10,6 +10,8 @@ using System.Web.Mvc;
 using SPade.Models.DAL;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
+using System.IO;
+using Microsoft.AspNet.Identity;
 
 namespace SPade.Controllers
 {
@@ -25,13 +27,88 @@ namespace SPade.Controllers
         {
             return View();
         }
+        [HttpGet]
         public ActionResult BulkAddLecturer()
         {
             return View();
         }
+
+        [HttpPost]
+        public ActionResult BulkAddLecturer(HttpPostedFileBase file)
+        {
+            //Upload and save the file
+            // extract only the filename
+            var fileName = Path.GetFileName(file.FileName);
+            // store the file inside ~/App_Data/uploads folder
+            var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+            file.SaveAs(path);
+
+            string[] lines = System.IO.File.ReadAllLines(path);
+            List<Lecturer> lectlist = new List<Lecturer>();
+            for (int i = 1; i < lines.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(lines[i]))
+                {
+                    Lecturer lect = new Lecturer();
+                    lect.StaffID = lines[i].Split(',')[0];
+                    lect.Name = lines[i].Split(',')[1];
+                    lect.Email = lines[i].Split(',')[2];
+                    lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
+                    lect.CreatedAt = DateTime.Now;
+                    lect.CreatedBy = User.Identity.GetUserName();
+                    lect.UpdatedAt = DateTime.Now;
+                    lect.UpdatedBy = User.Identity.GetUserName();
+
+                    lectlist.Add(lect);
+                }
+            }
+            db.Lecturers.AddRange(lectlist);
+            db.SaveChanges();
+
+            return View("ManageLecturer");
+        }
+
+
+        [HttpGet]
         public ActionResult BulkAddStudent()
         {
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        {
+            //Upload and save the file
+            // extract only the filename
+            var fileName = Path.GetFileName(file.FileName);
+            // store the file inside ~/App_Data/uploads folder
+            var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+            file.SaveAs(path);
+
+            string[] lines = System.IO.File.ReadAllLines(path);
+            List<Student> slist = new List<Student>();
+            for (int i = 1; i < lines.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(lines[i]))
+                {
+                    Student s = new Student();
+                    s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
+                    s.AdminNo = lines[i].Split(',')[1];
+                    s.Name = lines[i].Split(',')[2];
+                    s.Email = lines[i].Split(',')[3];
+                    s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                    s.CreatedAt = DateTime.Now;
+                    s.CreatedBy = User.Identity.GetUserName();
+                    s.UpdatedAt = DateTime.Now;
+                    s.UpdatedBy = User.Identity.GetUserName();
+
+                    slist.Add(s);
+                }
+            }
+            db.Students.AddRange(slist);
+            db.SaveChanges();
+
+            return View("ManageStudent");
         }
         [HttpPost]
         public ActionResult AddOneStudent(AddStudentViewModel model)

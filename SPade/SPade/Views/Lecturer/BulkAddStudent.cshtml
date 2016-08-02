@@ -3,56 +3,6 @@
     ViewBag.Title = "Bulk Add Student";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@*<div class="container">
-    <div class="col-md-8 col-md-offset-2 form-horizontal">
-        <fieldset>
-            <legend>Bulk Add Students</legend>
-
-
-            <p>
-                1. Please enter the details in the relevant fields.
-            </p>
-
-            @*
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <label class=" control-label" for="filebutton">Upload completed .CSV file</label>
-                        <input id="AssignmentFile" type="file" style="border: solid 1px red" />
-                    </div>
-                </div>*@
-
-@*Adding of Relevant Fields*@
-
-@*<div class="form-group">
-
-    <fieldset id="studentInput">
-        <div class="studentInputGroup">
-            <div class="col-md-2">
-                <input type="text" name="adminInput[]" id="adminInput" placeholder="Admin No" class="form-control" />
-            </div>
-
-            <div class="col-md-3">
-                <input type="text" name="nameInput[]" id="nameInput" placeholder="Name" class="form-control" />
-            </div>
-
-            <div class="col-md-3">
-                <input type="text" name="emailInput[]" id="emailInput" placeholder="Email" class="form-control" />
-            </div
-
-            <div class="col-md-3">
-                <input type="text" name="contactInput[]" id="contactInput" placeholder="Contact" class="form-control" />
-            </div>
-
-            <div class="col-md-1">
-                <button class="btn btn-default removeButton" id="removeButton" type="button">
-                    <span class="glyphicon-minus"></span>
-                </button>
-            </div>
-        </div>
-    </fieldset> @*end of studentInput*@
-
-             @*End of Fields form group*@
-
             @using (Html.BeginForm("BulkAddStudent", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 <div class="col-md-4 col-md-offset-4 form-horizontal">
@@ -72,8 +22,7 @@
 
                         <div class="form-group">
                             <div class="col-md-12">
-                                @*<a id="btnSave" href="ManageStudent" class="btn btn-primary">Save</a>*@
-                                <input type="submit" class="btn btn-primary" value="Saveeeee"/>
+                                <input type="submit" class="btn btn-primary" value="Save"/>
                                 <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
                             </div>
                         </div>
@@ -83,92 +32,4 @@
 
 
 
-            @*<script>
-                    $(document).ready(function () {
-                        // The event listener for the file upload
-                        document.getElementById('txtFileUpload').addEventListener('change', upload, false);
-
-                        // Method that checks that the browser supports the HTML5 File API
-                        function browserSupportFileUpload() {
-                            var isCompatible = false;
-                            if (window.File && window.FileReader && window.FileList && window.Blob) {
-                                isCompatible = true;
-                            }
-                            return isCompatible;
-                        }
-
-                        // Method that reads and processes the selected file
-                        function upload(evt) {
-                            if (!browserSupportFileUpload()) {
-                                alert('The File APIs are not fully supported in this browser!');
-                            } else {
-                                var data = null;
-                                var file = evt.target.files[0];
-                                var reader = new FileReader();
-                                reader.readAsText(file);
-                                reader.onload = function (event) {
-                                    var csvData = event.target.result;
-                                    console.log(csvData);
-                                    // CSV to Array
-
-
-                                    // obj to var
-                                    // Ajax post
-                                };
-                                reader.onerror = function () {
-                                    alert('Unable to read ' + file.fileName);
-                                };
-                            }
-                        }
-                    });
-
-
-                    $('#addButton').on('click', function () {
-
-                        $('#studentInput').append('<div class="studentInputGroup">'
-                        + '<div class="col-md-2"><input type="text" name="adminInput[]" id="adminInput" placeholder="Admin No" class="form-control" /></div>'
-                        + '<div class="col-md-3"><input type="text" name="nameInput[]" id="nameInput" placeholder="Name" class="form-control" /></div>'
-                        + '<div class="col-md-3"><input type="text" name="emailInput[]" id="emailInput" placeholder="Email" class="form-control" /></div>'
-                        + '<div class="col-md-3"><input type="text" name="contactInput[]" id="contactInput" placeholder="Contact" class="form-control" /></div>'
-                        + '<div class="col-md-1"><button class="btn btn-default removeButton" type="button"><span class="glyphicon-minus"></span></button></div>'
-                        + '</div>');
-                        return false; // prevent form submission
-                    });
-
-                    $('#studentInput').on('click', '.removeButton', function () {
-                        $(this).parent().parent().remove();
-                    });
-
-                    // Reading through the array of data.
-
-                    $('#submitButton').on('click', function () {
-                        var studentArr = [];
-
-                        $('.studentInputGroup').each(function (index, obj) {
-
-                            var adminId, name, email, contact, student;
-                            adminId = $(obj).find('#adminInput').val();
-                            email = $(obj).find('#emailInput').val();
-                            name = $(obj).find('#nameInput').val();
-                            contact = $(obj).find('#contactInput').val();
-
-                            student = {
-                                "AdminNo": adminId,
-                                "Email": email,
-                                "Name": name,
-                                "ContactNo": contact
-                            };
-                            studentArr.push(student);
-                        });
-                        $.ajax({
-                            type: 'POST',
-                            url: 'BulkAddStudent',
-                            contentType: 'application/json',
-                            data: JSON.stringify(studentArr) ,
-                            success: function () {
-                                alert("Successfully added/updated!")
-                            }
-                        });
-                    });
-
-                </script>*@
+          
