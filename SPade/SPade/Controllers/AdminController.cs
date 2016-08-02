@@ -266,6 +266,43 @@ namespace SPade.Controllers
         {
             return View();
         }
+        public ActionResult AddModule()
+        {
+            List<ProgLanguage> languageList = new List<ProgLanguage>();
+            languageList = db.ProgLanguages.ToList();
+            AddModuleViewModel mVM = new AddModuleViewModel();
+            mVM.Languages = languageList;
+
+            return View(mVM);
+        }
+        [HttpPost]
+        public ActionResult AddModule(AddModuleViewModel addModuleVM)
+        {
+            Module module = new Module();
+
+            try
+            {
+                module.ModuleCode = addModuleVM.ModuleCode;
+                module.ModuleName = addModuleVM.ModuleName;
+                module.LanguageId = addModuleVM.ProgLangId;
+                module.CreatedAt = DateTime.Now;
+                module.CreatedBy = User.Identity.GetUserName();
+                module.UpdatedAt = DateTime.Now;
+                module.UpdatedBy = User.Identity.GetUserName();
+                db.Modules.Add(module);
+
+                db.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                addModuleVM.Languages = db.ProgLanguages.ToList();
+                TempData["Error"] = "Failed to save module. Please try again !";
+                return View(addModuleVM);
+            }
+
+            return RedirectToAction("Admin", "ManageModule");
+        }
         public ActionResult ManageClass()
         {
             List<Lecturer> lecturer = new List<Lecturer>();
@@ -282,7 +319,7 @@ namespace SPade.Controllers
 
 
 
-            
+
             return View();
         }
         public ActionResult ManageStudent()
