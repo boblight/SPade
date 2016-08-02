@@ -1,19 +1,18 @@
-﻿using SPade.Models;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using SPade.Models;
+using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
+using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Validation;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using SPade.Models.DAL;
-using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 
 namespace SPade.Controllers
 {
@@ -186,13 +185,11 @@ namespace SPade.Controllers
                 throw;
 
             }
-            //return View(model);
             return RedirectToAction("Dashboard");
         }
 
         public ActionResult AddOneStudent()
         {
-
             AddStudentViewModel model = new AddStudentViewModel();
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;

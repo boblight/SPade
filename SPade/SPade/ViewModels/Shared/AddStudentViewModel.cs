@@ -5,13 +5,13 @@ using System.Web;
 using SPade.Models.DAL;
 using System.ComponentModel.DataAnnotations;
 
-namespace SPade.ViewModels.Admin
+namespace SPade.ViewModels.Shared
 {
     public class AddStudentViewModel
     {
         [Required]
         [StringLength(8, ErrorMessage = "Please enter a valid Admin No.")]
-        [RegularExpression("^[s]+$", ErrorMessage = "Please enter valid Admin No.")]
+        [RegularExpression("^[p]+$", ErrorMessage = "Please enter valid Admin No.")]
         public string AdminNo { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Do not exceed 50 characters")]

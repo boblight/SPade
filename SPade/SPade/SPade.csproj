@@ -259,7 +259,6 @@
     <Compile Include="ViewModels\Admin\AddCourseViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddLecturerViewMode.cs" />
     <Compile Include="ViewModels\Admin\AddModuleViewModel.cs" />
-    <Compile Include="ViewModels\Admin\AddStudentViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddStudentViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageClassViewModel.cs" />
@@ -272,6 +271,7 @@
     <Compile Include="ViewModels\Admin\UpdateLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\AddAssignmentViewModel.cs" />
+    <Compile Include="ViewModels\Shared\AddStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\AssignmentClass.cs" />
     <Compile Include="ViewModels\Lecturer\BulkAddStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ClassesAndModulesViewModel.cs" />
@@ -411,6 +411,7 @@
     <Content Include="Views\Admin\ManageModule.cshtml" />
     <Content Include="Views\Admin\AddModule.cshtml" />
     <Content Include="Views\Admin\AddCourse.cshtml" />
+    <Content Include="Views\Lecturer\AddOneStudent.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
