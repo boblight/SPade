@@ -161,6 +161,39 @@ namespace SPade.Controllers
 
 
         }
+
+        public ActionResult AddCourse()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult AddCourse(AddCourseViewModel aCVM)
+        {
+            Course c = new Course();
+
+            try
+            {
+                c.CourseName = aCVM.CourseName;
+                c.CourseAbbr = aCVM.CourseName;
+                c.CreatedBy = User.Identity.GetUserName();
+                c.CreatedAt = DateTime.Now;
+                c.UpdatedBy = User.Identity.GetUserName();
+                c.UpdatedAt = DateTime.Now;
+                db.Courses.Add(c);
+
+                db.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Failed to save module. Please try again !";
+                return View(aCVM);
+            }
+            return RedirectToAction("ManageCourse", "Admin");
+        }
+
+
         [HttpPost]
         public ActionResult AddOneClass(AddClassViewModel model)
         {
