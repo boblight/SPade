@@ -74,14 +74,6 @@ namespace SPade.Controllers
             var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
             file.SaveAs(path);
 
-            //DataTable dt = new DataTable();
-            //dt.Columns.AddRange(new DataColumn[5] {
-            //new DataColumn("ClassID", typeof(int)),
-            //new DataColumn("AdminNo", typeof(string)),
-            //new DataColumn("Name",typeof(string)),
-            //new DataColumn("Email", typeof(string)),
-            //new DataColumn("Contact",typeof(string)) });
-
             string[] lines = System.IO.File.ReadAllLines(path);
             List<Student> slist = new List<Student>();
             for (int i = 1; i < lines.Length; i++)
@@ -100,13 +92,6 @@ namespace SPade.Controllers
                     s.UpdatedBy = User.Identity.GetUserName();
 
                     slist.Add(s);
-                    //dt.Rows.Add();
-                    //int i = 0;
-                    //foreach (string cell in row.Split(','))
-                    //{
-                    //    dt.Rows[dt.Rows.Count - 1][i] = cell;
-                    //    i++;
-                    //}
                 }
             }
             db.Students.AddRange(slist);
