@@ -90,13 +90,20 @@
                     </div>
                 </div>
 
+                <!--Start Date-->
                 <div class="form-group">
                     <div class="col-md-12">
-                        <label class="control-label" for="daterange">Select start and end date</label>
-                        @Html.TextBoxFor(m => Model.DateRange, new { @class = "form-control", @placeholder = "Select start and end date", @readonly = "true" })
-                        @Html.HiddenFor(m => Model.StartDate)
-                        @Html.HiddenFor(m => Model.DueDate)
-                        <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger", @id = "DateError", @name = "DateError" })</span>
+                        <label class="control-label" for="StartDate">Select Assignment Start Date</label>
+                        @Html.TextBoxFor(m => Model.StartDate, new { @class = "form-control", @placeholder = "Select start date", @readonly = "true" })
+                    </div>
+                </div>
+
+                <!--Due Date-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label" for="DueDate">Select Assignment Due Date</label>
+                        @Html.TextBoxFor(m => Model.DueDate, new { @class = "form-control", @placeholder = "Select due date", @readonly = "true" })
+                        <span class="help-block">@Html.ValidationMessage("DueDate", new { @class = "text-danger", @id = "DateError", @name = "DateError" })</span>
                     </div>
                 </div>
 
@@ -144,7 +151,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <div class="col-md-12">
                         <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
@@ -154,4 +160,4 @@
             </fieldset>
         </div>
     </div>
-                                    }            
+ }            
