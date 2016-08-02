@@ -281,6 +281,7 @@
     <Compile Include="ViewModels\Lecturer\UpdateStudentViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ViewResultsViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ViewStudentsByClassViewModel.cs" />
+    <Compile Include="ViewModels\Shared\AddStudentViewModel.cs" />
     <Compile Include="ViewModels\Student\SubmissionViewModel.cs" />
     <Compile Include="ViewModels\Student\SubmitAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewAssignmentViewModel.cs" />
