@@ -263,6 +263,7 @@
     <Compile Include="ViewModels\Admin\ManageClassViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageStudentViewModel.cs" />
+    <Compile Include="ViewModels\Admin\PurgeViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateClassViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateStudentViewModel.cs" />
@@ -400,6 +401,8 @@
     <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
+    <Content Include="Views\Admin\Purge.cshtml" />
+    <Content Include="Views\Admin\AddOneAdmin.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -410,7 +413,7 @@
   <ItemGroup>
     <Folder Include="App_Data\Uploads\" />
     <Folder Include="fonts\font-awesome\" />
-    <Folder Include="img\" />
+    <Folder Include="Migrations\img\" />
     <Folder Include="Properties\" />
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />

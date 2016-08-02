@@ -1,20 +1,17 @@
-﻿using System;
+﻿using Ionic.Zip;
+using Microsoft.AspNet.Identity;
+using SPade.Grading;
+using SPade.Models.DAL;
+using SPade.ViewModels.Student;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using SPade.Models;
-using SPade.Models.DAL;
-using SPade.ViewModels;
-using SPade.ViewModels.Student;
-using System.Threading.Tasks;
-using System.IO;
-using SPade.Grading;
-using System.Diagnostics;
-using Microsoft.AspNet.Identity;
-using System.Data.SqlClient;
-using Ionic.Zip;
-using System.Text.RegularExpressions;
 
 namespace SPade.Controllers
 {
@@ -74,6 +71,12 @@ namespace SPade.Controllers
 
                     //grade submission
                     Grader grader = new Grader(filePathForGrade, fileName, assgnId, langUsed.LangageType);
+
+                    //grade returns an 'exitcode'
+                    //if result is more than 1 then is error code
+                    //2 for program failure
+                    //3 for infinite loop
+                    //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
                     decimal result = grader.grade();
 
                     submission.Grade = result;
@@ -119,13 +122,14 @@ namespace SPade.Controllers
             if (Session["UploadError"] != null)
             {
                 ModelState.AddModelError("UploadError", Session["UploadError"].ToString());
-                Session["UploadError"] = null;
+                Session.Remove("UploadError");
             }
 
             svm.assignment = assignment;
 
             return View(svm);
         }//end of get SubmitAssignment
+
 
         // GET: ViewAssignment
         public ActionResult ViewAssignment()
@@ -218,9 +222,28 @@ namespace SPade.Controllers
         public ActionResult PostSubmission()
         {
             Submission submission = (Submission)Session["submission"];
+
+            if (submission.Grade == 2)
+            {
+                ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to logic error or " +
+                    "syntax error in your code. Please check through your program and make the appropriate modification.");
+                submission.Grade = 0;
+            }
+            else if (submission.Grade == 3)
+            {
+                ModelState.AddModelError("SubmissionError", "Your program has encountered an infinite loop. Please check through your program and make appropriate " +
+                    "modification.");
+                submission.Grade = 0;
+            }
+            else if (submission.Grade < 1)
+            {
+                ModelState.AddModelError("SubmissionError", "Program has failed a couple of test cases. Please check through your program and make appropriate " +
+                    "modification to meet the requirements stated in the assignment description.");
+            }
+
+            Session.Remove("submission"); //clear session
             return View(submission);
         }
-
 
         [HttpGet]
         public ActionResult Download(string file)
@@ -237,8 +260,6 @@ namespace SPade.Controllers
 
             memoryStream.Seek(0, SeekOrigin.Begin);
             return File(memoryStream, "application/zip", zipname);
-
-
         }
 
         private class DBres

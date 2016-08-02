@@ -45,22 +45,32 @@
             }
             else
             {
-                  <!-- File Button -->
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <label class="control-label" for="AssignmentFile">Upload Solution (Note: Please zip up your project before uploading)</label>
-                        @Html.TextBoxFor(m => m.File, new { type = "file" })
-                        @Html.ValidationMessageFor(m => m.File)
-                        <p class="text-danger">@Html.ValidationMessage("UploadError")</p>
+                <div id="submissionField">
+
+                    <!-- File Button -->
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label class="control-label" for="AssignmentFile">Upload Solution (Note: Please zip up your project before uploading)</label>
+                            @Html.TextBoxFor(m => m.File, new { type = "file" })
+                            @Html.ValidationMessageFor(m => m.File)
+                            <p class="text-danger">@Html.ValidationMessage("UploadError")</p>
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    <div class="form-group">
+                        <div class="col-md-10 ">
+                            <input id="submit" type="submit" class="btn btn-primary" value="Submit" />
+                            <button onClick="goBack()" class="btn btn-default">Cancel</button>
+                        </div>
                     </div>
                 </div>
 
-        <!-- Button -->
-                <div class="form-group">
-                    <div class="col-md-10 ">
-                        <input type="submit" class="btn btn-primary" value="Submit" />
-                        @*<a id="btnCancel" href="/Student/ViewAssignment" class="btn btn-default">Cancel</a>*@
-                        <button onClick="goBack()" class="btn btn-default">Cancel</button>
+                <div class="form-group" id="progressBar" hidden>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active" role="progressbar" style="width:100%">
+                            grading...
+                        </div>
                     </div>
                 </div>
             }
@@ -75,6 +85,10 @@
 
         <script>
             function goBack() { window.history.back(); }
+            $('#submit').on('click', function () {
+                $('#progressBar').prop('hidden', false);
+                $('#submissionField').prop('hidden', true);
+            })
         </script>
 
     </fieldset>
