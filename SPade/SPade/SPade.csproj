@@ -250,19 +250,23 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\sysdiagram.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GmailService.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="ViewModels\Accounts\RegViewModel.cs" />
+    <Compile Include="ViewModels\Admin\AddAdminViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddClassViewModel.cs" />
+    <Compile Include="ViewModels\Admin\AddCourseViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddLecturerViewMode.cs" />
+    <Compile Include="ViewModels\Admin\AddModuleViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddStudentViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddStudentViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageClassViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageLecturerViewModel.cs" />
-    <Compile Include="ViewModels\Admin\ManageModuleViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageStudentViewModel.cs" />
     <Compile Include="ViewModels\Admin\PurgeViewModel.cs" />
     <Compile Include="ViewModels\Admin\UpdateAdminViewModel.cs" />
@@ -406,7 +410,8 @@
     <Content Include="Views\Admin\Purge.cshtml" />
     <Content Include="Views\Admin\AddOneAdmin.cshtml" />
     <Content Include="Views\Admin\UpdateAdmin.cshtml" />
-    <Content Include="Views\Admin\ManageModule.cshtml" />
+    <Content Include="Views\Admin\AddModule.cshtml" />
+    <Content Include="Views\Admin\AddCourse.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -423,6 +428,7 @@
     <Folder Include="Submissions\" />
     <Folder Include="TempSubmissions\" />
     <Folder Include="TestCase\" />
+    <Folder Include="ViewModels\Accounts\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

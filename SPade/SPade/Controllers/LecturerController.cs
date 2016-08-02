@@ -65,40 +65,54 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        public ActionResult BulkAddStudent(HttpPostedFileBase file, BulkAddStudentViewModel addStud)
         {
-            //Upload and save the file
-            // extract only the filename
-            var fileName = Path.GetFileName(file.FileName);
-            // store the file inside ~/App_Data/uploads folder
-            var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
-            file.SaveAs(path);
-
-            string[] lines = System.IO.File.ReadAllLines(path);
-            List<Student> slist = new List<Student>();
-            for (int i = 1; i < lines.Length; i++)
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv"))
             {
-                if (!string.IsNullOrEmpty(lines[i]))
+                //Upload and save the file
+                // extract only the filename
+                var fileName = Path.GetFileName(file.FileName);
+            // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                file.SaveAs(path);
+
+
+
+                string[] lines = System.IO.File.ReadAllLines(path);
+                List<Student> slist = new List<Student>();
+                for (int i = 1; i < lines.Length; i++)
                 {
-                    Student s = new Student();
-                    s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-                    s.AdminNo = lines[i].Split(',')[1];
-                    s.Name = lines[i].Split(',')[2];
-                    s.Email = lines[i].Split(',')[3];
-                    s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
-                    s.CreatedAt = DateTime.Now;
-                    s.CreatedBy = User.Identity.GetUserName();
-                    s.UpdatedAt = DateTime.Now;
-                    s.UpdatedBy = User.Identity.GetUserName();
+                    if (!string.IsNullOrEmpty(lines[i]))
+                    {
+                        Student s = new Student();
+                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
+                        s.AdminNo = lines[i].Split(',')[1];
+                        s.Name = lines[i].Split(',')[2];
+                        s.Email = lines[i].Split(',')[3];
+                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                        s.CreatedAt = DateTime.Now;
+                        s.CreatedBy = User.Identity.GetUserName();
+                        s.UpdatedAt = DateTime.Now;
+                        s.UpdatedBy = User.Identity.GetUserName();
 
-                    slist.Add(s);
+                        slist.Add(s);
+                    }
                 }
+                db.Students.AddRange(slist);
+                db.SaveChanges();
+            }else
+            {
+                addStud.Student = db.Students.ToList();
+                string err = "Uploaded file is invalid ! Please try again.";
+                TempData["SlnWarning"] = err;
+                TempData["TcWarning"] = err;
+                return View(addStud);
             }
-            db.Students.AddRange(slist);
-            db.SaveChanges();
-
+    
             return View("ManageClassesAndStudents");
         }
+    
+        
 
 
         public ActionResult ViewStudentsByClass(string classID)
