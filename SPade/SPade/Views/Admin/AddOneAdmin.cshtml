@@ -1,0 +1,17 @@
+﻿@model SPade.ViewModels.Admin.AddClassViewModel
+
+@{
+    ViewBag.Title = "AddOneAdmin";
+}
+
+@using (Html.BeginForm("AddOneClass", "Admin", FormMethod.Post))
+{
+    <h2>AddOneAdmin</h2>
+
+    <div class="col-md-4 col-md-offset-4 form-horizontal">
+        <fieldset>
+            @Html.AntiForgeryToken()
+
+        </fieldset>
+    </div>
+}

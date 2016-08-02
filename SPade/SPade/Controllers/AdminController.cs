@@ -686,5 +686,10 @@ namespace SPade.Controllers
 
             return RedirectToAction("Purge");
         }//end of purge controller method
+
+        public ActionResult AddOneAdmin()
+        {
+            return View();
+        }
     }
 }
