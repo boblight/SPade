@@ -79,11 +79,11 @@ namespace SPade.Controllers
         public ActionResult AddOneStudent()
         {
 
-            AddStudentViewModel model = new AddStudentViewModel();
+            //AddStudentViewModel model = new AddStudentViewModel();
             //Get all classes
-            List<Class> allClasses = db.Classes.ToList();
-            model.Classes = allClasses;
-            return View(model);
+            //List<Class> allClasses = db.Classes.ToList();
+            //model.Classes = allClasses;
+            return View();
 
 
 
