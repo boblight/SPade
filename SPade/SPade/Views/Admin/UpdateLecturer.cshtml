@@ -42,8 +42,11 @@
             <div class="form-group">
                 <div class="col-md-12">
                     <input type="submit" value="Update" name="command" class="btn btn-primary" />
-                    <input type="submit" value="Delete" name="command" class="btn btn-danger" />
+                    <input type="submit" value="Delete" name="command" class="btn btn-danger"
+                            onclick="return confirm('Are you sure?')" />
                     <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                    <!-- Show alert-->
+                    @Html.Raw(TempData["msg"])
                 </div>
             </div>
         </fieldset>

@@ -1,7 +1,58 @@
-﻿
+﻿@model SPade.ViewModels.Admin.UpdateAdminViewModel
+
 @{
     ViewBag.Title = "UpdateAdmin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>UpdateAdmin</h2>
 
+@using (Html.BeginForm("UpdateAdmin", "Admin", FormMethod.Post))
+{
+
+    <div class="container">
+        <div class="col-md-4 col-md-offset-4 form-horizontal">
+            <fieldset>
+                @Html.AntiForgeryToken()
+                <legend>Update Admin</legend>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label for="inputAdminName" class="control-label">Admin Name</label>
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control input-md", required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label for="inputContact" class="control-label">Contact</label>
+                        @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label for="inputEmail" class="control-label">Email</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md", required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="submit" value="Update" name="command" class="btn btn-primary" />
+                        <input type="submit" value="Delete" name="command" class="btn btn-danger" onclick="return confirm('Are you sure?')" />
+                        <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                        <!-- Show alert-->
+                        @Html.Raw(TempData["msg"])
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+}
