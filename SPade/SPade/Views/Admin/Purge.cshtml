@@ -11,8 +11,8 @@
 
 
     <div class="form-group">
-        <button class="btn btn-primary glyphicon glyphicon-unchecked" id="unselectAllAssgn">Unselect All</button>
-        <button class="btn btn-primary glyphicon glyphicon-check" id="selectAllAssgn">Select All</button>
+        <button class="btn btn-primary" id="unselectAllAssgn"><span class="glyphicon glyphicon-unchecked"></span> Unselect All</button>
+        <button class="btn btn-primary" id="selectAllAssgn"><span class="glyphicon glyphicon-check"></span> Select All</button>
     </div>
 
     @using (Html.BeginForm("Purge", "Admin", FormMethod.Post))
@@ -71,8 +71,8 @@
     @*-------------------------------------------------------------------------------------------------------------------------------------*@
     
     <div class="form-group">
-        <button class="btn btn-primary glyphicon glyphicon-unchecked" id="unselectAllSub">Unselect All</button>
-        <button class="btn btn-primary glyphicon glyphicon-check" id="selectAllSub">Select All</button>
+        <button class="btn btn-primary" id="unselectAllSub"><span class="glyphicon glyphicon-unchecked"></span> Unselect All</button>
+        <button class="btn btn-primary" id="selectAllSub"><span class="glyphicon glyphicon-check"></span> Select All</button>
     </div>
 
     @using (Html.BeginForm("Purge", "Admin", FormMethod.Post))
