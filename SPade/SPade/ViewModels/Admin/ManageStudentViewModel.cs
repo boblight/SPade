@@ -9,10 +9,8 @@ namespace SPade.ViewModels.Admin
     public class ManageStudentViewModel
     {
         public List<string> AdminNo { get; set; }
-        public List<string> Name
-        { get; set; }
-        public List<string> Email
-        { get; set; }
+        public List<string> Name { get; set; }
+        public List<string> Email { get; set; }
         public List<string> ContactNo { get; set; }
         public List<SPade.Models.DAL.Student> stud { get; set; }
     }
