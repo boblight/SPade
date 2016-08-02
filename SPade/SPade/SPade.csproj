@@ -411,6 +411,7 @@
     <Content Include="Views\Admin\ManageModule.cshtml" />
     <Content Include="Views\Admin\AddModule.cshtml" />
     <Content Include="Views\Admin\AddCourse.cshtml" />
+    <Content Include="Views\Admin\UpdateCourse.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

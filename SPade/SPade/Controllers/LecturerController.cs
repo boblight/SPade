@@ -72,7 +72,7 @@ namespace SPade.Controllers
                 //Upload and save the file
                 // extract only the filename
                 var fileName = Path.GetFileName(file.FileName);
-            // store the file inside ~/App_Data/uploads folder
+                // store the file inside ~/App_Data/uploads folder
                 var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
                 file.SaveAs(path);
 
@@ -100,7 +100,8 @@ namespace SPade.Controllers
                 }
                 db.Students.AddRange(slist);
                 db.SaveChanges();
-            }else
+            }
+            else
             {
                 addStud.Student = db.Students.ToList();
                 string err = "Uploaded file is invalid ! Please try again.";
@@ -108,12 +109,9 @@ namespace SPade.Controllers
                 TempData["TcWarning"] = err;
                 return View(addStud);
             }
-    
+
             return View("ManageClassesAndStudents");
         }
-    
-        
-
 
         public ActionResult ViewStudentsByClass(string classID)
         {
@@ -229,7 +227,7 @@ namespace SPade.Controllers
                 {
                     if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                     {
-                        if (solutionsFileUpload.ContentLength > 104857600)
+                        if (solutionsFileUpload.ContentLength < 104857600) //check if the uploaded solution is more than 150mb
                         {
                             //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
                             string slnFilePath = "";
@@ -460,44 +458,6 @@ namespace SPade.Controllers
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
 
-        //used to move the class file into the subfolder in order for it to be compiled
-        //THIS IS BROKEN. PAY NO MIND TO IT
-
-        //public bool MoveFileToSubFolder(string fileName, string slnFilePath, string assignmentTitle, ProgLanguage lang, bool isTestCasePresent)
-        //{
-        //    bool saveStatus = false;
-
-        //    try
-        //    {
-        //        //access the solution + move the classname.java/.cs into a folder 
-        //        var toLowerPath = fileName.ToLower();
-        //        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
-        //        Directory.CreateDirectory(path);
-
-        //        //get the appropirate file and move the file accordingly
-        //        var ogPath = "";
-        //        var newPath = "";
-
-        //        if (lang.LangageType.Equals("Java"))
-        //        {
-        //            ogPath = slnFilePath + "/" + fileName + ".java";
-        //            newPath = path + "/" + fileName + ".java";
-        //        }
-        //        else if (lang.LangageType.Equals("C#"))
-        //        {
-        //            ogPath = slnFilePath + "/" + fileName + ".cs";
-        //            newPath = path + "/" + fileName + ".cs";
-        //        }
-
-        //        System.IO.File.Move(ogPath, newPath);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        saveStatus = true;
-        //    }
-        //    return saveStatus;
-        //}
-
         //used to insert the data into DB. 
         public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
         {
@@ -512,14 +472,20 @@ namespace SPade.Controllers
             newAssignment.AssgnTitle = addAssgn.AssgnTitle;
             newAssignment.Describe = addAssgn.Describe;
             newAssignment.MaxAttempt = addAssgn.MaxAttempt;
-            newAssignment.StartDate = addAssgn.StartDate;
+
+            if (addAssgn.StartDate == null)
+            {
+                newAssignment.StartDate = DateTime.Now; //if a lecturer dont select a date, we take the time that this assignment is created as the start time
+            }
+            else
+            {
+                newAssignment.StartDate = addAssgn.StartDate;
+            }
             newAssignment.DueDate = addAssgn.DueDate;
             newAssignment.Solution = addAssgn.Solution;
             newAssignment.ModuleCode = addAssgn.ModuleId;
-            // newAssignment.CreateBy = "s1431489";
             newAssignment.CreateBy = User.Identity.GetUserName();
             newAssignment.CreateAt = DateTime.Now;
-            //newAssignment.UpdatedBy = "s1431489";
             newAssignment.UpdatedBy = User.Identity.GetUserName();
             newAssignment.UpdatedAt = DateTime.Now;
             db.Assignments.Add(newAssignment);
