@@ -13,7 +13,6 @@ using SPade.Models.DAL;
 using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
-using SPade.ViewModels.Accounts;
 using System.Web.Security;
 
 namespace SPade.Controllers

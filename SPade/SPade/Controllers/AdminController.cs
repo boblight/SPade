@@ -11,6 +11,9 @@ using SPade.Models.DAL;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.IO;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using System.Threading.Tasks;
 
 namespace SPade.Controllers
 {
@@ -18,8 +21,30 @@ namespace SPade.Controllers
     public class AdminController : Controller
     {
         //  { UserID = Request.QueryString["UserID"]
-
+        private ApplicationUserManager _userManager;
         private SPadeDBEntities db = new SPadeDBEntities();
+
+        public AdminController()
+        {
+
+        }
+
+        public AdminController(ApplicationUserManager userManager)
+        {
+            UserManager = userManager;
+        }
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
 
         // GET: Admin
         public ActionResult Dashboard()
@@ -74,8 +99,8 @@ namespace SPade.Controllers
 
             }
             return View(model);
-
         }
+
         public ActionResult AddOneStudent()
         {
 
@@ -199,17 +224,10 @@ namespace SPade.Controllers
             List<Class> classes = new List<Class>();
             List<Lec_Class> lc = db.Lec_Class.ToList().FindAll(c => c.ClassID == 1);
 
-
             foreach (Lec_Class i in lc)
             {
                 lecturer = db.Lecturers.ToList().FindAll(lect => lect.StaffID == i.StaffID);
             }
-
-
-
-
-
-
             return View();
         }
         public ActionResult ManageStudent()
@@ -418,7 +436,7 @@ namespace SPade.Controllers
                 {
                     if (S.AdminNo == x)
                     {
-                        S.UpdatedBy = "ADMIN";
+                        S.UpdatedBy = User.Identity.Name;
                         S.UpdatedAt = DateTime.Now;
 
                         if (TryUpdateModel(S, "",
@@ -446,7 +464,7 @@ namespace SPade.Controllers
                 {
                     if (S.AdminNo == x)
                     {
-                        S.DeletedBy = "ADMIN";
+                        S.DeletedBy = User.Identity.Name;
                         S.DeletedAt = DateTime.Now;
 
                         if (TryUpdateModel(S, "",
@@ -691,5 +709,50 @@ namespace SPade.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddOneAdmin(AddAdminViewModel model)
+        {
+            //create default account
+            var user = new ApplicationUser { UserName = model.AdminID, Email = model.Email };
+            user.EmailConfirmed = true;
+            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+            if (result.Succeeded)
+            {
+                int contact = 0;
+                if (Int32.TryParse(model.ContactNo.ToString(), out contact))
+                {
+                    Admin admin = new Admin();
+                    admin.AdminID = model.AdminID;
+                    admin.FullName = model.FullName;
+                    admin.ContactNo = contact;
+                    admin.Email = model.Email;
+                    admin.CreatedAt = DateTime.Now;
+                    admin.CreatedBy = User.Identity.Name;
+                    admin.UpdatedAt = DateTime.Now;
+                    admin.UpdatedBy = User.Identity.Name;
+
+                    db.Admins.Add(admin);
+                    db.SaveChanges();
+
+                    return RedirectToAction("Dashboard");
+                }
+                else
+                {
+                    ModelState.AddModelError("ContactNo", "Invalid contact no.");
+                    return View(model);
+                }
+            }
+            else
+            {
+                //display identity framework error
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error);
+                }
+                return View(model);
+            }
+        }//
     }
 }
