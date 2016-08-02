@@ -279,12 +279,9 @@ namespace SPade.Controllers
             }
 
 
-
-
-
-            
             return View();
         }
+
         public ActionResult ManageStudent()
         {
             ManageStudentViewModel ms = new ManageStudentViewModel();
@@ -303,6 +300,30 @@ namespace SPade.Controllers
             lecturer = db.Lecturers.ToList();
             return View();
         }
+
+        public ActionResult ManageModule()
+        {
+            List<ManageModuleViewModel> lmmvm = new List<ManageModuleViewModel>();
+            
+            List<Module> m = new List<Module>();
+            m = db.Modules.ToList();
+
+            foreach(Module i in m)
+            {
+                ManageModuleViewModel mmvm = new ManageModuleViewModel();
+
+
+                mmvm.ModuleCode = i.ModuleCode;
+                mmvm.ModuleName = i.ModuleName;
+                mmvm.ProgrammingLanguage = db.ProgLanguages.ToList().Find(p => p.LanguageId == i.LanguageId).LangageType;
+                mmvm.CreatedBy = i.CreatedBy.ToUpper();
+
+                lmmvm.Add(mmvm);
+            }
+            
+            return View(lmmvm);
+        }
+
         public ActionResult UpdateClass()
         {
             UpdateClassViewModel model = new UpdateClassViewModel();
