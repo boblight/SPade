@@ -1,19 +1,18 @@
-﻿using SPade.Models;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using SPade.Models;
+using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
+using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Validation;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using SPade.Models.DAL;
-using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 
 namespace SPade.Controllers
 {
@@ -134,26 +133,42 @@ namespace SPade.Controllers
 
             return View("ManageStudent");
         }
+
         [HttpPost]
-        public ActionResult AddOneStudent(AddStudentViewModel model)
+        public async Task<ActionResult> AddOneStudent(AddStudentViewModel model, FormCollection formCollection)
         {
             try
             {
-                var student = new Student()
+                var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
+                user.EmailConfirmed = true;
+                var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                if (result.Succeeded)
                 {
-                    AdminNo = model.AdminNo.Trim(),
-                    Name = model.Name,
-                    Email = model.Email,
-                    ContactNo = model.ContactNo,
-                    ClassID = '1',
-                    CreatedBy = "Admin",
-                    UpdatedBy = "Admin",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                };
+                    var student = new Student()
+                    {
+                        AdminNo = model.AdminNo.Trim(),
+                        Name = model.Name,
+                        Email = model.Email,
+                        ContactNo = model.ContactNo,
+                        ClassID = Int32.Parse(formCollection["ClassID"].ToString()),
+                        CreatedBy = User.Identity.Name,
+                        UpdatedBy = User.Identity.Name,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                    };
 
-                db.Students.Add(student);
-                db.SaveChanges();
+                    db.Students.Add(student);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    //error in registering account
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+                    return View(model);
+                }
             }
             catch (DbEntityValidationException e)
             {
@@ -170,20 +185,15 @@ namespace SPade.Controllers
                 throw;
 
             }
-            return View(model);
+            return RedirectToAction("Dashboard");
         }
 
         public ActionResult AddOneStudent()
         {
-
-            //AddStudentViewModel model = new AddStudentViewModel();
-            //Get all classes
-            //List<Class> allClasses = db.Classes.ToList();
-            //model.Classes = allClasses;
-            return View();
-
-
-
+            AddStudentViewModel model = new AddStudentViewModel();
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
         }
 
         public ActionResult AddCourse()
@@ -281,26 +291,41 @@ namespace SPade.Controllers
             return View(model);
 
         }
+
         [HttpPost]
-        public ActionResult AddOneLecturer(AddLecturerViewMode model)
+        public async Task<ActionResult> AddOneLecturer(AddLecturerViewMode model)
         {
             try
             {
-                var lecturer = new Lecturer()
+                var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
+                user.EmailConfirmed = true;
+                var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                if (result.Succeeded)
                 {
-                    StaffID = model.StaffID,
-                    Name = model.Name,
-                    ContactNo = model.ContactNo,
-                    Email = model.Email,
-                    CreatedBy = "Admin",
-                    UpdatedBy = "Admin",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
+                    var lecturer = new Lecturer()
+                    {
+                        StaffID = model.StaffID,
+                        Name = model.Name,
+                        ContactNo = model.ContactNo,
+                        Email = model.Email,
+                        CreatedBy = User.Identity.Name,
+                        UpdatedBy = User.Identity.Name,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                    };
 
-                };
-
-                db.Lecturers.Add(lecturer);
-                db.SaveChanges();
+                    db.Lecturers.Add(lecturer);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    //error in registering account
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+                    return View(model);
+                }
             }
             catch (DbEntityValidationException e)
             {
@@ -319,10 +344,12 @@ namespace SPade.Controllers
             }
             return View(model);
         }
+
         public ActionResult AddOneLecturer()
         {
             return View();
         }
+
         public ActionResult AddModule()
         {
             List<ProgLanguage> languageList = new List<ProgLanguage>();
@@ -360,6 +387,7 @@ namespace SPade.Controllers
 
             return RedirectToAction("Admin", "ManageModule");
         }
+
         public ActionResult ManageClass()
         {
             List<Lecturer> lecturer = new List<Lecturer>();
@@ -372,6 +400,7 @@ namespace SPade.Controllers
             }
             return View();
         }
+
         public ActionResult ManageStudent()
         {
             ManageStudentViewModel ms = new ManageStudentViewModel();
@@ -414,6 +443,7 @@ namespace SPade.Controllers
             lecturer = db.Lecturers.ToList();
             return View();
         }
+
         public ActionResult UpdateClass()
         {
             UpdateClassViewModel model = new UpdateClassViewModel();
@@ -455,6 +485,7 @@ namespace SPade.Controllers
 
             return View(model);
         }
+
         [HttpPost]
         public ActionResult UpdateClass(UpdateClassViewModel model, string command)
         {
@@ -542,6 +573,7 @@ namespace SPade.Controllers
             }
             return View(model);
         }
+
         [HttpGet]
         public ActionResult UpdateStudent()
         {
@@ -566,6 +598,7 @@ namespace SPade.Controllers
             }
             return View(model);
         }
+
         [HttpPost]
         public ActionResult UpdateStudent(UpdateStudentViewModel model, string command)
         {
@@ -636,6 +669,7 @@ namespace SPade.Controllers
             }
             return View(model);
         }
+
         public ActionResult UpdateLecturer()
         {
             UpdateLecturerViewModel model = new UpdateLecturerViewModel();
@@ -656,6 +690,7 @@ namespace SPade.Controllers
             }
             return View(model);
         }
+
         [HttpPost]
         public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command)
         {
@@ -730,6 +765,7 @@ namespace SPade.Controllers
             return View(model);
 
         }
+
         public ActionResult UpdateAdmin()
         {
             UpdateAdminViewModel model = new UpdateAdminViewModel();
@@ -751,6 +787,7 @@ namespace SPade.Controllers
             }
             return View(model);
         }
+
         [HttpPost]
         public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command)
         {

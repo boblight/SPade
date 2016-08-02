@@ -1,10 +1,10 @@
-﻿@model SPade.ViewModels.Admin.AddStudentViewModel
+﻿@model SPade.ViewModels.Shared.AddStudentViewModel
 
 @{
     ViewBag.Title = "Add Student";
 }
 
-@using (Html.BeginForm("AddOneStudent", "Admin", FormMethod.Post))
+@using (Html.BeginForm("AddOneStudent", "Lecturer", FormMethod.Post))
 {
 
     <div class="col-md-4 col-md-offset-4 form-horizontal">
@@ -42,7 +42,7 @@
                             @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
                         }
                     </div>
-                    </div>
+                </div>
             </div>
 
             <!-- studentEmail-->
@@ -76,7 +76,7 @@
 
         </fieldset>
     </div>
-}
+                            }
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

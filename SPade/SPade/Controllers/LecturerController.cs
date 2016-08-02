@@ -1,15 +1,18 @@
 ﻿using Ionic.Zip;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using SPade.Grading;
+using SPade.Models;
 using SPade.Models.DAL;
 using SPade.ViewModels.Lecturer;
+using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -21,6 +24,29 @@ namespace SPade.Controllers
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
+        private ApplicationUserManager _userManager;
+
+        public LecturerController()
+        {
+
+        }
+
+        public LecturerController(ApplicationUserManager userManager)
+        {
+            UserManager = userManager;
+        }
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
 
         // GET: Lecturer
         public ActionResult Dashboard()
@@ -112,6 +138,51 @@ namespace SPade.Controllers
 
             return View("ManageClassesAndStudents");
         }
+
+        public ActionResult AddOneStudent()
+        {
+            AddStudentViewModel model = new AddStudentViewModel();
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddOneStudent(AddStudentViewModel model, FormCollection formCollection)
+        {
+            var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
+            user.EmailConfirmed = true;
+            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+            if (result.Succeeded)
+            {
+                var student = new Student()
+                {
+                    AdminNo = model.AdminNo.Trim(),
+                    Name = model.Name,
+                    Email = model.Email,
+                    ContactNo = model.ContactNo,
+                    ClassID = Int32.Parse(formCollection["ClassID"].ToString()),
+                    CreatedBy = User.Identity.Name,
+                    UpdatedBy = User.Identity.Name,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                };
+
+                db.Students.Add(student);
+                db.SaveChanges();
+            }
+            else
+            {
+                //error in registering account
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error);
+                }
+                return View(model);
+            }
+            return RedirectToAction("Dashboard");
+        }
+
 
         public ActionResult ViewStudentsByClass(string classID)
         {
@@ -227,7 +298,7 @@ namespace SPade.Controllers
                 {
                     if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                     {
-                        if (solutionsFileUpload.ContentLength < 104857600) //check if the uploaded solution is more than 150mb
+                        if (solutionsFileUpload.ContentLength > 104857600)
                         {
                             //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
                             string slnFilePath = "";
@@ -458,6 +529,44 @@ namespace SPade.Controllers
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
 
+        //used to move the class file into the subfolder in order for it to be compiled
+        //THIS IS BROKEN. PAY NO MIND TO IT
+
+        //public bool MoveFileToSubFolder(string fileName, string slnFilePath, string assignmentTitle, ProgLanguage lang, bool isTestCasePresent)
+        //{
+        //    bool saveStatus = false;
+
+        //    try
+        //    {
+        //        //access the solution + move the classname.java/.cs into a folder 
+        //        var toLowerPath = fileName.ToLower();
+        //        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+        //        Directory.CreateDirectory(path);
+
+        //        //get the appropirate file and move the file accordingly
+        //        var ogPath = "";
+        //        var newPath = "";
+
+        //        if (lang.LangageType.Equals("Java"))
+        //        {
+        //            ogPath = slnFilePath + "/" + fileName + ".java";
+        //            newPath = path + "/" + fileName + ".java";
+        //        }
+        //        else if (lang.LangageType.Equals("C#"))
+        //        {
+        //            ogPath = slnFilePath + "/" + fileName + ".cs";
+        //            newPath = path + "/" + fileName + ".cs";
+        //        }
+
+        //        System.IO.File.Move(ogPath, newPath);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        saveStatus = true;
+        //    }
+        //    return saveStatus;
+        //}
+
         //used to insert the data into DB. 
         public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
         {
@@ -472,20 +581,14 @@ namespace SPade.Controllers
             newAssignment.AssgnTitle = addAssgn.AssgnTitle;
             newAssignment.Describe = addAssgn.Describe;
             newAssignment.MaxAttempt = addAssgn.MaxAttempt;
-
-            if (addAssgn.StartDate == null)
-            {
-                newAssignment.StartDate = DateTime.Now; //if a lecturer dont select a date, we take the time that this assignment is created as the start time
-            }
-            else
-            {
-                newAssignment.StartDate = addAssgn.StartDate;
-            }
+            newAssignment.StartDate = addAssgn.StartDate;
             newAssignment.DueDate = addAssgn.DueDate;
             newAssignment.Solution = addAssgn.Solution;
             newAssignment.ModuleCode = addAssgn.ModuleId;
+            // newAssignment.CreateBy = "s1431489";
             newAssignment.CreateBy = User.Identity.GetUserName();
             newAssignment.CreateAt = DateTime.Now;
+            //newAssignment.UpdatedBy = "s1431489";
             newAssignment.UpdatedBy = User.Identity.GetUserName();
             newAssignment.UpdatedAt = DateTime.Now;
             db.Assignments.Add(newAssignment);

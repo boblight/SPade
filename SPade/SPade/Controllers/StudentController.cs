@@ -88,8 +88,10 @@ namespace SPade.Controllers
             }
             else if (file == null)
             {
-                Session["UploadError"] = "Please select a file to upload.";
-                return RedirectToAction("SubmitAssignment", assgnId);
+                //Session["UploadError"] = "Please select a file to upload.";
+                //return RedirectToAction("SubmitAssignment", assgnId);
+                ModelState.AddModelError("UploadError", "Please select a file to upload.");
+                return View();
             }
             else if (Path.GetExtension(file.FileName) != ".zip")
             {
