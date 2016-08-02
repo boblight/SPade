@@ -634,6 +634,21 @@ namespace SPade.Controllers
 
 
 
+        public ActionResult UpdateAdmin()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command)
+        {
+            return View(model);
+
+        }
+
+
+
+
+
 
     }
 }
