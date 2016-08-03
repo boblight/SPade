@@ -436,6 +436,52 @@ namespace SPade.Controllers
             return View(lmmvm);
         }
 
+        public ActionResult ManageCourse()
+        {
+            List<ManageCourseViewModel> lmcvm = new List<ManageCourseViewModel>();
+
+            List<Course> c = new List<Course>();
+            c = db.Courses.ToList();
+
+            foreach (Course i in c)
+            {
+                ManageCourseViewModel mcvm = new ManageCourseViewModel();
+
+                mcvm.CourseId = i.CourseID.ToString();
+                mcvm.CourseName = i.CourseName;
+                mcvm.Abbreviation = i.CourseAbbr;
+                mcvm.CreatedBy = i.CreatedBy.ToUpper();
+                mcvm.ClassCount = db.Classes.Where(cl => cl.CourseID == i.CourseID).Count().ToString();
+
+                lmcvm.Add(mcvm);
+            }
+
+            return View(lmcvm);
+        }
+
+        public ActionResult ManageAdmin()
+        {
+            List<ManageAdminViewModel> lmavm = new List<ManageAdminViewModel>();
+
+            List<Admin> a = new List<Admin>();
+            a = db.Admins.ToList();
+
+            foreach (Admin i in a)
+            {
+                ManageAdminViewModel mavm = new ManageAdminViewModel();
+
+                mavm.AdminId = i.AdminID.ToUpper();
+                mavm.Name = i.FullName;
+                mavm.ContactNo = i.ContactNo.ToString();
+                mavm.Email = i.Email;
+                mavm.CreatedBy = i.CreatedBy.ToUpper();
+
+                lmavm.Add(mavm);
+            }
+
+            return View(lmavm);
+        }
+
         public ActionResult ManageLecturer()
         {
             ManageLecturerViewModel ml = new ManageLecturerViewModel();
