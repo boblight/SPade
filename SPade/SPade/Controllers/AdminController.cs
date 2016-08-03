@@ -439,9 +439,9 @@ namespace SPade.Controllers
         public ActionResult ManageLecturer()
         {
             ManageLecturerViewModel ml = new ManageLecturerViewModel();
-            List<Lecturer> lecturer = new List<Lecturer>();
-            lecturer = db.Lecturers.ToList();
-            return View();
+            List<Lecturer> lecturers = new List<Lecturer>();
+            lecturers = db.Lecturers.ToList();
+            return View(lecturers);
         }
 
         public ActionResult UpdateClass()
@@ -590,6 +590,7 @@ namespace SPade.Controllers
             {
                 if (S.AdminNo == AdminNo)
                 {
+                    model.AdminNo = S.AdminNo;
                     model.Name = S.Name;
                     model.ClassID = S.ClassID;
                     model.ContactNo = S.ContactNo;
@@ -601,8 +602,7 @@ namespace SPade.Controllers
 
         [HttpPost]
         public ActionResult UpdateStudent(UpdateStudentViewModel model, string command, string AdminNo)
-        {
-            
+        {           
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -670,18 +670,18 @@ namespace SPade.Controllers
             return View(model);
         }
 
-        public ActionResult UpdateLecturer()
+        public ActionResult UpdateLecturer(string StaffID)
         {
             UpdateLecturerViewModel model = new UpdateLecturerViewModel();
             //Get Lecturer
-
-            string x = "s4444444";
+          
             List<Lecturer> Lecturers = db.Lecturers.ToList();
 
             foreach (Lecturer L in Lecturers)
             {
-                if (L.StaffID == x)
+                if (L.StaffID == StaffID)
                 {
+                    model.StaffID = L.StaffID;
                     model.Name = L.Name;
                     model.ContactNo = L.ContactNo;
                     model.Email = L.Email;
@@ -692,16 +692,16 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command)
+        public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command, string StaffID)
         {
-            string x = "s4444444";
+            
             List<Lecturer> Lecturers = db.Lecturers.ToList();
             if (command.Equals("Update"))
             {
                 //Update functionality
                 foreach (Lecturer L in Lecturers)
                 {
-                    if (L.StaffID == x)
+                    if (L.StaffID == StaffID)
                     {
                         //Update Lecturer
                         L.UpdatedBy = "ADMIN";
@@ -734,7 +734,7 @@ namespace SPade.Controllers
                 //Delete functionality
                 foreach (Lecturer L in Lecturers)
                 {
-                    if (L.StaffID == x)
+                    if (L.StaffID == StaffID)
                     {
                         //Update Lecturer
                         L.DeletedBy = "ADMIN";
