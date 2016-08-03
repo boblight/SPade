@@ -1,4 +1,4 @@
-﻿@model SPade.ViewModels.Admin.AddLecturerViewMode
+﻿@model SPade.ViewModels.Admin.AddLecturerViewModel
 
 @{
     ViewBag.Title = "Add Lecturer";
@@ -18,7 +18,7 @@
             <div class="col-md-12">
                 <label for="inputStaffNo" class="control-label">Staff ID</label>
                 @Html.TextBoxFor(m => m.StaffID, new { @class = "form-control input-md", required = "required" })
-                <span class="help-block">With 'p' (e.g. p1234567)</span>
+                <span class="help-block">With 's' (e.g. s1234567)</span>
                 <span class="help-block">@Html.ValidationMessage("StaffID", new { @class = "text-danger" })</span>
             </div>
         </div>
@@ -30,6 +30,18 @@
                 <span class="help-block">e.g. John Tan</span>
                 <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
 
+            </div>
+        </div>
+
+        <!-- lecturerClass-->
+        <div class="form-group">
+            <div>
+                <div class="col-md-12">
+                    <label>Class</label>
+                    @{
+                        @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
+                    }
+                </div>
             </div>
         </div>
 

@@ -11,7 +11,7 @@ namespace SPade.ViewModels.Shared
     {
         [Required]
         [StringLength(8, ErrorMessage = "Please enter a valid Admin No.")]
-        [RegularExpression("^[p]+$", ErrorMessage = "Please enter valid Admin No.")]
+        [RegularExpression("^[p0-9]{8,8}$", ErrorMessage = "Please enter valid Admin No.")]
         public string AdminNo { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Do not exceed 50 characters")]

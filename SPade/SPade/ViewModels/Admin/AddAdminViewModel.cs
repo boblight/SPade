@@ -6,7 +6,7 @@ namespace SPade.ViewModels.Admin
     {
         [Required]
         [StringLength(8, ErrorMessage = "Please enter a valid Admin ID")]
-        [RegularExpression("^[a]+$", ErrorMessage = "Please enter valid Admin ID")]
+        [RegularExpression("^[a0-9]{8,8}$", ErrorMessage = "Please enter valid Admin ID")]
         public string AdminID { get; set; }
         [Required]
         [RegularExpression("^[0-9]{8,8}$", ErrorMessage = "Please enter a proper Singapore-based phone number")]
