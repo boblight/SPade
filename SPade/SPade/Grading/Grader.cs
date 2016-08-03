@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Web;
 using System.Xml;
 
@@ -99,174 +100,179 @@ namespace SPade.Grading
                     break;
             }
 
-            ////create a new file for grading executable to append output to
-            //File.AppendAllText(filePath + "/output.txt", "");
+            //create a new file for grading executable to append output to
+            File.AppendAllText(filePath + "/output.txt", "");
 
-            ////arguments to be passed into the grading executable
-            ////1st string is path to submission
-            ////2nd string is path to test case
-            ////3rd string is path to solution
-            ////4th string is path to output
-            //arguments = new string[4];
-            //arguments[0] = pathToExecutable;
-            //arguments[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
-            //arguments[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
-            //arguments[3] = filePath + "/output.txt";
+            //arguments to be passed into the grading executable
+            //1st string is path to submission
+            //2nd string is path to test case
+            //3rd string is path to solution
+            //4th string is path to output
+            arguments = new string[4];
+            arguments[0] = pathToExecutable;
+            arguments[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
+            arguments[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
+            arguments[3] = filePath + "/output.txt";
 
-            ////File.AppendAllText("C:/Users/tongliang/Desktop/viewarguments.txt", arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3]);
-
-            //procInfo.CreateNoWindow = true;
-            //procInfo.UseShellExecute = false;
-            //procInfo.Arguments = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
-
-            ////run sandbox grading
-            //proc = Process.Start(procInfo);
-
-            //proc.WaitForExit(10000);
-
-            ////once Grading process is done, retrive output and return to controller
-            //return Decimal.Parse(File.ReadAllText(filePath + "/output.txt"));
-
-
+            //File.AppendAllText("C:/Users/tongliang/Desktop/viewarguments.txt", arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3]);
 
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
+            procInfo.Arguments = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
 
-            //redirect standard output and error
-            procInfo.RedirectStandardError = true;
-            procInfo.RedirectStandardOutput = true;
-            procInfo.RedirectStandardInput = true;
+            //run sandbox grading
+            proc = Process.Start(procInfo);
 
-            //load test cases if any
-            XmlDocument testCaseFile = new XmlDocument();
-            XmlDocument solutionFile = new XmlDocument();
+            proc.WaitForExit(10000);
 
-            try
-            {
-                testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml"));
-                XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
+            //once Grading process is done, retrive output and return to controller
+            return Decimal.Parse(File.ReadAllText(filePath + "/output.txt"));
+            //while (true)
+            //{
+            //    decimal returnVal == Decimal.Parse(File.ReadAllText(filePath + "/output.txt"))
+            //if (returnVal != null) { return returnVal; }
+            //}
 
-                foreach (XmlNode testcase in testcaseList)
-                {
-                    List<string> inputs = new List<string>();
-                    noOfTestCase++;
-                    proc = Process.Start(procInfo);
-                    subOut = "";
 
-                    System.IO.StreamWriter sw = proc.StandardInput;
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //procInfo.CreateNoWindow = true;
+            //procInfo.UseShellExecute = false;
 
-                    foreach (XmlNode input in testcase.ChildNodes)
-                    {
-                        inputs.Add(input.InnerText);
-                        sw.WriteLine(input.InnerText);
-                        sw.Flush();
-                    }//end of inputs
+            ////redirect standard output and error
+            //procInfo.RedirectStandardError = true;
+            //procInfo.RedirectStandardOutput = true;
+            //procInfo.RedirectStandardInput = true;
 
-                    //check if there is another error thrown by program
-                    error = proc.StandardError.ReadToEnd();
+            ////load test cases if any
+            //XmlDocument testCaseFile = new XmlDocument();
+            //XmlDocument solutionFile = new XmlDocument();
 
-                    if (error.Equals(""))
-                    {
-                        //scan through all lines of standard output to retrieve anything
-                        string checkEmpty;
-                        do
-                        {
-                            checkEmpty = proc.StandardOutput.ReadLine();
-                            subOut += checkEmpty;
-                        } while (checkEmpty != null);
+            //try
+            //{
+            //    testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml"));
+            //    XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
 
-                        foreach (string input in inputs)
-                        {
-                            subOut += input;
-                        }
-                    }
-                    else
-                    {
-                        //program given fail if an error was encountered
-                        return 2; //program fails to run
-                    }//check if error
+            //    foreach (XmlNode testcase in testcaseList)
+            //    {
+            //        List<string> inputs = new List<string>();
+            //        noOfTestCase++;
+            //        proc = Process.Start(procInfo);
+            //        subOut = "";
 
-                    //get the output from solution
-                    solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
-                    XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
-                    //loop through all the solutions to find matching
-                    foreach (XmlNode solution in solutions)
-                    {
-                        if (subOut.Equals(solution.InnerText))
-                        {
-                            testCasePassed++;
-                        }
-                    }//end of foreach loop
+            //        System.IO.StreamWriter sw = proc.StandardInput;
 
-                    if (!proc.WaitForExit(10000))
-                    {
-                        proc.Kill();
-                        return 3;//infinite loop
-                    }
-                }//end of test case loop
+            //        foreach (XmlNode input in testcase.ChildNodes)
+            //        {
+            //            inputs.Add(input.InnerText);
+            //            sw.WriteLine(input.InnerText);
+            //            sw.Flush();
+            //        }//end of inputs
 
-                //else
-                //{
-                //    //terminate sandboxie if program fails
-                //    Process terminateSandbox = new Process();
-                //    terminateSandbox.StartInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"  /terminate_all");
-                //    terminateSandbox.StartInfo.CreateNoWindow = true;
-                //    terminateSandbox.StartInfo.UseShellExecute = false;
-                //    terminateSandbox.Start();
-                //    terminateSandbox.WaitForExit();
+            //        //check if there is another error thrown by program
+            //        error = proc.StandardError.ReadToEnd();
 
-                //    return 2; //program failure
-                //}
+            //        if (error.Equals(""))
+            //        {
+            //            //scan through all lines of standard output to retrieve anything
+            //            string checkEmpty;
+            //            do
+            //            {
+            //                checkEmpty = proc.StandardOutput.ReadLine();
+            //                subOut += checkEmpty;
+            //            } while (checkEmpty != null);
 
-                return (testCasePassed / noOfTestCase); //return results
-            }
-            catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
-            {//start catch, application does not accept input
-                try
-                {
-                    proc = Process.Start(procInfo);
-                }
-                catch (Exception exc)
-                {
-                    return 2; //return error code if program failed to run
-                }
+            //            foreach (string input in inputs)
+            //            {
+            //                subOut += input;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            //program given fail if an error was encountered
+            //            return 2; //program fails to run
+            //        }//check if error
 
-                if (!proc.WaitForExit(10000))
-                {
-                    return 3; //return error code if program failed to produce feedback after 10 seconds
-                }
+            //        //get the output from solution
+            //        solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
+            //        XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
+            //        //loop through all the solutions to find matching
+            //        foreach (XmlNode solution in solutions)
+            //        {
+            //            if (subOut.Equals(solution.InnerText))
+            //            {
+            //                testCasePassed++;
+            //            }
+            //        }//end of foreach loop
 
-                proc.WaitForExit();
+            //        if (!proc.WaitForExit(10000))
+            //        {
+            //            proc.Kill();
+            //            return 3;//infinite loop
+            //        }
+            //    }//end of test case loop
 
-                //read output and error
-                error = proc.StandardError.ReadToEnd();
-                exitcode = proc.ExitCode; //0 means success 1 means failure
+            //    //else
+            //    //{
+            //    //    //terminate sandboxie if program fails
+            //    //    Process terminateSandbox = new Process();
+            //    //    terminateSandbox.StartInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"  /terminate_all");
+            //    //    terminateSandbox.StartInfo.CreateNoWindow = true;
+            //    //    terminateSandbox.StartInfo.UseShellExecute = false;
+            //    //    terminateSandbox.Start();
+            //    //    terminateSandbox.WaitForExit();
 
-                //get output from submission
+            //    //    return 2; //program failure
+            //    //}
 
-                ans = proc.StandardOutput.ReadToEnd();
+            //    return (testCasePassed / noOfTestCase); //return results
+            //}
+            //catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
+            //{//start catch, application does not accept input
+            //    try
+            //    {
+            //        proc = Process.Start(procInfo);
+            //    }
+            //    catch (Exception exc)
+            //    {
+            //        return 2; //return error code if program failed to run
+            //    }
 
-                //get the output from solution
-                //get the output from solution
-                solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
-                solOut = solutionFile.SelectSingleNode("/body/solution").InnerText;
+            //    if (!proc.WaitForExit(10000))
+            //    {
+            //        return 3; //return error code if program failed to produce feedback after 10 seconds
+            //    }
 
-                if (exitcode == 0 && error.Equals("")) //if submission properly ran and produced desired outcome
-                {
-                    if (ans.Equals(solOut))
-                    {
-                        return 1;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
-                }
-                else //means fail
-                {
-                    return 2;//program failure
-                }
-            }//end of catch
+            //    proc.WaitForExit();
+
+            //    //read output and error
+            //    error = proc.StandardError.ReadToEnd();
+            //    exitcode = proc.ExitCode; //0 means success 1 means failure
+
+            //    //get output from submission
+
+            //    ans = proc.StandardOutput.ReadToEnd();
+
+            //    //get the output from solution
+            //    //get the output from solution
+            //    solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml"));
+            //    solOut = solutionFile.SelectSingleNode("/body/solution").InnerText;
+
+            //    if (exitcode == 0 && error.Equals("")) //if submission properly ran and produced desired outcome
+            //    {
+            //        if (ans.Equals(solOut))
+            //        {
+            //            return 1;
+            //        }
+            //        else
+            //        {
+            //            return 0;
+            //        }
+            //    }
+            //    else //means fail
+            //    {
+            //        return 2;//program failure
+            //    }
+            //}//end of catch
         }//end of grade method
 
         public int RunLecturerSolution()
