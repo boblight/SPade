@@ -91,6 +91,21 @@ namespace SPade.Controllers
             return View("ManageLecturer");
         }
 
+        public FileResult DownloadBulkAddStudentFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddStudent.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
+        public FileResult DownloadBulkAddLecturerFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddLecturer.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddLecturer.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
 
         [HttpGet]
         public ActionResult BulkAddStudent()
@@ -574,11 +589,11 @@ namespace SPade.Controllers
             return View(model);
         }
 
-        
+
         public ActionResult UpdateStudent(string AdminNo)
         {
             UpdateStudentViewModel model = new UpdateStudentViewModel();
-            
+
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -602,7 +617,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateStudent(UpdateStudentViewModel model, string command, string AdminNo)
         {
-            
+
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;

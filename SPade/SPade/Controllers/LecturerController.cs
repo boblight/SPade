@@ -84,6 +84,14 @@ namespace SPade.Controllers
 
         }
 
+        public FileResult DownloadBulkAddStudentFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddStudent.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
         [HttpGet]
         public ActionResult BulkAddStudent()
         {
@@ -531,7 +539,7 @@ namespace SPade.Controllers
 
         //used to move the class file into the subfolder in order for it to be compiled
         //THIS IS BROKEN. PAY NO MIND TO IT
-    
+
 
         //used to insert the data into DB. 
         public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)

@@ -326,6 +326,8 @@
     <Content Include="Models\DAL\SPadeDBModel.edmx.diagram">
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
     </Content>
+    <Content Include="BulkUploadFiles\BulkAddLecturer.csv" />
+    <Content Include="BulkUploadFiles\BulkAddStudent.csv" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
     <Content Include="Scripts\indexscript.js" />
