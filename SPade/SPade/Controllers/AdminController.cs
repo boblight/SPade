@@ -574,11 +574,11 @@ namespace SPade.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        public ActionResult UpdateStudent()
+        
+        public ActionResult UpdateStudent(string AdminNo)
         {
             UpdateStudentViewModel model = new UpdateStudentViewModel();
-            string x = "p1111111";
+            
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -588,7 +588,7 @@ namespace SPade.Controllers
 
             foreach (Student S in Students)
             {
-                if (S.AdminNo == x)
+                if (S.AdminNo == AdminNo)
                 {
                     model.Name = S.Name;
                     model.ClassID = S.ClassID;
@@ -600,9 +600,9 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateStudent(UpdateStudentViewModel model, string command)
+        public ActionResult UpdateStudent(UpdateStudentViewModel model, string command, string AdminNo)
         {
-            string x = "p3333333";
+            
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -614,7 +614,7 @@ namespace SPade.Controllers
             {
                 foreach (Student S in Students)
                 {
-                    if (S.AdminNo == x)
+                    if (S.AdminNo == AdminNo)
                     {
                         S.UpdatedBy = User.Identity.Name;
                         S.UpdatedAt = DateTime.Now;
@@ -643,7 +643,7 @@ namespace SPade.Controllers
             {
                 foreach (Student S in Students)
                 {
-                    if (S.AdminNo == x)
+                    if (S.AdminNo == AdminNo)
                     {
                         S.DeletedBy = User.Identity.Name;
                         S.DeletedAt = DateTime.Now;

@@ -259,7 +259,6 @@
     <Compile Include="ViewModels\Admin\AddCourseViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddLecturerViewMode.cs" />
     <Compile Include="ViewModels\Admin\AddModuleViewModel.cs" />
-    <Compile Include="ViewModels\Admin\AddStudentViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddStudentViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageClassViewModel.cs" />
