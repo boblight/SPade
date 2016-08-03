@@ -298,7 +298,7 @@ namespace SPade.Controllers
                 {
                     if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                     {
-                        if (solutionsFileUpload.ContentLength > 104857600)
+                        if (solutionsFileUpload.ContentLength < 104857600)
                         {
                             //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
                             string slnFilePath = "";
