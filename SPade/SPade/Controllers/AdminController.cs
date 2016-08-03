@@ -453,48 +453,48 @@ namespace SPade.Controllers
 
         public ActionResult ManageCourse()
         {
-            List<ManageModuleViewModel> lmmvm = new List<ManageModuleViewModel>();
+            List<ManageCourseViewModel> lmcvm = new List<ManageCourseViewModel>();
 
-            List<Module> m = new List<Module>();
-            m = db.Modules.ToList();
+            List<Course> c = new List<Course>();
+            c = db.Courses.ToList();
 
-            foreach (Module i in m)
+            foreach (Course i in c)
             {
-                ManageModuleViewModel mmvm = new ManageModuleViewModel();
+                ManageCourseViewModel mcvm = new ManageCourseViewModel();
 
-
-                mmvm.ModuleCode = i.ModuleCode;
-                mmvm.ModuleName = i.ModuleName;
-                mmvm.ProgrammingLanguage = db.ProgLanguages.ToList().Find(p => p.LanguageId == i.LanguageId).LangageType;
-                mmvm.CreatedBy = i.CreatedBy.ToUpper();
-
-                lmmvm.Add(mmvm);
+                mcvm.CourseId = i.CourseID.ToString();
+                mcvm.CourseName = i.CourseName;
+                mcvm.Abbreviation = i.CourseAbbr;
+                mcvm.CreatedBy = i.CreatedBy.ToUpper();
+                mcvm.ClassCount= db.Classes.Where(cl => cl.CourseID == i.CourseID).Count().ToString();
+                
+                lmcvm.Add(mcvm);
             }
 
-            return View(lmmvm);
+            return View(lmcvm);
         }
 
         public ActionResult ManageAdmin()
         {
-            List<ManageModuleViewModel> lmmvm = new List<ManageModuleViewModel>();
+            List<ManageAdminViewModel> lmavm = new List<ManageAdminViewModel>();
 
-            List<Module> m = new List<Module>();
-            m = db.Modules.ToList();
+            List<Admin> a = new List<Admin>();
+            a = db.Admins.ToList();
 
-            foreach (Module i in m)
+            foreach (Admin i in a)
             {
-                ManageModuleViewModel mmvm = new ManageModuleViewModel();
+                ManageAdminViewModel mavm = new ManageAdminViewModel();
 
+                mavm.AdminId = i.AdminID.ToUpper();
+                mavm.Name = i.FullName;
+                mavm.ContactNo = i.ContactNo.ToString();
+                mavm.Email = i.Email;
+                mavm.CreatedBy = i.CreatedBy.ToUpper();
 
-                mmvm.ModuleCode = i.ModuleCode;
-                mmvm.ModuleName = i.ModuleName;
-                mmvm.ProgrammingLanguage = db.ProgLanguages.ToList().Find(p => p.LanguageId == i.LanguageId).LangageType;
-                mmvm.CreatedBy = i.CreatedBy.ToUpper();
-
-                lmmvm.Add(mmvm);
+                lmavm.Add(mavm);
             }
 
-            return View(lmmvm);
+            return View(lmavm);
         }
 
         public ActionResult ManageLecturer()
