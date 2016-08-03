@@ -1,15 +1,18 @@
 ﻿using Ionic.Zip;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using SPade.Grading;
+using SPade.Models;
 using SPade.Models.DAL;
 using SPade.ViewModels.Lecturer;
+using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -21,6 +24,29 @@ namespace SPade.Controllers
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
+        private ApplicationUserManager _userManager;
+
+        public LecturerController()
+        {
+
+        }
+
+        public LecturerController(ApplicationUserManager userManager)
+        {
+            UserManager = userManager;
+        }
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
 
         // GET: Lecturer
         public ActionResult Dashboard()
@@ -65,39 +91,96 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        public ActionResult BulkAddStudent(HttpPostedFileBase file, BulkAddStudentViewModel addStud)
         {
-            //Upload and save the file
-            // extract only the filename
-            var fileName = Path.GetFileName(file.FileName);
-            // store the file inside ~/App_Data/uploads folder
-            var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
-            file.SaveAs(path);
-
-            string[] lines = System.IO.File.ReadAllLines(path);
-            List<Student> slist = new List<Student>();
-            for (int i = 1; i < lines.Length; i++)
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv"))
             {
-                if (!string.IsNullOrEmpty(lines[i]))
-                {
-                    Student s = new Student();
-                    s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-                    s.AdminNo = lines[i].Split(',')[1];
-                    s.Name = lines[i].Split(',')[2];
-                    s.Email = lines[i].Split(',')[3];
-                    s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
-                    s.CreatedAt = DateTime.Now;
-                    s.CreatedBy = User.Identity.GetUserName();
-                    s.UpdatedAt = DateTime.Now;
-                    s.UpdatedBy = User.Identity.GetUserName();
+                //Upload and save the file
+                // extract only the filename
+                var fileName = Path.GetFileName(file.FileName);
+                // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                file.SaveAs(path);
 
-                    slist.Add(s);
+
+
+                string[] lines = System.IO.File.ReadAllLines(path);
+                List<Student> slist = new List<Student>();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(lines[i]))
+                    {
+                        Student s = new Student();
+                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
+                        s.AdminNo = lines[i].Split(',')[1];
+                        s.Name = lines[i].Split(',')[2];
+                        s.Email = lines[i].Split(',')[3];
+                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                        s.CreatedAt = DateTime.Now;
+                        s.CreatedBy = User.Identity.GetUserName();
+                        s.UpdatedAt = DateTime.Now;
+                        s.UpdatedBy = User.Identity.GetUserName();
+
+                        slist.Add(s);
+                    }
                 }
+                db.Students.AddRange(slist);
+                db.SaveChanges();
             }
-            db.Students.AddRange(slist);
-            db.SaveChanges();
+            else
+            {
+                addStud.Student = db.Students.ToList();
+                string err = "Uploaded file is invalid ! Please try again.";
+                TempData["SlnWarning"] = err;
+                TempData["TcWarning"] = err;
+                return View(addStud);
+            }
 
             return View("ManageClassesAndStudents");
+        }
+
+        public ActionResult AddOneStudent()
+        {
+            AddStudentViewModel model = new AddStudentViewModel();
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddOneStudent(AddStudentViewModel model, FormCollection formCollection)
+        {
+            var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
+            user.EmailConfirmed = true;
+            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+            if (result.Succeeded)
+            {
+                var student = new Student()
+                {
+                    AdminNo = model.AdminNo.Trim(),
+                    Name = model.Name,
+                    Email = model.Email,
+                    ContactNo = model.ContactNo,
+                    ClassID = Int32.Parse(formCollection["ClassID"].ToString()),
+                    CreatedBy = User.Identity.Name,
+                    UpdatedBy = User.Identity.Name,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                };
+
+                db.Students.Add(student);
+                db.SaveChanges();
+            }
+            else
+            {
+                //error in registering account
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error);
+                }
+                return View(model);
+            }
+            return RedirectToAction("Dashboard");
         }
 
 

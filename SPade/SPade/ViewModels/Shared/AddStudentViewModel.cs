@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using SPade.Models.DAL;
+using System.ComponentModel.DataAnnotations;
 
-namespace SPade.ViewModels.Admin
+namespace SPade.ViewModels.Shared
 {
-    public class AddLecturerViewMode
+    public class AddStudentViewModel
     {
         [Required]
-        [StringLength(8, ErrorMessage = "Please enter a valid Staff number")]
-        [RegularExpression("^[s]+$", ErrorMessage = "Please enter valid Staff number")]
-        public string StaffID { get; set; }
+        [StringLength(8, ErrorMessage = "Please enter a valid Admin No.")]
+        [RegularExpression("^[p]+$", ErrorMessage = "Please enter valid Admin No.")]
+        public string AdminNo { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Do not exceed 50 characters")]
         [Display(Name = "Full Name")]
@@ -23,5 +24,8 @@ namespace SPade.ViewModels.Admin
         [RegularExpression("^[0-9]{8,8}$", ErrorMessage = "Please enter a proper Singapore-based phone number")]
         [Display(Name = "Contact Number")]
         public int ContactNo { get; set; }
+        public List<Class> Classes { get; set; }
+        public string ClassName { get; set; }
+        public int ClassID { get; set; }
     }
 }

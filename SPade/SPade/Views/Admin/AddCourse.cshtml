@@ -1,0 +1,51 @@
+﻿@model SPade.ViewModels.Admin.AddCourseViewModel
+
+@{
+    ViewBag.Title = "AddCourse";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Scripts.Render("~/bundles/jqueryval")
+
+@using (Html.BeginForm("AddCourse", "Admin", FormMethod.Post))
+{
+    <div class="container">
+        <div class="col-md-4 col-md-offset-4 form-horizontal">
+            <fieldset>
+                @Html.AntiForgeryToken()
+                <legend>Add Module</legend>
+
+                <span class="help-block">
+                    <span class="text-danger" id="slnRunError">@TempData["Error"]</span>
+                </span>
+
+                <!--Course Name-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Course Name</label>
+                        @Html.TextBoxFor(m => Model.CourseName, new { @class = "form-control" })
+                        <span class="help-block">@Html.ValidationMessage("CourseName", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <!--Course Abbreviation-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Course Abbrevation</label>
+                        @Html.TextBoxFor(m => Model.CourseAbv, new { @class = "form-control" })
+                        <span class="help-block">@Html.ValidationMessage("CourseAbv", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
+                        <a href="javascript:history.back()" class="btn btn btn-default">Cancel</a>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+    </div>
+}
+

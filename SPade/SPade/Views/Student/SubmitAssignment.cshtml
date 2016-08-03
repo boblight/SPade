@@ -53,7 +53,8 @@
                             <label class="control-label" for="AssignmentFile">Upload Solution (Note: Please zip up your project before uploading)</label>
                             @Html.TextBoxFor(m => m.File, new { type = "file" })
                             @Html.ValidationMessageFor(m => m.File)
-                            <p class="text-danger">@Html.ValidationMessage("UploadError")</p>
+                            @*<p class="text-danger">@Html.ValidationMessage("UploadError")</p>*@
+                            @Html.ValidationSummary(true, "UploadError", new { @class = "text-danger" })
                         </div>
                     </div>
 

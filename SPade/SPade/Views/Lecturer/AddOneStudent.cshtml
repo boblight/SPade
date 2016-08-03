@@ -1,40 +1,51 @@
-﻿@model SPade.ViewModels.Admin.AddAdminViewModel
+﻿@model SPade.ViewModels.Shared.AddStudentViewModel
 
 @{
-    ViewBag.Title = "AddOneAdmin";
+    ViewBag.Title = "Add Student";
 }
 
-@using (Html.BeginForm("AddOneAdmin", "Admin", FormMethod.Post))
+@using (Html.BeginForm("AddOneStudent", "Lecturer", FormMethod.Post))
 {
 
     <div class="col-md-4 col-md-offset-4 form-horizontal">
-
         <fieldset>
             @Html.AntiForgeryToken()
-            <legend>Add new Administrator</legend>
+            <legend>Add Student</legend>
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-            <!-- adminIdInput-->
+            <!-- studentIdInput-->
             <div class="form-group">
                 <div class="col-md-12">
-                    <label>Admin Id</label>
-                    @Html.TextBoxFor(m => m.AdminID, new { @class = "form-control input-md", required = "required" })
-                    <span class="help-block">With 'a' (e.g. a1234567)</span>
-                    <span class="help-block">@Html.ValidationMessage("AdminID", new { @class = "text-danger" })</span>
+                    <label>Admin No</label>
+                    @Html.TextBoxFor(m => m.AdminNo, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">With 'p' (e.g. p1234567)</span>
+                    <span class="help-block">@Html.ValidationMessage("AdminNo", new { @class = "text-danger" })</span>
                 </div>
             </div>
 
-            <!-- adminNameInput-->
+            <!-- studentNameInput-->
             <div class="form-group">
                 <div class="col-md-12">
-                    @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control input-md", required = "required" })
+                    @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md", required = "required" })
                     <span class="help-block">e.g. John Tan</span>
                     <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
                 </div>
             </div>
 
-            <!-- adminEmail-->
+            <!-- studentClass-->
+            <div class="form-group">
+                <div>
+                    <div class="col-md-12">
+                        <label>Class</label>
+                        @{
+                            @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- studentEmail-->
             <div class="form-group">
                 <div class="col-md-12">
 
@@ -46,12 +57,11 @@
                 </div>
             </div>
 
-            <!-- adminContactNo-->
+            <!-- studentContactNo-->
             <div class="form-group">
                 <div class="col-md-12">
                     @Html.LabelFor(m => m.ContactNo, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control", required = "required" })
-                    <span class="help-block">e.g. 12345678</span>
+                    @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
                     <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
                 </div>
             </div>
@@ -66,8 +76,7 @@
 
         </fieldset>
     </div>
-}
-
+                            }
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
