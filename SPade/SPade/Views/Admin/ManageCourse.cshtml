@@ -1,6 +1,6 @@
-﻿@model IEnumerable<SPade.ViewModels.Admin.ManageModuleViewModel>
+﻿@model IEnumerable<SPade.ViewModels.Admin.ManageCourseViewModel>
 @{
-    ViewBag.Title = "Manage Modules";
+    ViewBag.Title = "Manage Courses";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -10,11 +10,11 @@
 <div class="container">
     <div class="col-md-10 col-md-offset-1">
         <fieldset>
-            <legend>Manage Modules</legend>
+            <legend>Manage Courses</legend>
 
             <div class="form-group ">
                 <div>
-                    <a href="AddModule" class="btn btn-primary">Add Module</a>
+                    <a href="AddCourse" class="btn btn-primary">Add Course</a>
                 </div>
             </div>
 
@@ -29,10 +29,11 @@
                 <table class="table table-striped table-hover tablesorter">
                     <thead>
                         <tr>
-                            <th>Module Code</th>
-                            <th>Module Name</th>
-                            <th>Programming Language</th>
+                            <th>Course ID</th>
+                            <th>Course Name</th>
+                            <th>Abbreviation</th>
                             <th>Created By</th>
+                            <th>No. of Classes</th>
                             <th class="sorter-false">Update</th>
                         </tr>
                     </thead>
@@ -41,11 +42,12 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(Model => item.ModuleCode)</td>
-                                <td>@Html.DisplayFor(Model => item.ModuleName)</td>
-                                <td>@Html.DisplayFor(Model => item.ProgrammingLanguage)</td>
+                                <td>@Html.DisplayFor(Model => item.CourseId)</td>
+                                <td>@Html.DisplayFor(Model => item.CourseName)</td>
+                                <td>@Html.DisplayFor(Model => item.Abbreviation)</td>
                                 <td>@Html.DisplayFor(Model => item.CreatedBy)</td>
-                                <td><a href="/Admin/UpdateModule/@Html.DisplayFor(Model => item.ModuleCode)" class="btn btn-primary">Update</a></td>
+                                <td>@Html.DisplayFor(Model => item.ClassCount)</td>
+                                <td><a href="/Admin/UpdateCourse/@Html.DisplayFor(Model => item.CourseId)" class="btn btn-primary">Update</a></td>
                             </tr>
 
                         }

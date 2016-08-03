@@ -84,6 +84,14 @@ namespace SPade.Controllers
 
         }
 
+        public FileResult DownloadBulkAddStudentFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddStudent.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
         [HttpGet]
         public ActionResult BulkAddStudent()
         {
@@ -183,10 +191,27 @@ namespace SPade.Controllers
             return RedirectToAction("Dashboard");
         }
 
-
         public ActionResult ViewStudentsByClass(string classID)
         {
-            return View();
+            int cID = Int32.Parse(classID);
+
+            List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
+            List<Student> sList = new List<Student>();
+
+            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
+
+            foreach (Student s in sList)
+            {
+                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
+
+                vm.AdminNo = s.AdminNo;
+                vm.Name = s.Name;
+                vm.Email = s.Email;
+                vm.ContactNo = s.ContactNo;
+
+                studList.Add(vm);
+            }
+            return View(studList);
         }
 
         public ActionResult UpdateStudent()
@@ -528,10 +553,6 @@ namespace SPade.Controllers
             //everything all okay 
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
-
-        //used to move the class file into the subfolder in order for it to be compiled
-        //THIS IS BROKEN. PAY NO MIND TO IT
-    
 
         //used to insert the data into DB. 
         public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)

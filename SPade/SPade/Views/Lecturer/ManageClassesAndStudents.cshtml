@@ -47,7 +47,7 @@
                                 @Html.DisplayFor(model => item.NumberOfStudents)
                             </td>
                             <td>
-                                @Html.ActionLink("View Class", "ViewStudentsByClass", "Lecturer", new { @id = (string)ViewData["item.Id"], @class = "btn btn-danger" })
+                                @Html.ActionLink("View Class", "ViewStudentsByClass", "Lecturer", new { ClassID = item.Id }, new { @id = "classId", @class = "btn btn-primary" })
                             </td>
                         </tr>
                     }
