@@ -261,7 +261,9 @@
     <Compile Include="ViewModels\Admin\AddModuleViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddStudentViewModel.cs" />
+    <Compile Include="ViewModels\Admin\ManageAdminViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageClassViewModel.cs" />
+    <Compile Include="ViewModels\Admin\ManageCourseViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageModuleViewModel.cs" />
     <Compile Include="ViewModels\Admin\ManageStudentViewModel.cs" />
@@ -414,6 +416,8 @@
     <Content Include="Views\Admin\UpdateCourse.cshtml" />
     <Content Include="Scripts\jquery.validate.date.js" />
     <Content Include="Views\Lecturer\AddOneStudent.cshtml" />
+    <Content Include="Views\Admin\ManageCourse.cshtml" />
+    <Content Include="Views\Admin\ManageAdmin.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
