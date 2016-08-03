@@ -70,14 +70,16 @@ namespace SPade.Controllers
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
                     //grade submission
-                    Grader grader = new Grader(filePathForGrade, fileName, assgnId, langUsed.LangageType);
+                    //Grader grader = new Grader(filePathForGrade, fileName, assgnId, langUsed.LangageType);
+                    Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed.LangageType);
 
                     //grade returns an 'exitcode'
                     //if result is more than 1 then is error code
                     //2 for program failure
                     //3 for infinite loop
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
-                    decimal result = grader.grade();
+                    //decimal result = grader.grade();
+                    decimal result = sandBoxedGrading.runSandboxedGrading();
 
                     submission.Grade = result;
                     submission.AssignmentID = assgnId;

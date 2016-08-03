@@ -185,6 +185,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Grading\Grader.cs" />
+    <Compile Include="Grading\Sandboxer.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\DAL\Admin.cs">
@@ -257,7 +258,7 @@
     <Compile Include="ViewModels\Admin\AddAdminViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddClassViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddCourseViewModel.cs" />
-    <Compile Include="ViewModels\Admin\AddLecturerViewMode.cs" />
+    <Compile Include="ViewModels\Admin\AddLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\AddModuleViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddLecturerViewModel.cs" />
     <Compile Include="ViewModels\Admin\BulkAddStudentViewModel.cs" />
@@ -291,7 +292,6 @@
   <ItemGroup>
     <Content Include="Grader.exe" />
     <Content Include="Ionic.Zip.xml" />
-    <Content Include="App_Data\log.txt" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -331,6 +331,7 @@
     </Content>
     <Content Include="BulkUploadFiles\BulkAddLecturer.csv" />
     <Content Include="BulkUploadFiles\BulkAddStudent.csv" />
+    <Content Include="GradingSandbox.snk" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
     <Content Include="Scripts\indexscript.js" />
@@ -453,9 +454,21 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Visual Studio 2015\Projects\Grade\Grade\Grade.csproj">
+      <Project>{74fdb689-d5b4-410b-a7b8-5fbd6cacbfdf}</Project>
+      <Name>Grade</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>GradingSandbox.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

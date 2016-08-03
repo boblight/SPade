@@ -191,7 +191,7 @@ namespace SPade.Controllers
         public ActionResult AddOneStudent()
         {
             AddStudentViewModel model = new AddStudentViewModel();
-            List<Class> allClasses = db.Classes.ToList();
+            List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
             model.Classes = allClasses;
             return View(model);
         }
@@ -293,7 +293,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddOneLecturer(AddLecturerViewMode model)
+        public async Task<ActionResult> AddOneLecturer(AddLecturerViewModel model, FormCollection formCollection)
         {
             try
             {
@@ -313,6 +313,12 @@ namespace SPade.Controllers
                         CreatedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
                     };
+
+                    db.Lec_Class.Add(new Lec_Class
+                    {
+                        ClassID = int.Parse(formCollection["ClassID"].ToString()),
+                        StaffID = model.StaffID
+                    });
 
                     db.Lecturers.Add(lecturer);
                     db.SaveChanges();
@@ -342,12 +348,15 @@ namespace SPade.Controllers
                 throw;
 
             }
-            return View(model);
+            return RedirectToAction("Dashboard");
         }
 
         public ActionResult AddOneLecturer()
         {
-            return View();
+            AddLecturerViewModel model = new AddLecturerViewModel();
+            List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+            model.Classes = allClasses;
+            return View(model);
         }
 
         public ActionResult AddModule()
@@ -580,7 +589,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateClass(UpdateClassViewModel model, string command, string ClassID)
         {
-            
+
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -663,11 +672,11 @@ namespace SPade.Controllers
             return View(model);
         }
 
-        
+
         public ActionResult UpdateStudent(string AdminNo)
         {
             UpdateStudentViewModel model = new UpdateStudentViewModel();
-            
+
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -691,7 +700,7 @@ namespace SPade.Controllers
 
         [HttpPost]
         public ActionResult UpdateStudent(UpdateStudentViewModel model, string command, string AdminNo)
-        {           
+        {
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -763,7 +772,7 @@ namespace SPade.Controllers
         {
             UpdateLecturerViewModel model = new UpdateLecturerViewModel();
             //Get Lecturer
-          
+
             List<Lecturer> Lecturers = db.Lecturers.ToList();
 
             foreach (Lecturer L in Lecturers)
@@ -798,7 +807,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command, string StaffID)
         {
-            
+
             List<Lecturer> Lecturers = db.Lecturers.ToList();
             if (command.Equals("Update"))
             {
@@ -892,7 +901,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command, 
+        public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command,
             string AdminID)
         {
             List<Admin> Admins = db.Admins.ToList();

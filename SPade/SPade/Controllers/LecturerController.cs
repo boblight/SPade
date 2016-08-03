@@ -191,10 +191,27 @@ namespace SPade.Controllers
             return RedirectToAction("Dashboard");
         }
 
-
         public ActionResult ViewStudentsByClass(string classID)
         {
-            return View();
+            int cID = Int32.Parse(classID);
+
+            List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
+            List<Student> sList = new List<Student>();
+
+            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
+
+            foreach (Student s in sList)
+            {
+                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
+
+                vm.AdminNo = s.AdminNo;
+                vm.Name = s.Name;
+                vm.Email = s.Email;
+                vm.ContactNo = s.ContactNo;
+
+                studList.Add(vm);
+            }
+            return View(studList);
         }
 
         public ActionResult UpdateStudent()
