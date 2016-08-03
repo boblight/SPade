@@ -11,7 +11,7 @@ namespace SPade.ViewModels.Admin
         public List<string> StaffID { get; set; }
         public int Count { get; set; }
         public List<string> Name { get; set; }
-        public SPade.Models.DAL.Lecturer lecturer { get; set; }
+        public SPade.Models.DAL.Lecturer lecturers { get; set; }
         public SPade.Models.DAL.Class classes { get; set; }
 
         

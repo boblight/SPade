@@ -306,7 +306,7 @@ namespace SPade.Controllers
                 {
                     if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                     {
-                        if (solutionsFileUpload.ContentLength > 104857600)
+                        if (solutionsFileUpload.ContentLength < 104857600)
                         {
                             //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
                             string slnFilePath = "";
@@ -536,10 +536,6 @@ namespace SPade.Controllers
             //everything all okay 
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
-
-        //used to move the class file into the subfolder in order for it to be compiled
-        //THIS IS BROKEN. PAY NO MIND TO IT
-
 
         //used to insert the data into DB. 
         public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)

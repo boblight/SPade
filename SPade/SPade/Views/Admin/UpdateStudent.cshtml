@@ -16,6 +16,8 @@
 
             <legend>Update Student</legend>
 
+            @Html.Hidden("AdminNo")
+
             <!-- studentNameInput-->
             <div class="form-group">
                 <div class="col-md-12">
@@ -69,7 +71,6 @@
                     @Html.Raw(TempData["msg"])
                 </div>
             </div>
-            @*@Request.QueryString["AdminNo"]*@
         </fieldset>
     </div>
 </div>
