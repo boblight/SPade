@@ -314,12 +314,6 @@ namespace SPade.Controllers
             {
                 lecturer = db.Lecturers.ToList().FindAll(lect => lect.StaffID == i.StaffID);
             }
-
-
-
-
-
-
             return View();
         }
         public ActionResult ManageStudent()
@@ -468,34 +462,44 @@ namespace SPade.Controllers
             }
             return View(model);
         }
-        [HttpGet]
-        public ActionResult UpdateStudent()
+
+        public ActionResult UpdateStudent(string AdminNo)
         {
             UpdateStudentViewModel model = new UpdateStudentViewModel();
-            string x = "p1111111";
+            string x = AdminNo;
+
+
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
 
-            //Get Student           
-            List<Student> Students = db.Students.ToList();
+            Student ss = new Student();
+            ss = db.Students.ToList().Find(s => s.AdminNo == AdminNo);
 
-            foreach (Student S in Students)
-            {
-                if (S.AdminNo == x)
-                {
-                    model.Name = S.Name;
-                    model.ClassID = S.ClassID;
-                    model.ContactNo = S.ContactNo;
-                    model.Email = S.Email;
-                }
-            }
+            model.Name = ss.Name;
+            model.ClassID = ss.ClassID;
+            model.ContactNo = ss.ContactNo;
+            model.Email = ss.Email;
+
+            ////Get Student           
+            //List<Student> Students = db.Students.ToList();
+
+            //foreach (Student S in Students)
+            //{
+            //    if (S.AdminNo == x)
+            //    {
+            //        model.Name = S.Name;
+            //        model.ClassID = S.ClassID;
+            //        model.ContactNo = S.ContactNo;
+            //        model.Email = S.Email;
+            //    }
+            //}
             return View(model);
         }
         [HttpPost]
         public ActionResult UpdateStudent(UpdateStudentViewModel model, string command)
         {
-            string x = "p3333333";
+            string x = this.RouteData.Values["AdminNo"].ToString();
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
             model.Classes = allClasses;
@@ -568,6 +572,7 @@ namespace SPade.Controllers
             //Get Lecturer
 
             string x = "s4444444";
+            //string x = this.RouteData.Values["StaffID"].ToString();
             List<Lecturer> Lecturers = db.Lecturers.ToList();
 
             foreach (Lecturer L in Lecturers)
@@ -588,7 +593,7 @@ namespace SPade.Controllers
             string x = "s4444444";
             List<Lecturer> Lecturers = db.Lecturers.ToList();
             if (command.Equals("Update"))
-            {   
+            {
                 //Update functionality
                 foreach (Lecturer L in Lecturers)
                 {
@@ -683,7 +688,7 @@ namespace SPade.Controllers
             string x = "a1111111";
             List<Admin> Admins = db.Admins.ToList();
             if (command.Equals("Update"))
-            {   
+            {
                 //Update Functionality
                 foreach (Admin A in Admins)
                 {
