@@ -84,6 +84,14 @@ namespace SPade.Controllers
 
         }
 
+        public FileResult DownloadBulkAddStudentFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddStudent.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
         [HttpGet]
         public ActionResult BulkAddStudent()
         {
@@ -532,40 +540,6 @@ namespace SPade.Controllers
         //used to move the class file into the subfolder in order for it to be compiled
         //THIS IS BROKEN. PAY NO MIND TO IT
 
-        //public bool MoveFileToSubFolder(string fileName, string slnFilePath, string assignmentTitle, ProgLanguage lang, bool isTestCasePresent)
-        //{
-        //    bool saveStatus = false;
-
-        //    try
-        //    {
-        //        //access the solution + move the classname.java/.cs into a folder 
-        //        var toLowerPath = fileName.ToLower();
-        //        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
-        //        Directory.CreateDirectory(path);
-
-        //        //get the appropirate file and move the file accordingly
-        //        var ogPath = "";
-        //        var newPath = "";
-
-        //        if (lang.LangageType.Equals("Java"))
-        //        {
-        //            ogPath = slnFilePath + "/" + fileName + ".java";
-        //            newPath = path + "/" + fileName + ".java";
-        //        }
-        //        else if (lang.LangageType.Equals("C#"))
-        //        {
-        //            ogPath = slnFilePath + "/" + fileName + ".cs";
-        //            newPath = path + "/" + fileName + ".cs";
-        //        }
-
-        //        System.IO.File.Move(ogPath, newPath);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        saveStatus = true;
-        //    }
-        //    return saveStatus;
-        //}
 
         //used to insert the data into DB. 
         public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
