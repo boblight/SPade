@@ -43,14 +43,14 @@
                         foreach (var item in Model)
                         {
                             <tr>
-                                <th>@Html.DisplayFor(Model => item.Assignment.AssgnTitle)</th>
-                                <th>@Html.DisplayFor(Model => item.Assignment.CreateAt)</th>
-                                <th>@Html.DisplayFor(Model => item.Classes)</th>
-                                <th>@Html.DisplayFor(Model => item.Assignment.StartDate)</th>
-                                <th>@Html.DisplayFor(Model => item.Assignment.DueDate)</th>
-                                <th>
+                                <td>@Html.DisplayFor(Model => item.Assignment.AssgnTitle)</td>
+                                <td>@Html.DisplayFor(Model => item.Assignment.CreateAt)</td>
+                                <td>@Html.DisplayFor(Model => item.Classes)</td>
+                                <td>@Html.DisplayFor(Model => item.Assignment.StartDate)</td>
+                                <td>@Html.DisplayFor(Model => item.Assignment.DueDate)</td>
+                                <td>
                                     @Html.ActionLink("Update", "UpdateAssignment", "Lecturer", new { AssignmentId = item.Assignment.AssignmentID }, new { id = "UpdateAssignment", @class = "btn btn-primary" })
-                                </th>
+                                </td>
                             </tr>
                         }
                     }

@@ -390,15 +390,15 @@ namespace SPade.Controllers
 
         public ActionResult ManageClass()
         {
-            List<Lecturer> lecturer = new List<Lecturer>();
+            List<Lecturer> lecturers = new List<Lecturer>();
             List<Class> classes = new List<Class>();
             List<Lec_Class> lc = db.Lec_Class.ToList().FindAll(c => c.ClassID == 1);
 
             foreach (Lec_Class i in lc)
             {
-                lecturer = db.Lecturers.ToList().FindAll(lect => lect.StaffID == i.StaffID);
+                lecturers = db.Lecturers.ToList().FindAll(lect => lect.StaffID == i.StaffID);
             }
-            return View();
+            return View(lecturers);
         }
 
         public ActionResult ManageStudent()
@@ -436,6 +436,52 @@ namespace SPade.Controllers
             return View(lmmvm);
         }
 
+        public ActionResult ManageCourse()
+        {
+            List<ManageCourseViewModel> lmcvm = new List<ManageCourseViewModel>();
+
+            List<Course> c = new List<Course>();
+            c = db.Courses.ToList();
+
+            foreach (Course i in c)
+            {
+                ManageCourseViewModel mcvm = new ManageCourseViewModel();
+
+                mcvm.CourseId = i.CourseID.ToString();
+                mcvm.CourseName = i.CourseName;
+                mcvm.Abbreviation = i.CourseAbbr;
+                mcvm.CreatedBy = i.CreatedBy.ToUpper();
+                mcvm.ClassCount = db.Classes.Where(cl => cl.CourseID == i.CourseID).Count().ToString();
+
+                lmcvm.Add(mcvm);
+            }
+
+            return View(lmcvm);
+        }
+
+        public ActionResult ManageAdmin()
+        {
+            List<ManageAdminViewModel> lmavm = new List<ManageAdminViewModel>();
+
+            List<Admin> a = new List<Admin>();
+            a = db.Admins.ToList();
+
+            foreach (Admin i in a)
+            {
+                ManageAdminViewModel mavm = new ManageAdminViewModel();
+
+                mavm.AdminId = i.AdminID.ToUpper();
+                mavm.Name = i.FullName;
+                mavm.ContactNo = i.ContactNo.ToString();
+                mavm.Email = i.Email;
+                mavm.CreatedBy = i.CreatedBy.ToUpper();
+
+                lmavm.Add(mavm);
+            }
+
+            return View(lmavm);
+        }
+
         public ActionResult ManageLecturer()
         {
             ManageLecturerViewModel ml = new ManageLecturerViewModel();
@@ -444,10 +490,9 @@ namespace SPade.Controllers
             return View(lecturers);
         }
 
-        public ActionResult UpdateClass()
+        public ActionResult UpdateClass(string ClassID)
         {
             UpdateClassViewModel model = new UpdateClassViewModel();
-            int x = 3;
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -465,7 +510,7 @@ namespace SPade.Controllers
 
             foreach (Class C in Classes)
             {
-                if (C.ClassID.Equals(x))
+                if (C.ClassID.Equals(ClassID))
                 {
                     model.CourseID = C.CourseID;
                     model.ClassID = C.ClassID;
@@ -475,7 +520,7 @@ namespace SPade.Controllers
             }
             foreach (Lec_Class LC in all_Lec_Class)
             {
-                if (LC.ClassID.Equals(x))
+                if (LC.ClassID.Equals(ClassID))
                 {
                     model.StaffID = LC.StaffID;
                 }
@@ -487,11 +532,9 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateClass(UpdateClassViewModel model, string command)
+        public ActionResult UpdateClass(UpdateClassViewModel model, string command, string ClassID)
         {
-            int x = 3;
-
-
+            
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -511,7 +554,7 @@ namespace SPade.Controllers
             {
                 foreach (Class C in Classes)
                 {
-                    if (C.ClassID.Equals(x))
+                    if (C.ClassID.Equals(ClassID))
                     {
                         C.UpdatedBy = "ADMIN";
                         C.UpdatedAt = DateTime.Now;
@@ -530,7 +573,7 @@ namespace SPade.Controllers
                 }
                 foreach (Lec_Class LC in all_Lec_Class)
                 {
-                    if (LC.ClassID.Equals(x))
+                    if (LC.ClassID.Equals(ClassID))
                     {
                         try
                         {
@@ -552,7 +595,7 @@ namespace SPade.Controllers
             {
                 foreach (Class C in Classes)
                 {
-                    if (C.ClassID.Equals(x))
+                    if (C.ClassID.Equals(ClassID))
                     {
                         C.DeletedBy = "ADMIN";
                         C.DeletedAt = DateTime.Now;
@@ -766,18 +809,17 @@ namespace SPade.Controllers
 
         }
 
-        public ActionResult UpdateAdmin()
+        public ActionResult UpdateAdmin(string AdminID)
         {
             UpdateAdminViewModel model = new UpdateAdminViewModel();
             //Get Lecturer
-
-            string x = "a1111111";
             List<Admin> Admins = db.Admins.ToList();
 
             foreach (Admin A in Admins)
             {
-                if (A.AdminID == x)
+                if (A.AdminID == AdminID)
                 {
+                    model.AdminID = A.AdminID;
                     model.FullName = A.FullName;
                     model.ContactNo = A.ContactNo;
                     model.Email = A.Email;
@@ -789,16 +831,16 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command)
+        public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command, 
+            string AdminID)
         {
-            string x = "a1111111";
             List<Admin> Admins = db.Admins.ToList();
             if (command.Equals("Update"))
             {
                 //Update Functionality
                 foreach (Admin A in Admins)
                 {
-                    if (A.AdminID == x)
+                    if (A.AdminID == AdminID)
                     {
 
                         A.UpdatedBy = "ADMIN";
@@ -829,7 +871,7 @@ namespace SPade.Controllers
             {   // Delete Function
                 foreach (Admin A in Admins)
                 {
-                    if (A.AdminID == x)
+                    if (A.AdminID == AdminID)
                     {
                         //Update Lecturer
                         A.DeletedBy = "ADMIN";
