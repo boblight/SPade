@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SPade.Models.DAL.Lecturer>
+﻿@model IEnumerable<SPade.ViewModels.Admin.ManageLecturerViewModel>
 @{
     ViewBag.Title = "Manage Lecturer";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -37,6 +37,8 @@
                             <th>Lecturer Name</th>
                             <th>Contact No.</th>
                             <th>Email</th>
+                            <th>Created By</th>
+                            <th>No. of Classes</th>
                             <th class="sorter-false">Update</th>
                         </tr>
                     </thead>
@@ -48,6 +50,8 @@
                                 <td>@Html.DisplayFor(Model => item.Name)</td>
                                 <td>@Html.DisplayFor(Model => item.ContactNo)</td>
                                 <td>@Html.DisplayFor(Model => item.Email)</td>
+                                <td>@Html.DisplayFor(Model => item.CreatedBy)</td>
+                                <td>@Html.DisplayFor(Model => item.NumClasses)</td>
                                 <td>@Html.ActionLink("Update", "UpdateLecturer", "Admin", new { StaffID = item.StaffID }, new { id = "UpdateLecturer", @class = "btn btn-primary" })</td>
                             </tr>                      
                              
