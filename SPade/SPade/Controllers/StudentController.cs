@@ -119,6 +119,7 @@ namespace SPade.Controllers
 
             Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
             svm.Module = module.ModuleCode + " " + module.ModuleName;
+            svm.IssuedBy = db.Lecturers.ToList().Find(lc => lc.StaffID == assignment.CreateBy).Name.ToString();
 
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
