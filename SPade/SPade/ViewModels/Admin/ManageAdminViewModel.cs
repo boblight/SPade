@@ -7,7 +7,7 @@ namespace SPade.ViewModels.Admin
 {
     public class ManageAdminViewModel
     {
-        public String AdminId { get; set; }
+        public String AdminID { get; set; }
         public String Name { get; set; }
         public String ContactNo { get; set; }
         public String Email { get; set; }

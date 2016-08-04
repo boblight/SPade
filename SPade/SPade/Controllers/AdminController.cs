@@ -509,7 +509,7 @@ namespace SPade.Controllers
             {
                 ManageAdminViewModel mavm = new ManageAdminViewModel();
 
-                mavm.AdminId = i.AdminID.ToUpper();
+                mavm.AdminID = i.AdminID.ToUpper();
                 mavm.Name = i.FullName;
                 mavm.ContactNo = i.ContactNo.ToString();
                 mavm.Email = i.Email;
@@ -887,7 +887,7 @@ namespace SPade.Controllers
 
             foreach (Admin A in Admins)
             {
-                if (A.AdminID == AdminID)
+                if (A.AdminID.ToUpper() == AdminID)
                 {
                     model.AdminID = A.AdminID;
                     model.FullName = A.FullName;
@@ -910,7 +910,7 @@ namespace SPade.Controllers
                 //Update Functionality
                 foreach (Admin A in Admins)
                 {
-                    if (A.AdminID == AdminID)
+                    if (A.AdminID.ToUpper() == AdminID)
                     {
 
                         A.UpdatedBy = "ADMIN";
@@ -941,7 +941,7 @@ namespace SPade.Controllers
             {   // Delete Function
                 foreach (Admin A in Admins)
                 {
-                    if (A.AdminID == AdminID)
+                    if (A.AdminID.ToUpper() == AdminID)
                     {
                         //Update Lecturer
                         A.DeletedBy = "ADMIN";
