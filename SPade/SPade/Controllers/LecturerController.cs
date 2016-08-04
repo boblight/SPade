@@ -65,9 +65,9 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file, BulkAddStudentViewModel addStud)
+        public ActionResult BulkAddStudent(HttpPostedFileBase file)
         {
-            if ((file != null && Path.GetExtension(file.FileName) == ".csv"))
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
                 //Upload and save the file
                 // extract only the filename
@@ -75,8 +75,6 @@ namespace SPade.Controllers
             // store the file inside ~/App_Data/uploads folder
                 var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
                 file.SaveAs(path);
-
-
 
                 string[] lines = System.IO.File.ReadAllLines(path);
                 List<Student> slist = new List<Student>();
@@ -102,11 +100,10 @@ namespace SPade.Controllers
                 db.SaveChanges();
             }else
             {
-                addStud.Student = db.Students.ToList();
-                string err = "Uploaded file is invalid ! Please try again.";
-                TempData["SlnWarning"] = err;
-                TempData["TcWarning"] = err;
-                return View(addStud);
+                // Upload file is invalid
+                string err = "Uploaded file is invalid ! Please try again!";
+                TempData["InputWarning"] = err;
+                return View();
             }
     
             return View("ManageClassesAndStudents");

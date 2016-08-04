@@ -36,34 +36,44 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult BulkAddLecturer(HttpPostedFileBase file)
         {
-            //Upload and save the file
-            // extract only the filename
-            var fileName = Path.GetFileName(file.FileName);
-            // store the file inside ~/App_Data/uploads folder
-            var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
-            file.SaveAs(path);
-
-            string[] lines = System.IO.File.ReadAllLines(path);
-            List<Lecturer> lectlist = new List<Lecturer>();
-            for (int i = 1; i < lines.Length; i++)
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
-                if (!string.IsNullOrEmpty(lines[i]))
-                {
-                    Lecturer lect = new Lecturer();
-                    lect.StaffID = lines[i].Split(',')[0];
-                    lect.Name = lines[i].Split(',')[1];
-                    lect.Email = lines[i].Split(',')[2];
-                    lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
-                    lect.CreatedAt = DateTime.Now;
-                    lect.CreatedBy = User.Identity.GetUserName();
-                    lect.UpdatedAt = DateTime.Now;
-                    lect.UpdatedBy = User.Identity.GetUserName();
+                //Upload and save the file
+                // extract only the filename
+                var fileName = Path.GetFileName(file.FileName);
+                // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                file.SaveAs(path);
 
-                    lectlist.Add(lect);
+                string[] lines = System.IO.File.ReadAllLines(path);
+                List<Lecturer> lectlist = new List<Lecturer>();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(lines[i]))
+                    {
+                        Lecturer lect = new Lecturer();
+                        lect.StaffID = lines[i].Split(',')[0];
+                        lect.Name = lines[i].Split(',')[1];
+                        lect.Email = lines[i].Split(',')[2];
+                        lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
+                        lect.CreatedAt = DateTime.Now;
+                        lect.CreatedBy = User.Identity.GetUserName();
+                        lect.UpdatedAt = DateTime.Now;
+                        lect.UpdatedBy = User.Identity.GetUserName();
+
+                        lectlist.Add(lect);
+                    }
                 }
+                db.Lecturers.AddRange(lectlist);
+                db.SaveChanges();
             }
-            db.Lecturers.AddRange(lectlist);
-            db.SaveChanges();
+            else
+            {
+                // Upload file is invalid
+                string err = "Uploaded file is invalid ! Please try again!";
+                TempData["InputWarning"] = err;
+                return View();
+            }
 
             return View("ManageLecturer");
         }
@@ -78,36 +88,45 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult BulkAddStudent(HttpPostedFileBase file)
         {
-            //Upload and save the file
-            // extract only the filename
-            var fileName = Path.GetFileName(file.FileName);
-            // store the file inside ~/App_Data/uploads folder
-            var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
-            file.SaveAs(path);
-
-            string[] lines = System.IO.File.ReadAllLines(path);
-            List<Student> slist = new List<Student>();
-            for (int i = 1; i < lines.Length; i++)
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
-                if (!string.IsNullOrEmpty(lines[i]))
+                //Upload and save the file
+                // extract only the filename
+                var fileName = Path.GetFileName(file.FileName);
+                // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                file.SaveAs(path);
+
+                string[] lines = System.IO.File.ReadAllLines(path);
+                List<Student> slist = new List<Student>();
+                for (int i = 1; i < lines.Length; i++)
                 {
-                    Student s = new Student();
-                    s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-                    s.AdminNo = lines[i].Split(',')[1];
-                    s.Name = lines[i].Split(',')[2];
-                    s.Email = lines[i].Split(',')[3];
-                    s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
-                    s.CreatedAt = DateTime.Now;
-                    s.CreatedBy = User.Identity.GetUserName();
-                    s.UpdatedAt = DateTime.Now;
-                    s.UpdatedBy = User.Identity.GetUserName();
+                    if (!string.IsNullOrEmpty(lines[i]))
+                    {
+                        Student s = new Student();
+                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
+                        s.AdminNo = lines[i].Split(',')[1];
+                        s.Name = lines[i].Split(',')[2];
+                        s.Email = lines[i].Split(',')[3];
+                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                        s.CreatedAt = DateTime.Now;
+                        s.CreatedBy = User.Identity.GetUserName();
+                        s.UpdatedAt = DateTime.Now;
+                        s.UpdatedBy = User.Identity.GetUserName();
 
-                    slist.Add(s);
+                        slist.Add(s);
+                    }
                 }
+                db.Students.AddRange(slist);
+                db.SaveChanges();
             }
-            db.Students.AddRange(slist);
-            db.SaveChanges();
-
+            else
+            {
+                // Upload file is invalid
+                string err = "Uploaded file is invalid ! Please try again!";
+                TempData["InputWarning"] = err;
+                return View();
+            }
             return View("ManageStudent");
         }
         [HttpPost]
@@ -588,7 +607,7 @@ namespace SPade.Controllers
             string x = "s4444444";
             List<Lecturer> Lecturers = db.Lecturers.ToList();
             if (command.Equals("Update"))
-            {   
+            {
                 //Update functionality
                 foreach (Lecturer L in Lecturers)
                 {
@@ -683,7 +702,7 @@ namespace SPade.Controllers
             string x = "a1111111";
             List<Admin> Admins = db.Admins.ToList();
             if (command.Equals("Update"))
-            {   
+            {
                 //Update Functionality
                 foreach (Admin A in Admins)
                 {

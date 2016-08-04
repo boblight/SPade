@@ -3,33 +3,33 @@
     ViewBag.Title = "Bulk Add Student";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-            @using (Html.BeginForm("BulkAddStudent", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("BulkAddStudent", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
-                <div class="col-md-4 col-md-offset-4 form-horizontal">
-                    <fieldset>
-                        <legend>Bulk Add Students</legend>
+    <div class="col-md-4 col-md-offset-4 form-horizontal">
+        <fieldset>
+            <legend>Bulk Add Students</legend>
 
-                        <p>1. <a href="CSVdownload"><i class="glyphicon glyphicon-file"></i>Download this .CSV file</a> and fill up the fields accordingly with students' details</p>
-                        <p>2. Upload the completed file using the form below to add students according to the file's contents</p>
+            <p>1. <a href="CSVdownload"><i class="glyphicon glyphicon-file"></i>Download this .CSV file</a> and fill up the fields accordingly with students' details</p>
+            <p>2. Upload the completed file using the form below to add students according to the file's contents</p>
 
-
-                        <div class="form-group">
-                            <div class="col-md-12">
-                                <label class=" control-label" for="filebutton">Upload completed .CSV file</label>
-                                <input id="BulkAddFile" type="file" style="border: solid 1px red" name="file" />
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-12">
-                                <input type="submit" class="btn btn-primary" value="Save"/>
-                                <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
-                            </div>
-                        </div>
-                    </fieldset>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label class=" control-label" for="filebutton">Upload completed .CSV file</label>
+                    <input id="BulkAddFile" type="file" style="border: solid 1px red" name="file" />
+                    @TempData["InputWarning"]
                 </div>
-            }
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+}
 
 
 
-          
+
