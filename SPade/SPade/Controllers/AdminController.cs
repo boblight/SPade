@@ -399,26 +399,56 @@ namespace SPade.Controllers
 
         public ActionResult ManageClass()
         {
-            List<Lecturer> lecturers = new List<Lecturer>();
-            List<Class> classes = new List<Class>();
-            List<Lec_Class> lc = db.Lec_Class.ToList().FindAll(c => c.ClassID == 1);
+            List<ManageClassViewModel> lvm = new List<ManageClassViewModel>();
 
-            foreach (Lec_Class i in lc)
+            List<Class> x = new List<Class>();
+            x = db.Classes.ToList();
+
+            foreach (Class i in x)
             {
-                lecturers = db.Lecturers.ToList().FindAll(lect => lect.StaffID == i.StaffID);
+                ManageClassViewModel vm = new ManageClassViewModel();
+
+                vm.ClassID = i.ClassID.ToString();
+                vm.Course= db.Courses.ToList().Find(cs => cs.CourseID == i.CourseID).CourseName;
+                vm.Class = i.ClassName.ToString();
+                vm.CreatedBy = i.CreatedBy.ToUpper();
+                vm.NumLecturers= db.Lec_Class.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
+                vm.NumStudents = db.Students.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
+
+                lvm.Add(vm);
             }
-            return View(lecturers);
+
+            return View(lvm);
         }
 
         public ActionResult ManageStudent()
         {
-            ManageStudentViewModel ms = new ManageStudentViewModel();
+            List<ManageStudentViewModel> lvm = new List<ManageStudentViewModel>();
 
-            List<Student> students = new List<Student>();
+            List<Student> x = new List<Student>();
+            x = db.Students.ToList();
 
-            students = db.Students.ToList();
+            foreach (Student i in x)
+            {
+                ManageStudentViewModel vm = new ManageStudentViewModel();
 
-            return View(students);
+                vm.AdminNo = i.AdminNo.ToUpper();
+                vm.Name = i.Name;
+                vm.ContactNo = i.ContactNo.ToString();
+                vm.Email = i.Email;
+
+                int courseId= db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).CourseID;
+                string className = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).ClassName;
+                string courseAbbr = db.Courses.ToList().Find(cs => cs.CourseID == courseId).CourseAbbr;
+
+
+                vm.Class = courseAbbr+"/" +className;
+                vm.CreatedBy = i.CreatedBy.ToUpper();
+
+                lvm.Add(vm);
+            }
+
+            return View(lvm);
 
         }
 
@@ -493,10 +523,26 @@ namespace SPade.Controllers
 
         public ActionResult ManageLecturer()
         {
-            ManageLecturerViewModel ml = new ManageLecturerViewModel();
-            List<Lecturer> lecturers = new List<Lecturer>();
-            lecturers = db.Lecturers.ToList();
-            return View(lecturers);
+            List<ManageLecturerViewModel> lvm = new List<ManageLecturerViewModel>();
+
+            List<Lecturer> x = new List<Lecturer>();
+            x = db.Lecturers.ToList();
+
+            foreach (Lecturer i in x)
+            {
+                ManageLecturerViewModel vm = new ManageLecturerViewModel();
+
+                vm.StaffID = i.StaffID.ToUpper();
+                vm.Name = i.Name;
+                vm.ContactNo = i.ContactNo.ToString();
+                vm.Email = i.Email;
+                vm.CreatedBy = i.CreatedBy.ToUpper();
+                vm.NumClasses= db.Lec_Class.Where(cl => cl.StaffID == i.StaffID).Count().ToString();
+                
+                lvm.Add(vm);
+            }
+
+            return View(lvm);
         }
 
         public ActionResult UpdateClass(string ClassID)
@@ -738,9 +784,24 @@ namespace SPade.Controllers
                     model.ContactNo = L.ContactNo;
                     model.Email = L.Email;
                 }
-
             }
             return View(model);
+        }
+
+        public FileResult DownloadBulkAddStudentFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddStudent.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
+        public FileResult DownloadBulkAddLecturerFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddLecturer.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddLecturer.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
         [HttpPost]
