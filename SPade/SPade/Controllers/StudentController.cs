@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security.AntiXss;
 
 namespace SPade.Controllers
 {
@@ -117,6 +118,8 @@ namespace SPade.Controllers
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
             svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
 
+
+
             Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
             svm.Module = module.ModuleCode + " " + module.ModuleName;
 
@@ -130,6 +133,9 @@ namespace SPade.Controllers
             }
 
             svm.assignment = assignment;
+
+            //encode the richtext from the DB 
+            svm.assignment.Describe = AntiXssEncoder.HtmlEncode(svm.assignment.Describe, false);
 
             return View(svm);
         }//end of get SubmitAssignment
