@@ -402,7 +402,7 @@ namespace SPade.Controllers
             List<ManageClassViewModel> lvm = new List<ManageClassViewModel>();
 
             List<Class> x = new List<Class>();
-            x = db.Classes.ToList();
+            x = db.Classes.Where(a => a.DeletedAt == null).ToList();
 
             foreach (Class i in x)
             {
@@ -426,7 +426,7 @@ namespace SPade.Controllers
             List<ManageStudentViewModel> lvm = new List<ManageStudentViewModel>();
 
             List<Student> x = new List<Student>();
-            x = db.Students.ToList();
+            x = db.Students.Where(a => a.DeletedAt == null).ToList();
 
             foreach (Student i in x)
             {
@@ -456,7 +456,7 @@ namespace SPade.Controllers
             List<ManageModuleViewModel> lmmvm = new List<ManageModuleViewModel>();
 
             List<Module> m = new List<Module>();
-            m = db.Modules.ToList();
+            m = db.Modules.Where(a => a.DeletedAt == null).ToList();
 
             foreach (Module i in m)
             {
@@ -479,7 +479,7 @@ namespace SPade.Controllers
             List<ManageCourseViewModel> lmcvm = new List<ManageCourseViewModel>();
 
             List<Course> c = new List<Course>();
-            c = db.Courses.ToList();
+            c = db.Courses.Where(a => a.DeletedAt == null).ToList();
 
             foreach (Course i in c)
             {
@@ -502,7 +502,7 @@ namespace SPade.Controllers
             List<ManageAdminViewModel> lmavm = new List<ManageAdminViewModel>();
 
             List<Admin> a = new List<Admin>();
-            a = db.Admins.ToList();
+            a = db.Admins.Where(ad => ad.DeletedAt == null).ToList();
 
             foreach (Admin i in a)
             {
@@ -525,7 +525,7 @@ namespace SPade.Controllers
             List<ManageLecturerViewModel> lvm = new List<ManageLecturerViewModel>();
 
             List<Lecturer> x = new List<Lecturer>();
-            x = db.Lecturers.ToList();
+            x = db.Lecturers.Where(a => a.DeletedAt == null).ToList();
 
             foreach (Lecturer i in x)
             {
