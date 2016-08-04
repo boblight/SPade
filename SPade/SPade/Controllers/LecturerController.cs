@@ -62,7 +62,7 @@ namespace SPade.Controllers
             string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
             //get the students in that classs
             foreach (Class c in managedClasses)

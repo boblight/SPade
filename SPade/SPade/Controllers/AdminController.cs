@@ -441,7 +441,6 @@ namespace SPade.Controllers
                 string className = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).ClassName;
                 string courseAbbr = db.Courses.ToList().Find(cs => cs.CourseID == courseId).CourseAbbr;
 
-
                 vm.Class = courseAbbr+"/" +className;
                 vm.CreatedBy = i.CreatedBy.ToUpper();
 
