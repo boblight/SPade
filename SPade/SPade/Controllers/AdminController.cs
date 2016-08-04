@@ -387,6 +387,7 @@ namespace SPade.Controllers
 
             return View(mVM);
         }
+
         [HttpPost]
         public ActionResult AddModule(AddModuleViewModel addModuleVM)
         {
@@ -413,7 +414,7 @@ namespace SPade.Controllers
                 return View(addModuleVM);
             }
 
-            return RedirectToAction("Admin", "ManageModule");
+            return RedirectToAction("ManageModule");
         }
 
         public ActionResult ManageClass()
@@ -428,10 +429,10 @@ namespace SPade.Controllers
                 ManageClassViewModel vm = new ManageClassViewModel();
 
                 vm.ClassID = i.ClassID.ToString();
-                vm.Course= db.Courses.ToList().Find(cs => cs.CourseID == i.CourseID).CourseName;
+                vm.Course = db.Courses.ToList().Find(cs => cs.CourseID == i.CourseID).CourseName;
                 vm.Class = i.ClassName.ToString();
                 vm.CreatedBy = i.CreatedBy.ToUpper();
-                vm.NumLecturers= db.Lec_Class.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
+                vm.NumLecturers = db.Lec_Class.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
                 vm.NumStudents = db.Students.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
 
                 lvm.Add(vm);
@@ -456,11 +457,12 @@ namespace SPade.Controllers
                 vm.ContactNo = i.ContactNo.ToString();
                 vm.Email = i.Email;
 
-                int courseId= db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).CourseID;
+                int courseId = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).CourseID;
                 string className = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).ClassName;
                 string courseAbbr = db.Courses.ToList().Find(cs => cs.CourseID == courseId).CourseAbbr;
 
-                vm.Class = courseAbbr+"/" +className;
+
+                vm.Class = courseAbbr + "/" + className;
                 vm.CreatedBy = i.CreatedBy.ToUpper();
 
                 lvm.Add(vm);
@@ -475,12 +477,11 @@ namespace SPade.Controllers
             List<ManageModuleViewModel> lmmvm = new List<ManageModuleViewModel>();
 
             List<Module> m = new List<Module>();
-            m = db.Modules.Where(a => a.DeletedAt == null).ToList();
+            m = db.Modules.Where(mod => mod.DeletedAt == null).ToList();
 
             foreach (Module i in m)
             {
                 ManageModuleViewModel mmvm = new ManageModuleViewModel();
-
 
                 mmvm.ModuleCode = i.ModuleCode;
                 mmvm.ModuleName = i.ModuleName;
@@ -493,6 +494,53 @@ namespace SPade.Controllers
             return View(lmmvm);
         }
 
+        public ActionResult UpdateModule(string id)
+        {
+            if(Session["DeleteError"] != null)
+            {
+                ModelState.AddModelError("Delete Error", Session["DeleteError"].ToString());
+                Session.RemoveAll();
+            }
+            AddModuleViewModel umvm = new AddModuleViewModel();
+            Module module = db.Modules.ToList().Find(m => m.ModuleCode == id && m.DeletedAt == null);
+            umvm.ModuleCode = module.ModuleCode;
+            umvm.ModuleName = module.ModuleName;
+            umvm.ProgLangId = module.LanguageId;
+            umvm.Languages = db.ProgLanguages.ToList();
+            return View(umvm);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateModule(AddModuleViewModel model)
+        {
+            Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
+            module.ModuleName = model.ModuleName;
+            module.UpdatedAt = DateTime.Now;
+            module.UpdatedBy = User.Identity.Name;
+            db.SaveChanges();
+            return RedirectToAction("Dashboard");
+        }
+
+        public ActionResult DeleteModule(string id)
+        {
+            //check if there is any assignment that is still tied to it
+            if (db.Assignments.ToList().FindAll(a => a.ModuleCode == id && a.DeletedAt == null).Count == 0)
+            {
+                Module module = db.Modules.ToList().Find(m => m.ModuleCode == id);
+                module.DeletedAt = DateTime.Now;
+                module.DeletedBy = User.Identity.Name;
+                db.SaveChanges();
+
+                return RedirectToAction("ManageModule");
+            }
+            else
+            {
+                Session["DeleteError"] = "An assignment belonging to this module is still active, please delete that assignment before attempting to "
+                    + "delete this module.";
+                //return RedirectToAction("UpdateModule", "Admin", id);
+                return Redirect("/admin/updatemodule/" + id);
+            }
+        }
         public ActionResult ManageCourse()
         {
             List<ManageCourseViewModel> lmcvm = new List<ManageCourseViewModel>();
@@ -555,8 +603,8 @@ namespace SPade.Controllers
                 vm.ContactNo = i.ContactNo.ToString();
                 vm.Email = i.Email;
                 vm.CreatedBy = i.CreatedBy.ToUpper();
-                vm.NumClasses= db.Lec_Class.Where(cl => cl.StaffID == i.StaffID).Count().ToString();
-                
+                vm.NumClasses = db.Lec_Class.Where(cl => cl.StaffID == i.StaffID).Count().ToString();
+
                 lvm.Add(vm);
             }
 
