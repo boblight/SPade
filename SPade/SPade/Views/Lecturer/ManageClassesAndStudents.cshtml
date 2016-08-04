@@ -15,6 +15,7 @@
 
             <div class="form-group">
                 <div>
+                    <a href="AddOneStudent" class="btn btn-primary">Add Student</a>
                     <a href="BulkAddStudent" class="btn btn-primary">Bulk Add Students</a>
                 </div>
             </div>
@@ -46,7 +47,7 @@
                                 @Html.DisplayFor(model => item.NumberOfStudents)
                             </td>
                             <td>
-                                @Html.ActionLink("View Class", "ViewStudentsByClass", "Lecturer", new { @id = (string)ViewData["item.Id"], @class = "btn btn-danger" })
+                                @Html.ActionLink("View Class", "ViewStudentsByClass", "Lecturer", new { ClassID = item.Id }, new { @id = "classId", @class = "btn btn-primary" })
                             </td>
                         </tr>
                     }

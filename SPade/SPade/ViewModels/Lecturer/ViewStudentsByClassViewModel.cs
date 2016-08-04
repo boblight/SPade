@@ -7,12 +7,9 @@ namespace SPade.ViewModels.Lecturer
 {
     public class ViewStudentsByClassViewModel
     {
-        public string ClassName { get; set; }
         public string AdminNo { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public int ContactNo { get; set; }
-
-
     }
 }

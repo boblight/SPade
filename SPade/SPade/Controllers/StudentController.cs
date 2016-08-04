@@ -70,14 +70,16 @@ namespace SPade.Controllers
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
                     //grade submission
-                    Grader grader = new Grader(filePathForGrade, fileName, assgnId, langUsed.LangageType);
+                    //Grader grader = new Grader(filePathForGrade, fileName, assgnId, langUsed.LangageType);
+                    Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed.LangageType);
 
                     //grade returns an 'exitcode'
                     //if result is more than 1 then is error code
                     //2 for program failure
                     //3 for infinite loop
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
-                    decimal result = grader.grade();
+                    //decimal result = grader.grade();
+                    decimal result = sandBoxedGrading.runSandboxedGrading();
 
                     submission.Grade = result;
                     submission.AssignmentID = assgnId;
@@ -88,8 +90,10 @@ namespace SPade.Controllers
             }
             else if (file == null)
             {
-                Session["UploadError"] = "Please select a file to upload.";
-                return RedirectToAction("SubmitAssignment", assgnId);
+                //Session["UploadError"] = "Please select a file to upload.";
+                //return RedirectToAction("SubmitAssignment", assgnId);
+                ModelState.AddModelError("UploadError", "Please select a file to upload.");
+                return View();
             }
             else if (Path.GetExtension(file.FileName) != ".zip")
             {
@@ -142,7 +146,7 @@ namespace SPade.Controllers
 
             foreach (Class_Assgn i in ca)
             {
-                assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssignmentID == i.AssignmentID);
+                assignments = db.Assignments.Where(a => a.DeletedAt == null).ToList().FindAll(assgn => assgn.AssignmentID == i.AssignmentID);
 
                 foreach (Assignment a in assignments)
                 {

@@ -1,4 +1,4 @@
-﻿@model SPade.ViewModels.Admin.AddStudentViewModel
+﻿@model SPade.ViewModels.Shared.AddStudentViewModel
 
 @{
     ViewBag.Title = "Add Student";
@@ -9,8 +9,9 @@
 
     <div class="col-md-4 col-md-offset-4 form-horizontal">
         <fieldset>
-
+            @Html.AntiForgeryToken()
             <legend>Add Student</legend>
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
             <!-- studentIdInput-->
             <div class="form-group">
@@ -41,7 +42,7 @@
                             @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
                         }
                     </div>
-                    </div>
+                </div>
             </div>
 
             <!-- studentEmail-->
@@ -53,17 +54,6 @@
                     <span class="help-block">e.g. abc@hotmail.com</span>
                     <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
 
-                </div>
-            </div>
-
-            <!-- passwordInput-->
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label for="passwordInput" class="control-label">Password</label>
-                    <input id="passwordInput" name="passwordInput" type="password" 
-                           placeholder="Password" class="form-control input-md", required ="required"/>
-                    <span class="help-block">Password must have at least 1 uppercase, lowercase, number and special character</span>
-                    <span class="help-block">@Html.ValidationMessage("Password", new { @class = "text-danger" })</span>
                 </div>
             </div>
 
@@ -83,12 +73,11 @@
                     <a id="btnCancel" href="javascript:history.back()" class="btn btn-default">Cancel</a>
                 </div>
             </div>
+
         </fieldset>
     </div>
+                            }
 
-    @section Scripts {
-        @Scripts.Render("~/bundles/jqueryval")
-    }
-
-
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
 }

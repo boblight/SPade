@@ -27,7 +27,7 @@ namespace SPade.ViewModels.Lecturer
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
-        [Required(ErrorMessage ="Please select a due date !")]
+        [Required(ErrorMessage = "Please select a due date !")]
         [Display(Name = "Due Date")]
         public DateTime DueDate { get; set; }
 

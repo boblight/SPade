@@ -1,15 +1,18 @@
 ﻿using Ionic.Zip;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using SPade.Grading;
+using SPade.Models;
 using SPade.Models.DAL;
 using SPade.ViewModels.Lecturer;
+using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -21,6 +24,29 @@ namespace SPade.Controllers
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
+        private ApplicationUserManager _userManager;
+
+        public LecturerController()
+        {
+
+        }
+
+        public LecturerController(ApplicationUserManager userManager)
+        {
+            UserManager = userManager;
+        }
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
 
         // GET: Lecturer
         public ActionResult Dashboard()
@@ -36,7 +62,7 @@ namespace SPade.Controllers
             string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
             //get the students in that classs
             foreach (Class c in managedClasses)
@@ -58,6 +84,14 @@ namespace SPade.Controllers
 
         }
 
+        public FileResult DownloadBulkAddStudentFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddStudent.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
         [HttpGet]
         public ActionResult BulkAddStudent()
         {
@@ -72,7 +106,7 @@ namespace SPade.Controllers
                 //Upload and save the file
                 // extract only the filename
                 var fileName = Path.GetFileName(file.FileName);
-            // store the file inside ~/App_Data/uploads folder
+                // store the file inside ~/App_Data/uploads folder
                 var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
                 file.SaveAs(path);
 
@@ -98,23 +132,83 @@ namespace SPade.Controllers
                 }
                 db.Students.AddRange(slist);
                 db.SaveChanges();
-            }else
+            }
+            else
             {
                 // Upload file is invalid
                 string err = "Uploaded file is invalid ! Please try again!";
                 TempData["InputWarning"] = err;
                 return View();
             }
-    
+
             return View("ManageClassesAndStudents");
         }
-    
-        
 
+        public ActionResult AddOneStudent()
+        {
+            AddStudentViewModel model = new AddStudentViewModel();
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddOneStudent(AddStudentViewModel model, FormCollection formCollection)
+        {
+            var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
+            user.EmailConfirmed = true;
+            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+            if (result.Succeeded)
+            {
+                var student = new Student()
+                {
+                    AdminNo = model.AdminNo.Trim(),
+                    Name = model.Name,
+                    Email = model.Email,
+                    ContactNo = model.ContactNo,
+                    ClassID = Int32.Parse(formCollection["ClassID"].ToString()),
+                    CreatedBy = User.Identity.Name,
+                    UpdatedBy = User.Identity.Name,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                };
+
+                db.Students.Add(student);
+                db.SaveChanges();
+            }
+            else
+            {
+                //error in registering account
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error);
+                }
+                return View(model);
+            }
+            return RedirectToAction("Dashboard");
+        }
 
         public ActionResult ViewStudentsByClass(string classID)
         {
-            return View();
+            int cID = Int32.Parse(classID);
+
+            List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
+            List<Student> sList = new List<Student>();
+
+            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
+
+            foreach (Student s in sList)
+            {
+                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
+
+                vm.AdminNo = s.AdminNo.ToUpper();
+                vm.Name = s.Name;
+                vm.Email = s.Email;
+                vm.ContactNo = s.ContactNo;
+
+                studList.Add(vm);
+            }
+            return View(studList);
         }
 
         public ActionResult UpdateStudent()
@@ -226,7 +320,7 @@ namespace SPade.Controllers
                 {
                     if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                     {
-                        if (solutionsFileUpload.ContentLength > 104857600)
+                        if (solutionsFileUpload.ContentLength < 104857600)
                         {
                             //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
                             string slnFilePath = "";
@@ -456,44 +550,6 @@ namespace SPade.Controllers
             //everything all okay 
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
-
-        //used to move the class file into the subfolder in order for it to be compiled
-        //THIS IS BROKEN. PAY NO MIND TO IT
-
-        //public bool MoveFileToSubFolder(string fileName, string slnFilePath, string assignmentTitle, ProgLanguage lang, bool isTestCasePresent)
-        //{
-        //    bool saveStatus = false;
-
-        //    try
-        //    {
-        //        //access the solution + move the classname.java/.cs into a folder 
-        //        var toLowerPath = fileName.ToLower();
-        //        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
-        //        Directory.CreateDirectory(path);
-
-        //        //get the appropirate file and move the file accordingly
-        //        var ogPath = "";
-        //        var newPath = "";
-
-        //        if (lang.LangageType.Equals("Java"))
-        //        {
-        //            ogPath = slnFilePath + "/" + fileName + ".java";
-        //            newPath = path + "/" + fileName + ".java";
-        //        }
-        //        else if (lang.LangageType.Equals("C#"))
-        //        {
-        //            ogPath = slnFilePath + "/" + fileName + ".cs";
-        //            newPath = path + "/" + fileName + ".cs";
-        //        }
-
-        //        System.IO.File.Move(ogPath, newPath);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        saveStatus = true;
-        //    }
-        //    return saveStatus;
-        //}
 
         //used to insert the data into DB. 
         public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)

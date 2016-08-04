@@ -36,44 +36,25 @@
                         @{
                             foreach (var s in Model)
                             {
-
                                 <tr>
-                                    <td></td>
+                                    <td>
+                                        @Html.DisplayFor(Model => s.AdminNo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(Model => s.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(Model => s.Email)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(Model => s.ContactNo)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink("Update Student", "UpdateStudent", "Lecturer", new { StudentId = s.AdminNo }, new { @id = "studentId", @class = "btn btn-primary" })
+                                    </td>
                                 </tr>
-
-
-
                             }
                         }
-
-
-                        <tr>
-                            <td>1431897</td>
-                            <td>Bob Chan</td>
-                            <td>bob@gmail.com</td>
-                            <td>98875869</td>
-                            <td>
-                                <a href="UpdateStudent" class="btn btn btn-primary btn-sm">Update</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1431954</td>
-                            <td>Jenny Tan</td>
-                            <td>jantan@outlook.sg</td>
-                            <td>96043576</td>
-                            <td>
-                                <a href="UpdateStudent" class="btn btn btn-primary btn-sm">Update</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>146454</td>
-                            <td>Jonathan Chia</td>
-                            <td>jon.chia@yahoo.com.sg</td>
-                            <td>97837545</td>
-                            <td>
-                                <a href="UpdateStudent" class="btn btn btn-primary btn-sm">Update</a>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
