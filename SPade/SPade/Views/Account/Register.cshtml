@@ -72,7 +72,6 @@
                 <div class="form-group">
                     <div>
                         <div class="col-md-12">
-                            <label>Class</label>
                             @{
                                 @Html.DropDownListFor(c => Model.classID, new SelectList(Model.classList, "ClassID", "ClassName"), new { @class = "form-control" })
                             }
