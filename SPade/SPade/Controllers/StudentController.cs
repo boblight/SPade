@@ -122,6 +122,7 @@ namespace SPade.Controllers
 
             Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
             svm.Module = module.ModuleCode + " " + module.ModuleName;
+            svm.IssuedBy = db.Lecturers.ToList().Find(lc => lc.StaffID == assignment.CreateBy).Name.ToString();
 
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
@@ -152,7 +153,7 @@ namespace SPade.Controllers
 
             foreach (Class_Assgn i in ca)
             {
-                assignments = db.Assignments.ToList().FindAll(assgn => assgn.AssignmentID == i.AssignmentID);
+                assignments = db.Assignments.Where(a => a.DeletedAt == null).ToList().FindAll(assgn => assgn.AssignmentID == i.AssignmentID);
 
                 foreach (Assignment a in assignments)
                 {

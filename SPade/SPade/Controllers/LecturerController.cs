@@ -63,7 +63,7 @@ namespace SPade.Controllers
             string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
             //get the students in that classs
             foreach (Class c in managedClasses)
@@ -100,9 +100,9 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file, BulkAddStudentViewModel addStud)
+        public ActionResult BulkAddStudent(HttpPostedFileBase file)
         {
-            if ((file != null && Path.GetExtension(file.FileName) == ".csv"))
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
                 //Upload and save the file
                 // extract only the filename
@@ -110,8 +110,6 @@ namespace SPade.Controllers
                 // store the file inside ~/App_Data/uploads folder
                 var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
                 file.SaveAs(path);
-
-
 
                 string[] lines = System.IO.File.ReadAllLines(path);
                 List<Student> slist = new List<Student>();
@@ -138,11 +136,10 @@ namespace SPade.Controllers
             }
             else
             {
-                addStud.Student = db.Students.ToList();
-                string err = "Uploaded file is invalid ! Please try again.";
-                TempData["SlnWarning"] = err;
-                TempData["TcWarning"] = err;
-                return View(addStud);
+                // Upload file is invalid
+                string err = "Uploaded file is invalid ! Please try again!";
+                TempData["InputWarning"] = err;
+                return View();
             }
 
             return View("ManageClassesAndStudents");
@@ -201,17 +198,24 @@ namespace SPade.Controllers
 
             sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
 
+            Class c= db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
+
+            int courseId = c.CourseID; 
+            string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
+            
             foreach (Student s in sList)
             {
                 ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
 
-                vm.AdminNo = s.AdminNo;
+                vm.AdminNo = s.AdminNo.ToUpper();
                 vm.Name = s.Name;
                 vm.Email = s.Email;
                 vm.ContactNo = s.ContactNo;
 
                 studList.Add(vm);
             }
+
+            ViewBag.ClassName = courseAbbr + "/" + c.ClassName;
             return View(studList);
         }
 

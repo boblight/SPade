@@ -15,7 +15,7 @@ namespace SPade.ViewModels.Student
         public HttpPostedFile File { get; set; }
 
         public Assignment assignment { get; set; }
-
+        public string IssuedBy { get; set; }
         public int RetryRemaining { get; set; }
 
         public string Module { get; set; }

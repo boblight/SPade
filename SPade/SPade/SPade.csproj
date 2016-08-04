@@ -425,6 +425,7 @@
     <Content Include="Views\Lecturer\AddOneStudent.cshtml" />
     <Content Include="Views\Admin\ManageCourse.cshtml" />
     <Content Include="Views\Admin\ManageAdmin.cshtml" />
+    <Content Include="Views\Admin\UpdateModule.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

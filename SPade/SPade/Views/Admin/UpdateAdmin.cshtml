@@ -15,13 +15,13 @@
                 @Html.AntiForgeryToken()
                 <legend>Update Admin</legend>
 
-                @Html.Hidden("AdminNo")
+                @Html.Hidden("AdminID")
 
                 <div class="form-group">
                     <div class="col-md-12">
                         <label for="inputAdminName" class="control-label">Admin Name</label>
                         @Html.TextBoxFor(m => m.FullName, new { @class = "form-control input-md", required = "required" })
-                        <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
+                        <span class="help-block">@Html.ValidationMessage("FullName", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 

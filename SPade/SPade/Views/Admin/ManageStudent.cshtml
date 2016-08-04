@@ -50,7 +50,8 @@
                                 <td>@Html.DisplayFor(Model => item.Email)</td>
                                 <td>@Html.DisplayFor(Model => item.Class)</td>
                                 <td>@Html.DisplayFor(Model => item.CreatedBy)</td>
-                                <td>@Html.ActionLink("Update", "UpdateStudent", "Admin", new { AdminNo = item.AdminNo }, new { id = "UpdateAssignment", @class = "btn btn-primary" })</td>                                                                  
+                                @*<td>@Html.ActionLink("Update", "UpdateStudent", "Admin", new { AdminNo = item.AdminNo }, new { id = "UpdateAssignment", @class = "btn btn-primary" })</td>*@                                                                  
+                                <td><a href="/admin/updatestudent/@item.AdminNo.ToLower()" class="btn btn-primary">Update Student</a></td>
                             </tr>
 
                         }
