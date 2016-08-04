@@ -239,9 +239,9 @@ namespace SPade.Controllers
                             student.ContactNo = model.ContactNo;
                             student.Email = model.Email;
                             student.CreatedAt = DateTime.Now;
-                            student.CreatedBy = name;
+                            student.CreatedBy = model.AdminNo;
                             student.UpdatedAt = DateTime.Now;
-                            student.UpdatedBy = name;
+                            student.UpdatedBy = model.AdminNo;
                             student.ClassID = Int32.Parse(formCollection.Get("ClassSelect")); //this is temporary. added to stop error from coming out
 
                             db.Students.Add(student);

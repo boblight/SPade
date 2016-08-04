@@ -15,7 +15,7 @@ namespace SPade.Grading
 {
     public class Sandboxer : MarshalByRefObject
     {
-        private string ans, error, subOut, solOut;
+        private string ans, error, subOut, solOut, serializedStartInfo;
         private List<String> subList = new List<String>();
         private bool programFailed = false;
         private decimal testCasePassed;
@@ -29,15 +29,13 @@ namespace SPade.Grading
         private bool isTestCasePresnt = false;
 
         const string pathToUntrusted = @"C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug";
-        //const string pathToUntrusted = @"~/Grading";
-        const string untrustedAssembly = "SPade.Grading";
-        const string untrustedClass = "SPade.Grading.SandboxGrader";
-        const string entryPoint = "SandboxGrading"; //method name
+        const string untrustedAssembly = "Grade";
+        const string untrustedClass = "Grade.Program";
+        const string entryPoint = "Main"; //method name
         private static string[] parameters = new string[4];
 
         public Sandboxer()
         {
-
         }
 
         //constructor
@@ -66,7 +64,8 @@ namespace SPade.Grading
 
                 compile.WaitForExit();//compilation process ends
 
-                parameters[0] = "java " + "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
+                pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
+                //procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
             }
             else if (language == "C#")
             {
@@ -80,9 +79,11 @@ namespace SPade.Grading
 
                 compile.WaitForExit();//compilation process ends
 
-                parameters[0] = filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe";
+                pathToExecutable = filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe";
+                //procInfo = new ProcessStartInfo(filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe");
             }
 
+            parameters[0] = pathToExecutable;
             parameters[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
             parameters[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
             parameters[3] = filePath + "/output.txt";
@@ -99,7 +100,8 @@ namespace SPade.Grading
 
             //Setting the permissions for the AppDomain. We give the permission to execute and to 
             //read/discover the location where the untrusted code is loaded.
-            PermissionSet permSet = new PermissionSet(PermissionState.Unrestricted);
+            PermissionSet permSet = new PermissionSet(PermissionState.None);
+            //permSet.AddPermission(new System.Security.Permissions.FileIOPermission(System.Security.Permissions.FileIOPermissionAccess.Read, "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/TestCase"));
             permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
 
             //We want the sandboxer assembly's strong name, so that we can add it to the full trust list.
@@ -108,7 +110,12 @@ namespace SPade.Grading
             //Now we have everything we need to create the AppDomain, so let's create it.
             AppDomain newDomain = AppDomain.CreateDomain("Sandbox", null, adSetup, permSet, fullTrustAssembly);
             //newDomain.SetData("assgnId", assgnId);
-            //newDomain.SetData("executionPath", parameters[0]);
+            //newDomain.SetData("executionPath", pathToExecutable);
+            //newDomain.SetData("lang", language);
+            newDomain.SetData("param1", parameters[0]);
+            newDomain.SetData("param2", parameters[1]);
+            newDomain.SetData("param3", parameters[2]);
+            newDomain.SetData("param4", parameters[3]);
 
             //Use CreateInstanceFrom to load an instance of the Sandboxer class into the
             //new AppDomain.
@@ -120,16 +127,24 @@ namespace SPade.Grading
             //Unwrap the new domain instance into a reference in this domain and use it to execute the 
             //untrusted code.
             Sandboxer newDomainInstance = (Sandboxer)handle.Unwrap();
-            //newDomainInstance.assgnId = (int)AppDomain.CurrentDomain.GetData("assgnId");
-            //newDomainInstance.pathToExecutable = (string)AppDomain.CurrentDomain.GetData("executionPath");
-            return newDomainInstance.ExecuteUntrusedGrading();
-            //return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
+            //return newDomainInstance.ExecuteUntrusedGrading(int.Parse(newDomain.GetData("assgnId").ToString()), newDomain.GetData("executionPath").ToString(), newDomain.GetData("lang").ToString());
+
+
+
+            return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, );
         }
 
-        public decimal ExecuteUntrusedGrading()
+        public decimal ExecuteUntrusedGrading(int assgnId, string pathToExecutable, string lang)
         {
-            proc = new Process();
-            procInfo = new ProcessStartInfo("java", "-cp C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Submissions/p1111111JavaPayIncrement4 " + "sampleqns1.SampleQns1");
+            Process proc = new Process();
+            if (lang == "Java")
+            {
+                ProcessStartInfo procInfo = new ProcessStartInfo("java", pathToExecutable);
+            }
+            else if (lang == "C#")
+            {
+                ProcessStartInfo procInfo = new ProcessStartInfo(pathToExecutable);
+            }
 
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
@@ -145,8 +160,8 @@ namespace SPade.Grading
 
             try
             {
-                testCaseFile.Load("C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/TestCase/4testcase.xml");
-                //testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + 4 + "testcase.xml"));
+                testCaseFile.Load("C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/TestCase/" + assgnId + "testcase.xml");
+                //testCaseFile.Load(HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml"));
                 XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
 
                 foreach (XmlNode testcase in testcaseList)
@@ -190,7 +205,7 @@ namespace SPade.Grading
                     }//check if error
 
                     //get the output from solution
-                    solutionFile.Load(HttpContext.Current.Server.MapPath(@"~/Solutions/" + 4 + "solution.xml"));
+                    solutionFile.Load("C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Solutions/" + 4 + "solution.xml");
                     XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
                     //loop through all the solutions to find matching
                     foreach (XmlNode solution in solutions)
@@ -200,26 +215,13 @@ namespace SPade.Grading
                             testCasePassed++;
                         }
                     }//end of foreach loop
-                    
+
                     if (!proc.WaitForExit(10000))
                     {
                         proc.Kill();
                         return 3;//infinite loop
                     }
                 }//end of test case loop
-
-                //else
-                //{
-                //    //terminate sandboxie if program fails
-                //    Process terminateSandbox = new Process();
-                //    terminateSandbox.StartInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"  /terminate_all");
-                //    terminateSandbox.StartInfo.CreateNoWindow = true;
-                //    terminateSandbox.StartInfo.UseShellExecute = false;
-                //    terminateSandbox.Start();
-                //    terminateSandbox.WaitForExit();
-
-                //    return 2; //program failure
-                //}
 
                 return (testCasePassed / noOfTestCase); //return results
             }
@@ -272,7 +274,7 @@ namespace SPade.Grading
             }//end of catch
         }
 
-        public decimal ExecuteUntrustedCode(string assemblyName, string typeName, string entryPoint, Object[] parameters)
+        public decimal ExecuteUntrustedCode(string assemblyName, string typeName, string entryPoint, string[] parameters)
         {
             //code taken from: https://msdn.microsoft.com/en-us/library/bb763046(v=vs.110).aspx
 
@@ -283,7 +285,8 @@ namespace SPade.Grading
             {
                 //Now invoke the method.
                 //return (decimal)
-                return (decimal) target.Invoke(this, parameters);
+                target.Invoke(this, parameters);
+                return 666;
             }
             catch (Exception ex)
             {
@@ -295,7 +298,7 @@ namespace SPade.Grading
                 CodeAccessPermission.RevertAssert();
                 //Console.ReadLine();
             }
-            return 100;
+            return 1000;
         }
     }//end of sandboxer
 }
