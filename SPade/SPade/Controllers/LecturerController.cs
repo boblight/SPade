@@ -204,7 +204,7 @@ namespace SPade.Controllers
             {
                 ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
 
-                vm.AdminNo = s.AdminNo;
+                vm.AdminNo = s.AdminNo.ToUpper();
                 vm.Name = s.Name;
                 vm.Email = s.Email;
                 vm.ContactNo = s.ContactNo;
