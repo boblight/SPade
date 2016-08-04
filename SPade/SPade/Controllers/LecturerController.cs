@@ -197,6 +197,11 @@ namespace SPade.Controllers
 
             sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
 
+            Class c= db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
+
+            int courseId = c.CourseID; 
+            string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
+            
             foreach (Student s in sList)
             {
                 ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
@@ -208,6 +213,8 @@ namespace SPade.Controllers
 
                 studList.Add(vm);
             }
+
+            ViewBag.ClassName = courseAbbr + "/" + c.ClassName;
             return View(studList);
         }
 
