@@ -131,7 +131,7 @@ namespace SPade.Grading
 
 
 
-            return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, );
+            return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
         }
 
         public decimal ExecuteUntrusedGrading(int assgnId, string pathToExecutable, string lang)

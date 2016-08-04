@@ -266,16 +266,22 @@ namespace SPade.Controllers
                     }
                     else
                     {
-                        Session["RegisterError"] = "Administrative number has already been registered. Please check with your lecturer if you are sure that" +
-                            " you have entered the correct administrative number.";
-                        return RedirectToAction("Register");
+                        //Session["RegisterError"] = "Administrative number has already been registered. Please check with your lecturer if you are sure that" +
+                        //    " you have entered the correct administrative number.";
+                        //return RedirectToAction("Register");
+                        ModelState.AddModelError("RegisterError", "Administrative number has already been registered. Please check with your lecturer if you are sure that" +
+                            " you have entered the correct administrative number.");
+                        return View(model);
                     }
                 }
                 else
                 {
-                    Session["RegisterError"] = "Email has already been registered. Please check with your lecturer if you are sure that" +
-                        " you have entered the correct email.";
-                    return RedirectToAction("Register");
+                    //Session["RegisterError"] = "Email has already been registered. Please check with your lecturer if you are sure that" +
+                    //    " you have entered the correct email.";
+                    //return RedirectToAction("Register");
+                    ModelState.AddModelError("RegisterError", "Email has already been registered. Please check with your lecturer if you are sure that" +
+                        " you have entered the correct email.");
+                    return View(model);
                 }
             }
             return View("ConfirmEmailMessage");
