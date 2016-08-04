@@ -14,6 +14,7 @@ using SPade.ViewModels;
 using System.Collections;
 using System.Collections.Generic;
 using System.Web.Security;
+using System.IO;
 
 namespace SPade.Controllers
 {
@@ -178,32 +179,8 @@ namespace SPade.Controllers
         public ActionResult Register()
         {
             RegisterViewModel rvm = new RegisterViewModel();
-
-            if (Session["RegisterError"] != null)
-            {
-                ModelState.AddModelError("RegisterErrorRegisterError", Session["RegisterError"].ToString());
-                Session["RegisterError"] = null;
-            }
-
             List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
-
-            List<String> classIds = new List<String>();
-            List<String> classNames = new List<String>();
-
-            foreach (Class c in managedClasses)
-            {
-                Course course = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault();
-
-                String cId = c.ClassID.ToString();
-                String cName = course.CourseAbbr + "/" + c.ClassName.ToString();
-
-                classIds.Add(cId);
-                classNames.Add(cName);
-            }
-
-            rvm.classID = classIds;
-            rvm.classNames = classNames;
-
+            rvm.classList = managedClasses;
             return View(rvm);
         }
 
@@ -242,7 +219,7 @@ namespace SPade.Controllers
                             student.CreatedBy = model.AdminNo;
                             student.UpdatedAt = DateTime.Now;
                             student.UpdatedBy = model.AdminNo;
-                            student.ClassID = Int32.Parse(formCollection.Get("ClassSelect")); //this is temporary. added to stop error from coming out
+                            student.ClassID = Int32.Parse(formCollection["ClassID"].ToString());
 
                             db.Students.Add(student);
 
@@ -259,16 +236,14 @@ namespace SPade.Controllers
                             ViewBag.errorMessage = "Please confirm the email was sent to you.";
                             return View("ConfirmEmailMessage");
                         }
-
+                        model.classList = db.Classes.ToList();
                         AddErrors(result);
                         // If we got this far, something failed, redisplay form
                         return View(model);
                     }
                     else
                     {
-                        //Session["RegisterError"] = "Administrative number has already been registered. Please check with your lecturer if you are sure that" +
-                        //    " you have entered the correct administrative number.";
-                        //return RedirectToAction("Register");
+                        model.classList = db.Classes.ToList();
                         ModelState.AddModelError("RegisterError", "Administrative number has already been registered. Please check with your lecturer if you are sure that" +
                             " you have entered the correct administrative number.");
                         return View(model);
@@ -276,9 +251,7 @@ namespace SPade.Controllers
                 }
                 else
                 {
-                    //Session["RegisterError"] = "Email has already been registered. Please check with your lecturer if you are sure that" +
-                    //    " you have entered the correct email.";
-                    //return RedirectToAction("Register");
+                    model.classList = db.Classes.ToList();
                     ModelState.AddModelError("RegisterError", "Email has already been registered. Please check with your lecturer if you are sure that" +
                         " you have entered the correct email.");
                     return View(model);

@@ -82,7 +82,7 @@ namespace SPade.Models
 
         [Required]
         [StringLength(8, ErrorMessage = "Please enter a valid Student number")]
-        [RegularExpression("^[p]+$", ErrorMessage = "Please enter valid Student number")]
+        [RegularExpression("^[p0-9]{8,8}$", ErrorMessage = "Please enter valid Student number")]
         [Display(Name = "Administration Number")]
         public string AdminNo { get; set; }
 
