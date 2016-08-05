@@ -304,7 +304,7 @@ namespace SPade.Controllers
         {
             AddClassViewModel model = new AddClassViewModel();
             //Get all classes
-            List<Course> allCourses = db.Courses.ToList();
+            List<Course> allCourses = db.Courses.Where(c => c.DeletedAt == null).ToList();
             model.Courses = allCourses;
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
@@ -340,7 +340,7 @@ namespace SPade.Controllers
                         {
                             db.Lec_Class.Add(new Lec_Class
                             {
-                                ClassID = int.Parse(formCollection["ClassID"].ToString()),
+                                ClassID = ac.ClassId,
                                 StaffID = model.StaffID
                             });
                         }
