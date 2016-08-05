@@ -80,6 +80,33 @@ namespace SPade.Controllers
                 return View(model);
             }
 
+            //check for deleted accounts
+            string identifier = model.UserName.Substring(0);
+            if (identifier.Equals("p"))
+            {
+                if (db.Students.ToList().Find(s => s.AdminNo == model.UserName).DeletedAt != null)
+                {
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    return View(model);
+                }
+            }
+            else if (identifier.Equals("s"))
+            {
+                if (db.Lecturers.ToList().Find(s => s.StaffID == model.UserName).DeletedAt != null)
+                {
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    return View(model);
+                }
+            }
+            else if (identifier.Equals("a"))
+            {
+                if (db.Admins.ToList().Find(s => s.AdminID == model.UserName).DeletedAt != null)
+                {
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    return View(model);
+                }
+            }
+
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var userid = UserManager.FindByName(model.UserName).Id;
@@ -106,8 +133,9 @@ namespace SPade.Controllers
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
+
             }
-        }
+        }//end of login
 
         public ActionResult RedirectLogin(string returnUrl)
         {
@@ -127,7 +155,6 @@ namespace SPade.Controllers
             {
                 return RedirectToLocal(returnUrl);
             }
-
         }
 
         //

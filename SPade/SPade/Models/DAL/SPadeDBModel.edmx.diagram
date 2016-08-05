@@ -15,11 +15,11 @@
         <EntityTypeShape EntityType="SPadeDBModel.Class" Width="1.5" PointX="0.75" PointY="6" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Class_Assgn" Width="1.5" PointX="10.5" PointY="6.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Course" Width="1.5" PointX="1.5" PointY="10.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Lec_Class" Width="1.5" PointX="3" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModel.Lec_Class" Width="1.5" PointX="5.125" PointY="2.25" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Lecturer" Width="1.5" PointX="1" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Module" Width="1.5" PointX="6" PointY="6.125" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.ProgLanguage" Width="1.5" PointX="3.75" PointY="6.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Student" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModel.Student" Width="1.5" PointX="7.125" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Submission" Width="1.5" PointX="10.5" PointY="3.5" IsExpanded="true" />
         <AssociationConnector Association="SPadeDBModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
         <AssociationConnector Association="SPadeDBModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />

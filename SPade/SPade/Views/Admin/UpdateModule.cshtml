@@ -31,7 +31,7 @@
 
                 <div class="form-group">
                     <div class="col-md-12">
-                        <input type="submit" id="submitBtn" name="submitBtn" value="Update" class="btn btn-primary" />
+                        <input type="submit" id="submitBtn" name="command" value="Update" class="btn btn-primary" />
                         <button class="btn btn-danger" data-toggle="modal" data-target="#modal">Delete</button>
                         <a href="javascript:history.back()" class="btn btn btn-default">Cancel</a>
                     </div>
@@ -46,7 +46,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <a href="/admin/deletemodule/@Model.ModuleCode" class="btn btn-primary">Delete</a>
+                                <input type="submit" id="submitBtn" name="command" value="Delete" class="btn btn-primary" />
                             </div>
                         </div>
                     </div>

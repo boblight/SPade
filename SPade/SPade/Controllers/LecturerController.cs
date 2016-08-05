@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security.AntiXss;
 
 namespace SPade.Controllers
 {
@@ -385,10 +386,9 @@ namespace SPade.Controllers
                             testCaseUpload.SaveAs(filePath);
 
                             //get the language and pass into grader
-
                             Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
 
-                            //change running of lecturer from checking boolean to checking exitcode
+                            //exit codes returned from grader 
                             //1 is successfully done everything
                             //2 is test case submitted could not be read
                             //3 is program has failed to run
@@ -398,7 +398,14 @@ namespace SPade.Controllers
                             if (exitCode == 1)
                             {
                                 //save to DB + rename solution/testcase
-                                AddAssignmentToDB(addAssgn, fileName, true);
+                                if (AddAssignmentToDB(addAssgn, fileName, true) == true)
+                                {
+                                    //failed to save to DB
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    addAssgn.Modules = db.Modules.ToList();
+                                    TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                    return View(addAssgn);
+                                }
 
                                 //delete the uploaded sln
                                 DeleteFile(fileName, assignmentTitle, false);
@@ -522,7 +529,14 @@ namespace SPade.Controllers
                         if (exitCode == 1)
                         {
                             //save to DB + rename solution file
-                            AddAssignmentToDB(addAssgn, fileName, false);
+                            if (AddAssignmentToDB(addAssgn, fileName, false) == true)
+                            {
+                                //solution has failed to save to DB
+                                DeleteFile(fileName, assignmentTitle, false);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                return View(addAssgn);
+                            }
 
                             //delete the uploaded sln
                             DeleteFile(fileName, assignmentTitle, false);
@@ -559,113 +573,100 @@ namespace SPade.Controllers
         }
 
         //used to insert the data into DB. 
-        public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
+        public bool AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
         {
             //now to add into the DB
             Assignment newAssignment = new Assignment();
             Class_Assgn classAssgn = new Class_Assgn();
             List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
             string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
-
-            addAssgn.Solution = "~/Solutions/" + assignmentTitle + ".xml";
-
-            newAssignment.AssgnTitle = addAssgn.AssgnTitle;
-            newAssignment.Describe = addAssgn.Describe;
-            newAssignment.MaxAttempt = addAssgn.MaxAttempt;
-            newAssignment.StartDate = addAssgn.StartDate;
-            newAssignment.DueDate = addAssgn.DueDate;
-            newAssignment.Solution = addAssgn.Solution;
-            newAssignment.ModuleCode = addAssgn.ModuleId;
-            // newAssignment.CreateBy = "s1431489";
-            newAssignment.CreateBy = User.Identity.GetUserName();
-            newAssignment.CreateAt = DateTime.Now;
-            //newAssignment.UpdatedBy = "s1431489";
-            newAssignment.UpdatedBy = User.Identity.GetUserName();
-            newAssignment.UpdatedAt = DateTime.Now;
-            db.Assignments.Add(newAssignment);
+            bool isFailed = false; //used to tell the user if the assignment has already been successfully save to DB
 
             try
             {
+                //save the main assignment to DB
+                addAssgn.Solution = "~/Solutions/" + assignmentTitle + ".xml";
+                newAssignment.AssgnTitle = addAssgn.AssgnTitle;
+                newAssignment.Describe = addAssgn.Describe;
+                newAssignment.MaxAttempt = addAssgn.MaxAttempt;
+                newAssignment.StartDate = addAssgn.StartDate;
+                newAssignment.DueDate = addAssgn.DueDate;
+                newAssignment.Solution = addAssgn.Solution;
+                newAssignment.ModuleCode = addAssgn.ModuleId;
+                newAssignment.CreateBy = User.Identity.GetUserName();
+                newAssignment.CreateAt = DateTime.Now;
+                newAssignment.UpdatedBy = User.Identity.GetUserName();
+                newAssignment.UpdatedAt = DateTime.Now;
+                db.Assignments.Add(newAssignment);
                 db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                DeleteFile(fileName, assignmentTitle, isTestCase);
-                addAssgn.Modules = db.Modules.ToList();
-                TempData["GeneralError"] = "Failed to add assignment. Please try again.";
-                return View(addAssgn);
-            }
 
-            //get the assignment ID 
-            var assgnId = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First();
+                //get the assignment ID 
+                var assgnId = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First();
 
-            //insert into Class_Assgn
-            foreach (AssignmentClass a in addAssgn.ClassList)
-            {
-                if (a.isSelected == true)
+                //insert into Class_Assgn
+                foreach (AssignmentClass a in addAssgn.ClassList)
                 {
-                    classAssgn.ClassID = a.ClassId;
-                    classAssgn.AssignmentID = assgnId;
-                    db.Class_Assgn.Add(classAssgn);
-
-                    try
+                    if (a.isSelected == true)
                     {
+                        classAssgn.ClassID = a.ClassId;
+                        classAssgn.AssignmentID = assgnId;
+                        db.Class_Assgn.Add(classAssgn);
                         db.SaveChanges();
                     }
-                    catch (Exception ex)
-                    {
-                        DeleteFile(fileName, assignmentTitle, isTestCase);
-                        addAssgn.Modules = db.Modules.ToList();
-                        TempData["GeneralError"] = "Failed to add assignment. Please try again.";
-                        return View("AddAssignment", addAssgn);
-                    }
                 }
-            }
 
-            //rename the solution here
-            var solutionPath = Server.MapPath(@"~/Solutions/");
 
-            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
-            {
-                if (f.Name == assignmentTitle + ".xml")
-                {
-                    var sourcePath = solutionPath + f.Name;
-                    var destPath = solutionPath + assgnId + "solution.xml";
-                    FileInfo info = new FileInfo(sourcePath);
-                    info.MoveTo(destPath);
+                //rename the solution here
+                var solutionPath = Server.MapPath(@"~/Solutions/");
 
-                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnId select Assignment;
-
-                    //update the DB to reflect the change of name for the solution
-                    foreach (Assignment a in query)
-                    {
-                        a.Solution = "~/Solutions/" + assgnId + "solution.xml";
-                    }
-                    db.SaveChanges();
-                }
-            }
-
-            //rename the testcase IF there is one 
-            if (isTestCase == true)
-            {
-                var testCasePath = Server.MapPath(@"~/TestCase/");
-
-                foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
                 {
                     if (f.Name == assignmentTitle + ".xml")
                     {
-                        var sourcePath = testCasePath + f.Name;
-                        var destPath = testCasePath + assgnId + "testcase.xml";
+                        var sourcePath = solutionPath + f.Name;
+                        var destPath = solutionPath + assgnId + "solution.xml";
                         FileInfo info = new FileInfo(sourcePath);
                         info.MoveTo(destPath);
+
+                        var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnId select Assignment;
+
+                        //update the DB to reflect the change of name for the solution
+                        foreach (Assignment a in query)
+                        {
+                            a.Solution = "~/Solutions/" + assgnId + "solution.xml";
+                        }
+                        db.SaveChanges();
                     }
                 }
-            }
 
-            return null;
+                //rename the testcase IF there is one 
+                if (isTestCase == true)
+                {
+                    var testCasePath = Server.MapPath(@"~/TestCase/");
+
+                    foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                    {
+                        if (f.Name == assignmentTitle + ".xml")
+                        {
+                            var sourcePath = testCasePath + f.Name;
+                            var destPath = testCasePath + assgnId + "testcase.xml";
+                            FileInfo info = new FileInfo(sourcePath);
+                            info.MoveTo(destPath);
+                        }
+                    }
+                }
+
+            }//end of try 
+
+            catch (Exception ex)
+            {
+                //failed to save to DB. will show something to user
+                isFailed = true;
+            }
+            return isFailed;
         }
 
-        //used to delete files when something goes wrong somewhere
+        //used to delete files
         private void DeleteFile(string fileName, string assgnTitle, bool isTestCase)
         {
             //delete their solution + testcase 
@@ -786,8 +787,8 @@ namespace SPade.Controllers
             string loggedInLecturer = User.Identity.GetUserName(); //temp 
 
             var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
-    new SqlParameter("@inClass", Class),
-    new SqlParameter("@inCreator", loggedInLecturer)).ToList();
+        new SqlParameter("@inClass", Class),
+        new SqlParameter("@inCreator", loggedInLecturer)).ToList();
 
             return Json(assignments);
         }
@@ -798,8 +799,8 @@ namespace SPade.Controllers
 
 
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
-    new SqlParameter("@inClass", Class),
-    new SqlParameter("@inAssignment", Assignment)).ToList();
+        new SqlParameter("@inClass", Class),
+        new SqlParameter("@inAssignment", Assignment)).ToList();
 
             return Json(results);
         }
