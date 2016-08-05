@@ -250,7 +250,6 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult AddOneClass(AddClassViewModel model)
         {
-
             //Get all classes
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
@@ -276,28 +275,20 @@ namespace SPade.Controllers
 
                 };
 
-
                 db.Classes.Add(class1);
                 db.Lec_Class.Add(lec_class);
                 db.SaveChanges();
 
             }
-            catch (DbEntityValidationException e)
+            catch (Exception e)
             {
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                throw;
-
+                //if fail
+                TempData["Error"] = "Failed to save class to database. Pease try again !";
+                return View(model);
             }
-            return View(model);
+
+            //if successful 
+            return RedirectToAction("Dashboard", "Admin");
         }
         public ActionResult AddOneClass()
         {
@@ -782,7 +773,7 @@ namespace SPade.Controllers
             //Delete Student
             else
             {
-                if(db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
+                if (db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
                 {
                     student.DeletedAt = DateTime.Now;
                     student.DeletedBy = User.Identity.Name;
