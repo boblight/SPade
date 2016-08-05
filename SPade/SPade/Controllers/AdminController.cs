@@ -161,6 +161,7 @@ namespace SPade.Controllers
             {
                 var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
                 user.EmailConfirmed = true;
+                UserManager.AddToRole(user.Id, "Student");
                 var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                 if (result.Succeeded)
                 {
@@ -319,6 +320,7 @@ namespace SPade.Controllers
             {
                 var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
                 user.EmailConfirmed = true;
+                UserManager.AddToRole(user.Id, "Lecturer");
                 var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                 if (result.Succeeded)
                 {
@@ -1093,6 +1095,7 @@ namespace SPade.Controllers
             //create default account
             var user = new ApplicationUser { UserName = model.AdminID, Email = model.Email };
             user.EmailConfirmed = true;
+            UserManager.AddToRole(user.Id, "Admin");
             var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
             if (result.Succeeded)
             {
