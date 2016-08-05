@@ -914,24 +914,15 @@ namespace SPade.Controllers
             return RedirectToAction("ManageLecturer");
         }//end of update lecturer
 
-        public ActionResult UpdateAdmin(string AdminID)
+        public ActionResult UpdateAdmin(string id)
         {
             UpdateAdminViewModel model = new UpdateAdminViewModel();
             //Get Lecturer
-            List<Admin> Admins = db.Admins.ToList();
-
-            foreach (Admin A in Admins)
-            {
-                if (A.AdminID.ToUpper() == AdminID)
-                {
-                    model.AdminID = A.AdminID;
-                    model.FullName = A.FullName;
-                    model.ContactNo = A.ContactNo;
-                    model.Email = A.Email;
-
-                }
-
-            }
+            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == id);
+            model.AdminID = id;
+            model.FullName = admin.FullName;
+            model.ContactNo = admin.ContactNo;
+            
             return View(model);
         }
 
@@ -939,68 +930,25 @@ namespace SPade.Controllers
         public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command,
             string AdminID)
         {
-            List<Admin> Admins = db.Admins.ToList();
+            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == AdminID);
             if (command.Equals("Update"))
             {
-                //Update Functionality
-                foreach (Admin A in Admins)
-                {
-                    if (A.AdminID.ToUpper() == AdminID)
-                    {
+                admin.FullName = model.FullName;
+                admin.ContactNo = model.ContactNo;
+                admin.UpdatedAt = DateTime.Now;
+                admin.UpdatedBy = User.Identity.Name;
 
-                        A.UpdatedBy = "ADMIN";
-                        A.UpdatedAt = DateTime.Now;
-
-                        //Update Lecturer
-                        if (TryUpdateModel(A, "",
-                           new string[] { "FullName", "Email", "ContactNo", "UpdatedBy", "UpdatedAt" }))
-                        {
-                            try
-                            {
-                                db.SaveChanges();
-                                TempData["msg"] = "<script>alert('Updated successfully');</script>";
-                            }
-                            catch (DataException /* dex */)
-                            {
-                                //Log the error (uncomment dex variable name and add a line here to write a log.
-                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                                TempData["msg"] = "<script>alert('Unable to update successfully');</script>";
-                            }
-                        }
-
-                    }
-
-                }
+                db.SaveChanges();
             }
             else
-            {   // Delete Function
-                foreach (Admin A in Admins)
-                {
-                    if (A.AdminID.ToUpper() == AdminID)
-                    {
-                        //Update Lecturer
-                        A.DeletedBy = "ADMIN";
-                        A.DeletedAt = DateTime.Now;
+            {
+                admin.DeletedAt = DateTime.Now;
+                admin.DeletedBy = User.Identity.Name;
 
-                        if (TryUpdateModel(A, "",
-                           new string[] { "DeletedBy", "DeletedAt" }))
-                        {
-                            try
-                            {
-                                db.SaveChanges();
-                                TempData["msg"] = "<script>alert('Delete successfully');</script>";
-                            }
-                            catch (DataException /* dex */)
-                            {
-                                //Log the error (uncomment dex variable name and add a line here to write a log.
-                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                                TempData["msg"] = "<script>alert('Unable to delete successfully');</script>";
-                            }
-                        }
-                    }
-                }
+                db.SaveChanges();
             }
-            return View(model);
+
+            return RedirectToAction("ManageADmin");
         }
 
         public ActionResult Purge()
