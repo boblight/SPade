@@ -3,6 +3,7 @@ using Microsoft.AspNet.Identity.Owin;
 using SPade.Models;
 using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
+using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
@@ -160,6 +161,7 @@ namespace SPade.Controllers
             {
                 var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
                 user.EmailConfirmed = true;
+                UserManager.AddToRole(user.Id, "Student");
                 var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                 if (result.Succeeded)
                 {
@@ -294,7 +296,7 @@ namespace SPade.Controllers
         {
             AddClassViewModel model = new AddClassViewModel();
             //Get all classes
-            List<Course> allCourses = db.Courses.ToList();
+            List<Course> allCourses = db.Courses.Where(c => c.DeletedAt == null).ToList();
             model.Courses = allCourses;
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
@@ -309,6 +311,7 @@ namespace SPade.Controllers
             {
                 var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
                 user.EmailConfirmed = true;
+                UserManager.AddToRole(user.Id, "Lecturer");
                 var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                 if (result.Succeeded)
                 {
@@ -324,11 +327,18 @@ namespace SPade.Controllers
                         UpdatedAt = DateTime.Now,
                     };
 
-                    db.Lec_Class.Add(new Lec_Class
+                    foreach (AssignmentClass ac in model.ClassList)
                     {
-                        ClassID = int.Parse(formCollection["ClassID"].ToString()),
-                        StaffID = model.StaffID
-                    });
+                        if (ac.isSelected == true)
+                        {
+                            db.Lec_Class.Add(new Lec_Class
+                            {
+                                ClassID = ac.ClassId,
+                                StaffID = model.StaffID
+                            });
+                        }
+                    }
+
 
                     db.Lecturers.Add(lecturer);
                     db.SaveChanges();
@@ -365,6 +375,17 @@ namespace SPade.Controllers
         {
             AddLecturerViewModel model = new AddLecturerViewModel();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+            List<AssignmentClass> ac = new List<AssignmentClass>();
+
+            foreach (var c in allClasses)
+            {
+                AssignmentClass a = new AssignmentClass();
+                a.ClassName = c.ClassName;
+                a.ClassId = c.ClassID;
+                a.isSelected = false;
+                ac.Add(a);
+            }
+            model.ClassList = ac;
             model.Classes = allClasses;
             return View(model);
         }
@@ -736,7 +757,7 @@ namespace SPade.Controllers
 
         public ActionResult UpdateStudent(string id)
         {
-            UpdateStudentViewModel model = new UpdateStudentViewModel();
+            ViewModels.Admin.UpdateStudentViewModel model = new ViewModels.Admin.UpdateStudentViewModel();
 
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
@@ -754,7 +775,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateStudent(UpdateStudentViewModel model, string command, string AdminNo)
+        public ActionResult UpdateStudent(ViewModels.Admin.UpdateStudentViewModel model, string command, string AdminNo)
         {
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
@@ -790,26 +811,6 @@ namespace SPade.Controllers
             }
         }
 
-        public ActionResult UpdateLecturer(string StaffID)
-        {
-            UpdateLecturerViewModel model = new UpdateLecturerViewModel();
-            //Get Lecturer
-
-            List<Lecturer> Lecturers = db.Lecturers.ToList();
-
-            foreach (Lecturer L in Lecturers)
-            {
-                if (L.StaffID == StaffID)
-                {
-                    model.StaffID = L.StaffID;
-                    model.Name = L.Name;
-                    model.ContactNo = L.ContactNo;
-                    model.Email = L.Email;
-                }
-            }
-            return View(model);
-        }
-
         public FileResult DownloadBulkAddStudentFile()
         {
             string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
@@ -826,99 +827,95 @@ namespace SPade.Controllers
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
+
+        public ActionResult UpdateLecturer(string id)
+        {
+            UpdateLecturerViewModel ulvm = new UpdateLecturerViewModel();
+            List<AssignmentClass> ac = new List<AssignmentClass>();
+
+            //Get Lecturer
+            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id);
+            List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == id).ToList();
+            List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+
+            foreach (var c in allClasses)
+            {
+                AssignmentClass a = new AssignmentClass();
+                a.ClassName = c.ClassName;
+                a.ClassId = c.ClassID;
+                if (lc.FindAll(lec => lec.ClassID == c.ClassID).Count() > 0)
+                {
+                    a.isSelected = true;
+                }
+                else
+                {
+                    a.isSelected = false;
+                }
+                ac.Add(a);
+            }
+
+            ulvm.ClassList = ac;
+            ulvm.StaffID = id;
+            ulvm.Name = lecturer.Name;
+            ulvm.ContactNo = lecturer.ContactNo;
+
+            return View(ulvm);
+        }
+
         [HttpPost]
         public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command, string StaffID)
         {
-
+            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == StaffID);
             List<Lecturer> Lecturers = db.Lecturers.ToList();
+            List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == StaffID).ToList();
+
             if (command.Equals("Update"))
             {
-                //Update functionality
-                foreach (Lecturer L in Lecturers)
+                lecturer.Name = model.Name;
+                lecturer.ContactNo = model.ContactNo;
+                lecturer.UpdatedAt = DateTime.Now;
+                lecturer.UpdatedBy = User.Identity.Name;
+
+                //clear data from lecturer-class relation table before adding new ones
+                foreach (Lec_Class lec in lc)
                 {
-                    if (L.StaffID == StaffID)
-                    {
-                        //Update Lecturer
-                        L.UpdatedBy = "ADMIN";
-                        L.UpdatedAt = DateTime.Now;
-
-                        if (TryUpdateModel(L, "",
-                           new string[] { "Name", "Email", "ContactNo", "UpdatedBy", "UpdatedAt" }))
-                        {
-                            try
-                            {
-                                db.SaveChanges();
-                                TempData["msg"] = "<script>alert('Updated successfully');</script>";
-
-                            }
-                            catch (DataException /* dex */)
-                            {
-                                //Log the error (uncomment dex variable name and add a line here to write a log.
-                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                                TempData["msg"] = "<script>alert('Unable to update successfully');</script>";
-
-                            }
-                        }
-
-                    }
-
+                    db.Lec_Class.Remove(lec);
                 }
+
+                foreach (AssignmentClass ac in model.ClassList)
+                {
+                    if (ac.isSelected == true)
+                    {
+                        db.Lec_Class.Add(new Lec_Class
+                        {
+                            ClassID = ac.ClassId,
+                            StaffID = model.StaffID
+                        });
+                    }
+                }
+
+                db.SaveChanges();
             }
             else
             {
-                //Delete functionality
-                foreach (Lecturer L in Lecturers)
-                {
-                    if (L.StaffID == StaffID)
-                    {
-                        //Update Lecturer
-                        L.DeletedBy = "ADMIN";
-                        L.DeletedAt = DateTime.Now;
+                lecturer.DeletedAt = DateTime.Now;
+                lecturer.DeletedBy = User.Identity.Name;
 
-                        if (TryUpdateModel(L, "",
-                           new string[] { "DeletedBy", "DeletedAt" }))
-                        {
-                            try
-                            {
-                                db.SaveChanges();
-                                TempData["msg"] = "<script>alert('Deleted successfully');</script>";
-
-                            }
-                            catch (DataException /* dex */)
-                            {
-                                //Log the error (uncomment dex variable name and add a line here to write a log.
-                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                                TempData["msg"] = "<script>alert('Unable to delete successfully');</script>";
-                            }
-                        }
-
-                    }
-
-                }
+                db.SaveChanges();
             }
 
-            return View(model);
+            return RedirectToAction("ManageLecturer");
+        }//end of update lecturer
 
-        }
-
-        public ActionResult UpdateAdmin(string AdminID)
+        public ActionResult UpdateAdmin(string id)
         {
             UpdateAdminViewModel model = new UpdateAdminViewModel();
             //Get Lecturer
-            List<Admin> Admins = db.Admins.ToList();
-
-            foreach (Admin A in Admins)
-            {
-                if (A.AdminID.ToUpper() == AdminID)
-                {
-                    model.AdminID = A.AdminID;
-                    model.FullName = A.FullName;
-                    model.ContactNo = A.ContactNo;
-                    model.Email = A.Email;
-
-                }
-
-            }
+            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == id);
+            model.AdminID = id;
+            model.FullName = admin.FullName;
+            model.ContactNo = admin.ContactNo;
+            
             return View(model);
         }
 
@@ -926,68 +923,25 @@ namespace SPade.Controllers
         public ActionResult UpdateAdmin(UpdateAdminViewModel model, string command,
             string AdminID)
         {
-            List<Admin> Admins = db.Admins.ToList();
+            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == AdminID);
             if (command.Equals("Update"))
             {
-                //Update Functionality
-                foreach (Admin A in Admins)
-                {
-                    if (A.AdminID.ToUpper() == AdminID)
-                    {
+                admin.FullName = model.FullName;
+                admin.ContactNo = model.ContactNo;
+                admin.UpdatedAt = DateTime.Now;
+                admin.UpdatedBy = User.Identity.Name;
 
-                        A.UpdatedBy = "ADMIN";
-                        A.UpdatedAt = DateTime.Now;
-
-                        //Update Lecturer
-                        if (TryUpdateModel(A, "",
-                           new string[] { "FullName", "Email", "ContactNo", "UpdatedBy", "UpdatedAt" }))
-                        {
-                            try
-                            {
-                                db.SaveChanges();
-                                TempData["msg"] = "<script>alert('Updated successfully');</script>";
-                            }
-                            catch (DataException /* dex */)
-                            {
-                                //Log the error (uncomment dex variable name and add a line here to write a log.
-                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                                TempData["msg"] = "<script>alert('Unable to update successfully');</script>";
-                            }
-                        }
-
-                    }
-
-                }
+                db.SaveChanges();
             }
             else
-            {   // Delete Function
-                foreach (Admin A in Admins)
-                {
-                    if (A.AdminID.ToUpper() == AdminID)
-                    {
-                        //Update Lecturer
-                        A.DeletedBy = "ADMIN";
-                        A.DeletedAt = DateTime.Now;
+            {
+                admin.DeletedAt = DateTime.Now;
+                admin.DeletedBy = User.Identity.Name;
 
-                        if (TryUpdateModel(A, "",
-                           new string[] { "DeletedBy", "DeletedAt" }))
-                        {
-                            try
-                            {
-                                db.SaveChanges();
-                                TempData["msg"] = "<script>alert('Delete successfully');</script>";
-                            }
-                            catch (DataException /* dex */)
-                            {
-                                //Log the error (uncomment dex variable name and add a line here to write a log.
-                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                                TempData["msg"] = "<script>alert('Unable to delete successfully');</script>";
-                            }
-                        }
-                    }
-                }
+                db.SaveChanges();
             }
-            return View(model);
+
+            return RedirectToAction("ManageADmin");
         }
 
         public ActionResult Purge()
@@ -1132,6 +1086,7 @@ namespace SPade.Controllers
             //create default account
             var user = new ApplicationUser { UserName = model.AdminID, Email = model.Email };
             user.EmailConfirmed = true;
+            UserManager.AddToRole(user.Id, "Admin");
             var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
             if (result.Succeeded)
             {

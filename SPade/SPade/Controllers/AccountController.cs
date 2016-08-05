@@ -82,27 +82,27 @@ namespace SPade.Controllers
 
             //check for deleted accounts
             string identifier = model.UserName.Substring(0);
-            if (identifier.Equals("p"))
+            if (identifier.Contains("p"))
             {
                 if (db.Students.ToList().Find(s => s.AdminNo == model.UserName).DeletedAt != null)
                 {
-                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administrator.");
                     return View(model);
                 }
             }
-            else if (identifier.Equals("s"))
+            else if (identifier.Contains("s"))
             {
                 if (db.Lecturers.ToList().Find(s => s.StaffID == model.UserName).DeletedAt != null)
                 {
-                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administrator.");
                     return View(model);
                 }
             }
-            else if (identifier.Equals("a"))
+            else if (identifier.Contains("a"))
             {
                 if (db.Admins.ToList().Find(s => s.AdminID == model.UserName).DeletedAt != null)
                 {
-                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administrator.");
                     return View(model);
                 }
             }
@@ -207,7 +207,17 @@ namespace SPade.Controllers
         {
             RegisterViewModel rvm = new RegisterViewModel();
             List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
+            
+            foreach (Class c in managedClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+            
             rvm.classList = managedClasses;
+
             return View(rvm);
         }
 
