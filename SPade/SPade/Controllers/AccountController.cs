@@ -86,7 +86,7 @@ namespace SPade.Controllers
             {
                 if (db.Students.ToList().Find(s => s.AdminNo == model.UserName).DeletedAt != null)
                 {
-                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administrator.");
                     return View(model);
                 }
             }
@@ -94,7 +94,7 @@ namespace SPade.Controllers
             {
                 if (db.Lecturers.ToList().Find(s => s.StaffID == model.UserName).DeletedAt != null)
                 {
-                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administrator.");
                     return View(model);
                 }
             }
@@ -102,7 +102,7 @@ namespace SPade.Controllers
             {
                 if (db.Admins.ToList().Find(s => s.AdminID == model.UserName).DeletedAt != null)
                 {
-                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administratorn.");
+                    ModelState.AddModelError("", "Your account has been deleted. Please contact your administrator.");
                     return View(model);
                 }
             }
