@@ -63,7 +63,7 @@ namespace SPade.Controllers
             string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
             //get the students in that classs
             foreach (Class c in managedClasses)
@@ -198,11 +198,11 @@ namespace SPade.Controllers
 
             sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
 
-            Class c= db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
+            Class c = db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
 
-            int courseId = c.CourseID; 
+            int courseId = c.CourseID;
             string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
-            
+
             foreach (Student s in sList)
             {
                 ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
@@ -291,8 +291,7 @@ namespace SPade.Controllers
         {
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
-
-            //  string x = "s1431489"; //temp 
+            
             var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
@@ -465,7 +464,6 @@ namespace SPade.Controllers
                     return View(addAssgn);
                 }
             }//end of run with testcase
-
             //run without testcase 
             else if (addAssgn.IsTestCasePresent == false)
             {
@@ -570,7 +568,7 @@ namespace SPade.Controllers
 
             //everything all okay 
             return RedirectToAction("ManageAssignments", "Lecturer");
-        }
+        }//
 
         //used to insert the data into DB. 
         public bool AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)

@@ -3,6 +3,7 @@ using Microsoft.AspNet.Identity.Owin;
 using SPade.Models;
 using SPade.Models.DAL;
 using SPade.ViewModels.Admin;
+using SPade.ViewModels.Lecturer;
 using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
@@ -333,11 +334,18 @@ namespace SPade.Controllers
                         UpdatedAt = DateTime.Now,
                     };
 
-                    db.Lec_Class.Add(new Lec_Class
+                    foreach (AssignmentClass ac in model.ClassList)
                     {
-                        ClassID = int.Parse(formCollection["ClassID"].ToString()),
-                        StaffID = model.StaffID
-                    });
+                        if (ac.isSelected == true)
+                        {
+                            db.Lec_Class.Add(new Lec_Class
+                            {
+                                ClassID = int.Parse(formCollection["ClassID"].ToString()),
+                                StaffID = model.StaffID
+                            });
+                        }
+                    }
+                   
 
                     db.Lecturers.Add(lecturer);
                     db.SaveChanges();
@@ -374,6 +382,17 @@ namespace SPade.Controllers
         {
             AddLecturerViewModel model = new AddLecturerViewModel();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+            List<AssignmentClass> ac = new List<AssignmentClass>();
+
+            foreach (var c in allClasses)
+            {
+                AssignmentClass a = new AssignmentClass();
+                a.ClassName = c.ClassName;
+                a.ClassId = c.ClassID;
+                a.isSelected = false;
+                ac.Add(a);
+            }
+            model.ClassList = ac;
             model.Classes = allClasses;
             return View(model);
         }
@@ -745,7 +764,7 @@ namespace SPade.Controllers
 
         public ActionResult UpdateStudent(string id)
         {
-            UpdateStudentViewModel model = new UpdateStudentViewModel();
+            ViewModels.Admin.UpdateStudentViewModel model = new ViewModels.Admin.UpdateStudentViewModel();
 
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
@@ -763,7 +782,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateStudent(UpdateStudentViewModel model, string command, string AdminNo)
+        public ActionResult UpdateStudent(ViewModels.Admin.UpdateStudentViewModel model, string command, string AdminNo)
         {
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();

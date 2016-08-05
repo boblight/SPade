@@ -82,7 +82,7 @@ namespace SPade.Controllers
 
             //check for deleted accounts
             string identifier = model.UserName.Substring(0);
-            if (identifier.Equals("p"))
+            if (identifier.Contains("p"))
             {
                 if (db.Students.ToList().Find(s => s.AdminNo == model.UserName).DeletedAt != null)
                 {
@@ -90,7 +90,7 @@ namespace SPade.Controllers
                     return View(model);
                 }
             }
-            else if (identifier.Equals("s"))
+            else if (identifier.Contains("s"))
             {
                 if (db.Lecturers.ToList().Find(s => s.StaffID == model.UserName).DeletedAt != null)
                 {
@@ -98,7 +98,7 @@ namespace SPade.Controllers
                     return View(model);
                 }
             }
-            else if (identifier.Equals("a"))
+            else if (identifier.Contains("a"))
             {
                 if (db.Admins.ToList().Find(s => s.AdminID == model.UserName).DeletedAt != null)
                 {

@@ -8,71 +8,109 @@
 @using (Html.BeginForm("AddOneLecturer", "Admin", FormMethod.Post))
 {
 
-<div class="col-md-4 col-md-offset-4 form-horizontal">
-    <fieldset>
-        @Html.AntiForgeryToken()
-        <legend>Add Lecturer</legend>
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="col-md-4 col-md-offset-4 form-horizontal">
+        <fieldset>
+            @Html.AntiForgeryToken()
+            <legend>Add Lecturer</legend>
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        <div class="form-group">
-            <div class="col-md-12">
-                <label for="inputStaffNo" class="control-label">Staff ID</label>
-                @Html.TextBoxFor(m => m.StaffID, new { @class = "form-control input-md", required = "required" })
-                <span class="help-block">With 's' (e.g. s1234567)</span>
-                <span class="help-block">@Html.ValidationMessage("StaffID", new { @class = "text-danger" })</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-12">
-                <label for="inputLecturerName" class="control-label">Lecturer Name</label>
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md", required = "required" })
-                <span class="help-block">e.g. John Tan</span>
-                <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
-
-            </div>
-        </div>
-
-        <!-- lecturerClass-->
-        <div class="form-group">
-            <div>
+            <div class="form-group">
                 <div class="col-md-12">
-                    <label>Class</label>
-                    @{
-                        @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
-                    }
+                    <label for="inputStaffNo" class="control-label">Staff ID</label>
+                    @Html.TextBoxFor(m => m.StaffID, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">With 's' (e.g. s1234567)</span>
+                    <span class="help-block">@Html.ValidationMessage("StaffID", new { @class = "text-danger" })</span>
                 </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <div class="col-md-12">
-                <label for="inputContact" class="control-label">Contact</label>
-                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
-                <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label for="inputLecturerName" class="control-label">Lecturer Name</label>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">e.g. John Tan</span>
+                    <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
 
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <div class="col-md-12">
-                <label for="inputEmail" class="control-label">Email</label>
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md", required = "required" })
-                <span class="help-block">e.g. abc@hotmail.com </span>
-                <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
-
+            <!--Classes-->
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label class="control-label">
+                        Select classes to allocate assignment to
+                    </label>
+                    @Html.TextBoxFor(m => m.SelectedClasses, new { @class = "form-control", @placeholder = "Select classes...", @readonly = "true", @data-toggle = "modal", @data-target = "#myModal"})
+                    <input t
+                    <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <div class="col-md-12">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a id="btnCancel" href="javascript:history.back()" class="btn btn-default">Cancel</a>
+            <!-- lecturerClass-->
+            @*<div class="form-group">
+                    <div>
+                        <div class="col-md-12">
+                            <label>Class</label>
+                            @{
+                                @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
+                            }
+                        </div>
+                    </div>
+                </div>*@
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label for="inputContact" class="control-label">Contact</label>
+                    @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+
+                </div>
             </div>
-        </div>
-    </fieldset>
-</div>
-}
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label for="inputEmail" class="control-label">Email</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">e.g. abc@hotmail.com </span>
+                    <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
+
+                </div>
+            </div>
+
+            <!--Modal for selecting clas-->
+            <div name="classModal" id="classModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Choose classes to allocate assignment to</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            @{
+                                for (var i = 0; i < Model.ClassList.Count(); i++)
+                                {
+                                    @Html.HiddenFor(m => Model.ClassList[i].ClassId)
+                                    @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
+                                    @Model.ClassList[i].ClassName
+                                }
+                            }
+                        </div>
+                        <div class="modal-footer">
+                            <button name="modalSelect" id="modalSelect" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <a id="btnCancel" href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+                                }
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
