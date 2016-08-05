@@ -180,7 +180,17 @@ namespace SPade.Controllers
         {
             RegisterViewModel rvm = new RegisterViewModel();
             List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
+            
+            foreach (Class c in managedClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+            
             rvm.classList = managedClasses;
+
             return View(rvm);
         }
 
