@@ -39,6 +39,8 @@ namespace SPade.ViewModels.Lecturer
         [Required(ErrorMessage = "Please select classes to assign to")]
         [Display(Name = "assigned classes")]
         public string SelectedClasses { get; set; }
+
+        public bool UpdateSolution { get; set; }
         public bool IsTestCasePresent { get; set; }
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
