@@ -55,6 +55,7 @@ namespace SPade.Controllers
             return View();
         }
 
+        //Manage Students (View all + Class + Update)
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -85,6 +86,42 @@ namespace SPade.Controllers
 
         }
 
+        public ActionResult ViewStudentsByClass(string classID)
+        {
+            int cID = Int32.Parse(classID);
+
+            List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
+            List<Student> sList = new List<Student>();
+
+            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
+
+            Class c = db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
+
+            int courseId = c.CourseID;
+            string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
+
+            foreach (Student s in sList)
+            {
+                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
+
+                vm.AdminNo = s.AdminNo.ToUpper();
+                vm.Name = s.Name;
+                vm.Email = s.Email;
+                vm.ContactNo = s.ContactNo;
+
+                studList.Add(vm);
+            }
+
+            ViewBag.ClassName = courseAbbr + "/" + c.ClassName;
+            return View(studList);
+        }
+
+        public ActionResult UpdateStudent()
+        {
+            return View();
+        }
+
+        //Add Students (Bulk + Single)
         public FileResult DownloadBulkAddStudentFile()
         {
             string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
@@ -93,7 +130,6 @@ namespace SPade.Controllers
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
-        [HttpGet]
         public ActionResult BulkAddStudent()
         {
             return View();
@@ -189,55 +225,18 @@ namespace SPade.Controllers
             return RedirectToAction("Dashboard");
         }
 
-        public ActionResult ViewStudentsByClass(string classID)
-        {
-            int cID = Int32.Parse(classID);
-
-            List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
-            List<Student> sList = new List<Student>();
-
-            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
-
-            Class c = db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
-
-            int courseId = c.CourseID;
-            string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
-
-            foreach (Student s in sList)
-            {
-                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
-
-                vm.AdminNo = s.AdminNo.ToUpper();
-                vm.Name = s.Name;
-                vm.Email = s.Email;
-                vm.ContactNo = s.ContactNo;
-
-                studList.Add(vm);
-            }
-
-            ViewBag.ClassName = courseAbbr + "/" + c.ClassName;
-            return View(studList);
-        }
-
-        public ActionResult UpdateStudent()
-        {
-            return View();
-        }
-
+        //Manage + Update Assignment
         public ActionResult ManageAssignments()
         {
             List<ManageAssignmentViewModel> manageAssgn = new List<ManageAssignmentViewModel>();
             List<Assignment> lecAssgn = new List<Assignment>();
-            //ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
 
             //to store the classes assigned that assignment 
             List<string> classAssgn = new List<string>();
 
-            //string lecturerID = "s1431489"; //temp 
             var lecturerID = User.Identity.GetUserName();
 
             //get the assignments that this lecturer created
-            //lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
             lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedBy == null);
 
             //get the name of the classes assigned to an assignment 
@@ -279,6 +278,37 @@ namespace SPade.Controllers
             return View(manageAssgn);
         }
 
+        public ActionResult UpdateAssignment(string assignmentId)
+        {
+            var i = Int32.Parse(assignmentId);
+            var x = User.Identity.GetUserName();
+
+            UpdateAssignmentViewModel model = new UpdateAssignmentViewModel();
+            Assignment assgn = new Assignment();
+            List<Module> modList = new List<Module>();
+            List<Class> cList = new List<Class>();
+
+            //get the assignment details from the DB
+            assgn = db.Assignments.Where(a => a.AssignmentID == i).FirstOrDefault();
+
+            //get the classes managed by the lecturer
+            cList = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+
+            //get all the modules 
+            modList = db.Modules.ToList();
+
+
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult UpdateAssignment(int AssignmentId)
+        {
+            return View();
+        }
+
+        //Add Assignment
         public FileResult DownloadTestCase()
         {
             string f = Server.MapPath(@"~/TestCase/testcase.xml");
@@ -291,7 +321,7 @@ namespace SPade.Controllers
         {
             List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
-            
+
             var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
@@ -402,7 +432,7 @@ namespace SPade.Controllers
                                     //failed to save to DB
                                     DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.ToList();
-                                    TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                    TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
                                     return View(addAssgn);
                                 }
 
@@ -464,6 +494,7 @@ namespace SPade.Controllers
                     return View(addAssgn);
                 }
             }//end of run with testcase
+
             //run without testcase 
             else if (addAssgn.IsTestCasePresent == false)
             {
@@ -568,7 +599,7 @@ namespace SPade.Controllers
 
             //everything all okay 
             return RedirectToAction("ManageAssignments", "Lecturer");
-        }//
+        }
 
         //used to insert the data into DB. 
         public bool AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
@@ -706,49 +737,7 @@ namespace SPade.Controllers
             }
         }
 
-        public ActionResult UpdateAssignment()
-        {
-
-            //create model to store info to display
-            UpdateAssignmentViewModel model = new UpdateAssignmentViewModel();
-            //load lecAssgn list with assignments.
-            List<Assignment> lecAssgn = db.Assignments.ToList();
-            List<Class_Assgn> classList = db.Class_Assgn.ToList();
-
-            int x = 2;
-
-            List<string> classAssgn = new List<string>();
-
-            //get the name of the classes assigned to an assignment 
-            foreach (Assignment a in lecAssgn)
-            {
-                if (a.AssignmentID.Equals(x))
-                {
-                    model.Assignment = a;
-                    model.AssgnTitle = a.AssgnTitle;
-                    model.Describe = a.Describe;
-                    model.Solution = a.Solution;
-                    model.ModuleId = a.ModuleCode;
-                    model.StartDate = a.StartDate;
-                    model.DueDate = a.DueDate;
-                    model.MaxAttempt = a.MaxAttempt;
-
-                }
-
-            }
-
-
-
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public ActionResult UpdateAssignment(int AssignmentId)
-        {
-            return View();
-        }
-
+        //View Results
         public ActionResult ViewResults()
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();
@@ -794,8 +783,6 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult ViewResults(string Class, string Assignment)
         {
-
-
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
         new SqlParameter("@inClass", Class),
         new SqlParameter("@inAssignment", Assignment)).ToList();

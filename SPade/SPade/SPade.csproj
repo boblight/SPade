@@ -413,7 +413,6 @@
     </Content>
     <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
-    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <Content Include="Views\Admin\Purge.cshtml" />
     <Content Include="Views\Admin\AddOneAdmin.cshtml" />
     <Content Include="Views\Admin\UpdateAdmin.cshtml" />
@@ -426,6 +425,7 @@
     <Content Include="Views\Admin\ManageCourse.cshtml" />
     <Content Include="Views\Admin\ManageAdmin.cshtml" />
     <Content Include="Views\Admin\UpdateModule.cshtml" />
+    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
