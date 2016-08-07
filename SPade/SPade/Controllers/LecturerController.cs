@@ -287,6 +287,8 @@ namespace SPade.Controllers
             Assignment assgn = new Assignment();
             List<Module> modList = new List<Module>();
             List<Class> cList = new List<Class>();
+            List<AssignmentClass> assgnClassList = new List<AssignmentClass>();
+            List<Class_Assgn> classAssgn = new List<Class_Assgn>();
 
             //get the assignment details from the DB
             assgn = db.Assignments.Where(a => a.AssignmentID == i).FirstOrDefault();
@@ -294,12 +296,46 @@ namespace SPade.Controllers
             //get the classes managed by the lecturer
             cList = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
-            //get all the modules 
+            //get the classes that are assigned this class
+            classAssgn = db.Class_Assgn.Where(ca => ca.AssignmentID == i).ToList();
+
+            foreach (Class c in cList)
+            {
+                AssignmentClass ac = new AssignmentClass();
+                ac.ClassId = c.ClassID;
+                ac.ClassName = c.ClassName;
+
+                //used for populating the checkboxes later on
+                foreach (Class_Assgn ca in classAssgn)
+                {
+                    if (ac.ClassId == ca.ClassID)
+                    {
+                        ac.isSelected = true;
+                    }
+                    else
+                    {
+                        ac.isSelected = false;
+                    }
+                }
+                assgnClassList.Add(ac);
+            }
+
+            //get all the modules
             modList = db.Modules.ToList();
 
+            //set the data for the assignment 
+            model.AssgnTitle = assgn.AssgnTitle;
+            model.ModuleId = assgn.ModuleCode;
+            model.Describe = assgn.Describe;
+            model.StartDate = assgn.StartDate;
+            model.DueDate = assgn.DueDate;
+            model.MaxAttempt = assgn.MaxAttempt;
+            model.Modules = modList;
+            model.ClassList = assgnClassList;
+            model.UpdateSolution = false;
+            model.IsTestCasePresent = true; 
 
-
-            return View();
+            return View(model);
         }
 
         [HttpPost]
