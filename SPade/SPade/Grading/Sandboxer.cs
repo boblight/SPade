@@ -62,7 +62,7 @@ namespace SPade.Grading
                 compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
                 compile = Process.Start(compileInfo);
 
-                compile.WaitForExit();//compilation process ends
+                compile.WaitForExit(5000);//compilation process ends
                 
                 pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
                 //procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
@@ -108,9 +108,6 @@ namespace SPade.Grading
 
             //Now we have everything we need to create the AppDomain, so let's create it.
             AppDomain newDomain = AppDomain.CreateDomain("Sandbox", null, adSetup, permSet, fullTrustAssembly);
-            //newDomain.SetData("assgnId", assgnId);
-            //newDomain.SetData("executionPath", pathToExecutable);
-            //newDomain.SetData("lang", language);
             newDomain.SetData("param1", parameters[0]);
             newDomain.SetData("param2", parameters[1]);
             newDomain.SetData("param3", parameters[2]);
