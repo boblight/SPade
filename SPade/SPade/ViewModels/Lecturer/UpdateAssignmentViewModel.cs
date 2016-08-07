@@ -17,6 +17,8 @@ namespace SPade.ViewModels.Lecturer
 
         public string ModuleId { get; set; }
 
+        public string SelectedModuleId { get; set; }
+
         [AllowHtml]
         [Required(ErrorMessage = "Please provide a valid question")]
         [Display(Name = "Assignment Question")]

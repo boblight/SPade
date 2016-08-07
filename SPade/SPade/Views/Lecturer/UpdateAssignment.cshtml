@@ -1,7 +1,7 @@
 ﻿@model SPade.ViewModels.Lecturer.UpdateAssignmentViewModel
 
 @{
-    ViewBag.Title = "Add Assignment";
+    ViewBag.Title = "Update Assignment";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -9,7 +9,7 @@
 @Scripts.Render("~/bundles/updateassignmentscripts")
 @Scripts.Render("~/bundles/wysiwygscripts")
 
-@using (Html.BeginForm("AddAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data", id = "submitAssignmentForm" }))
+@using (Html.BeginForm("UpdateAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data", id = "submitAssignmentForm" }))
 {
     <div class="container">
 
@@ -47,7 +47,7 @@
                     <div class="col-md-12">
                         <label>Assignment Module</label>
                         @{
-                            @Html.DropDownListFor(c => Model.ModuleId, new SelectList(Model.Modules, "ModuleCode", "ModuleName"), new { @class = "form-control" })
+                            @Html.DropDownListFor(c => Model.ModuleId, new SelectList(Model.Modules, "ModuleCode", "ModuleName", Model.SelectedModuleId), new { @class = "form-control" })
                         }
                     </div>
                 </div>
@@ -199,6 +199,7 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <input type="button" id="resetBtn" name="resetBtn" class="btn btn-primary" value="Reset Dates" />
+                        <input type="button" id="resetDefaultDate" name="resetDefaultDate" class="btn btn-primary" value="Reset to Default Date" />
                     </div>
                 </div>
 
@@ -237,9 +238,11 @@
                                 @{
                                     for (var i = 0; i < Model.ClassList.Count(); i++)
                                     {
-                                        @Html.HiddenFor(m => Model.ClassList[i].ClassId)
-                                        @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
-                                        @Model.ClassList[i].ClassName
+                                        <div>
+                                            @Html.HiddenFor(m => Model.ClassList[i].ClassId)
+                                            @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
+                                            @Model.ClassList[i].ClassName
+                                        </div>
                                     }
                                 }
                             </div>
@@ -254,6 +257,7 @@
                     <div class="col-md-12">
                         <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
                         <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                        <a href="ManageAssignments" class="btn btn-danger pull-right">Delete</a>
                     </div>
                 </div>
             </fieldset>

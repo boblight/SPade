@@ -254,20 +254,22 @@ namespace SPade.Controllers
 
                 classAssgn = query.ToList();
 
-                var o = classAssgn.Last();
-                string jc = "";
+                string jc = "Yahallo";
 
-                foreach (string s in classAssgn)
-                {
-                    if (s.Equals(o))
-                    {
-                        jc += s;
-                    }
-                    else
-                    {
-                        jc += s + ",";
-                    }
-                }
+                //var o = classAssgn.Last();
+                //string jc = "";
+
+                //foreach (string s in classAssgn)
+                //{
+                //    if (s.Equals(o))
+                //    {
+                //        jc += s;
+                //    }
+                //    else
+                //    {
+                //        jc += s + ",";
+                //    }
+                //}
 
                 mmvm.Assignment = a;
                 mmvm.classList = classAssgn;
@@ -286,37 +288,51 @@ namespace SPade.Controllers
             UpdateAssignmentViewModel model = new UpdateAssignmentViewModel();
             Assignment assgn = new Assignment();
             List<Module> modList = new List<Module>();
-            List<Class> cList = new List<Class>();
-            List<AssignmentClass> assgnClassList = new List<AssignmentClass>();
+
+            List<Class> classList = new List<Class>();
             List<Class_Assgn> classAssgn = new List<Class_Assgn>();
+            List<AssignmentClass> assgnClassList = new List<AssignmentClass>();
+            List<Course> courseList = new List<Course>();
 
             //get the assignment details from the DB
             assgn = db.Assignments.Where(a => a.AssignmentID == i).FirstOrDefault();
 
-            //get the classes managed by the lecturer
-            cList = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            //get all courses
+            courseList = db.Courses.ToList();
 
-            //get the classes that are assigned this class
+            //get the classes that this lecturer manages 
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) select c;
+            classList = query.ToList();
+
+            //now we get the classses that are assigned this assignment 
             classAssgn = db.Class_Assgn.Where(ca => ca.AssignmentID == i).ToList();
 
-            foreach (Class c in cList)
+            //loop through the classes, check if they are assigned, then give to assignClassList to populate the checkboxes
+            foreach (Class cl in classList)
             {
                 AssignmentClass ac = new AssignmentClass();
-                ac.ClassId = c.ClassID;
-                ac.ClassName = c.ClassName;
 
-                //used for populating the checkboxes later on
+                ac.ClassId = cl.ClassID;
+
+                //string together course abb + class name
+                foreach (Course cr in courseList)
+                {
+                    if (cr.CourseID == cl.CourseID)
+                    {
+                        ac.ClassName = cr.CourseAbbr + "/" + cl.ClassName;
+                    }
+                }
+
+                //check which class has been assigned the assignment
                 foreach (Class_Assgn ca in classAssgn)
                 {
-                    if (ac.ClassId == ca.ClassID)
+                    if (ca.AssignmentID == i && ca.ClassID == ac.ClassId)
                     {
                         ac.isSelected = true;
                     }
-                    else
-                    {
-                        ac.isSelected = false;
-                    }
                 }
+
+                //add to list
                 assgnClassList.Add(ac);
             }
 
@@ -326,6 +342,16 @@ namespace SPade.Controllers
             //set the data for the assignment 
             model.AssgnTitle = assgn.AssgnTitle;
             model.ModuleId = assgn.ModuleCode;
+
+            //get the id of the assignment module to set the dropdown
+            foreach (Module m in modList)
+            {
+                if (m.ModuleCode == model.ModuleId)
+                {
+                    model.SelectedModuleId = m.ModuleCode;
+                }
+            }
+
             model.Describe = assgn.Describe;
             model.StartDate = assgn.StartDate;
             model.DueDate = assgn.DueDate;
@@ -333,7 +359,7 @@ namespace SPade.Controllers
             model.Modules = modList;
             model.ClassList = assgnClassList;
             model.UpdateSolution = false;
-            model.IsTestCasePresent = true; 
+            model.IsTestCasePresent = true;
 
             return View(model);
         }
@@ -355,18 +381,18 @@ namespace SPade.Controllers
 
         public ActionResult AddAssignment()
         {
-            List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
+
+            List<AssignmentClass> ac = new List<AssignmentClass>();
+            List<Class> managedClasses = new List<Class>();
 
             var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) select c;
+            managedClasses = query.ToList();
 
-            //get the modules 
-            List<Module> allModules = db.Modules.ToList().FindAll(mod => mod.DeletedAt == null);
-
-            //we loop through the classList to fill up the assignmentclass -> which is used to populate 
+            //we loop through the managedClasses to fill up the assignmentclass -> which is used to populate checkboxes
             foreach (var c in managedClasses)
             {
                 AssignmentClass a = new AssignmentClass();
@@ -375,6 +401,9 @@ namespace SPade.Controllers
                 a.isSelected = false;
                 ac.Add(a);
             }
+
+            //get the modules 
+            List<Module> allModules = db.Modules.ToList();
 
             aaVM.IsTestCasePresent = true;
             aaVM.ClassList = ac;
