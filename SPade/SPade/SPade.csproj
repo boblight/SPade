@@ -251,6 +251,9 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\sysdiagram.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GmailService.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />

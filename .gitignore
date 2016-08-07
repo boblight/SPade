@@ -248,3 +248,6 @@ ModelManifest.xml
 .fake/
 /SPade/SPade/App_Data/Temp
 /SPade/SPade/Submissions/p14314763/SampleQns1/nbproject/private/
+/SPade/SPade/Solutions
+/SPade/SPade/Submissions
+/SPade/SPade/TestCase

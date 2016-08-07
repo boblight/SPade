@@ -102,41 +102,7 @@ namespace SPade.Grading
                     break;
             }
 
-            ////create a new file for grading executable to append output to
-            //File.AppendAllText(filePath + "/output.txt", "");
 
-            ////arguments to be passed into the grading executable
-            ////1st string is path to submission
-            ////2nd string is path to test case
-            ////3rd string is path to solution
-            ////4th string is path to output
-            //arguments = new string[4];
-            //arguments[0] = pathToExecutable;
-            //arguments[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
-            //arguments[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
-            //arguments[3] = filePath + "/output.txt";
-
-            ////File.AppendAllText("C:/Users/tongliang/Desktop/viewarguments.txt", arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3]);
-
-            //procInfo.CreateNoWindow = true;
-            //procInfo.UseShellExecute = false;
-            //procInfo.Arguments = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
-
-            ////run sandbox grading
-            //proc = Process.Start(procInfo);
-
-            //proc.WaitForExit(10000);
-
-            ////once Grading process is done, retrive output and return to controller
-            //return Decimal.Parse(File.ReadAllText(filePath + "/output.txt"));
-            ////while (true)
-            ////{
-            ////    decimal returnVal == Decimal.Parse(File.ReadAllText(filePath + "/output.txt"))
-            ////if (returnVal != null) { return returnVal; }
-            ////}
-
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -159,7 +125,7 @@ namespace SPade.Grading
                     List<string> inputs = new List<string>();
                     noOfTestCase++;
                     proc = Process.Start(procInfo);
-                    File.AppendAllText("C:/User/tongliang/Desktop/debugger.txt", "TEST");
+                    File.AppendAllText("C:/Users/tongliang/Desktop/debugger.txt", "TEST");
                     subOut = "";
 
                     System.IO.StreamWriter sw = proc.StandardInput;
@@ -213,19 +179,6 @@ namespace SPade.Grading
                         return 3;//infinite loop
                     }
                 }//end of test case loop
-
-                //else
-                //{
-                //    //terminate sandboxie if program fails
-                //    Process terminateSandbox = new Process();
-                //    terminateSandbox.StartInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"  /terminate_all");
-                //    terminateSandbox.StartInfo.CreateNoWindow = true;
-                //    terminateSandbox.StartInfo.UseShellExecute = false;
-                //    terminateSandbox.Start();
-                //    terminateSandbox.WaitForExit();
-
-                //    return 2; //program failure
-                //}
 
                 return (testCasePassed / noOfTestCase); //return results
             }

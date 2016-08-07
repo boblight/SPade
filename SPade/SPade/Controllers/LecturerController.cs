@@ -328,7 +328,7 @@ namespace SPade.Controllers
             List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
             //get the modules 
-            List<Module> allModules = db.Modules.ToList();
+            List<Module> allModules = db.Modules.ToList().FindAll(mod => mod.DeletedAt == null);
 
             //we loop through the classList to fill up the assignmentclass -> which is used to populate 
             foreach (var c in managedClasses)
