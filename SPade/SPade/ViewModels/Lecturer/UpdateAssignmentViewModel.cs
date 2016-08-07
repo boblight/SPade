@@ -10,6 +10,8 @@ namespace SPade.ViewModels.Lecturer
 {
     public class UpdateAssignmentViewModel
     {
+        public int AssignmentId { get; set; }
+
         [Required(ErrorMessage = "Please provide a valid assignment title")]
         [StringLength(100, ErrorMessage = "Please keep the title below 100 characters", MinimumLength = 1)]
         [Display(Name = "Assignment Title")]

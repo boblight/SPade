@@ -230,16 +230,16 @@ namespace SPade.Controllers
         {
             List<ManageAssignmentViewModel> manageAssgn = new List<ManageAssignmentViewModel>();
             List<Assignment> lecAssgn = new List<Assignment>();
-
-            //to store the classes assigned that assignment 
-            List<string> classAssgn = new List<string>();
+            List<Class> classAssgn = new List<Class>();
+            List<Course> courseList = new List<Course>();
 
             var lecturerID = User.Identity.GetUserName();
 
             //get the assignments that this lecturer created
             lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedBy == null);
+            courseList = db.Courses.ToList();
 
-            //get the name of the classes assigned to an assignment 
+            //get the details of each assignment and pass to view
             foreach (Assignment a in lecAssgn)
             {
                 ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
@@ -250,30 +250,62 @@ namespace SPade.Controllers
                             where ca.AssignmentID.Equals(a.AssignmentID)
                             join cl in db.Lec_Class on c.ClassID equals cl.ClassID
                             where cl.StaffID.Equals(lecturerID)
-                            select c.ClassName;
+                            select c;
 
                 classAssgn = query.ToList();
 
-                string jc = "Yahallo";
+                string joinedClasses = "";
 
-                //var o = classAssgn.Last();
-                //string jc = "";
+                //if theres only 1 class assigned that assignment 
+                if (classAssgn.Count() == 1)
+                {
+                    foreach (Course c in courseList)
+                    {
+                        if (c.CourseID == classAssgn.FirstOrDefault().CourseID)
+                        {
+                            joinedClasses = c.CourseAbbr + "/" + classAssgn.FirstOrDefault().ClassName;
+                        }
+                    }
+                }
 
-                //foreach (string s in classAssgn)
-                //{
-                //    if (s.Equals(o))
-                //    {
-                //        jc += s;
-                //    }
-                //    else
-                //    {
-                //        jc += s + ",";
-                //    }
-                //}
+                //if there are more then 1 class assigned that assignment
+                if (classAssgn.Count() > 1)
+                {
+                    //get the last item 
+                    var lastItem = classAssgn.LastOrDefault().ClassName;
+                    var listSize = classAssgn.Count();
+                    int listIndex = 0;
+
+                    foreach (Class c in classAssgn)
+                    {
+                        listIndex++;
+
+                        if (listIndex != listSize) //not yet the last time
+                        {
+                            foreach (Course cr in courseList)
+                            {
+                                if (cr.CourseID == c.CourseID)
+                                {
+                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName + ",";
+                                }
+                            }
+                        }
+
+                        if (listIndex == listSize) //reach the last time 
+                        {
+                            foreach (Course cr in courseList)
+                            {
+                                if (cr.CourseID == c.CourseID)
+                                {
+                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName;
+                                }
+                            }
+                        }
+                    }
+                }//end of class loop 
 
                 mmvm.Assignment = a;
-                mmvm.classList = classAssgn;
-                mmvm.Classes = jc;
+                mmvm.Classes = joinedClasses;
                 manageAssgn.Add(mmvm);
             }
 
@@ -352,6 +384,7 @@ namespace SPade.Controllers
                 }
             }
 
+            model.AssignmentId = assgn.AssignmentID;
             model.Describe = assgn.Describe;
             model.StartDate = assgn.StartDate;
             model.DueDate = assgn.DueDate;
@@ -365,9 +398,74 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateAssignment(int AssignmentId)
+        public ActionResult UpdateAssignment(UpdateAssignmentViewModel uAVM, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload)
+        {
+            //user doesnt wants to update solution
+            if (uAVM.UpdateSolution == false)
+            {
+                if (UpdateAssignmentToDB(uAVM, false, "") == true)
+                {
+                    //failed to update assignment 
+                    TempData["GeneralError"] = "Failed to update assignment to database. Please try again !";
+                    return View(uAVM);
+                }
+            }
+
+            //user wants to update solution 
+            if (uAVM.UpdateSolution == true)
+            {
+                //run the solution
+                
+
+                //update the DB 
+            }
+
+            //successfully updating assignment to DB
+            return RedirectToAction("ManageAssignments", "Lecturer");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteAssignment()
         {
             return View();
+        }
+
+        public bool UpdateAssignmentToDB(UpdateAssignmentViewModel uVM, bool updateSln, string solutionName)
+        {
+            bool isFailed = false;
+
+            //get the previous asssignment from db
+            var query = from at in db.Assignments where at.AssignmentID.Equals(uVM.AssignmentId) select at;
+
+            //update the assignment
+            foreach (Assignment updatedAssignment in query)
+            {
+                try
+                {
+                    //update the values 
+                    updatedAssignment.AssgnTitle = uVM.AssgnTitle;
+                    updatedAssignment.ModuleCode = uVM.ModuleId;
+                    updatedAssignment.Describe = uVM.Describe;
+                    updatedAssignment.MaxAttempt = uVM.MaxAttempt;
+                    updatedAssignment.StartDate = uVM.StartDate;
+                    updatedAssignment.DueDate = uVM.DueDate;
+                    updatedAssignment.UpdatedBy = User.Identity.GetUserName();
+                    updatedAssignment.UpdatedAt = DateTime.Now;
+
+                    //users choose to update the assignment solution
+                    if (updateSln == true)
+                    {
+                        updatedAssignment.Solution = "~/Solution/" + uVM.AssignmentId + ".xml";
+                    }
+
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    isFailed = true;
+                }
+            }
+            return isFailed;
         }
 
         //Add Assignment
