@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Security;
@@ -28,10 +27,11 @@ namespace SPade.Grading
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private bool isTestCasePresnt = false;
 
-        const string pathToUntrusted = @"C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug";
+        const string pathToUntrusted = @"C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
+        //const string pathToUntrusted = @"C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
-        const string entryPoint = "Main"; //method name
+        const string entryPoint = "Grading"; //method name
         private static string[] parameters = new string[4];
 
         public Sandboxer()
@@ -63,15 +63,14 @@ namespace SPade.Grading
                 compile = Process.Start(compileInfo);
 
                 compile.WaitForExit();//compilation process ends
-
+                
                 pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
                 //procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
             }
             else if (language == "C#")
             {
-                //compile java program
-                compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
-
+                //compile c# program
+                compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", "Program.cs");
                 compileInfo.CreateNoWindow = true;
                 compileInfo.UseShellExecute = false;
                 compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
@@ -79,14 +78,14 @@ namespace SPade.Grading
 
                 compile.WaitForExit();//compilation process ends
 
-                pathToExecutable = filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe";
+                pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".exe";
                 //procInfo = new ProcessStartInfo(filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe");
             }
 
             parameters[0] = pathToExecutable;
             parameters[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
             parameters[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
-            parameters[3] = filePath + "/output.txt";
+            parameters[3] = language;
         }//end of setup
 
         public decimal runSandboxedGrading()
@@ -100,7 +99,7 @@ namespace SPade.Grading
 
             //Setting the permissions for the AppDomain. We give the permission to execute and to 
             //read/discover the location where the untrusted code is loaded.
-            PermissionSet permSet = new PermissionSet(PermissionState.None);
+            PermissionSet permSet = new PermissionSet(PermissionState.Unrestricted);
             //permSet.AddPermission(new System.Security.Permissions.FileIOPermission(System.Security.Permissions.FileIOPermissionAccess.Read, "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/TestCase"));
             permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
 
@@ -129,7 +128,10 @@ namespace SPade.Grading
             Sandboxer newDomainInstance = (Sandboxer)handle.Unwrap();
             //return newDomainInstance.ExecuteUntrusedGrading(int.Parse(newDomain.GetData("assgnId").ToString()), newDomain.GetData("executionPath").ToString(), newDomain.GetData("lang").ToString());
 
-
+            parameters[0] = newDomain.GetData("param1").ToString();
+            parameters[1] = newDomain.GetData("param2").ToString();
+            parameters[2] = newDomain.GetData("param3").ToString();
+            parameters[3] = newDomain.GetData("param4").ToString();
 
             return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
         }
@@ -281,12 +283,11 @@ namespace SPade.Grading
             //Load the MethodInfo for a method in the new Assembly. This might be a method you know, or 
             //you can use Assembly.EntryPoint to get to the main function in an executable.
             MethodInfo target = Assembly.Load(assemblyName).GetType(typeName).GetMethod(entryPoint);
+
             try
             {
                 //Now invoke the method.
-                //return (decimal)
-                target.Invoke(this, parameters);
-                return 666;
+                return (decimal)target.Invoke(null, new Object[] { parameters });
             }
             catch (Exception ex)
             {
@@ -298,7 +299,7 @@ namespace SPade.Grading
                 CodeAccessPermission.RevertAssert();
                 //Console.ReadLine();
             }
-            return 1000;
+            return 666;
         }
     }//end of sandboxer
 }

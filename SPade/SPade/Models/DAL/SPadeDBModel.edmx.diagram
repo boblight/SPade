@@ -4,36 +4,37 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="078275a8c0d2414db87e150930108c22" Name="Diagram1">
-        <EntityTypeShape EntityType="SPadeDBModel.C__MigrationHistory" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Admin" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetRole" Width="1.5" PointX="3.75" PointY="12.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetUserClaim" Width="1.5" PointX="8.25" PointY="11" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetUserLogin" Width="1.5" PointX="8.25" PointY="13.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetUser" Width="1.5" PointX="6" PointY="11.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Assignment" Width="1.5" PointX="8.25" PointY="5.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Class" Width="1.5" PointX="0.75" PointY="6" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Class_Assgn" Width="1.5" PointX="10.5" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Course" Width="1.5" PointX="1.5" PointY="10.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Lec_Class" Width="1.5" PointX="3" PointY="1.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Lecturer" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Module" Width="1.5" PointX="6" PointY="6.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.ProgLanguage" Width="1.5" PointX="3.75" PointY="6.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Student" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Submission" Width="1.5" PointX="10.5" PointY="3.5" IsExpanded="true" />
-        <AssociationConnector Association="SPadeDBModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.assgn_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.FK_Submission_ToTable" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.Module_fk_constrain" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.class_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.class_fk2" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.classcrse_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.staff_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.staff_fkk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.Language_fk_constrain" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.substud_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.AspNetUserRoles" ManuallyRouted="false" />
+      <Diagram DiagramId="57af7063d0b6411eb97b0f6c6027c20d" Name="Diagram1">
+        <EntityTypeShape EntityType="SpadeDBModel.C__MigrationHistory" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Admin" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetRole" Width="1.5" PointX="3.75" PointY="12.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetUserClaim" Width="1.5" PointX="8.25" PointY="11" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetUserLogin" Width="1.5" PointX="8.25" PointY="13.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.AspNetUser" Width="1.5" PointX="6" PointY="11.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Assignment" Width="1.5" PointX="8.25" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Class" Width="1.5" PointX="0.75" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Class_Assgn" Width="1.5" PointX="10.5" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Course" Width="1.5" PointX="1.5" PointY="10.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Lec_Class" Width="1.5" PointX="3" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Lecturer" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Module" Width="1.5" PointX="6" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.ProgLanguage" Width="1.5" PointX="3.75" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Student" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.Submission" Width="1.5" PointX="10.5" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpadeDBModel.sysdiagram" Width="1.5" PointX="12.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="SpadeDBModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.assgn_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.FK_Submission_ToTable" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.Module_fk_constrain" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.class_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.class_fk2" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.classcrse_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.staff_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.staff_fkk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.Language_fk_constrain" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.substud_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SpadeDBModel.AspNetUserRoles" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
