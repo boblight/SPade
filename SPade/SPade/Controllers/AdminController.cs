@@ -98,7 +98,7 @@ namespace SPade.Controllers
                 return View();
             }
 
-            return View("ManageLecturer");
+            return RedirectToAction("ManageLecturer");
         }
 
 
@@ -111,6 +111,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult BulkAddStudent(HttpPostedFileBase file)
         {
+            
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
                 //Upload and save the file
@@ -150,7 +151,7 @@ namespace SPade.Controllers
                 TempData["InputWarning"] = err;
                 return View();
             }
-            return View("ManageStudent");
+            return RedirectToAction("ManageStudent");
         }
 
         [HttpPost]
