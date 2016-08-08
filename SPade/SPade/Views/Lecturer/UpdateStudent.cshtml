@@ -1,49 +1,87 @@
-﻿
+﻿@model SPade.ViewModels.Lecturer.UpdateStudentViewModel
+
 @{
     ViewBag.Title = "Update Student";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container">
-    <div class="col-md-6 col-md-offset-3 form-horizontal">
-        <fieldset>
 
-            <legend>Update Student</legend>
+@using (Html.BeginForm("UpdateStudent", "Lecturer", FormMethod.Post))
+{
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label for="inputName" class="control-label">Name:</label>
-                    <input type="text" class="form-control" id="inputName" placeholder="Name" />
+    <div class="container">
+
+        <div class="col-md-6 col-md-offset-3 form-horizontal">
+            <fieldset>
+
+                <legend>Update Student</legend>
+
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                @Html.Hidden("AdminNo")
+
+                <!-- studentNameInput-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-md", required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label for="" class="control-label">Class:</label>
-                    <select class="form-control" id="select">
-                        <option>Select a class...</option>
-                        <option>DIT/1A21</option>
-                        <option>DIT/1A22</option>
-                        <option>DIT/1A23</option>
-                        <option>DIT/1A24</option>
-                    </select>
+                <!-- studentClass-->
+                <div class="form-group">
+                    <div>
+                        <div class="col-md-12">
+                            <label>Class</label>
+                            @{
+                                @Html.DropDownListFor(c => Model.ClassID, new SelectList(Model.Classes, "ClassID", "ClassName"), new { @class = "form-control" })
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label for="" class="control-label">Contact Number</label>
-                    <input type="text" class="form-control" id="inputContact" placeholder="Contact Number" />
+                <!-- studentContactNo-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">Contact No.</label>
+                        @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
+                        <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <a href="ViewStudentsByClass" class="btn btn-primary">Update</a>
-                    <a href="javascript:history.back()" class="btn btn-danger">Delete</a>
-                    <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="submit" value="Update" name="command" class="btn btn-primary" />
+                        <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                        <button class="btn btn-danger pull-right" data-toggle="modal" data-target="#modal">Delete</button>
+                        <!-- Show alert-->
+                        @Html.Raw(TempData["Message"])
+                    </div>
                 </div>
-            </div>
-        </fieldset>
+
+                <div class="modal" id="modal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Are you sure you want to delete?</h4>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <input type="submit" value="Delete" name="command" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
     </div>
-</div>
 
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+
+}

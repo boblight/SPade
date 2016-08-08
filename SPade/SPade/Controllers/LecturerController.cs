@@ -85,7 +85,7 @@ namespace SPade.Controllers
 
                 ManageClassesViewModel e = new ManageClassesViewModel();
                 //match the class ID of student wit hthe class ID of the managed Classes
-                var count = db.Students.Where(s => s.ClassID == c.ClassID).Count();
+                var count = db.Students.Where(s => s.ClassID == c.ClassID).Where(s=>s.DeletedAt==null).Count();
 
                 Course cs = db.Courses.Where(cx => cx.CourseID == c.CourseID).First();
 
@@ -131,9 +131,69 @@ namespace SPade.Controllers
             return View(studList);
         }
 
-        public ActionResult UpdateStudent()
+        public ActionResult UpdateStudent(string id)
         {
-            return View();
+            ViewModels.Lecturer.UpdateStudentViewModel model = new ViewModels.Lecturer.UpdateStudentViewModel();
+
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+
+            foreach (Class c in allClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+
+            model.Classes = allClasses;
+
+            //Get Student           
+            Student student = db.Students.ToList().Find(st => st.AdminNo == id);
+
+            model.AdminNo = student.AdminNo;
+            model.Name = student.Name;
+            model.ClassID = student.ClassID;
+            model.ContactNo = student.ContactNo;
+            model.Email = student.Email;
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateStudent(ViewModels.Lecturer.UpdateStudentViewModel model, string command, string AdminNo)
+        {
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            Student student = db.Students.Where(s => s.AdminNo == AdminNo).FirstOrDefault();
+
+            //Udate Student information
+            if (command.Equals("Update"))
+            {
+                student.Name = model.Name;
+                student.ContactNo = model.ContactNo;
+                student.ClassID = model.ClassID;
+                db.SaveChanges();
+                return RedirectToAction("ManageClassesAndStudents");
+            }
+            //Delete Student
+            else
+            {
+                if (db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
+                {
+                    student.DeletedAt = DateTime.Now;
+                    student.DeletedBy = User.Identity.Name;
+
+                    db.SaveChanges();
+                    return RedirectToAction("ManageClassesAndStudents");
+                }
+                else
+                {
+                    ModelState.AddModelError("DeleteError", "There are still submissions that are tied to this student's account. " +
+                        "Contact an Admin to purge all submissions made by this student before deleting.");
+                    return View(model);
+                }
+            }
         }
 
         //Add Students (Bulk + Single)

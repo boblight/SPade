@@ -757,7 +757,7 @@ namespace SPade.Controllers
                         {
                             //Log the error (uncomment dex variable name and add a line here to write a log.
                             ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                            TempData["msg"] = "<script>alert('Updated unsuccessful');</script>";
+                            TempData["msg"] = "<script>alert('Update unsuccessful');</script>";
                         }
                     };
                 }
@@ -776,7 +776,7 @@ namespace SPade.Controllers
                         {
                             //Log the error (uncomment dex variable name and add a line here to write a log.
                             ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
-                            TempData["msg"] = "<script>alert('Updated unsuccessful');</script>";
+                            TempData["msg"] = "<script>alert('Update unsuccessful');</script>";
                         }
                     };
                 }
@@ -866,7 +866,7 @@ namespace SPade.Controllers
                 else
                 {
                     ModelState.AddModelError("DeleteError", "There are still submissions that are tied to this student's account. " +
-                        "You have to purge all submissions made by this student before ");
+                        "You have to purge all submissions made by this student before deleting.");
                     return View(model);
                 }
             }
