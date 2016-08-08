@@ -336,6 +336,8 @@
     <Content Include="Models\DAL\SPadeDBModel.edmx.diagram">
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
     </Content>
+    <None Include="Properties\PublishProfiles\IIS.pubxml" />
+    <None Include="Properties\PublishProfiles\TestIIS.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
     <Content Include="Scripts\indexscript.js" />
@@ -436,12 +438,14 @@
     <None Include="Web.Release.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
+    <None Include="Web.TestIIS.config">
+      <DependentUpon>Web.Config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Uploads\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="Migrations\img\" />
-    <Folder Include="Properties\" />
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />
     <Folder Include="TempSubmissions\" />

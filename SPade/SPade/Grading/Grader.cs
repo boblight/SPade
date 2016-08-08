@@ -21,7 +21,6 @@ namespace SPade.Grading
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private bool isTestCasePresnt = false;
-        private string[] arguments; //to be used for sandboxing
         XmlNode docNode, bodyNode, solutionsNode;
         XmlDocument slnDoc = new XmlDocument();
 

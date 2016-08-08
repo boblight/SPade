@@ -251,3 +251,12 @@ ModelManifest.xml
 /SPade/SPade/Solutions
 /SPade/SPade/Submissions
 /SPade/SPade/TestCase
+/SPade/Grant.sql
+/SPade.zip
+/SPade.SourceManifest.xml
+/SPade.SetParameters.xml
+/SPade.deploy.cmd
+/SPade.deploy-readme.txt
+/SPade/SPade/Web.TestIIS.config
+/SPade/SPade/Properties/PublishProfiles/IIS.pubxml
+/SPade/SPade/Properties/PublishProfiles/TestIIS.pubxml

@@ -29,7 +29,7 @@ namespace SPade.Controllers
 
         //POST: SubmitAssignment
         [HttpPost]
-        public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
+        public ActionResult SubmitAssignment(HttpPostedFileBase file)
         {
             decimal result = 0;
             string submissionName = "";

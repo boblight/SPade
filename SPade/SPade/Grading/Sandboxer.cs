@@ -14,21 +14,20 @@ namespace SPade.Grading
 {
     public class Sandboxer : MarshalByRefObject
     {
-        private string ans, error, subOut, solOut, serializedStartInfo;
+        private string ans, error, subOut, solOut;
         private List<String> subList = new List<String>();
-        private bool programFailed = false;
         private decimal testCasePassed;
         private int exitcode, assgnId;
         private int noOfTestCase;
         private ProcessStartInfo procInfo, compileInfo;
-        private Process proc, compile;
+        private Process compile;
         private List<object> testcases = new List<object>();
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
-        private bool isTestCasePresnt = false;
+        //private bool isTestCasePresnt = false;
 
         const string pathToUntrusted = @"C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
-        //const string pathToUntrusted = @"C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
+        //const string pathToUntrusted = @"C:/inetpub/wwwroot/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
         const string entryPoint = "Grading"; //method name
@@ -292,7 +291,7 @@ namespace SPade.Grading
                 //calling it with a full-trust stack.
                 (new PermissionSet(PermissionState.Unrestricted)).Assert();
                 //Console.WriteLine("SecurityException caught:\n{0}", ex.ToString());
-                File.AppendAllText("C:/Users/tongliang/Desktop/SandboxDebuggingLog.txt", "Security exception" + ex.ToString());
+                //File.AppendAllText("C:/Users/tongliang/Desktop/SandboxDebuggingLog.txt", "Security exception" + ex.ToString());
                 CodeAccessPermission.RevertAssert();
                 //Console.ReadLine();
             }

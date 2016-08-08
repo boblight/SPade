@@ -403,7 +403,7 @@ namespace SPade.Controllers
             }
 
             //get the modules 
-            List<Module> allModules = db.Modules.ToList();
+            List<Module> allModules = db.Modules.ToList().FindAll(mod => mod.DeletedAt == null);
 
             aaVM.IsTestCasePresent = true;
             aaVM.ClassList = ac;
