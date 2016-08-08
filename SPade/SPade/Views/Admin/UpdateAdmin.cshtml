@@ -27,7 +27,7 @@
 
                 <div class="form-group">
                     <div class="col-md-12">
-                        <label for="inputContact" class="control-label">Contact</label>
+                        <label class="control-label">Contact No.</label>
                         @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
                         <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
                     </div>
@@ -51,8 +51,8 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <input type="submit" value="Update" name="command" class="btn btn-primary" />
-                        <button class="btn btn-danger" data-toggle="modal" data-target="#modal">Delete</button>
                         <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                        <button class="btn btn-danger pull-right" data-toggle="modal" data-target="#modal">Delete</button>
                         <!-- Show alert-->
                         @Html.Raw(TempData["msg"])
                     </div>
