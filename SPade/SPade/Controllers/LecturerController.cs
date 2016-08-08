@@ -200,6 +200,15 @@ namespace SPade.Controllers
         {
             AddStudentViewModel model = new AddStudentViewModel();
             List<Class> allClasses = db.Classes.ToList();
+
+            foreach (Class c in allClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+
             model.Classes = allClasses;
             return View(model);
         }
@@ -424,7 +433,7 @@ namespace SPade.Controllers
                     if (UpdateAssignmentToDB(uAVM, false, false) == true)
                     {
                         //failed to update assignment 
-                        TempData["GeneralError"] = "Failed to update assignment to database. Please try again !";
+                        TempData["GeneralError"] = "Failed to update assignment to database. Please try again!";
                         return View(uAVM);
                     }
                 }
@@ -527,7 +536,7 @@ namespace SPade.Controllers
                                     {
                                         DeleteFile(fileName, assignmentTitle, true);
                                         uAVM.Modules = db.Modules.ToList();
-                                        TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
+                                        TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                         return View(uAVM);
                                     }
 
@@ -536,7 +545,7 @@ namespace SPade.Controllers
                                         //solution failed to run 
                                         DeleteFile(fileName, assignmentTitle, true);
                                         uAVM.Modules = db.Modules.ToList();
-                                        TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                                        TempData["GeneralError"] = "The program has failed to run entirely. Please check your program.";
                                         return View(uAVM);
                                     }
                                     else if (exitCode == 4)
@@ -544,7 +553,7 @@ namespace SPade.Controllers
                                         //solution stuck in infinite loop
                                         DeleteFile(fileName, assignmentTitle, true);
                                         uAVM.Modules = db.Modules.ToList();
-                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                         return View(uAVM);
                                     }
                                 }
@@ -552,7 +561,7 @@ namespace SPade.Controllers
                                 {
                                     //more than 150MB                     
                                     uAVM.Modules = db.Modules.ToList();
-                                    TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                                    TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                                     return View(uAVM);
                                 }
                             }
@@ -560,7 +569,7 @@ namespace SPade.Controllers
                             {
                                 //empty file 
                                 uAVM.Modules = db.Modules.ToList();
-                                string err = "Uploaded file is invalid ! Please try again.";
+                                string err = "Uploaded file is invalid! Please try again.";
                                 TempData["SlnWarning"] = err;
                                 TempData["TcWarning"] = err;
                                 return View(uAVM);
@@ -570,7 +579,7 @@ namespace SPade.Controllers
                         {
                             //uploaded file is invalid
                             uAVM.Modules = db.Modules.ToList();
-                            string err = "Uploaded file is invalid ! Please try again.";
+                            string err = "Uploaded file is invalid! Please try again.";
                             TempData["SlnWarning"] = err;
                             TempData["TcWarning"] = err;
                             return View(uAVM);
@@ -647,7 +656,7 @@ namespace SPade.Controllers
                                             //solution has failed to save to DB
                                             DeleteFile(fileName, assignmentTitle, false);
                                             uAVM.Modules = db.Modules.ToList();
-                                            TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                            TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
                                             return View(uAVM);
                                         }
 
@@ -660,7 +669,7 @@ namespace SPade.Controllers
                                         //solution failed to run 
                                         DeleteFile(fileName, assignmentTitle, false);
                                         uAVM.Modules = db.Modules.ToList();
-                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                         return View(uAVM);
                                     }
 
@@ -669,7 +678,7 @@ namespace SPade.Controllers
                                 {
                                     //file size is more that 150MB
                                     uAVM.Modules = db.Modules.ToList();
-                                    TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                                    TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                                     return View(uAVM);
                                 }
                             }
@@ -677,7 +686,7 @@ namespace SPade.Controllers
                             {
                                 //empty file 
                                 uAVM.Modules = db.Modules.ToList();
-                                string err = "Uploaded file is invalid ! Please try again.";
+                                string err = "Uploaded file is invalid! Please try again.";
                                 TempData["SlnWarning"] = err;
                                 TempData["TcWarning"] = err;
                                 return View(uAVM);
@@ -687,7 +696,7 @@ namespace SPade.Controllers
                         {
                             //invalid file 
                             uAVM.Modules = db.Modules.ToList();
-                            string err = "Uploaded file is invalid ! Please try again.";
+                            string err = "Uploaded file is invalid! Please try again.";
                             TempData["SlnWarning"] = err;
                             TempData["TcWarning"] = err;
                             return View(uAVM);
@@ -704,7 +713,7 @@ namespace SPade.Controllers
                 if (DeleteAssignment(uAVM) == true)
                 {
                     //failed to delete assignment 
-                    TempData["GeneralError"] = "Failed to delete assignment. Please try again !";
+                    TempData["GeneralError"] = "Failed to delete assignment. Please try again!";
                     return View(uAVM);
                 }
 
@@ -885,7 +894,12 @@ namespace SPade.Controllers
             foreach (var c in managedClasses)
             {
                 AssignmentClass a = new AssignmentClass();
-                a.ClassName = c.ClassName;
+
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                a.ClassName = className;
+
                 a.ClassId = c.ClassID;
                 a.isSelected = false;
                 ac.Add(a);
@@ -963,7 +977,7 @@ namespace SPade.Controllers
                                 //solution stuck in infinite loop
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.ToList();
-                                TempData["GeneralError"] = "The program uploaded is unpoorted by the compiler used for this module. Please upload "
+                                TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
                                     + "program coded in the appropriate programming language or ensure you have selected the correct module.";
                                 return View(addAssgn);
                             }
@@ -1008,7 +1022,7 @@ namespace SPade.Controllers
                             {
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.ToList();
-                                TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
+                                TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                 return View(addAssgn);
                             }
 
@@ -1025,7 +1039,7 @@ namespace SPade.Controllers
                                 //solution stuck in infinite loop
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.ToList();
-                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                 return View(addAssgn);
                             }
                             else if (exitCode == 5)
@@ -1043,7 +1057,7 @@ namespace SPade.Controllers
                         {
                             //uploaded file is more than 150MB
                             addAssgn.Modules = db.Modules.ToList();
-                            TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                            TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
                         }
                     }
@@ -1051,7 +1065,7 @@ namespace SPade.Controllers
                     {
                         //uploaded file is empty 
                         addAssgn.Modules = db.Modules.ToList();
-                        string err = "Uploaded file is invalid ! Please try again.";
+                        string err = "Uploaded file is invalid! Please try again.";
                         TempData["SlnWarning"] = err;
                         TempData["TcWarning"] = err;
                         return View(addAssgn);
@@ -1061,7 +1075,7 @@ namespace SPade.Controllers
                 {
                     //uploaded file is invalid
                     addAssgn.Modules = db.Modules.ToList();
-                    string err = "Uploaded file is invalid ! Please try again.";
+                    string err = "Uploaded file is invalid! Please try again.";
                     TempData["SlnWarning"] = err;
                     TempData["TcWarning"] = err;
                     return View(addAssgn);
@@ -1139,7 +1153,7 @@ namespace SPade.Controllers
                                     //solution has failed to save to DB
                                     DeleteFile(fileName, assignmentTitle, false);
                                     addAssgn.Modules = db.Modules.ToList();
-                                    TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                    TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
                                     return View(addAssgn);
                                 }
 
@@ -1152,7 +1166,7 @@ namespace SPade.Controllers
                                 //solution failed to run 
                                 DeleteFile(fileName, assignmentTitle, false);
                                 addAssgn.Modules = db.Modules.ToList();
-                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                 return View(addAssgn);
                             }
                         }
@@ -1160,7 +1174,7 @@ namespace SPade.Controllers
                         {
                             //uploaded file is more than 150MB
                             addAssgn.Modules = db.Modules.ToList();
-                            TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                            TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
                         }
                     }
@@ -1168,7 +1182,7 @@ namespace SPade.Controllers
                     {
                         //uploaded file is empty 
                         addAssgn.Modules = db.Modules.ToList();
-                        TempData["SlnWarning"] = "Uploaded file is empty ! Please try again.";
+                        TempData["SlnWarning"] = "Uploaded file is empty! Please try again.";
                         return View(addAssgn);
                     }
                 }
@@ -1176,7 +1190,7 @@ namespace SPade.Controllers
                 {
                     //uploaded file is invalid 
                     addAssgn.Modules = db.Modules.ToList();
-                    TempData["SlnWarning"] = "Uploaded file is invalid ! Please try again.";
+                    TempData["SlnWarning"] = "Uploaded file is invalid! Please try again.";
                     return View(addAssgn);
                 }
             }//end of run without testcase

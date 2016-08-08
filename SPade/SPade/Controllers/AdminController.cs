@@ -214,6 +214,15 @@ namespace SPade.Controllers
         {
             AddStudentViewModel model = new AddStudentViewModel();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+
+            foreach (Class c in allClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+
             model.Classes = allClasses;
             return View(model);
         }
@@ -423,7 +432,12 @@ namespace SPade.Controllers
             foreach (var c in allClasses)
             {
                 AssignmentClass a = new AssignmentClass();
-                a.ClassName = c.ClassName;
+
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                a.ClassName = className;
+
                 a.ClassId = c.ClassID;
                 a.isSelected = false;
                 ac.Add(a);
@@ -799,6 +813,15 @@ namespace SPade.Controllers
 
             //Get all classes
             List<Class> allClasses = db.Classes.ToList();
+
+            foreach(Class c in allClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+
             model.Classes = allClasses;
 
             //Get Student           
@@ -878,7 +901,12 @@ namespace SPade.Controllers
             foreach (var c in allClasses)
             {
                 AssignmentClass a = new AssignmentClass();
-                a.ClassName = c.ClassName;
+
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                a.ClassName = className;
+
                 a.ClassId = c.ClassID;
                 if (lc.FindAll(lec => lec.ClassID == c.ClassID).Count() > 0)
                 {
