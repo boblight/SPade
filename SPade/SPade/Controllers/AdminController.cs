@@ -631,7 +631,7 @@ namespace SPade.Controllers
 
             foreach (Class C in Classes)
             {
-                if (C.ClassID.Equals(ClassID))
+                if (C.ClassID.Equals(ClassID) && C.DeletedAt == null)
                 {
                     model.CourseID = C.CourseID;
                     model.ClassID = C.ClassID;
@@ -752,7 +752,7 @@ namespace SPade.Controllers
 
             foreach (Student S in Students)
             {
-                if (S.AdminNo == AdminNo)
+                if (S.AdminNo == AdminNo && S.DeletedAt == null)
                 {
                     model.AdminNo = S.AdminNo;
                     model.Name = S.Name;
@@ -843,7 +843,7 @@ namespace SPade.Controllers
 
             foreach (Lecturer L in Lecturers)
             {
-                if (L.StaffID == StaffID)
+                if (L.StaffID == StaffID && L.DeletedAt == null)
                 {
                     model.StaffID = L.StaffID;
                     model.Name = L.Name;
@@ -883,7 +883,7 @@ namespace SPade.Controllers
                     if (L.StaffID == StaffID)
                     {
                         //Update Lecturer
-                        L.UpdatedBy = "ADMIN";
+                        L.UpdatedBy = User.Identity.Name;
                         L.UpdatedAt = DateTime.Now;
 
                         if (TryUpdateModel(L, "",
@@ -916,7 +916,7 @@ namespace SPade.Controllers
                     if (L.StaffID == StaffID)
                     {
                         //Update Lecturer
-                        L.DeletedBy = "ADMIN";
+                        L.DeletedBy = User.Identity.GetUserName();
                         L.DeletedAt = DateTime.Now;
 
                         if (TryUpdateModel(L, "",
@@ -953,7 +953,7 @@ namespace SPade.Controllers
 
             foreach (Admin A in Admins)
             {
-                if (A.AdminID.ToUpper() == AdminID)
+                if (A.AdminID.ToUpper() == AdminID && A.DeletedAt == null)
                 {
                     model.AdminID = A.AdminID;
                     model.FullName = A.FullName;
@@ -979,7 +979,7 @@ namespace SPade.Controllers
                     if (A.AdminID.ToUpper() == AdminID)
                     {
 
-                        A.UpdatedBy = "ADMIN";
+                        A.UpdatedBy = User.Identity.Name;
                         A.UpdatedAt = DateTime.Now;
 
                         //Update Lecturer
@@ -1010,7 +1010,7 @@ namespace SPade.Controllers
                     if (A.AdminID.ToUpper() == AdminID)
                     {
                         //Update Lecturer
-                        A.DeletedBy = "ADMIN";
+                        A.DeletedBy = User.Identity.Name;
                         A.DeletedAt = DateTime.Now;
 
                         if (TryUpdateModel(A, "",
