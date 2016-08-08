@@ -20,7 +20,6 @@ namespace SPade.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
-        //  { UserID = Request.QueryString["UserID"]
         private ApplicationUserManager _userManager;
         private SPadeDBEntities db = new SPadeDBEntities();
 
@@ -46,259 +45,47 @@ namespace SPade.Controllers
             }
         }
 
-        // GET: Admin
+        //Dashboard
         public ActionResult Dashboard()
         {
             return View();
         }
-        [HttpGet]
-        public ActionResult BulkAddLecturer()
+
+        //Manage + Add + Update/Delete Classes 
+        public ActionResult ManageClass()
         {
-            return View();
+            List<ManageClassViewModel> lvm = new List<ManageClassViewModel>();
+
+            List<Class> x = new List<Class>();
+            x = db.Classes.Where(a => a.DeletedAt == null).ToList();
+
+            foreach (Class i in x)
+            {
+                ManageClassViewModel vm = new ManageClassViewModel();
+
+                vm.ClassID = i.ClassID.ToString();
+                vm.Course = db.Courses.ToList().Find(cs => cs.CourseID == i.CourseID).CourseName;
+                vm.Class = i.ClassName.ToString();
+                vm.CreatedBy = i.CreatedBy.ToUpper();
+                vm.NumLecturers = db.Lec_Class.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
+                vm.NumStudents = db.Students.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
+
+                lvm.Add(vm);
+            }
+
+            return View(lvm);
         }
 
-        [HttpPost]
-        public ActionResult BulkAddLecturer(HttpPostedFileBase file)
+        public ActionResult AddOneClass()
         {
-            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
-            {
-                //Upload and save the file
-                // extract only the filename
-                var fileName = Path.GetFileName(file.FileName);
-                // store the file inside ~/App_Data/uploads folder
-                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
-                file.SaveAs(path);
-
-                string[] lines = System.IO.File.ReadAllLines(path);
-                List<Lecturer> lectlist = new List<Lecturer>();
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    if (!string.IsNullOrEmpty(lines[i]))
-                    {
-                        Lecturer lect = new Lecturer();
-                        lect.StaffID = lines[i].Split(',')[0];
-                        lect.Name = lines[i].Split(',')[1];
-                        lect.Email = lines[i].Split(',')[2];
-                        lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
-                        lect.CreatedAt = DateTime.Now;
-                        lect.CreatedBy = User.Identity.GetUserName();
-                        lect.UpdatedAt = DateTime.Now;
-                        lect.UpdatedBy = User.Identity.GetUserName();
-
-                        lectlist.Add(lect);
-                    }
-                }
-                db.Lecturers.AddRange(lectlist);
-                db.SaveChanges();
-            }
-            else
-            {
-                // Upload file is invalid
-                string err = "Uploaded file is invalid! Please try again!";
-                TempData["InputWarning"] = err;
-                return View();
-            }
-
-            return RedirectToAction("ManageLecturer");
-        }
-
-
-        [HttpGet]
-        public ActionResult BulkAddStudent()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file)
-        {
-
-            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
-            {
-                //Upload and save the file
-                // extract only the filename
-                var fileName = Path.GetFileName(file.FileName);
-                // store the file inside ~/App_Data/uploads folder
-                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
-                file.SaveAs(path);
-
-                string[] lines = System.IO.File.ReadAllLines(path);
-                List<Student> slist = new List<Student>();
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    if (!string.IsNullOrEmpty(lines[i]))
-                    {
-                        Student s = new Student();
-                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-                        s.AdminNo = lines[i].Split(',')[1];
-                        s.Name = lines[i].Split(',')[2];
-                        s.Email = lines[i].Split(',')[3];
-                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
-                        s.CreatedAt = DateTime.Now;
-                        s.CreatedBy = User.Identity.GetUserName();
-                        s.UpdatedAt = DateTime.Now;
-                        s.UpdatedBy = User.Identity.GetUserName();
-
-                        slist.Add(s);
-                    }
-                }
-                db.Students.AddRange(slist);
-                db.SaveChanges();
-            }
-            else
-            {
-                // Upload file is invalid
-                string err = "Uploaded file is invalid! Please try again!";
-                TempData["InputWarning"] = err;
-                return View();
-            }
-            return RedirectToAction("ManageStudent");
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> AddOneStudent(AddStudentViewModel model, FormCollection formCollection)
-        {
-            try
-            {
-                var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
-                user.EmailConfirmed = true;
-                var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
-                if (result.Succeeded)
-                {
-                    UserManager.AddToRole(user.Id, "Student");
-                    var student = new Student()
-                    {
-                        AdminNo = model.AdminNo.Trim(),
-                        Name = model.Name,
-                        Email = model.Email,
-                        ContactNo = model.ContactNo,
-                        ClassID = Int32.Parse(formCollection["ClassID"].ToString()),
-                        CreatedBy = User.Identity.Name,
-                        UpdatedBy = User.Identity.Name,
-                        CreatedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now,
-                    };
-
-                    db.Students.Add(student);
-                    db.SaveChanges();
-                }
-                else
-                {
-                    //error in registering account
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error);
-                    }
-                    return View(model);
-                }
-            }
-            catch (DbEntityValidationException e)
-            {
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                throw;
-
-            }
-            return RedirectToAction("Dashboard");
-        }
-
-        public ActionResult AddOneStudent()
-        {
-            AddStudentViewModel model = new AddStudentViewModel();
-            List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
-
-            foreach (Class c in allClasses)
-            {
-                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
-                String className = courseAbbr + "/" + c.ClassName;
-
-                c.ClassName = className;
-            }
-
-            model.Classes = allClasses;
+            AddClassViewModel model = new AddClassViewModel();
+            //Get all classes
+            List<Course> allCourses = db.Courses.Where(c => c.DeletedAt == null).ToList();
+            model.Courses = allCourses;
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
             return View(model);
-        }
 
-        public ActionResult AddCourse()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult AddCourse(AddCourseViewModel aCVM)
-        {
-            Course c = new Course();
-
-            try
-            {
-                c.CourseName = aCVM.CourseName;
-                c.CourseAbbr = aCVM.CourseAbv;
-                c.CreatedBy = User.Identity.GetUserName();
-                c.CreatedAt = DateTime.Now;
-                c.UpdatedBy = User.Identity.GetUserName();
-                c.UpdatedAt = DateTime.Now;
-                db.Courses.Add(c);
-
-                db.SaveChanges();
-
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Failed to save module. Please try again !";
-                return View(aCVM);
-            }
-            return RedirectToAction("ManageCourse", "Admin");
-        }
-
-        public ActionResult UpdateCourse(int id)
-        {
-            AddCourseViewModel acvm = new AddCourseViewModel();
-            Course c = db.Courses.Where(course => course.CourseID == id).FirstOrDefault();
-            acvm.CourseAbv = c.CourseAbbr;
-            acvm.CourseName = c.CourseName;
-            acvm.CourseID = id;
-            return View(acvm);
-        }
-
-        [HttpPost]
-        public ActionResult UpdateCourse(AddCourseViewModel model, string command, int CourseID)
-        {
-            Course c = db.Courses.Where(course => course.CourseID == CourseID).FirstOrDefault();
-
-            if (db.Classes.ToList().FindAll(classs => classs.CourseID == model.CourseID).Count() == 0)
-            {
-                if (command.Equals("Update"))
-                {
-                    c.CourseAbbr = model.CourseAbv;
-                    c.CourseName = model.CourseAbv;
-                    c.UpdatedAt = DateTime.Now;
-                    c.UpdatedBy = User.Identity.Name;
-
-                    db.SaveChanges();
-                    return RedirectToAction("ManageCourse");
-                }
-                else
-                {
-                    c.DeletedAt = DateTime.Now;
-                    c.DeletedBy = User.Identity.Name;
-
-                    db.SaveChanges();
-                    return RedirectToAction("ManageCourse");
-                }
-            }
-            else
-            {
-                ModelState.AddModelError("", "Unable to delete or update course as there are still active classes that belongs to this course.");
-                return View(model);
-            }
         }
 
         [HttpPost]
@@ -343,345 +130,6 @@ namespace SPade.Controllers
 
             //if successful 
             return RedirectToAction("Dashboard", "Admin");
-        }
-        public ActionResult AddOneClass()
-        {
-            AddClassViewModel model = new AddClassViewModel();
-            //Get all classes
-            List<Course> allCourses = db.Courses.Where(c => c.DeletedAt == null).ToList();
-            model.Courses = allCourses;
-            List<Lecturer> allLecturer = db.Lecturers.ToList();
-            model.Lecturers = allLecturer;
-            return View(model);
-
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> AddOneLecturer(AddLecturerViewModel model, FormCollection formCollection)
-        {
-            try
-            {
-                var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
-                user.EmailConfirmed = true;
-                var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
-                if (result.Succeeded)
-                {
-                    UserManager.AddToRole(user.Id, "Lecturer");
-                    var lecturer = new Lecturer()
-                    {
-                        StaffID = model.StaffID,
-                        Name = model.Name,
-                        ContactNo = model.ContactNo,
-                        Email = model.Email,
-                        CreatedBy = User.Identity.Name,
-                        UpdatedBy = User.Identity.Name,
-                        CreatedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now,
-                    };
-
-                    foreach (AssignmentClass ac in model.ClassList)
-                    {
-                        if (ac.isSelected == true)
-                        {
-                            db.Lec_Class.Add(new Lec_Class
-                            {
-                                ClassID = ac.ClassId,
-                                StaffID = model.StaffID
-                            });
-                        }
-                    }
-
-
-                    db.Lecturers.Add(lecturer);
-                    db.SaveChanges();
-                }
-                else
-                {
-                    //error in registering account
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error);
-                    }
-                    return View(model);
-                }
-            }
-            catch (DbEntityValidationException e)
-            {
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                throw;
-
-            }
-            return RedirectToAction("Dashboard");
-        }
-
-        public ActionResult AddOneLecturer()
-        {
-            AddLecturerViewModel model = new AddLecturerViewModel();
-            List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
-            List<AssignmentClass> ac = new List<AssignmentClass>();
-
-            foreach (var c in allClasses)
-            {
-                AssignmentClass a = new AssignmentClass();
-
-                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
-                String className = courseAbbr + "/" + c.ClassName;
-
-                a.ClassName = className;
-
-                a.ClassId = c.ClassID;
-                a.isSelected = false;
-                ac.Add(a);
-            }
-            model.ClassList = ac;
-            model.Classes = allClasses;
-            return View(model);
-        }
-
-        public ActionResult AddModule()
-        {
-            List<ProgLanguage> languageList = new List<ProgLanguage>();
-            languageList = db.ProgLanguages.ToList();
-            AddModuleViewModel mVM = new AddModuleViewModel();
-            mVM.Languages = languageList;
-
-            return View(mVM);
-        }
-
-        [HttpPost]
-        public ActionResult AddModule(AddModuleViewModel addModuleVM)
-        {
-            Module module = new Module();
-
-            try
-            {
-                module.ModuleCode = addModuleVM.ModuleCode;
-                module.ModuleName = addModuleVM.ModuleName;
-                module.LanguageId = addModuleVM.ProgLangId;
-                module.CreatedAt = DateTime.Now;
-                module.CreatedBy = User.Identity.GetUserName();
-                module.UpdatedAt = DateTime.Now;
-                module.UpdatedBy = User.Identity.GetUserName();
-                db.Modules.Add(module);
-
-                db.SaveChanges();
-
-            }
-            catch (Exception ex)
-            {
-                addModuleVM.Languages = db.ProgLanguages.ToList();
-                TempData["Error"] = "Failed to save module. Please try again !";
-                return View(addModuleVM);
-            }
-
-            return RedirectToAction("ManageModule");
-        }
-
-        public ActionResult ManageClass()
-        {
-            List<ManageClassViewModel> lvm = new List<ManageClassViewModel>();
-
-            List<Class> x = new List<Class>();
-            x = db.Classes.Where(a => a.DeletedAt == null).ToList();
-
-            foreach (Class i in x)
-            {
-                ManageClassViewModel vm = new ManageClassViewModel();
-
-                vm.ClassID = i.ClassID.ToString();
-                vm.Course = db.Courses.ToList().Find(cs => cs.CourseID == i.CourseID).CourseName;
-                vm.Class = i.ClassName.ToString();
-                vm.CreatedBy = i.CreatedBy.ToUpper();
-                vm.NumLecturers = db.Lec_Class.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
-                vm.NumStudents = db.Students.Where(cl => cl.ClassID == i.ClassID).Count().ToString();
-
-                lvm.Add(vm);
-            }
-
-            return View(lvm);
-        }
-
-        public ActionResult ManageStudent()
-        {
-            List<ManageStudentViewModel> lvm = new List<ManageStudentViewModel>();
-
-            List<Student> x = new List<Student>();
-            x = db.Students.Where(a => a.DeletedAt == null).ToList();
-
-            foreach (Student i in x)
-            {
-                ManageStudentViewModel vm = new ManageStudentViewModel();
-
-                vm.AdminNo = i.AdminNo.ToUpper();
-                vm.Name = i.Name;
-                vm.ContactNo = i.ContactNo.ToString();
-                vm.Email = i.Email;
-
-                int courseId = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).CourseID;
-                string className = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).ClassName;
-                string courseAbbr = db.Courses.ToList().Find(cs => cs.CourseID == courseId).CourseAbbr;
-
-
-                vm.Class = courseAbbr + "/" + className;
-                vm.CreatedBy = i.CreatedBy.ToUpper();
-
-                lvm.Add(vm);
-            }
-
-            return View(lvm);
-
-        }
-
-        public ActionResult ManageModule()
-        {
-            List<ManageModuleViewModel> lmmvm = new List<ManageModuleViewModel>();
-
-            List<Module> m = new List<Module>();
-            m = db.Modules.Where(mod => mod.DeletedAt == null).ToList();
-
-            foreach (Module i in m)
-            {
-                ManageModuleViewModel mmvm = new ManageModuleViewModel();
-
-                mmvm.ModuleCode = i.ModuleCode;
-                mmvm.ModuleName = i.ModuleName;
-                mmvm.ProgrammingLanguage = db.ProgLanguages.ToList().Find(p => p.LanguageId == i.LanguageId).LangageType;
-                mmvm.CreatedBy = i.CreatedBy.ToUpper();
-
-                lmmvm.Add(mmvm);
-            }
-
-            return View(lmmvm);
-        }
-
-        public ActionResult UpdateModule(string id)
-        {
-            AddModuleViewModel umvm = new AddModuleViewModel();
-            Module module = db.Modules.ToList().Find(m => m.ModuleCode == id && m.DeletedAt == null);
-            umvm.ModuleCode = module.ModuleCode;
-            umvm.ModuleName = module.ModuleName;
-            umvm.ProgLangId = module.LanguageId;
-            umvm.Languages = db.ProgLanguages.ToList();
-            return View(umvm);
-        }
-
-        [HttpPost]
-        public ActionResult UpdateModule(AddModuleViewModel model, string command)
-        {
-            if (command.Equals("Update"))
-            {
-                Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
-                module.ModuleName = model.ModuleName;
-                module.UpdatedAt = DateTime.Now;
-                module.UpdatedBy = User.Identity.Name;
-                db.SaveChanges();
-                return RedirectToAction("Dashboard");
-            }
-            else if (command.Equals("Delete"))
-            {
-                //check if there is any assignment that is still tied to it
-                if (db.Assignments.ToList().FindAll(a => a.ModuleCode == model.ModuleCode && a.DeletedAt == null).Count == 0)
-                {
-                    Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
-                    module.DeletedAt = DateTime.Now;
-                    module.DeletedBy = User.Identity.Name;
-                    db.SaveChanges();
-
-                    return RedirectToAction("ManageModule");
-                }
-                else
-                {
-                    //Session["DeleteError"] = "An assignment belonging to this module is still active, please delete that assignment before attempting to "
-                    //    + "delete this module.";
-                    //return RedirectToAction("UpdateModule", "Admin", id);
-                    ModelState.AddModelError("DeleteError", "An assignment belonging to this module is still active, please delete that assignment before attempting to "
-                        + "delete this module.");
-                    return View(model);
-                }
-            }
-            else
-            {
-                return View(model);
-            }
-        }
-
-        public ActionResult ManageCourse()
-        {
-            List<ManageCourseViewModel> lmcvm = new List<ManageCourseViewModel>();
-
-            List<Course> c = new List<Course>();
-            c = db.Courses.Where(a => a.DeletedAt == null).ToList();
-
-            foreach (Course i in c)
-            {
-                ManageCourseViewModel mcvm = new ManageCourseViewModel();
-
-                mcvm.CourseId = i.CourseID.ToString();
-                mcvm.CourseName = i.CourseName;
-                mcvm.Abbreviation = i.CourseAbbr;
-                mcvm.CreatedBy = i.CreatedBy.ToUpper();
-                mcvm.ClassCount = db.Classes.Where(cl => cl.CourseID == i.CourseID).Count().ToString();
-
-                lmcvm.Add(mcvm);
-            }
-
-            return View(lmcvm);
-        }
-
-        public ActionResult ManageAdmin()
-        {
-            List<ManageAdminViewModel> lmavm = new List<ManageAdminViewModel>();
-
-            List<Admin> a = new List<Admin>();
-            a = db.Admins.Where(ad => ad.DeletedAt == null).ToList();
-
-            foreach (Admin i in a)
-            {
-                ManageAdminViewModel mavm = new ManageAdminViewModel();
-
-                mavm.AdminID = i.AdminID.ToUpper();
-                mavm.Name = i.FullName;
-                mavm.ContactNo = i.ContactNo.ToString();
-                mavm.Email = i.Email;
-                mavm.CreatedBy = i.CreatedBy.ToUpper();
-
-                lmavm.Add(mavm);
-            }
-
-            return View(lmavm);
-        }
-
-        public ActionResult ManageLecturer()
-        {
-            List<ManageLecturerViewModel> lvm = new List<ManageLecturerViewModel>();
-
-            List<Lecturer> x = new List<Lecturer>();
-            x = db.Lecturers.Where(a => a.DeletedAt == null).ToList();
-
-            foreach (Lecturer i in x)
-            {
-                ManageLecturerViewModel vm = new ManageLecturerViewModel();
-
-                vm.StaffID = i.StaffID.ToUpper();
-                vm.Name = i.Name;
-                vm.ContactNo = i.ContactNo.ToString();
-                vm.Email = i.Email;
-                vm.CreatedBy = i.CreatedBy.ToUpper();
-                vm.NumClasses = db.Lec_Class.Where(cl => cl.StaffID == i.StaffID).Count().ToString();
-
-                lvm.Add(vm);
-            }
-
-            return View(lvm);
         }
 
         public ActionResult UpdateClass(string ClassID)
@@ -746,7 +194,7 @@ namespace SPade.Controllers
                 {
                     if (C.ClassID.Equals(ClassID))
                     {
-                        C.UpdatedBy = "ADMIN";
+                        C.UpdatedBy = User.Identity.GetUserName();
                         C.UpdatedAt = DateTime.Now;
                         try
                         {
@@ -787,7 +235,7 @@ namespace SPade.Controllers
                 {
                     if (C.ClassID.Equals(ClassID))
                     {
-                        C.DeletedBy = "ADMIN";
+                        C.DeletedBy = User.Identity.GetUserName();
                         C.DeletedAt = DateTime.Now;
                         try
                         {
@@ -807,77 +255,123 @@ namespace SPade.Controllers
             return View(model);
         }
 
-        public ActionResult UpdateStudent(string id)
+        //Manage + Add/Bulk Add + Update/Delete Lecturers 
+        public ActionResult ManageLecturer()
         {
-            ViewModels.Admin.UpdateStudentViewModel model = new ViewModels.Admin.UpdateStudentViewModel();
+            List<ManageLecturerViewModel> lvm = new List<ManageLecturerViewModel>();
 
-            //Get all classes
-            List<Class> allClasses = db.Classes.ToList();
+            List<Lecturer> x = new List<Lecturer>();
+            x = db.Lecturers.Where(a => a.DeletedAt == null).ToList();
 
-            foreach(Class c in allClasses)
+            foreach (Lecturer i in x)
             {
+                ManageLecturerViewModel vm = new ManageLecturerViewModel();
+
+                vm.StaffID = i.StaffID.ToUpper();
+                vm.Name = i.Name;
+                vm.ContactNo = i.ContactNo.ToString();
+                vm.Email = i.Email;
+                vm.CreatedBy = i.CreatedBy.ToUpper();
+                vm.NumClasses = db.Lec_Class.Where(cl => cl.StaffID == i.StaffID).Count().ToString();
+
+                lvm.Add(vm);
+            }
+
+            return View(lvm);
+        }
+
+        public ActionResult AddOneLecturer()
+        {
+            AddLecturerViewModel model = new AddLecturerViewModel();
+            List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+            List<AssignmentClass> ac = new List<AssignmentClass>();
+
+            foreach (var c in allClasses)
+            {
+                AssignmentClass a = new AssignmentClass();
+
                 String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
                 String className = courseAbbr + "/" + c.ClassName;
 
-                c.ClassName = className;
+                a.ClassName = className;
+
+                a.ClassId = c.ClassID;
+                a.isSelected = false;
+                ac.Add(a);
             }
-
+            model.ClassList = ac;
             model.Classes = allClasses;
-
-            //Get Student           
-            Student student = db.Students.ToList().Find(st => st.AdminNo == id);
-
-            model.AdminNo = student.AdminNo;
-            model.Name = student.Name;
-            model.ClassID = student.ClassID;
-            model.ContactNo = student.ContactNo;
-            model.Email = student.Email;
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult UpdateStudent(ViewModels.Admin.UpdateStudentViewModel model, string command, string AdminNo)
+        public async Task<ActionResult> AddOneLecturer(AddLecturerViewModel model, FormCollection formCollection)
         {
-            //Get all classes
-            List<Class> allClasses = db.Classes.ToList();
-            model.Classes = allClasses;
-            Student student = db.Students.Where(s => s.AdminNo == AdminNo).FirstOrDefault();
-
-            //Udate Student information
-            if (command.Equals("Update"))
+            try
             {
-                student.Name = model.Name;
-                student.ContactNo = model.ContactNo;
-                student.ClassID = model.ClassID;
-                db.SaveChanges();
-                return RedirectToAction("ManageStudent");
-            }
-            //Delete Student
-            else
-            {
-                if (db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
+                var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
+                user.EmailConfirmed = true;
+                var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                if (result.Succeeded)
                 {
-                    student.DeletedAt = DateTime.Now;
-                    student.DeletedBy = User.Identity.Name;
+                    UserManager.AddToRole(user.Id, "Lecturer");
+                    var lecturer = new Lecturer()
+                    {
+                        StaffID = model.StaffID,
+                        Name = model.Name,
+                        ContactNo = model.ContactNo,
+                        Email = model.Email,
+                        CreatedBy = User.Identity.Name,
+                        UpdatedBy = User.Identity.Name,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                    };
 
+                    foreach (AssignmentClass ac in model.ClassList)
+                    {
+                        if (ac.isSelected == true)
+                        {
+                            db.Lec_Class.Add(new Lec_Class
+                            {
+                                ClassID = ac.ClassId,
+                                StaffID = model.StaffID
+                            });
+                        }
+                    }
+                    db.Lecturers.Add(lecturer);
                     db.SaveChanges();
-                    return RedirectToAction("ManageStudent");
                 }
                 else
                 {
-                    ModelState.AddModelError("DeleteError", "There are still submissions that are tied to this student's account. " +
-                        "You have to purge all submissions made by this student before deleting.");
+                    //error in registering account
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
                     return View(model);
                 }
             }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                throw;
+
+            }
+            return RedirectToAction("Dashboard");
         }
 
-        public FileResult DownloadBulkAddStudentFile()
+        public ActionResult BulkAddLecturer()
         {
-            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
-            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
-            string fileName = "BulkAddStudent.csv";
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            return View();
         }
 
         public FileResult DownloadBulkAddLecturerFile()
@@ -886,6 +380,51 @@ namespace SPade.Controllers
             byte[] fileBytes = System.IO.File.ReadAllBytes(f);
             string fileName = "BulkAddLecturer.csv";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
+        [HttpPost]
+        public ActionResult BulkAddLecturer(HttpPostedFileBase file)
+        {
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
+            {
+                //Upload and save the file
+                // extract only the filename
+                var fileName = Path.GetFileName(file.FileName);
+                // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                file.SaveAs(path);
+
+                string[] lines = System.IO.File.ReadAllLines(path);
+                List<Lecturer> lectlist = new List<Lecturer>();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(lines[i]))
+                    {
+                        Lecturer lect = new Lecturer();
+                        lect.StaffID = lines[i].Split(',')[0];
+                        lect.Name = lines[i].Split(',')[1];
+                        lect.Email = lines[i].Split(',')[2];
+                        lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
+                        lect.CreatedAt = DateTime.Now;
+                        lect.CreatedBy = User.Identity.GetUserName();
+                        lect.UpdatedAt = DateTime.Now;
+                        lect.UpdatedBy = User.Identity.GetUserName();
+
+                        lectlist.Add(lect);
+                    }
+                }
+                db.Lecturers.AddRange(lectlist);
+                db.SaveChanges();
+            }
+            else
+            {
+                // Upload file is invalid
+                string err = "Uploaded file is invalid! Please try again!";
+                TempData["InputWarning"] = err;
+                return View();
+            }
+
+            return RedirectToAction("ManageLecturer");
         }
 
         public ActionResult UpdateLecturer(string id)
@@ -970,7 +509,509 @@ namespace SPade.Controllers
             }
 
             return RedirectToAction("ManageLecturer");
-        }//end of update lecturer
+        }
+
+        //Manage + Add/Bulk Add + Update/Delete Students
+        public ActionResult ManageStudent()
+        {
+            List<ManageStudentViewModel> lvm = new List<ManageStudentViewModel>();
+
+            List<Student> x = new List<Student>();
+            x = db.Students.Where(a => a.DeletedAt == null).ToList();
+
+            foreach (Student i in x)
+            {
+                ManageStudentViewModel vm = new ManageStudentViewModel();
+
+                vm.AdminNo = i.AdminNo.ToUpper();
+                vm.Name = i.Name;
+                vm.ContactNo = i.ContactNo.ToString();
+                vm.Email = i.Email;
+
+                int courseId = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).CourseID;
+                string className = db.Classes.ToList().Find(cs => cs.ClassID == i.ClassID).ClassName;
+                string courseAbbr = db.Courses.ToList().Find(cs => cs.CourseID == courseId).CourseAbbr;
+
+
+                vm.Class = courseAbbr + "/" + className;
+                vm.CreatedBy = i.CreatedBy.ToUpper();
+
+                lvm.Add(vm);
+            }
+
+            return View(lvm);
+
+        }
+
+        public ActionResult AddOneStudent()
+        {
+            AddStudentViewModel model = new AddStudentViewModel();
+            List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+
+            foreach (Class c in allClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+
+            model.Classes = allClasses;
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddOneStudent(AddStudentViewModel model, FormCollection formCollection)
+        {
+            try
+            {
+                var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
+                user.EmailConfirmed = true;
+                var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                if (result.Succeeded)
+                {
+                    UserManager.AddToRole(user.Id, "Student");
+                    var student = new Student()
+                    {
+                        AdminNo = model.AdminNo.Trim(),
+                        Name = model.Name,
+                        Email = model.Email,
+                        ContactNo = model.ContactNo,
+                        ClassID = Int32.Parse(formCollection["ClassID"].ToString()),
+                        CreatedBy = User.Identity.Name,
+                        UpdatedBy = User.Identity.Name,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                    };
+
+                    db.Students.Add(student);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    //error in registering account
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+                    return View(model);
+                }
+            }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                throw;
+
+            }
+            return RedirectToAction("Dashboard");
+        }
+
+        public ActionResult BulkAddStudent()
+        {
+            return View();
+        }
+
+        public FileResult DownloadBulkAddStudentFile()
+        {
+            string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(f);
+            string fileName = "BulkAddStudent.csv";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
+        [HttpPost]
+        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        {
+
+            if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
+            {
+                //Upload and save the file
+                // extract only the filename
+                var fileName = Path.GetFileName(file.FileName);
+                // store the file inside ~/App_Data/uploads folder
+                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                file.SaveAs(path);
+
+                string[] lines = System.IO.File.ReadAllLines(path);
+                List<Student> slist = new List<Student>();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(lines[i]))
+                    {
+                        Student s = new Student();
+                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
+                        s.AdminNo = lines[i].Split(',')[1];
+                        s.Name = lines[i].Split(',')[2];
+                        s.Email = lines[i].Split(',')[3];
+                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                        s.CreatedAt = DateTime.Now;
+                        s.CreatedBy = User.Identity.GetUserName();
+                        s.UpdatedAt = DateTime.Now;
+                        s.UpdatedBy = User.Identity.GetUserName();
+
+                        slist.Add(s);
+                    }
+                }
+                db.Students.AddRange(slist);
+                db.SaveChanges();
+            }
+            else
+            {
+                // Upload file is invalid
+                string err = "Uploaded file is invalid! Please try again!";
+                TempData["InputWarning"] = err;
+                return View();
+            }
+            return RedirectToAction("ManageStudent");
+        }
+
+        public ActionResult UpdateStudent(string id)
+        {
+            ViewModels.Admin.UpdateStudentViewModel model = new ViewModels.Admin.UpdateStudentViewModel();
+
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+
+            foreach (Class c in allClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
+
+            model.Classes = allClasses;
+
+            //Get Student           
+            Student student = db.Students.ToList().Find(st => st.AdminNo == id);
+
+            model.AdminNo = student.AdminNo;
+            model.Name = student.Name;
+            model.ClassID = student.ClassID;
+            model.ContactNo = student.ContactNo;
+            model.Email = student.Email;
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateStudent(ViewModels.Admin.UpdateStudentViewModel model, string command, string AdminNo)
+        {
+            //Get all classes
+            List<Class> allClasses = db.Classes.ToList();
+            model.Classes = allClasses;
+            Student student = db.Students.Where(s => s.AdminNo == AdminNo).FirstOrDefault();
+
+            //Udate Student information
+            if (command.Equals("Update"))
+            {
+                student.Name = model.Name;
+                student.ContactNo = model.ContactNo;
+                student.ClassID = model.ClassID;
+                db.SaveChanges();
+                return RedirectToAction("ManageStudent");
+            }
+            //Delete Student
+            else
+            {
+                if (db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
+                {
+                    student.DeletedAt = DateTime.Now;
+                    student.DeletedBy = User.Identity.Name;
+
+                    db.SaveChanges();
+                    return RedirectToAction("ManageStudent");
+                }
+                else
+                {
+                    ModelState.AddModelError("DeleteError", "There are still submissions that are tied to this student's account. " +
+                        "You have to purge all submissions made by this student before deleting.");
+                    return View(model);
+                }
+            }
+        }
+
+        //Manage + Add + Update/Delete Modules 
+        public ActionResult ManageModule()
+        {
+            List<ManageModuleViewModel> lmmvm = new List<ManageModuleViewModel>();
+
+            List<Module> m = new List<Module>();
+            m = db.Modules.Where(mod => mod.DeletedAt == null).ToList();
+
+            foreach (Module i in m)
+            {
+                ManageModuleViewModel mmvm = new ManageModuleViewModel();
+
+                mmvm.ModuleCode = i.ModuleCode;
+                mmvm.ModuleName = i.ModuleName;
+                mmvm.ProgrammingLanguage = db.ProgLanguages.ToList().Find(p => p.LanguageId == i.LanguageId).LangageType;
+                mmvm.CreatedBy = i.CreatedBy.ToUpper();
+
+                lmmvm.Add(mmvm);
+            }
+
+            return View(lmmvm);
+        }
+
+        public ActionResult AddModule()
+        {
+            List<ProgLanguage> languageList = new List<ProgLanguage>();
+            languageList = db.ProgLanguages.ToList();
+            AddModuleViewModel mVM = new AddModuleViewModel();
+            mVM.Languages = languageList;
+
+            return View(mVM);
+        }
+
+        [HttpPost]
+        public ActionResult AddModule(AddModuleViewModel addModuleVM)
+        {
+            Module module = new Module();
+
+            try
+            {
+                module.ModuleCode = addModuleVM.ModuleCode;
+                module.ModuleName = addModuleVM.ModuleName;
+                module.LanguageId = addModuleVM.ProgLangId;
+                module.CreatedAt = DateTime.Now;
+                module.CreatedBy = User.Identity.GetUserName();
+                module.UpdatedAt = DateTime.Now;
+                module.UpdatedBy = User.Identity.GetUserName();
+                db.Modules.Add(module);
+
+                db.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                addModuleVM.Languages = db.ProgLanguages.ToList();
+                TempData["Error"] = "Failed to save module. Please try again !";
+                return View(addModuleVM);
+            }
+
+            return RedirectToAction("ManageModule");
+        }
+
+        public ActionResult UpdateModule(string id)
+        {
+            AddModuleViewModel umvm = new AddModuleViewModel();
+            Module module = db.Modules.ToList().Find(m => m.ModuleCode == id && m.DeletedAt == null);
+            umvm.ModuleCode = module.ModuleCode;
+            umvm.ModuleName = module.ModuleName;
+            umvm.ProgLangId = module.LanguageId;
+            umvm.Languages = db.ProgLanguages.ToList();
+            return View(umvm);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateModule(AddModuleViewModel model, string command)
+        {
+            if (command.Equals("Update"))
+            {
+                Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
+                module.ModuleName = model.ModuleName;
+                module.UpdatedAt = DateTime.Now;
+                module.UpdatedBy = User.Identity.Name;
+                db.SaveChanges();
+                return RedirectToAction("Dashboard");
+            }
+            else if (command.Equals("Delete"))
+            {
+                //check if there is any assignment that is still tied to it
+                if (db.Assignments.ToList().FindAll(a => a.ModuleCode == model.ModuleCode && a.DeletedAt == null).Count == 0)
+                {
+                    Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
+                    module.DeletedAt = DateTime.Now;
+                    module.DeletedBy = User.Identity.Name;
+                    db.SaveChanges();
+
+                    return RedirectToAction("ManageModule");
+                }
+                else
+                {
+                    ModelState.AddModelError("DeleteError", "An assignment belonging to this module is still active, please delete that assignment before attempting to "
+                        + "delete this module.");
+                    return View(model);
+                }
+            }
+            else
+            {
+                return View(model);
+            }
+        }
+
+        //Manage + Add + Update/Delete Course
+        public ActionResult ManageCourse()
+        {
+            List<ManageCourseViewModel> lmcvm = new List<ManageCourseViewModel>();
+
+            List<Course> c = new List<Course>();
+            c = db.Courses.Where(a => a.DeletedAt == null).ToList();
+
+            foreach (Course i in c)
+            {
+                ManageCourseViewModel mcvm = new ManageCourseViewModel();
+
+                mcvm.CourseId = i.CourseID.ToString();
+                mcvm.CourseName = i.CourseName;
+                mcvm.Abbreviation = i.CourseAbbr;
+                mcvm.CreatedBy = i.CreatedBy.ToUpper();
+                mcvm.ClassCount = db.Classes.Where(cl => cl.CourseID == i.CourseID).Count().ToString();
+
+                lmcvm.Add(mcvm);
+            }
+
+            return View(lmcvm);
+        }
+
+        public ActionResult AddCourse()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult AddCourse(AddCourseViewModel aCVM)
+        {
+            Course c = new Course();
+
+            try
+            {
+                c.CourseName = aCVM.CourseName;
+                c.CourseAbbr = aCVM.CourseAbv;
+                c.CreatedBy = User.Identity.GetUserName();
+                c.CreatedAt = DateTime.Now;
+                c.UpdatedBy = User.Identity.GetUserName();
+                c.UpdatedAt = DateTime.Now;
+                db.Courses.Add(c);
+
+                db.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Failed to save module. Please try again !";
+                return View(aCVM);
+            }
+            return RedirectToAction("ManageCourse", "Admin");
+        }
+
+        public ActionResult UpdateCourse(int id)
+        {
+            AddCourseViewModel acvm = new AddCourseViewModel();
+            Course c = db.Courses.Where(course => course.CourseID == id).FirstOrDefault();
+            acvm.CourseAbv = c.CourseAbbr;
+            acvm.CourseName = c.CourseName;
+            acvm.CourseID = id;
+            return View(acvm);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateCourse(AddCourseViewModel model, string command, int CourseID)
+        {
+            Course c = db.Courses.Where(course => course.CourseID == CourseID).FirstOrDefault();
+
+            if (db.Classes.ToList().FindAll(classs => classs.CourseID == model.CourseID).Count() == 0)
+            {
+                if (command.Equals("Update"))
+                {
+                    c.CourseAbbr = model.CourseAbv;
+                    c.CourseName = model.CourseAbv;
+                    c.UpdatedAt = DateTime.Now;
+                    c.UpdatedBy = User.Identity.Name;
+
+                    db.SaveChanges();
+                    return RedirectToAction("ManageCourse");
+                }
+                else
+                {
+                    c.DeletedAt = DateTime.Now;
+                    c.DeletedBy = User.Identity.Name;
+
+                    db.SaveChanges();
+                    return RedirectToAction("ManageCourse");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Unable to delete or update course as there are still active classes that belongs to this course.");
+                return View(model);
+            }
+        }
+
+        //Manage + Add + Update/Delete Admins 
+        public ActionResult ManageAdmin()
+        {
+            List<ManageAdminViewModel> lmavm = new List<ManageAdminViewModel>();
+
+            List<Admin> a = new List<Admin>();
+            a = db.Admins.Where(ad => ad.DeletedAt == null).ToList();
+
+            foreach (Admin i in a)
+            {
+                ManageAdminViewModel mavm = new ManageAdminViewModel();
+
+                mavm.AdminID = i.AdminID.ToUpper();
+                mavm.Name = i.FullName;
+                mavm.ContactNo = i.ContactNo.ToString();
+                mavm.Email = i.Email;
+                mavm.CreatedBy = i.CreatedBy.ToUpper();
+
+                lmavm.Add(mavm);
+            }
+
+            return View(lmavm);
+        }
+
+        public ActionResult AddOneAdmin()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddOneAdmin(AddAdminViewModel model)
+        {
+            //create default account
+            var user = new ApplicationUser { UserName = model.AdminID, Email = model.Email };
+            user.EmailConfirmed = true;
+            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+            if (result.Succeeded)
+            {
+                UserManager.AddToRole(user.Id, "Admin");
+                Admin admin = new Admin();
+                admin.AdminID = model.AdminID;
+                admin.FullName = model.FullName;
+                admin.ContactNo = model.ContactNo;
+                admin.Email = model.Email;
+                admin.CreatedAt = DateTime.Now;
+                admin.CreatedBy = User.Identity.Name;
+                admin.UpdatedAt = DateTime.Now;
+                admin.UpdatedBy = User.Identity.Name;
+
+                db.Admins.Add(admin);
+                db.SaveChanges();
+
+                return RedirectToAction("Dashboard");
+            }
+            else
+            {
+                //display identity framework error
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error);
+                }
+                return View(model);
+            }
+        }
 
         public ActionResult UpdateAdmin(string id)
         {
@@ -1009,6 +1050,7 @@ namespace SPade.Controllers
             return RedirectToAction("ManageADmin");
         }
 
+        //Purge Files 
         public ActionResult Purge()
         {
             PurgeViewModel pvm = new PurgeViewModel();
@@ -1110,7 +1152,6 @@ namespace SPade.Controllers
                     int subId = Int32.Parse(s);
 
                     //each string is submissions to be deleted
-                    //System.IO.File.AppendAllText("C:/Users/tongliang/Desktop/testSubOutput.txt", s + "\n");
 
                     Submission sub = db.Submissions.ToList().Find(su => su.SubmissionID == subId);
 
@@ -1137,48 +1178,6 @@ namespace SPade.Controllers
             }
 
             return RedirectToAction("Purge");
-        }//end of purge controller method
-
-        public ActionResult AddOneAdmin()
-        {
-            return View();
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddOneAdmin(AddAdminViewModel model)
-        {
-            //create default account
-            var user = new ApplicationUser { UserName = model.AdminID, Email = model.Email };
-            user.EmailConfirmed = true;
-            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
-            if (result.Succeeded)
-            {
-                UserManager.AddToRole(user.Id, "Admin");
-                Admin admin = new Admin();
-                admin.AdminID = model.AdminID;
-                admin.FullName = model.FullName;
-                admin.ContactNo = model.ContactNo;
-                admin.Email = model.Email;
-                admin.CreatedAt = DateTime.Now;
-                admin.CreatedBy = User.Identity.Name;
-                admin.UpdatedAt = DateTime.Now;
-                admin.UpdatedBy = User.Identity.Name;
-
-                db.Admins.Add(admin);
-                db.SaveChanges();
-
-                return RedirectToAction("Dashboard");
-            }
-            else
-            {
-                //display identity framework error
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error);
-                }
-                return View(model);
-            }
-        }//
     }
 }
