@@ -286,7 +286,7 @@ namespace SPade.Controllers
                             {
                                 if (cr.CourseID == c.CourseID)
                                 {
-                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName + ",";
+                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName + ", ";
                                 }
                             }
                         }
@@ -398,295 +398,328 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateAssignment(UpdateAssignmentViewModel uAVM, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload)
+        public ActionResult UpdateAssignment(UpdateAssignmentViewModel uAVM, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload, string command)
         {
-            //user doesnt wants to update solution
-            if (uAVM.UpdateSolution == false)
-            {
-                if (UpdateAssignmentToDB(uAVM, false, false) == true)
-                {
-                    //failed to update assignment 
-                    TempData["GeneralError"] = "Failed to update assignment to database. Please try again !";
-                    return View(uAVM);
-                }
-            }
 
-            //user wants to update solution 
-            if (uAVM.UpdateSolution == true)
+            if (command.Equals("Update"))
             {
-                //run solution with testcase
-                if (uAVM.IsTestCasePresent == true)
+                //user doesnt wants to update solution
+                if (uAVM.UpdateSolution == false)
                 {
-                    if ((solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip") && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
+                    if (UpdateAssignmentToDB(uAVM, false, false) == true)
                     {
-                        if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
+                        //failed to update assignment 
+                        TempData["GeneralError"] = "Failed to update assignment to database. Please try again !";
+                        return View(uAVM);
+                    }
+                }
+
+                //user wants to update solution 
+                if (uAVM.UpdateSolution == true)
+                {
+                    //run solution with testcase
+                    if (uAVM.IsTestCasePresent == true)
+                    {
+                        if ((solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip") && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
                         {
-                            if (solutionsFileUpload.ContentLength < 104857600)
+                            if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                             {
-                                string slnFilePath = "";
-                                string assignmentTitle = (uAVM.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
-                                string fileName = ""; //name of the solution uploaded
-
-                                //save the solution
-                                fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
-                                var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
-                                solutionsFileUpload.SaveAs(zipLocation);
-                                slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
-                                DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
-
-                                if (fileDirectory.Exists)
+                                if (solutionsFileUpload.ContentLength < 104857600)
                                 {
-                                    foreach (FileInfo files in fileDirectory.GetFiles())
+                                    string slnFilePath = "";
+                                    string assignmentTitle = (uAVM.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
+                                    string fileName = ""; //name of the solution uploaded
+
+                                    //save the solution
+                                    fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
+                                    var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
+                                    solutionsFileUpload.SaveAs(zipLocation);
+                                    slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                                    DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+
+                                    if (fileDirectory.Exists)
                                     {
-                                        files.Delete();
+                                        foreach (FileInfo files in fileDirectory.GetFiles())
+                                        {
+                                            files.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
                                     }
-                                    foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                    fileDirectory.Create();
+                                    System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+
+                                    //access the solution + move the classname.java/.cs into a folder 
+                                    var toLowerPath = fileName.ToLower();
+                                    var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                                    Directory.CreateDirectory(path);
+
+                                    //get the language and pass into grader
+                                    ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == uAVM.ModuleId).LanguageId);
+
+                                    var ogPath = "";
+                                    var newPath = "";
+
+                                    if (lang.LangageType.Equals("Java"))
                                     {
-                                        dir.Delete(true);
+                                        ogPath = slnFilePath + "/" + fileName + ".java";
+                                        newPath = path + "/" + fileName + ".java";
                                     }
-                                }
-                                fileDirectory.Create();
-                                System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
-
-                                //access the solution + move the classname.java/.cs into a folder 
-                                var toLowerPath = fileName.ToLower();
-                                var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
-                                Directory.CreateDirectory(path);
-
-                                //get the language and pass into grader
-                                ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == uAVM.ModuleId).LanguageId);
-
-                                var ogPath = "";
-                                var newPath = "";
-
-                                if (lang.LangageType.Equals("Java"))
-                                {
-                                    ogPath = slnFilePath + "/" + fileName + ".java";
-                                    newPath = path + "/" + fileName + ".java";
-                                }
-                                else if (lang.LangageType.Equals("C#"))
-                                {
-                                    ogPath = slnFilePath + "/" + fileName + ".cs";
-                                    newPath = path + "/" + fileName + ".cs";
-                                }
-
-                                System.IO.File.Move(ogPath, newPath);
-
-                                //save the testcase
-                                var filePath = Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
-                                var fileInfo = new FileInfo(filePath);
-                                fileInfo.Directory.Create();
-                                testCaseUpload.SaveAs(filePath);
-
-                                //get the language and pass into grader
-                                Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
-
-                                //exit codes returned from grader 
-                                //1 is successfully done everything
-                                //2 is test case submitted could not be read
-                                //3 is program has failed to run
-                                //4 is program was caught in an infinite loop
-                                int exitCode = g.RunLecturerSolution();
-
-                                if (exitCode == 1)
-                                {
-                                    //update DB + rename solution/testcase
-                                    if (UpdateAssignmentToDB(uAVM, true, true) == true)
+                                    else if (lang.LangageType.Equals("C#"))
                                     {
-                                        //failed to update DB
+                                        ogPath = slnFilePath + "/" + fileName + ".cs";
+                                        newPath = path + "/" + fileName + ".cs";
+                                    }
+
+                                    System.IO.File.Move(ogPath, newPath);
+
+                                    //save the testcase
+                                    var filePath = Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
+                                    var fileInfo = new FileInfo(filePath);
+                                    fileInfo.Directory.Create();
+                                    testCaseUpload.SaveAs(filePath);
+
+                                    //get the language and pass into grader
+                                    Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
+
+                                    //exit codes returned from grader 
+                                    //1 is successfully done everything
+                                    //2 is test case submitted could not be read
+                                    //3 is program has failed to run
+                                    //4 is program was caught in an infinite loop
+                                    int exitCode = g.RunLecturerSolution();
+
+                                    if (exitCode == 1)
+                                    {
+                                        //update DB + rename solution/testcase
+                                        if (UpdateAssignmentToDB(uAVM, true, true) == true)
+                                        {
+                                            //failed to update DB
+                                            DeleteFile(fileName, assignmentTitle, true);
+                                            uAVM.Modules = db.Modules.ToList();
+                                            TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                            return View(uAVM);
+                                        }
+
+                                        //delete the uploaded sln but not test case
+                                        DeleteFile(fileName, assignmentTitle, false);
+
+                                    }//end of run succesfully method 
+
+                                    else if (exitCode == 2)
+                                    {
                                         DeleteFile(fileName, assignmentTitle, true);
                                         uAVM.Modules = db.Modules.ToList();
-                                        TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                        TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
                                         return View(uAVM);
                                     }
 
-                                    //delete the uploaded sln but not test case
-                                    DeleteFile(fileName, assignmentTitle, false);
-
-                                }//end of run succesfully method 
-
-                                else if (exitCode == 2)
-                                {
-                                    DeleteFile(fileName, assignmentTitle, true);
-                                    uAVM.Modules = db.Modules.ToList();
-                                    TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
-                                    return View(uAVM);
+                                    else if (exitCode == 3)
+                                    {
+                                        //solution failed to run 
+                                        DeleteFile(fileName, assignmentTitle, true);
+                                        uAVM.Modules = db.Modules.ToList();
+                                        TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                                        return View(uAVM);
+                                    }
+                                    else if (exitCode == 4)
+                                    {
+                                        //solution stuck in infinite loop
+                                        DeleteFile(fileName, assignmentTitle, true);
+                                        uAVM.Modules = db.Modules.ToList();
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                        return View(uAVM);
+                                    }
                                 }
-
-                                else if (exitCode == 3)
+                                else
                                 {
-                                    //solution failed to run 
-                                    DeleteFile(fileName, assignmentTitle, true);
+                                    //more than 150MB                     
                                     uAVM.Modules = db.Modules.ToList();
-                                    TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
-                                    return View(uAVM);
-                                }
-                                else if (exitCode == 4)
-                                {
-                                    //solution stuck in infinite loop
-                                    DeleteFile(fileName, assignmentTitle, true);
-                                    uAVM.Modules = db.Modules.ToList();
-                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                    TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
                                     return View(uAVM);
                                 }
                             }
                             else
                             {
-                                //more than 150MB                     
+                                //empty file 
                                 uAVM.Modules = db.Modules.ToList();
-                                TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                                string err = "Uploaded file is invalid ! Please try again.";
+                                TempData["SlnWarning"] = err;
+                                TempData["TcWarning"] = err;
                                 return View(uAVM);
                             }
                         }
                         else
                         {
-                            //empty file 
+                            //uploaded file is invalid
                             uAVM.Modules = db.Modules.ToList();
                             string err = "Uploaded file is invalid ! Please try again.";
                             TempData["SlnWarning"] = err;
                             TempData["TcWarning"] = err;
                             return View(uAVM);
                         }
-                    }
-                    else
-                    {
-                        //uploaded file is invalid
-                        uAVM.Modules = db.Modules.ToList();
-                        string err = "Uploaded file is invalid ! Please try again.";
-                        TempData["SlnWarning"] = err;
-                        TempData["TcWarning"] = err;
-                        return View(uAVM);
-                    }
-                }//end of run with testcase
+                    }//end of run with testcase
 
-                //run solution without testcase 
-                if (uAVM.IsTestCasePresent == false)
-                {
-                    if (solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip")
+                    //run solution without testcase 
+                    if (uAVM.IsTestCasePresent == false)
                     {
-                        if (solutionsFileUpload.ContentLength > 0)
+                        if (solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip")
                         {
-                            if (solutionsFileUpload.ContentLength < 104857600)
+                            if (solutionsFileUpload.ContentLength > 0)
                             {
-                                string slnFilePath = "";
-                                string assignmentTitle = (uAVM.AssgnTitle).Replace(" ", "");
-                                string fileName = "";
-
-                                //save the solution
-                                fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
-                                var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
-                                solutionsFileUpload.SaveAs(zipLocation);
-                                slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
-                                DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
-                                if (fileDirectory.Exists)
+                                if (solutionsFileUpload.ContentLength < 104857600)
                                 {
-                                    foreach (FileInfo files in fileDirectory.GetFiles())
+                                    string slnFilePath = "";
+                                    string assignmentTitle = (uAVM.AssgnTitle).Replace(" ", "");
+                                    string fileName = "";
+
+                                    //save the solution
+                                    fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
+                                    var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
+                                    solutionsFileUpload.SaveAs(zipLocation);
+                                    slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                                    DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+                                    if (fileDirectory.Exists)
                                     {
-                                        files.Delete();
+                                        foreach (FileInfo files in fileDirectory.GetFiles())
+                                        {
+                                            files.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
                                     }
-                                    foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                    fileDirectory.Create();
+                                    System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+
+                                    //access the solution + move the classname.java/.cs into a folder 
+                                    var toLowerPath = fileName.ToLower();
+                                    var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                                    Directory.CreateDirectory(path);
+
+                                    //get the language and pass into grader
+                                    ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == uAVM.ModuleId).LanguageId);
+
+                                    //get the appropirate file and move the file accordingly
+                                    var ogPath = "";
+                                    var newPath = "";
+
+                                    if (lang.LangageType.Equals("Java"))
                                     {
-                                        dir.Delete(true);
+                                        ogPath = slnFilePath + "/" + fileName + ".java";
+                                        newPath = path + "/" + fileName + ".java";
                                     }
-                                }
-                                fileDirectory.Create();
-                                System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
-
-                                //access the solution + move the classname.java/.cs into a folder 
-                                var toLowerPath = fileName.ToLower();
-                                var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
-                                Directory.CreateDirectory(path);
-
-                                //get the language and pass into grader
-                                ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == uAVM.ModuleId).LanguageId);
-
-                                //get the appropirate file and move the file accordingly
-                                var ogPath = "";
-                                var newPath = "";
-
-                                if (lang.LangageType.Equals("Java"))
-                                {
-                                    ogPath = slnFilePath + "/" + fileName + ".java";
-                                    newPath = path + "/" + fileName + ".java";
-                                }
-                                else if (lang.LangageType.Equals("C#"))
-                                {
-                                    ogPath = slnFilePath + "/" + fileName + ".cs";
-                                    newPath = path + "/" + fileName + ".cs";
-                                }
-
-                                System.IO.File.Move(ogPath, newPath);
-
-                                Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
-
-                                int exitCode = g.RunLecturerSolution();
-
-                                if (exitCode == 1)
-                                {
-                                    //save to DB + rename solution file
-                                    if (UpdateAssignmentToDB(uAVM, true, false) == true)
+                                    else if (lang.LangageType.Equals("C#"))
                                     {
-                                        //solution has failed to save to DB
+                                        ogPath = slnFilePath + "/" + fileName + ".cs";
+                                        newPath = path + "/" + fileName + ".cs";
+                                    }
+
+                                    System.IO.File.Move(ogPath, newPath);
+
+                                    Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
+
+                                    int exitCode = g.RunLecturerSolution();
+
+                                    if (exitCode == 1)
+                                    {
+                                        //save to DB + rename solution file
+                                        if (UpdateAssignmentToDB(uAVM, true, false) == true)
+                                        {
+                                            //solution has failed to save to DB
+                                            DeleteFile(fileName, assignmentTitle, false);
+                                            uAVM.Modules = db.Modules.ToList();
+                                            TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                            return View(uAVM);
+                                        }
+
+                                        //delete the uploaded sln
+                                        DeleteFile(fileName, assignmentTitle, false);
+
+                                    }
+                                    else if (exitCode == 3)
+                                    {
+                                        //solution failed to run 
                                         DeleteFile(fileName, assignmentTitle, false);
                                         uAVM.Modules = db.Modules.ToList();
-                                        TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
                                         return View(uAVM);
                                     }
 
-                                    //delete the uploaded sln
-                                    DeleteFile(fileName, assignmentTitle, false);
-
                                 }
-                                else if (exitCode == 3)
+                                else
                                 {
-                                    //solution failed to run 
-                                    DeleteFile(fileName, assignmentTitle, false);
+                                    //file size is more that 150MB
                                     uAVM.Modules = db.Modules.ToList();
-                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                    TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
                                     return View(uAVM);
                                 }
-
                             }
                             else
                             {
-                                //file size is more that 150MB
+                                //empty file 
                                 uAVM.Modules = db.Modules.ToList();
-                                TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                                string err = "Uploaded file is invalid ! Please try again.";
+                                TempData["SlnWarning"] = err;
+                                TempData["TcWarning"] = err;
                                 return View(uAVM);
                             }
                         }
                         else
                         {
-                            //empty file 
+                            //invalid file 
                             uAVM.Modules = db.Modules.ToList();
                             string err = "Uploaded file is invalid ! Please try again.";
                             TempData["SlnWarning"] = err;
                             TempData["TcWarning"] = err;
                             return View(uAVM);
                         }
-                    }
-                    else
-                    {
-                        //invalid file 
-                        uAVM.Modules = db.Modules.ToList();
-                        string err = "Uploaded file is invalid ! Please try again.";
-                        TempData["SlnWarning"] = err;
-                        TempData["TcWarning"] = err;
-                        return View(uAVM);
-                    }
 
-                }  //end of run without testcase 
+                    }  //end of run without testcase 
 
-            }//end of updateSolution
+                }//end of updateSolution
+
+            }
+            else
+            {
+                //delete assignment 
+                if (DeleteAssignment(uAVM) == true)
+                {
+                    //failed to delete assignment 
+                    TempData["GeneralError"] = "Failed to delete assignment. Please try again !";
+                    return View(uAVM);
+                }
+
+            }
 
             //successfully updating assignment to DB
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
 
-        [HttpPost]
-        public ActionResult DeleteAssignment()
+        public bool DeleteAssignment(UpdateAssignmentViewModel uAVM)
         {
-            return View();
+            bool isFailed = false;
+
+            try
+            {
+                //remove the assignment from the assigned classes 
+                db.Class_Assgn.RemoveRange(db.Class_Assgn.Where(ca => ca.AssignmentID == uAVM.AssignmentId));
+
+                //update the assignment deleted status to something 
+                Assignment a = db.Assignments.Where(at => at.AssignmentID == uAVM.AssignmentId).FirstOrDefault();
+                a.DeletedAt = DateTime.Now;
+                a.DeletedBy = User.Identity.GetUserName();
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                isFailed = true;
+            }
+
+            return isFailed;
         }
 
         public bool UpdateAssignmentToDB(UpdateAssignmentViewModel uVM, bool updateSln, bool isTestCase)
@@ -698,7 +731,7 @@ namespace SPade.Controllers
             //get the previous asssignment from db
             updatedAssignment = db.Assignments.Where(a => a.AssignmentID == uVM.AssignmentId).FirstOrDefault();
 
-            //update the assignment
+            //update the assignment values 
             try
             {
                 //update the values 
@@ -716,6 +749,24 @@ namespace SPade.Controllers
                 {
                     updatedAssignment.Solution = "~/Solutions/" + uVM.AssignmentId + ".xml";
                 }
+
+                //remove previously assigned classes 
+                db.Class_Assgn.RemoveRange(db.Class_Assgn.Where(ca => ca.AssignmentID == uVM.AssignmentId));
+
+                //re-assign the assignments 
+                List<Class_Assgn> newAssgn = new List<Class_Assgn>();
+                foreach (AssignmentClass ac in uVM.ClassList)
+                {
+                    if (ac.isSelected == true)
+                    {
+                        Class_Assgn a = new Class_Assgn();
+                        a.AssignmentID = uVM.AssignmentId;
+                        a.ClassID = ac.ClassId;
+                        newAssgn.Add(a);
+                    }
+                }
+
+                db.Class_Assgn.AddRange(newAssgn);
 
                 //delete the old solution that is stored  
                 var solutionPath = Server.MapPath(@"~/Solutions/");
