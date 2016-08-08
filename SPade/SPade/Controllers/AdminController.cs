@@ -112,7 +112,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult BulkAddStudent(HttpPostedFileBase file)
         {
-            
+
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
                 //Upload and save the file
@@ -231,7 +231,7 @@ namespace SPade.Controllers
             try
             {
                 c.CourseName = aCVM.CourseName;
-                c.CourseAbbr = aCVM.CourseName;
+                c.CourseAbbr = aCVM.CourseAbv;
                 c.CreatedBy = User.Identity.GetUserName();
                 c.CreatedAt = DateTime.Now;
                 c.UpdatedBy = User.Identity.GetUserName();
@@ -249,6 +249,48 @@ namespace SPade.Controllers
             return RedirectToAction("ManageCourse", "Admin");
         }
 
+        public ActionResult UpdateCourse(int id)
+        {
+            AddCourseViewModel acvm = new AddCourseViewModel();
+            Course c = db.Courses.Where(course => course.CourseID == id).FirstOrDefault();
+            acvm.CourseAbv = c.CourseAbbr;
+            acvm.CourseName = c.CourseName;
+            acvm.CourseID = id;
+            return View(acvm);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateCourse(AddCourseViewModel model, string command, int CourseID)
+        {
+            Course c = db.Courses.Where(course => course.CourseID == CourseID).FirstOrDefault();
+
+            if (db.Classes.ToList().FindAll(classs => classs.CourseID == model.CourseID).Count() == 0)
+            {
+                if (command.Equals("Update"))
+                {
+                    c.CourseAbbr = model.CourseAbv;
+                    c.CourseName = model.CourseAbv;
+                    c.UpdatedAt = DateTime.Now;
+                    c.UpdatedBy = User.Identity.Name;
+
+                    db.SaveChanges();
+                    return RedirectToAction("ManageCourse");
+                }
+                else
+                {
+                    c.DeletedAt = DateTime.Now;
+                    c.DeletedBy = User.Identity.Name;
+
+                    db.SaveChanges();
+                    return RedirectToAction("ManageCourse");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Unable to delete or update course as there are still active classes that belongs to this course.");
+                return View(model);
+            }
+        }
 
         [HttpPost]
         public ActionResult AddOneClass(AddClassViewModel model)
@@ -654,7 +696,6 @@ namespace SPade.Controllers
                     model.ClassID = C.ClassID;
                     model.ClassName = C.ClassName;
                 }
-
             }
             foreach (Lec_Class LC in all_Lec_Class)
             {
@@ -662,10 +703,7 @@ namespace SPade.Controllers
                 {
                     model.StaffID = LC.StaffID;
                 }
-
             }
-
-
             return View(model);
         }
 
@@ -755,7 +793,6 @@ namespace SPade.Controllers
             return View(model);
         }
 
-
         public ActionResult UpdateStudent(string id)
         {
             ViewModels.Admin.UpdateStudentViewModel model = new ViewModels.Admin.UpdateStudentViewModel();
@@ -827,7 +864,6 @@ namespace SPade.Controllers
             string fileName = "BulkAddLecturer.csv";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
-
 
         public ActionResult UpdateLecturer(string id)
         {
