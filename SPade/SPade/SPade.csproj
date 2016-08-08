@@ -428,6 +428,8 @@
     <Content Include="Views\Admin\ManageAdmin.cshtml" />
     <Content Include="Views\Admin\UpdateModule.cshtml" />
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
+    <Content Include="TempLecturerCSV\BulkAddLecturer0.csv" />
+    <Content Include="TempStudentCSV\BulkAddStudent0.csv" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

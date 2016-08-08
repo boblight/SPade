@@ -255,6 +255,27 @@ namespace SPade.Controllers
             return View(model);
         }
 
+        //Common method for BulkUploadStudent/BulkUploadLecturer
+        public void DeleteCSV(string fileName)
+        {
+            //this method is used to delete the CSV file after it has run successfully 
+
+            var filePath = Server.MapPath(@"~/TempCSV/");
+            DirectoryInfo di;
+
+            if ((di = new DirectoryInfo(filePath)).Exists)
+            {
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    if (f.Name == fileName)
+                    {
+                        f.IsReadOnly = false;
+                        f.Delete();
+                    }
+                }
+            }
+        }
+
         //Manage + Add/Bulk Add + Update/Delete Lecturers 
         public ActionResult ManageLecturer()
         {
@@ -388,10 +409,18 @@ namespace SPade.Controllers
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
                 //Upload and save the file
-                // extract only the filename
-                var fileName = Path.GetFileName(file.FileName);
-                // store the file inside ~/App_Data/uploads folder
-                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                DirectoryInfo di;
+                int subNum = 0;
+                //check how many files are inside, get the amount 
+                if ((di = new DirectoryInfo(Server.MapPath(@"~/TempLecturerCSV/"))).Exists)
+                {
+                    subNum = di.GetFiles().Count();
+                }
+                var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                fileName = fileName + subNum + ".csv";
+                //store the file inside TempCSV
+                //we name the file as fileName + number of files + 1 to give it an unique identifier
+                var path = Path.Combine(Server.MapPath(@"~/TempLecturerCSV/"), fileName);
                 file.SaveAs(path);
 
                 string[] lines = System.IO.File.ReadAllLines(path);
@@ -415,6 +444,7 @@ namespace SPade.Controllers
                 }
                 db.Lecturers.AddRange(lectlist);
                 db.SaveChanges();
+                DeleteCSV(fileName);
             }
             else
             {
@@ -631,14 +661,21 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult BulkAddStudent(HttpPostedFileBase file)
         {
-
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
                 //Upload and save the file
-                // extract only the filename
-                var fileName = Path.GetFileName(file.FileName);
-                // store the file inside ~/App_Data/uploads folder
-                var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
+                DirectoryInfo di;
+                int subNum = 0;
+                //check how many files are inside, get the amount 
+                if ((di = new DirectoryInfo(Server.MapPath(@"~/TempStudentCSV/"))).Exists)
+                {
+                    subNum = di.GetFiles().Count();
+                }
+                var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                fileName = fileName + subNum + ".csv";
+                //store the file inside TempCSV
+                //we name the file as fileName + number of files + 1 to give it an unique identifier
+                var path = Path.Combine(Server.MapPath(@"~/TempStudentCSV/"), fileName);
                 file.SaveAs(path);
 
                 string[] lines = System.IO.File.ReadAllLines(path);
@@ -663,6 +700,7 @@ namespace SPade.Controllers
                 }
                 db.Students.AddRange(slist);
                 db.SaveChanges();
+                DeleteCSV(fileName);
             }
             else
             {
