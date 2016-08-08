@@ -36,16 +36,6 @@
                 </div>
             </div>
 
-            <!--Select lecturer-->
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label>Lecturer</label>
-                    @{
-                        @Html.DropDownListFor(c => Model.StaffID, new SelectList(Model.Lecturers, "StaffID", "Name"), "--Select a Lecturer--", new { @class = "form-control" })
-                    }
-                </div>
-            </div>
-
             <!-- saveBtn, cancelBtn -->
             <div class="form-group">
                 <div class="col-md-12 ">
