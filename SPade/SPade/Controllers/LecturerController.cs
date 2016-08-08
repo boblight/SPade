@@ -59,16 +59,31 @@ namespace SPade.Controllers
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
-            ManageClassesViewModel e = new ManageClassesViewModel();
+           
 
-            string x = User.Identity.GetUserName(); //temp 
+            string loggedInLecturer = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+
+
+            List<Class> managedClasses = new List<Class>();
+
+            List<Lec_Class> lec_classes = db.Lec_Class.Where(lc => lc.StaffID == loggedInLecturer).ToList();
+
+            foreach (Lec_Class lc in lec_classes)
+            {
+                List<Class> temp = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.ClassID == lc.ClassID).ToList();
+                managedClasses.AddRange(temp);
+            }
+
+
+
 
             //get the students in that classs
             foreach (Class c in managedClasses)
             {
+
+                ManageClassesViewModel e = new ManageClassesViewModel();
                 //match the class ID of student wit hthe class ID of the managed Classes
                 var count = db.Students.Where(s => s.ClassID == c.ClassID).Count();
 
@@ -1257,8 +1272,17 @@ namespace SPade.Controllers
             string loggedInLecturer = User.Identity.GetUserName(); //temp 
 
 
-            List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == loggedInLecturer).ToList();
+            List<Class> managedClasses = new List<Class>();
 
+            List<Lec_Class> lec_classes = db.Lec_Class.Where(lc => lc.StaffID == loggedInLecturer).ToList();
+
+            foreach(Lec_Class lc in lec_classes)
+            {
+                List<Class> temp= db.Classes.Where(c => c.DeletedAt == null).Where(c => c.ClassID == lc.ClassID).ToList();
+                managedClasses.AddRange(temp);
+            }
+            
+                      
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
 
