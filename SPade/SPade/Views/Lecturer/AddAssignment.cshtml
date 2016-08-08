@@ -135,6 +135,7 @@
                 </div>
 
                 @Html.HiddenFor(m => Model.Describe)
+                <span class="help-block">@Html.ValidationMessage("Describe", new { @class = "text-danger" })</span>
 
                 <!--Upload solutions file-->
                 <div class="form-group">
