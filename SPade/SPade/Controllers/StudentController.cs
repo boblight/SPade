@@ -152,7 +152,7 @@ namespace SPade.Controllers
             List<Assignment> assignments = new List<Assignment>();
 
             //to replace hardcoded classid with sessions values
-            List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == 1);
+            List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == db.Students.Where(stud => stud.AdminNo == User.Identity.Name).FirstOrDefault().ClassID);
 
             foreach (Class_Assgn i in ca)
             {
@@ -186,7 +186,6 @@ namespace SPade.Controllers
         // GET: ViewResult
         public ActionResult ViewResult()
         {
-
             ViewResultViewModel vrvm = new ViewResultViewModel();
 
             string loggedInStudent = User.Identity.GetUserName();
