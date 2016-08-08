@@ -4,7 +4,7 @@
     ViewBag.Title = "Submit Assignment";
 }
 
-<div class="col-md-4 col-md-offset-4 form-horizontal">
+<div class="col-md-6 col-md-offset-3 form-horizontal">
     <fieldset>
 
         @using (Html.BeginForm("SubmitAssignment", "Student", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -20,14 +20,14 @@
                 <div class="col-md-12">
                     <div class="jumbotron col-md-12">
                         <p>
-                            @Html.DisplayFor(modelItem => modelItem.assignment.Describe)
+                            @Html.Raw(System.Web.HttpUtility.HtmlDecode(Model.assignment.Describe))
                         </p>
                     </div>
-                    <label>Module: </label>@Html.DisplayFor(modelItem => modelItem.Module)<br />
-                    <label>Start date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.StartDate)<br />
-                    <label>Due date: </label>@Html.DisplayFor(modelItem => modelItem.assignment.DueDate)<br />
-                    <label>Issued by: </label>@Html.DisplayFor(modelItem => modelItem.assignment.CreateBy)<br />
-                    <label>Number of attempts remaining: </label>@Html.DisplayFor(modelItem => modelItem.RetryRemaining)
+                    <label>Module: </label>&nbsp @Html.DisplayFor(modelItem => modelItem.Module)<br />
+                    <label>Start date: </label>&nbsp @Html.DisplayFor(modelItem => modelItem.assignment.StartDate)<br />
+                    <label>Due date: </label>&nbsp @Html.DisplayFor(modelItem => modelItem.assignment.DueDate)<br />
+                    <label>Issued by: </label>&nbsp @Html.DisplayFor(modelItem => modelItem.IssuedBy)<br />
+                    <label>Number of attempts remaining:</label>&nbsp @Html.DisplayFor(modelItem => modelItem.RetryRemaining)
                 </div>
             </div>
 
@@ -51,7 +51,7 @@
                     <div class="form-group">
                         <div class="col-md-12">
                             <label class="control-label" for="AssignmentFile">Upload Solution (Note: Please zip up your project before uploading)</label>
-                            @Html.TextBoxFor(m => m.File, new { type = "file" })
+                            @Html.TextBoxFor(m => m.File, new { type = "file", @class = "form-control", @style = "border: solid 1px red" })
                             @Html.ValidationMessageFor(m => m.File)
                             @*<p class="text-danger">@Html.ValidationMessage("UploadError")</p>*@
                             @Html.ValidationSummary(true, "UploadError", new { @class = "text-danger" })

@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security.AntiXss;
 
 namespace SPade.Controllers
 {
@@ -54,6 +55,7 @@ namespace SPade.Controllers
             return View();
         }
 
+        //Manage Students (View all + Class + Update)
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -62,7 +64,7 @@ namespace SPade.Controllers
             string x = User.Identity.GetUserName(); //temp 
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt==null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            List<Class> managedClasses = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
 
             //get the students in that classs
             foreach (Class c in managedClasses)
@@ -84,6 +86,42 @@ namespace SPade.Controllers
 
         }
 
+        public ActionResult ViewStudentsByClass(string classID)
+        {
+            int cID = Int32.Parse(classID);
+
+            List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
+            List<Student> sList = new List<Student>();
+
+            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
+
+            Class c = db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
+
+            int courseId = c.CourseID;
+            string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
+
+            foreach (Student s in sList)
+            {
+                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
+
+                vm.AdminNo = s.AdminNo.ToUpper();
+                vm.Name = s.Name;
+                vm.Email = s.Email;
+                vm.ContactNo = s.ContactNo;
+
+                studList.Add(vm);
+            }
+
+            ViewBag.ClassName = courseAbbr + "/" + c.ClassName;
+            return View(studList);
+        }
+
+        public ActionResult UpdateStudent()
+        {
+            return View();
+        }
+
+        //Add Students (Bulk + Single)
         public FileResult DownloadBulkAddStudentFile()
         {
             string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
@@ -92,7 +130,6 @@ namespace SPade.Controllers
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
-        [HttpGet]
         public ActionResult BulkAddStudent()
         {
             return View();
@@ -188,51 +225,21 @@ namespace SPade.Controllers
             return RedirectToAction("Dashboard");
         }
 
-        public ActionResult ViewStudentsByClass(string classID)
-        {
-            int cID = Int32.Parse(classID);
-
-            List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
-            List<Student> sList = new List<Student>();
-
-            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
-
-            foreach (Student s in sList)
-            {
-                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
-
-                vm.AdminNo = s.AdminNo.ToUpper();
-                vm.Name = s.Name;
-                vm.Email = s.Email;
-                vm.ContactNo = s.ContactNo;
-
-                studList.Add(vm);
-            }
-            return View(studList);
-        }
-
-        public ActionResult UpdateStudent()
-        {
-            return View();
-        }
-
+        //Manage + Update Assignment
         public ActionResult ManageAssignments()
         {
             List<ManageAssignmentViewModel> manageAssgn = new List<ManageAssignmentViewModel>();
             List<Assignment> lecAssgn = new List<Assignment>();
-            //ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
+            List<Class> classAssgn = new List<Class>();
+            List<Course> courseList = new List<Course>();
 
-            //to store the classes assigned that assignment 
-            List<string> classAssgn = new List<string>();
-
-            //string lecturerID = "s1431489"; //temp 
             var lecturerID = User.Identity.GetUserName();
 
             //get the assignments that this lecturer created
-            //lecAssgn = db.Assignments.Where(a => a.CreateBy == lecturerID && a.DeletedBy == null).ToList();
             lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedBy == null);
+            courseList = db.Courses.ToList();
 
-            //get the name of the classes assigned to an assignment 
+            //get the details of each assignment and pass to view
             foreach (Assignment a in lecAssgn)
             {
                 ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
@@ -243,34 +250,550 @@ namespace SPade.Controllers
                             where ca.AssignmentID.Equals(a.AssignmentID)
                             join cl in db.Lec_Class on c.ClassID equals cl.ClassID
                             where cl.StaffID.Equals(lecturerID)
-                            select c.ClassName;
+                            select c;
 
                 classAssgn = query.ToList();
 
-                var o = classAssgn.Last();
-                string jc = "";
+                string joinedClasses = "";
 
-                foreach (string s in classAssgn)
+                //if theres only 1 class assigned that assignment 
+                if (classAssgn.Count() == 1)
                 {
-                    if (s.Equals(o))
+                    foreach (Course c in courseList)
                     {
-                        jc += s;
-                    }
-                    else
-                    {
-                        jc += s + ",";
+                        if (c.CourseID == classAssgn.FirstOrDefault().CourseID)
+                        {
+                            joinedClasses = c.CourseAbbr + "/" + classAssgn.FirstOrDefault().ClassName;
+                        }
                     }
                 }
 
+                //if there are more then 1 class assigned that assignment
+                if (classAssgn.Count() > 1)
+                {
+                    //get the last item 
+                    var lastItem = classAssgn.LastOrDefault().ClassName;
+                    var listSize = classAssgn.Count();
+                    int listIndex = 0;
+
+                    foreach (Class c in classAssgn)
+                    {
+                        listIndex++;
+
+                        if (listIndex != listSize) //not yet the last time
+                        {
+                            foreach (Course cr in courseList)
+                            {
+                                if (cr.CourseID == c.CourseID)
+                                {
+                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName + ",";
+                                }
+                            }
+                        }
+
+                        if (listIndex == listSize) //reach the last time 
+                        {
+                            foreach (Course cr in courseList)
+                            {
+                                if (cr.CourseID == c.CourseID)
+                                {
+                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName;
+                                }
+                            }
+                        }
+                    }
+                }//end of class loop 
+
                 mmvm.Assignment = a;
-                mmvm.classList = classAssgn;
-                mmvm.Classes = jc;
+                mmvm.Classes = joinedClasses;
                 manageAssgn.Add(mmvm);
             }
 
             return View(manageAssgn);
         }
 
+        public ActionResult UpdateAssignment(string assignmentId)
+        {
+            var i = Int32.Parse(assignmentId);
+            var x = User.Identity.GetUserName();
+
+            UpdateAssignmentViewModel model = new UpdateAssignmentViewModel();
+            Assignment assgn = new Assignment();
+            List<Module> modList = new List<Module>();
+
+            List<Class> classList = new List<Class>();
+            List<Class_Assgn> classAssgn = new List<Class_Assgn>();
+            List<AssignmentClass> assgnClassList = new List<AssignmentClass>();
+            List<Course> courseList = new List<Course>();
+
+            //get the assignment details from the DB
+            assgn = db.Assignments.Where(a => a.AssignmentID == i).FirstOrDefault();
+
+            //get all courses
+            courseList = db.Courses.ToList();
+
+            //get the classes that this lecturer manages 
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) select c;
+            classList = query.ToList();
+
+            //now we get the classses that are assigned this assignment 
+            classAssgn = db.Class_Assgn.Where(ca => ca.AssignmentID == i).ToList();
+
+            //loop through the classes, check if they are assigned, then give to assignClassList to populate the checkboxes
+            foreach (Class cl in classList)
+            {
+                AssignmentClass ac = new AssignmentClass();
+
+                ac.ClassId = cl.ClassID;
+
+                //string together course abb + class name
+                foreach (Course cr in courseList)
+                {
+                    if (cr.CourseID == cl.CourseID)
+                    {
+                        ac.ClassName = cr.CourseAbbr + "/" + cl.ClassName;
+                    }
+                }
+
+                //check which class has been assigned the assignment
+                foreach (Class_Assgn ca in classAssgn)
+                {
+                    if (ca.AssignmentID == i && ca.ClassID == ac.ClassId)
+                    {
+                        ac.isSelected = true;
+                    }
+                }
+
+                //add to list
+                assgnClassList.Add(ac);
+            }
+
+            //get all the modules
+            modList = db.Modules.ToList();
+
+            //set the data for the assignment 
+            model.AssgnTitle = assgn.AssgnTitle;
+            model.ModuleId = assgn.ModuleCode;
+
+            //get the id of the assignment module to set the dropdown
+            foreach (Module m in modList)
+            {
+                if (m.ModuleCode == model.ModuleId)
+                {
+                    model.SelectedModuleId = m.ModuleCode;
+                }
+            }
+
+            model.AssignmentId = assgn.AssignmentID;
+            model.Describe = assgn.Describe;
+            model.StartDate = assgn.StartDate;
+            model.DueDate = assgn.DueDate;
+            model.MaxAttempt = assgn.MaxAttempt;
+            model.Modules = modList;
+            model.ClassList = assgnClassList;
+            model.UpdateSolution = false;
+            model.IsTestCasePresent = true;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateAssignment(UpdateAssignmentViewModel uAVM, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload)
+        {
+            //user doesnt wants to update solution
+            if (uAVM.UpdateSolution == false)
+            {
+                if (UpdateAssignmentToDB(uAVM, false, false) == true)
+                {
+                    //failed to update assignment 
+                    TempData["GeneralError"] = "Failed to update assignment to database. Please try again !";
+                    return View(uAVM);
+                }
+            }
+
+            //user wants to update solution 
+            if (uAVM.UpdateSolution == true)
+            {
+                //run solution with testcase
+                if (uAVM.IsTestCasePresent == true)
+                {
+                    if ((solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip") && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
+                    {
+                        if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
+                        {
+                            if (solutionsFileUpload.ContentLength < 104857600)
+                            {
+                                string slnFilePath = "";
+                                string assignmentTitle = (uAVM.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
+                                string fileName = ""; //name of the solution uploaded
+
+                                //save the solution
+                                fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
+                                var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
+                                solutionsFileUpload.SaveAs(zipLocation);
+                                slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                                DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+
+                                if (fileDirectory.Exists)
+                                {
+                                    foreach (FileInfo files in fileDirectory.GetFiles())
+                                    {
+                                        files.Delete();
+                                    }
+                                    foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                    {
+                                        dir.Delete(true);
+                                    }
+                                }
+                                fileDirectory.Create();
+                                System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+
+                                //access the solution + move the classname.java/.cs into a folder 
+                                var toLowerPath = fileName.ToLower();
+                                var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                                Directory.CreateDirectory(path);
+
+                                //get the language and pass into grader
+                                ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == uAVM.ModuleId).LanguageId);
+
+                                var ogPath = "";
+                                var newPath = "";
+
+                                if (lang.LangageType.Equals("Java"))
+                                {
+                                    ogPath = slnFilePath + "/" + fileName + ".java";
+                                    newPath = path + "/" + fileName + ".java";
+                                }
+                                else if (lang.LangageType.Equals("C#"))
+                                {
+                                    ogPath = slnFilePath + "/" + fileName + ".cs";
+                                    newPath = path + "/" + fileName + ".cs";
+                                }
+
+                                System.IO.File.Move(ogPath, newPath);
+
+                                //save the testcase
+                                var filePath = Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
+                                var fileInfo = new FileInfo(filePath);
+                                fileInfo.Directory.Create();
+                                testCaseUpload.SaveAs(filePath);
+
+                                //get the language and pass into grader
+                                Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
+
+                                //exit codes returned from grader 
+                                //1 is successfully done everything
+                                //2 is test case submitted could not be read
+                                //3 is program has failed to run
+                                //4 is program was caught in an infinite loop
+                                int exitCode = g.RunLecturerSolution();
+
+                                if (exitCode == 1)
+                                {
+                                    //update DB + rename solution/testcase
+                                    if (UpdateAssignmentToDB(uAVM, true, true) == true)
+                                    {
+                                        //failed to update DB
+                                        DeleteFile(fileName, assignmentTitle, true);
+                                        uAVM.Modules = db.Modules.ToList();
+                                        TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                        return View(uAVM);
+                                    }
+
+                                    //delete the uploaded sln but not test case
+                                    DeleteFile(fileName, assignmentTitle, false);
+
+                                }//end of run succesfully method 
+
+                                else if (exitCode == 2)
+                                {
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    uAVM.Modules = db.Modules.ToList();
+                                    TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file";
+                                    return View(uAVM);
+                                }
+
+                                else if (exitCode == 3)
+                                {
+                                    //solution failed to run 
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    uAVM.Modules = db.Modules.ToList();
+                                    TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                                    return View(uAVM);
+                                }
+                                else if (exitCode == 4)
+                                {
+                                    //solution stuck in infinite loop
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    uAVM.Modules = db.Modules.ToList();
+                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                    return View(uAVM);
+                                }
+                            }
+                            else
+                            {
+                                //more than 150MB                     
+                                uAVM.Modules = db.Modules.ToList();
+                                TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                                return View(uAVM);
+                            }
+                        }
+                        else
+                        {
+                            //empty file 
+                            uAVM.Modules = db.Modules.ToList();
+                            string err = "Uploaded file is invalid ! Please try again.";
+                            TempData["SlnWarning"] = err;
+                            TempData["TcWarning"] = err;
+                            return View(uAVM);
+                        }
+                    }
+                    else
+                    {
+                        //uploaded file is invalid
+                        uAVM.Modules = db.Modules.ToList();
+                        string err = "Uploaded file is invalid ! Please try again.";
+                        TempData["SlnWarning"] = err;
+                        TempData["TcWarning"] = err;
+                        return View(uAVM);
+                    }
+                }//end of run with testcase
+
+                //run solution without testcase 
+                if (uAVM.IsTestCasePresent == false)
+                {
+                    if (solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip")
+                    {
+                        if (solutionsFileUpload.ContentLength > 0)
+                        {
+                            if (solutionsFileUpload.ContentLength < 104857600)
+                            {
+                                string slnFilePath = "";
+                                string assignmentTitle = (uAVM.AssgnTitle).Replace(" ", "");
+                                string fileName = "";
+
+                                //save the solution
+                                fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
+                                var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
+                                solutionsFileUpload.SaveAs(zipLocation);
+                                slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                                DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+                                if (fileDirectory.Exists)
+                                {
+                                    foreach (FileInfo files in fileDirectory.GetFiles())
+                                    {
+                                        files.Delete();
+                                    }
+                                    foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                    {
+                                        dir.Delete(true);
+                                    }
+                                }
+                                fileDirectory.Create();
+                                System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+
+                                //access the solution + move the classname.java/.cs into a folder 
+                                var toLowerPath = fileName.ToLower();
+                                var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                                Directory.CreateDirectory(path);
+
+                                //get the language and pass into grader
+                                ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == uAVM.ModuleId).LanguageId);
+
+                                //get the appropirate file and move the file accordingly
+                                var ogPath = "";
+                                var newPath = "";
+
+                                if (lang.LangageType.Equals("Java"))
+                                {
+                                    ogPath = slnFilePath + "/" + fileName + ".java";
+                                    newPath = path + "/" + fileName + ".java";
+                                }
+                                else if (lang.LangageType.Equals("C#"))
+                                {
+                                    ogPath = slnFilePath + "/" + fileName + ".cs";
+                                    newPath = path + "/" + fileName + ".cs";
+                                }
+
+                                System.IO.File.Move(ogPath, newPath);
+
+                                Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
+
+                                int exitCode = g.RunLecturerSolution();
+
+                                if (exitCode == 1)
+                                {
+                                    //save to DB + rename solution file
+                                    if (UpdateAssignmentToDB(uAVM, true, false) == true)
+                                    {
+                                        //solution has failed to save to DB
+                                        DeleteFile(fileName, assignmentTitle, false);
+                                        uAVM.Modules = db.Modules.ToList();
+                                        TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                        return View(uAVM);
+                                    }
+
+                                    //delete the uploaded sln
+                                    DeleteFile(fileName, assignmentTitle, false);
+
+                                }
+                                else if (exitCode == 3)
+                                {
+                                    //solution failed to run 
+                                    DeleteFile(fileName, assignmentTitle, false);
+                                    uAVM.Modules = db.Modules.ToList();
+                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                    return View(uAVM);
+                                }
+
+                            }
+                            else
+                            {
+                                //file size is more that 150MB
+                                uAVM.Modules = db.Modules.ToList();
+                                TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
+                                return View(uAVM);
+                            }
+                        }
+                        else
+                        {
+                            //empty file 
+                            uAVM.Modules = db.Modules.ToList();
+                            string err = "Uploaded file is invalid ! Please try again.";
+                            TempData["SlnWarning"] = err;
+                            TempData["TcWarning"] = err;
+                            return View(uAVM);
+                        }
+                    }
+                    else
+                    {
+                        //invalid file 
+                        uAVM.Modules = db.Modules.ToList();
+                        string err = "Uploaded file is invalid ! Please try again.";
+                        TempData["SlnWarning"] = err;
+                        TempData["TcWarning"] = err;
+                        return View(uAVM);
+                    }
+
+                }  //end of run without testcase 
+
+            }//end of updateSolution
+
+            //successfully updating assignment to DB
+            return RedirectToAction("ManageAssignments", "Lecturer");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteAssignment()
+        {
+            return View();
+        }
+
+        public bool UpdateAssignmentToDB(UpdateAssignmentViewModel uVM, bool updateSln, bool isTestCase)
+        {
+            Assignment updatedAssignment = new Assignment();
+            bool isFailed = false;
+            string assignmentTitle = (uVM.AssgnTitle).Replace(" ", "");
+
+            //get the previous asssignment from db
+            updatedAssignment = db.Assignments.Where(a => a.AssignmentID == uVM.AssignmentId).FirstOrDefault();
+
+            //update the assignment
+            try
+            {
+                //update the values 
+                updatedAssignment.AssgnTitle = uVM.AssgnTitle;
+                updatedAssignment.ModuleCode = uVM.ModuleId;
+                updatedAssignment.Describe = uVM.Describe;
+                updatedAssignment.MaxAttempt = uVM.MaxAttempt;
+                updatedAssignment.StartDate = uVM.StartDate;
+                updatedAssignment.DueDate = uVM.DueDate;
+                updatedAssignment.UpdatedBy = User.Identity.GetUserName();
+                updatedAssignment.UpdatedAt = DateTime.Now;
+
+                //users choose to update the assignment solution
+                if (updateSln == true)
+                {
+                    updatedAssignment.Solution = "~/Solutions/" + uVM.AssignmentId + ".xml";
+                }
+
+                //delete the old solution that is stored  
+                var solutionPath = Server.MapPath(@"~/Solutions/");
+                var oldSlnName = uVM.AssignmentId + "solution.xml";
+
+                DirectoryInfo di;
+                if ((di = new DirectoryInfo(solutionPath)).Exists)
+                {
+                    foreach (FileInfo f in di.GetFiles())
+                    {
+                        //find the original solution 
+                        if (f.Name == oldSlnName)
+                        {
+                            //delete it 
+                            f.IsReadOnly = false;
+                            f.Delete();
+                        }
+                    }
+                }
+
+                //now that the old solution xml is gone, we reaname the new solution file 
+                foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
+                {
+                    if (f.Name == assignmentTitle + ".xml")
+                    {
+                        var sourcePath = solutionPath + f.Name;
+                        var destPath = solutionPath + uVM.AssignmentId + "solution.xml";
+                        FileInfo info = new FileInfo(sourcePath);
+                        info.MoveTo(destPath);
+                    }
+                }
+
+                //this part only runs IF a testcase is present 
+                if (isTestCase == true)
+                {
+                    var testCasePath = Server.MapPath(@"~/TestCase/");
+                    var oldTestCase = uVM.AssignmentId + "TestCase.xml";
+
+                    //delete the old testcase 
+                    if ((di = new DirectoryInfo(testCasePath)).Exists)
+                    {
+                        foreach (FileInfo f in di.GetFiles())
+                        {
+                            //find the original solution 
+                            if (f.Name == oldTestCase)
+                            {
+                                //delete it 
+                                f.IsReadOnly = false;
+                                f.Delete();
+                            }
+                        }
+                    }
+
+                    //now that it is deleted, we rename the new testcase uploaded
+                    foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                    {
+                        if (f.Name == assignmentTitle + ".xml")
+                        {
+                            var sourcePath = testCasePath + f.Name;
+                            var destPath = testCasePath + uVM.AssignmentId + "testcase.xml";
+                            FileInfo info = new FileInfo(sourcePath);
+                            info.MoveTo(destPath);
+                        }
+                    }
+                }
+
+                db.SaveChanges();
+
+            }//end of try 
+            catch (Exception ex)
+            {
+                isFailed = true;
+            }
+
+            return isFailed;
+        }
+
+        //Add Assignment
         public FileResult DownloadTestCase()
         {
             string f = Server.MapPath(@"~/TestCase/testcase.xml");
@@ -281,19 +804,18 @@ namespace SPade.Controllers
 
         public ActionResult AddAssignment()
         {
-            List<AssignmentClass> ac = new List<AssignmentClass>();
             AddAssignmentViewModel aaVM = new AddAssignmentViewModel();
 
-            //  string x = "s1431489"; //temp 
+            List<AssignmentClass> ac = new List<AssignmentClass>();
+            List<Class> managedClasses = new List<Class>();
+
             var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
-            List<Class> managedClasses = db.Classes.Where(c => c.Lec_Class.Where(lc => lc.ClassID == c.ClassID).FirstOrDefault().StaffID == x).ToList();
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) select c;
+            managedClasses = query.ToList();
 
-            //get the modules 
-            List<Module> allModules = db.Modules.ToList();
-
-            //we loop through the classList to fill up the assignmentclass -> which is used to populate 
+            //we loop through the managedClasses to fill up the assignmentclass -> which is used to populate checkboxes
             foreach (var c in managedClasses)
             {
                 AssignmentClass a = new AssignmentClass();
@@ -302,6 +824,9 @@ namespace SPade.Controllers
                 a.isSelected = false;
                 ac.Add(a);
             }
+
+            //get the modules 
+            List<Module> allModules = db.Modules.ToList().FindAll(mod => mod.DeletedAt == null);
 
             aaVM.IsTestCasePresent = true;
             aaVM.ClassList = ac;
@@ -322,7 +847,6 @@ namespace SPade.Controllers
                     {
                         if (solutionsFileUpload.ContentLength < 104857600)
                         {
-                            //SubmitWithTestCase(addAssgn, solutionsFileUpload, testCaseUpload);
                             string slnFilePath = "";
                             string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
                             string fileName = ""; //name of the solution uploaded
@@ -368,6 +892,15 @@ namespace SPade.Controllers
                                 ogPath = slnFilePath + "/" + fileName + ".cs";
                                 newPath = path + "/" + fileName + ".cs";
                             }
+                            else
+                            {
+                                //solution stuck in infinite loop
+                                DeleteFile(fileName, assignmentTitle, true);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The program uploaded is unpoorted by the compiler used for this module. Please upload "
+                                    + "program coded in the appropriate programming language or ensure you have selected the correct module.";
+                                return View(addAssgn);
+                            }
 
                             System.IO.File.Move(ogPath, newPath);
 
@@ -378,20 +911,27 @@ namespace SPade.Controllers
                             testCaseUpload.SaveAs(filePath);
 
                             //get the language and pass into grader
-
                             Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
 
-                            //change running of lecturer from checking boolean to checking exitcode
+                            //exit codes returned from grader 
                             //1 is successfully done everything
                             //2 is test case submitted could not be read
                             //3 is program has failed to run
                             //4 is program was caught in an infinite loop
+                            //5 is Unsupported Language Type
                             int exitCode = g.RunLecturerSolution();
 
                             if (exitCode == 1)
                             {
                                 //save to DB + rename solution/testcase
-                                AddAssignmentToDB(addAssgn, fileName, true);
+                                if (AddAssignmentToDB(addAssgn, fileName, true) == true)
+                                {
+                                    //failed to save to DB
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    addAssgn.Modules = db.Modules.ToList();
+                                    TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                    return View(addAssgn);
+                                }
 
                                 //delete the uploaded sln
                                 DeleteFile(fileName, assignmentTitle, false);
@@ -420,6 +960,16 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.ToList();
                                 TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                return View(addAssgn);
+                            }
+                            else if (exitCode == 5)
+                            {
+                                //solution stuck in infinite loop
+                                DeleteFile(fileName, assignmentTitle, true);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
+                                    + "program coded in the appropriate programming language or ensure you have selected the correct module." +
+                                    " Support for that language could also not be added yet.";
                                 return View(addAssgn);
                             }
                         }
@@ -459,74 +1009,92 @@ namespace SPade.Controllers
                 {
                     if (solutionsFileUpload.ContentLength > 0)
                     {
-                        string slnFilePath = "";
-                        string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
-                        string fileName = "";
-
-                        //save the solution
-                        fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
-                        var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
-                        solutionsFileUpload.SaveAs(zipLocation);
-                        slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
-                        DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
-                        if (fileDirectory.Exists)
+                        if (solutionsFileUpload.ContentLength < 104857600)
                         {
-                            foreach (FileInfo files in fileDirectory.GetFiles())
+
+                            string slnFilePath = "";
+                            string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
+                            string fileName = "";
+
+                            //save the solution
+                            fileName = Path.GetFileNameWithoutExtension(solutionsFileUpload.FileName);
+                            var zipLocation = Server.MapPath(@"~/TempSubmissions/" + solutionsFileUpload);
+                            solutionsFileUpload.SaveAs(zipLocation);
+                            slnFilePath = Server.MapPath(@"~/TempSubmissions/" + fileName);
+                            DirectoryInfo fileDirectory = new DirectoryInfo(slnFilePath);
+                            if (fileDirectory.Exists)
                             {
-                                files.Delete();
+                                foreach (FileInfo files in fileDirectory.GetFiles())
+                                {
+                                    files.Delete();
+                                }
+                                foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                                {
+                                    dir.Delete(true);
+                                }
                             }
-                            foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
+                            fileDirectory.Create();
+                            System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
+
+                            //access the solution + move the classname.java/.cs into a folder 
+                            var toLowerPath = fileName.ToLower();
+                            var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
+                            Directory.CreateDirectory(path);
+
+                            //get the language and pass into grader
+                            ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
+
+                            //get the appropirate file and move the file accordingly
+                            var ogPath = "";
+                            var newPath = "";
+
+                            if (lang.LangageType.Equals("Java"))
                             {
-                                dir.Delete(true);
+                                ogPath = slnFilePath + "/" + fileName + ".java";
+                                newPath = path + "/" + fileName + ".java";
+                            }
+                            else if (lang.LangageType.Equals("C#"))
+                            {
+                                ogPath = slnFilePath + "/" + fileName + ".cs";
+                                newPath = path + "/" + fileName + ".cs";
+                            }
+
+                            System.IO.File.Move(ogPath, newPath);
+
+                            Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
+
+                            int exitCode = g.RunLecturerSolution();
+
+                            if (exitCode == 1)
+                            {
+                                //save to DB + rename solution file
+                                if (AddAssignmentToDB(addAssgn, fileName, false) == true)
+                                {
+                                    //solution has failed to save to DB
+                                    DeleteFile(fileName, assignmentTitle, false);
+                                    addAssgn.Modules = db.Modules.ToList();
+                                    TempData["GeneralError"] = "Failed to save assignmet to database ! Please try again.";
+                                    return View(addAssgn);
+                                }
+
+                                //delete the uploaded sln
+                                DeleteFile(fileName, assignmentTitle, false);
+
+                            }
+                            else if (exitCode == 3)
+                            {
+                                //solution failed to run 
+                                DeleteFile(fileName, assignmentTitle, false);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                return View(addAssgn);
                             }
                         }
-                        fileDirectory.Create();
-                        System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, slnFilePath);
-
-                        //access the solution + move the classname.java/.cs into a folder 
-                        var toLowerPath = fileName.ToLower();
-                        var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
-                        Directory.CreateDirectory(path);
-
-                        //get the language and pass into grader
-                        ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
-
-                        //get the appropirate file and move the file accordingly
-                        var ogPath = "";
-                        var newPath = "";
-
-                        if (lang.LangageType.Equals("Java"))
+                        else
                         {
-                            ogPath = slnFilePath + "/" + fileName + ".java";
-                            newPath = path + "/" + fileName + ".java";
-                        }
-                        else if (lang.LangageType.Equals("C#"))
-                        {
-                            ogPath = slnFilePath + "/" + fileName + ".cs";
-                            newPath = path + "/" + fileName + ".cs";
-                        }
-
-                        System.IO.File.Move(ogPath, newPath);
-
-                        Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
-
-                        int exitCode = g.RunLecturerSolution();
-
-                        if (exitCode == 1)
-                        {
-                            //save to DB + rename solution file
-                            AddAssignmentToDB(addAssgn, fileName, false);
-
-                            //delete the uploaded sln
-                            DeleteFile(fileName, assignmentTitle, false);
-
-                        }
-                        else if (exitCode == 3)
-                        {
-                            //solution failed to run 
-                            DeleteFile(fileName, assignmentTitle, false);
+                            //uploaded file is more than 150MB
                             addAssgn.Modules = db.Modules.ToList();
-                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                            TempData["SlnWarning"] = "Please make sure that your files is less than 150MB !";
                             return View(addAssgn);
                         }
                     }
@@ -552,113 +1120,100 @@ namespace SPade.Controllers
         }
 
         //used to insert the data into DB. 
-        public ActionResult AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
+        public bool AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
         {
             //now to add into the DB
             Assignment newAssignment = new Assignment();
             Class_Assgn classAssgn = new Class_Assgn();
             List<HttpPostedFileBase> assgnFiles = new List<HttpPostedFileBase>();
             string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
-
-            addAssgn.Solution = "~/Solutions/" + assignmentTitle + ".xml";
-
-            newAssignment.AssgnTitle = addAssgn.AssgnTitle;
-            newAssignment.Describe = addAssgn.Describe;
-            newAssignment.MaxAttempt = addAssgn.MaxAttempt;
-            newAssignment.StartDate = addAssgn.StartDate;
-            newAssignment.DueDate = addAssgn.DueDate;
-            newAssignment.Solution = addAssgn.Solution;
-            newAssignment.ModuleCode = addAssgn.ModuleId;
-            // newAssignment.CreateBy = "s1431489";
-            newAssignment.CreateBy = User.Identity.GetUserName();
-            newAssignment.CreateAt = DateTime.Now;
-            //newAssignment.UpdatedBy = "s1431489";
-            newAssignment.UpdatedBy = User.Identity.GetUserName();
-            newAssignment.UpdatedAt = DateTime.Now;
-            db.Assignments.Add(newAssignment);
+            bool isFailed = false; //used to tell the user if the assignment has already been successfully save to DB
 
             try
             {
+                //save the main assignment to DB
+                addAssgn.Solution = "~/Solutions/" + assignmentTitle + ".xml";
+                newAssignment.AssgnTitle = addAssgn.AssgnTitle;
+                newAssignment.Describe = addAssgn.Describe;
+                newAssignment.MaxAttempt = addAssgn.MaxAttempt;
+                newAssignment.StartDate = addAssgn.StartDate;
+                newAssignment.DueDate = addAssgn.DueDate;
+                newAssignment.Solution = addAssgn.Solution;
+                newAssignment.ModuleCode = addAssgn.ModuleId;
+                newAssignment.CreateBy = User.Identity.GetUserName();
+                newAssignment.CreateAt = DateTime.Now;
+                newAssignment.UpdatedBy = User.Identity.GetUserName();
+                newAssignment.UpdatedAt = DateTime.Now;
+                db.Assignments.Add(newAssignment);
                 db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                DeleteFile(fileName, assignmentTitle, isTestCase);
-                addAssgn.Modules = db.Modules.ToList();
-                TempData["GeneralError"] = "Failed to add assignment. Please try again.";
-                return View(addAssgn);
-            }
 
-            //get the assignment ID 
-            var assgnId = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First();
+                //get the assignment ID 
+                var assgnId = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First();
 
-            //insert into Class_Assgn
-            foreach (AssignmentClass a in addAssgn.ClassList)
-            {
-                if (a.isSelected == true)
+                //insert into Class_Assgn
+                foreach (AssignmentClass a in addAssgn.ClassList)
                 {
-                    classAssgn.ClassID = a.ClassId;
-                    classAssgn.AssignmentID = assgnId;
-                    db.Class_Assgn.Add(classAssgn);
-
-                    try
+                    if (a.isSelected == true)
                     {
+                        classAssgn.ClassID = a.ClassId;
+                        classAssgn.AssignmentID = assgnId;
+                        db.Class_Assgn.Add(classAssgn);
                         db.SaveChanges();
                     }
-                    catch (Exception ex)
-                    {
-                        DeleteFile(fileName, assignmentTitle, isTestCase);
-                        addAssgn.Modules = db.Modules.ToList();
-                        TempData["GeneralError"] = "Failed to add assignment. Please try again.";
-                        return View("AddAssignment", addAssgn);
-                    }
                 }
-            }
 
-            //rename the solution here
-            var solutionPath = Server.MapPath(@"~/Solutions/");
 
-            foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
-            {
-                if (f.Name == assignmentTitle + ".xml")
-                {
-                    var sourcePath = solutionPath + f.Name;
-                    var destPath = solutionPath + assgnId + "solution.xml";
-                    FileInfo info = new FileInfo(sourcePath);
-                    info.MoveTo(destPath);
+                //rename the solution here
+                var solutionPath = Server.MapPath(@"~/Solutions/");
 
-                    var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnId select Assignment;
-
-                    //update the DB to reflect the change of name for the solution
-                    foreach (Assignment a in query)
-                    {
-                        a.Solution = "~/Solutions/" + assgnId + "solution.xml";
-                    }
-                    db.SaveChanges();
-                }
-            }
-
-            //rename the testcase IF there is one 
-            if (isTestCase == true)
-            {
-                var testCasePath = Server.MapPath(@"~/TestCase/");
-
-                foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
                 {
                     if (f.Name == assignmentTitle + ".xml")
                     {
-                        var sourcePath = testCasePath + f.Name;
-                        var destPath = testCasePath + assgnId + "testcase.xml";
+                        var sourcePath = solutionPath + f.Name;
+                        var destPath = solutionPath + assgnId + "solution.xml";
                         FileInfo info = new FileInfo(sourcePath);
                         info.MoveTo(destPath);
+
+                        var query = from Assignment in db.Assignments where Assignment.AssignmentID == assgnId select Assignment;
+
+                        //update the DB to reflect the change of name for the solution
+                        foreach (Assignment a in query)
+                        {
+                            a.Solution = "~/Solutions/" + assgnId + "solution.xml";
+                        }
+                        db.SaveChanges();
                     }
                 }
-            }
 
-            return null;
+                //rename the testcase IF there is one 
+                if (isTestCase == true)
+                {
+                    var testCasePath = Server.MapPath(@"~/TestCase/");
+
+                    foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                    {
+                        if (f.Name == assignmentTitle + ".xml")
+                        {
+                            var sourcePath = testCasePath + f.Name;
+                            var destPath = testCasePath + assgnId + "testcase.xml";
+                            FileInfo info = new FileInfo(sourcePath);
+                            info.MoveTo(destPath);
+                        }
+                    }
+                }
+
+            }//end of try 
+
+            catch (Exception ex)
+            {
+                //failed to save to DB. will show something to user
+                isFailed = true;
+            }
+            return isFailed;
         }
 
-        //used to delete files when something goes wrong somewhere
+        //used to delete files
         private void DeleteFile(string fileName, string assgnTitle, bool isTestCase)
         {
             //delete their solution + testcase 
@@ -700,49 +1255,7 @@ namespace SPade.Controllers
             }
         }
 
-        public ActionResult UpdateAssignment()
-        {
-
-            //create model to store info to display
-            UpdateAssignmentViewModel model = new UpdateAssignmentViewModel();
-            //load lecAssgn list with assignments.
-            List<Assignment> lecAssgn = db.Assignments.ToList();
-            List<Class_Assgn> classList = db.Class_Assgn.ToList();
-
-            int x = 2;
-
-            List<string> classAssgn = new List<string>();
-
-            //get the name of the classes assigned to an assignment 
-            foreach (Assignment a in lecAssgn)
-            {
-                if (a.AssignmentID.Equals(x))
-                {
-                    model.Assignment = a;
-                    model.AssgnTitle = a.AssgnTitle;
-                    model.Describe = a.Describe;
-                    model.Solution = a.Solution;
-                    model.ModuleId = a.ModuleCode;
-                    model.StartDate = a.StartDate;
-                    model.DueDate = a.DueDate;
-                    model.MaxAttempt = a.MaxAttempt;
-
-                }
-
-            }
-
-
-
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public ActionResult UpdateAssignment(int AssignmentId)
-        {
-            return View();
-        }
-
+        //View Results
         public ActionResult ViewResults()
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();
@@ -779,8 +1292,8 @@ namespace SPade.Controllers
             string loggedInLecturer = User.Identity.GetUserName(); //temp 
 
             var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
-    new SqlParameter("@inClass", Class),
-    new SqlParameter("@inCreator", loggedInLecturer)).ToList();
+        new SqlParameter("@inClass", Class),
+        new SqlParameter("@inCreator", loggedInLecturer)).ToList();
 
             return Json(assignments);
         }
@@ -788,11 +1301,9 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult ViewResults(string Class, string Assignment)
         {
-
-
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
-    new SqlParameter("@inClass", Class),
-    new SqlParameter("@inAssignment", Assignment)).ToList();
+        new SqlParameter("@inClass", Class),
+        new SqlParameter("@inAssignment", Assignment)).ToList();
 
             return Json(results);
         }

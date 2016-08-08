@@ -46,10 +46,10 @@
                                 <td>@Html.DisplayFor(Model => item.Assignment.AssgnTitle)</td>
                                 <td>@Html.DisplayFor(Model => item.Assignment.CreateAt)</td>
                                 <td>@Html.DisplayFor(Model => item.Classes)</td>
-                                <td>@Html.DisplayFor(Model => item.Assignment.StartDate)</td>
+                                <td>@Html.DisplayFor(Model => item.Assignment.StartDate) </td>
                                 <td>@Html.DisplayFor(Model => item.Assignment.DueDate)</td>
                                 <td>
-                                    @Html.ActionLink("Update", "UpdateAssignment", "Lecturer", new { AssignmentId = item.Assignment.AssignmentID }, new { id = "UpdateAssignment", @class = "btn btn-primary" })
+                                    @Html.ActionLink("Update", "UpdateAssignment", "Lecturer", new { AssignmentId = item.Assignment.AssignmentID }, new { id = "assignmentId", @class = "btn btn-primary" })
                                 </td>
                             </tr>
                         }

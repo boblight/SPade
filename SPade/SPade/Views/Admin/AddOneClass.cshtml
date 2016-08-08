@@ -7,55 +7,48 @@
 @using (Html.BeginForm("AddOneClass", "Admin", FormMethod.Post))
 {
 
-<div class="col-md-4 col-md-offset-4 form-horizontal">
-    <fieldset> 
-        @Html.AntiForgeryToken()
-        <legend>Add Class</legend>
+    <div class="col-md-4 col-md-offset-4 form-horizontal">
+        <fieldset>
+            @Html.AntiForgeryToken()
+            <legend>Add Class</legend>
 
+            <span class="help-block">
+                <span class="text-danger">@TempData["Error"]</span>
+            </span>
 
-        <!--Select Course-->
-        <div class="form-group">
-            <div class="col-md-12">
-                <label>Course</label>
-                @{
-                    @Html.DropDownListFor(c => Model.CourseID, new SelectList(Model.Courses, "CourseID", "CourseName"), "--Select a Course--", new { @class = "form-control" })
-                }
+            <!--Select Course-->
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label>Course</label>
+                    @{
+                        @Html.DropDownListFor(c => Model.CourseID, new SelectList(Model.Courses, "CourseID", "CourseName"), "--Select a Course--", new { @class = "form-control" })
+                    }
+                </div>
             </div>
-        </div>
 
-        <!-- classNameInput-->
-        <div class="form-group">
-            <div class="col-md-12">
-                <label for="inputStaffNo" class="control-label">Class Name</label>
-                @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md", required = "required" })
-                <span class="help-block">e.g. 2A22 </span>
-                 <span class="help-block">@Html.ValidationMessage("ClassName", new { @class = "text-danger" })</span>
+            <!-- classNameInput-->
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label for="inputStaffNo" class="control-label">Class Name</label>
+                    @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md", required = "required" })
+                    <span class="help-block">e.g. 2A22 </span>
+                    <span class="help-block">@Html.ValidationMessage("ClassName", new { @class = "text-danger" })</span>
+                </div>
             </div>
-        </div>
 
-        <!--Select lecturer-->
-        <div class="form-group">
-            <div class="col-md-12">
-                <label >Lecturer</label>
-                @{
-                    @Html.DropDownListFor(c => Model.StaffID, new SelectList(Model.Lecturers, "StaffID", "Name"), "--Select a Lecturer--", new { @class = "form-control"} )
-                }    
+            <!-- saveBtn, cancelBtn -->
+            <div class="form-group">
+                <div class="col-md-12 ">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <a id="btnCancel" href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                </div>
             </div>
-        </div>
-
-        <!-- saveBtn, cancelBtn -->
-        <div class="form-group">
-            <div class="col-md-12 ">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a id="btnCancel" href="javascript:history.back()" class="btn btn-default">Cancel</a>
-            </div>
-        </div>
-    </fieldset>
-</div>
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
-
-
-
+        </fieldset>
+    </div>
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
     }
+
+
+
+                        }

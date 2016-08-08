@@ -21,20 +21,20 @@ namespace SPade.Grading
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private bool isTestCasePresnt = false;
-        private string[] arguments; //to be used for sandboxing
         XmlNode docNode, bodyNode, solutionsNode;
         XmlDocument slnDoc = new XmlDocument();
+        Compiler c;
 
         //Lecturer use this
         public Grader(string filePath, string fileName, string assignmentTitle, string language, bool isTestCasePresent)
         {
-            this.filePath = filePath;
+            c = new Compiler(language, filePath, fileName);
+
             //fileName is the subfolder that contains the solution
-            this.fileName = fileName;
             //this is just the assignment title
             this.assignmentTitle = assignmentTitle;
-            this.language = language;
             this.isTestCasePresnt = isTestCasePresent;
+            this.language = language; 
 
         }//end of constructor
 
@@ -60,10 +60,10 @@ namespace SPade.Grading
             compile.WaitForExit();//compilation process ends
 
             //run program with Java
-            pathToExecutable = "java " + "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
-            procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", "java " + "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
+            //pathToExecutable = "java " + "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
+            //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", "java " + "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", "/hide_window " + "java -cp " + filePath + "/" + fileName + "/src " + fileName.ToLower() + "." + fileName);
-            //procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
+            procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
         }//end of processForJava
 
         public void processForCS()
@@ -83,7 +83,7 @@ namespace SPade.Grading
 
             //procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\" ", "/hide_window " + filePath + "/" + fileName + "/" + fileName + "/bin/Debug/" + fileName + ".exe");
             //procInfo = new ProcessStartInfo(filePath + "/" + fileName + "/" + fileName + "/Program.exe");
-            //procInfo = new ProcessStartInfo(filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe");
+            procInfo = new ProcessStartInfo(filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe");
         }//end of processForCS
 
         public decimal grade()
@@ -102,41 +102,7 @@ namespace SPade.Grading
                     break;
             }
 
-            ////create a new file for grading executable to append output to
-            //File.AppendAllText(filePath + "/output.txt", "");
 
-            ////arguments to be passed into the grading executable
-            ////1st string is path to submission
-            ////2nd string is path to test case
-            ////3rd string is path to solution
-            ////4th string is path to output
-            //arguments = new string[4];
-            //arguments[0] = pathToExecutable;
-            //arguments[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
-            //arguments[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
-            //arguments[3] = filePath + "/output.txt";
-
-            ////File.AppendAllText("C:/Users/tongliang/Desktop/viewarguments.txt", arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3]);
-
-            //procInfo.CreateNoWindow = true;
-            //procInfo.UseShellExecute = false;
-            //procInfo.Arguments = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
-
-            ////run sandbox grading
-            //proc = Process.Start(procInfo);
-
-            //proc.WaitForExit(10000);
-
-            ////once Grading process is done, retrive output and return to controller
-            //return Decimal.Parse(File.ReadAllText(filePath + "/output.txt"));
-            ////while (true)
-            ////{
-            ////    decimal returnVal == Decimal.Parse(File.ReadAllText(filePath + "/output.txt"))
-            ////if (returnVal != null) { return returnVal; }
-            ////}
-
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
 
@@ -159,7 +125,7 @@ namespace SPade.Grading
                     List<string> inputs = new List<string>();
                     noOfTestCase++;
                     proc = Process.Start(procInfo);
-                    File.AppendAllText("C:/User/tongliang/Desktop/debugger.txt", "TEST");
+                    File.AppendAllText("C:/Users/tongliang/Desktop/debugger.txt", "TEST");
                     subOut = "";
 
                     System.IO.StreamWriter sw = proc.StandardInput;
@@ -214,19 +180,6 @@ namespace SPade.Grading
                     }
                 }//end of test case loop
 
-                //else
-                //{
-                //    //terminate sandboxie if program fails
-                //    Process terminateSandbox = new Process();
-                //    terminateSandbox.StartInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"  /terminate_all");
-                //    terminateSandbox.StartInfo.CreateNoWindow = true;
-                //    terminateSandbox.StartInfo.UseShellExecute = false;
-                //    terminateSandbox.Start();
-                //    terminateSandbox.WaitForExit();
-
-                //    return 2; //program failure
-                //}
-
                 return (testCasePassed / noOfTestCase); //return results
             }
             catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
@@ -280,17 +233,32 @@ namespace SPade.Grading
 
         public int RunLecturerSolution()
         {
-            switch (language)
+            //switch (language)
+            //{
+            //    case "Java":
+            //        processForJava();
+            //        break;
+            //    case "C#":
+            //        processForCS();
+            //        break;
+            //    default:
+            //        processForJava();
+            //        break;
+            //}
+
+            if (language == "Java")
             {
-                case "Java":
-                    processForJava();
-                    break;
-                case "C#":
-                    processForCS();
-                    break;
-                default:
-                    processForJava();
-                    break;
+                proc = new Process();
+                procInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/java.exe", c.getExePath());
+            }
+            else if (language == "C#")
+            {
+                proc = new Process();
+                procInfo = new ProcessStartInfo(c.getExePath());
+            }
+            else
+            {
+                return 5;
             }
 
             procInfo.CreateNoWindow = true;

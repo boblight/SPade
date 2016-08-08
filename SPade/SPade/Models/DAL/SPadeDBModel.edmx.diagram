@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="e8535f33a15f4f9ea99560006deafd7e" Name="Diagram1" ZoomLevel="85">
+      <Diagram DiagramId="46d7c87215a442f381d62406d8846cf5" Name="Diagram1">
         <EntityTypeShape EntityType="SPadeDBModel.C__MigrationHistory" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Admin" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.AspNetRole" Width="1.5" PointX="3.75" PointY="12.5" IsExpanded="true" />
@@ -16,7 +16,7 @@
         <EntityTypeShape EntityType="SPadeDBModel.Class_Assgn" Width="1.5" PointX="10.5" PointY="6.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Course" Width="1.5" PointX="1.5" PointY="10.125" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Lec_Class" Width="1.5" PointX="3" PointY="1.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Lecturer" Width="1.5" PointX="1" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModel.Lecturer" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Module" Width="1.5" PointX="6" PointY="6.125" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.ProgLanguage" Width="1.5" PointX="3.75" PointY="6.375" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Student" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />

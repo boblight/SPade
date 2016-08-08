@@ -6,101 +6,95 @@
 <div class="col-md-4 col-md-offset-4 form-horizontal">
     <h2>@ViewBag.Title</h2>
 
-    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    @if (User.Identity.Name.Equals(""))
     {
-        @Html.AntiForgeryToken()
-        <h4>Create a new account.</h4>
-        @*<h5 class="text-danger">@Html.ValidationSummary("RegisterError")</h5>*@
-        <hr />
-        @Html.ValidationSummary("", new { @class = "text-danger" })
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="Email">Email</label>
-            <div class="col-md-10">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email" })
-                <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="Password">Password</label>
-            <div class="col-md-10">
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control", @required = "required" })
-                <span class="help-block">@Html.ValidationMessage("Password", new { @class = "text-danger" })</span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="ConfirmPassword">Confirm Password</label>
-            <div class="col-md-10">
-                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", required = "required" })
-                <span class="help-block">Password must have at least 1 uppercase, lowercase, number and special character</span>
-                <span class="help-block">@Html.ValidationMessage("ConfirmPassword", new { @class = "text-danger" })</span>
-            </div>
-        </div>
 
-        <h3 class="page-header">Info</h3>
-
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="AdminNo">Admin No.</label>
-            <div class="col-md-10">
-                @Html.TextBoxFor(m => m.AdminNo, new { @class = "form-control" })
-                <span class="help-block">With 'p' (e.g. p1234567)</span>
-                <span class="help-block">@Html.ValidationMessage("AdminNo", new { @class = "text-danger" })</span>
+        using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <h4>Create a new account.</h4>
+            @*<h5 class="text-danger">@Html.ValidationSummary("RegisterError")</h5>*@
+            <hr />
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="Email">Email</label>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email" })
+                    <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="Name">Full Name</label>
-            <div class="col-md-10">
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
-                <span class="help-block">As stated in Student Card</span>
-                <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="Password">Password</label>
+                <div class="col-md-10">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @required = "required" })
+                    <span class="help-block">@Html.ValidationMessage("Password", new { @class = "text-danger" })</span>
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="ContactNo">Contact Number</label>
-            <div class="col-md-10">
-                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control" })
-                <span class="help-block">For emergency contact</span>
-                <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="ConfirmPassword">Confirm Password</label>
+                <div class="col-md-10">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", required = "required" })
+                    <span class="help-block">Password must have at least 1 uppercase, lowercase, number and special character</span>
+                    <span class="help-block">@Html.ValidationMessage("ConfirmPassword", new { @class = "text-danger" })</span>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="ClassName">Class</label>
-            <div class="col-md-10">
+            <h3 class="page-header">Info</h3>
 
-                <div class="form-group">
-                    <div>
-                        <div class="col-md-12">
-                            <label>Class</label>
-                            @{
-                                @Html.DropDownListFor(c => Model.classID, new SelectList(Model.classList, "ClassID", "ClassName"), new { @class = "form-control" })
-                            }
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="AdminNo">Admin No.</label>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.AdminNo, new { @class = "form-control" })
+                    <span class="help-block">With 'p' (e.g. p1234567)</span>
+                    <span class="help-block">@Html.ValidationMessage("AdminNo", new { @class = "text-danger" })</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="Name">Full Name</label>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    <span class="help-block">As stated in Student Card</span>
+                    <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="ContactNo">Contact Number</label>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control" })
+                    <span class="help-block">For emergency contact</span>
+                    <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="ClassName">Class</label>
+                <div class="col-md-10">
+
+                    <div class="form-group">
+                        <div>
+                            <div class="col-md-12">
+                                @{
+                                    @Html.DropDownListFor(c => Model.classID, new SelectList(Model.classList, "ClassID", "ClassName"), new { @class = "form-control" })
+                                }
+                            </div>
                         </div>
                     </div>
+
                 </div>
-
-                @*<select class="form-control" id="ClassSelect" name="ClassSelect">
-                    @{
-                        int n = 0;
-                        foreach (var i in Model.classID)
-                        {
-
-                            <option value="@i">@Model.classNames[n]</option>
-                            n++;
-                        }
-                    }
-
-                </select>*@
-
             </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" class="btn btn-primary" value="Register" />
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" class="btn btn-primary" value="Register" />
+                </div>
             </div>
-        </div>
-                        }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>Please logout to access the registration page.</p>
+                                    }
 </div>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

@@ -16,7 +16,7 @@
 
                 widthFixed: true,
                 headerTemplate: '{content} {icon}', // Add icon for various themes
-                sortList: [[2, 0]],
+                sortList: [[3, 0]],
                 widgets: ['stickyHeaders', 'uitheme', 'filter'],
 
                 widgetOptions: {
@@ -32,12 +32,12 @@
 
                 widthFixed: true,
                 headerTemplate: '{content} {icon}', // Add icon for various themes
-                sortList: [[3, 0]],
+                sortList: [[4, 0]],
                 widgets: ['stickyHeaders', 'uitheme', 'filter'],
 
                 widgetOptions: {
                     filter_external: '#searchcompleted',
-                    filter_columnFilters: false
+                    filter_columnFilters: false 
                 }
 
             });
@@ -50,7 +50,7 @@
         <legend>Assignments</legend>
 
         <div class="form-group">
-
+             
             <!-- tabs -->
             <ul class="nav nav-tabs">
 
@@ -81,7 +81,6 @@
                         <thead>
                             <tr>
                                 <th>Assignment</th>
-                                <th>Issued By</th>
                                 <th>Module</th>
                                 <th>Number of Attempts</th>
                                 <th>Start Date</th>
@@ -97,7 +96,6 @@
                                 {
                                     <tr>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.AssgnTitle)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
                                         <td>@Html.DisplayFor(modelItem => item.Module)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.MaxAttempt)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.StartDate)</td>
@@ -125,7 +123,6 @@
                         <thead>
                             <tr>
                                 <th>Assignment</th>
-                                <th>Issued by</th>
                                 <th>Module</th>
                                 <th>Due date</th>
                                 <th>Attempts remaining</th>
@@ -141,7 +138,6 @@
                                 {
                                     <tr>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.AssgnTitle)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.assignment.CreateBy)</td>
                                         <td>@Html.DisplayFor(modelItem => item.Module)</td>
                                         <td>@Html.DisplayFor(modelItem => item.assignment.DueDate)</td>
                                         <td>@Html.DisplayFor(modelItem => item.RetryRemaining)</td>

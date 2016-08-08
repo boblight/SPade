@@ -42,14 +42,13 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(Model => item.AdminId)</td>
+                                <td>@Html.DisplayFor(Model => item.AdminID)</td>
                                 <td>@Html.DisplayFor(Model => item.Name)</td>
                                 <td>@Html.DisplayFor(Model => item.ContactNo)</td>
                                 <td>@Html.DisplayFor(Model => item.Email)</td>
                                 <td>@Html.DisplayFor(Model => item.CreatedBy)</td>
-                                <td><a href="/Admin/UpdateAdmin/@Html.DisplayFor(Model => item.AdminId)" class="btn btn-primary">Update</a></td>
+                                <td><a href="/admin/updateadmin/@item.AdminID.ToLower()" class="btn btn-danger">Update</a></td>
                             </tr>
-
                         }
 
                     </tbody>

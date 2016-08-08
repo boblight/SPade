@@ -184,6 +184,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Grading\Compiler.cs" />
     <Compile Include="Grading\Grader.cs" />
     <Compile Include="Grading\Sandboxer.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -315,12 +316,17 @@
       <LastGenOutput>SPadeDBModel.cs</LastGenOutput>
     </Content>
     <Content Include="Scripts\addassignmentscript.js" />
+    <Content Include="Scripts\bootstrap-wysiwyg.js" />
+    <Content Include="Scripts\bootstrap-wysiwyg.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="BulkUploadFiles\BulkAddLecturer.csv" />
+    <Content Include="BulkUploadFiles\BulkAddStudent.csv" />
+    <Content Include="GradingSandbox.snk" />
     <EntityDeploy Include="Models\DAL\SPadeDBModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>SPadeDBModel.Designer.cs</LastGenOutput>
@@ -328,9 +334,8 @@
     <Content Include="Models\DAL\SPadeDBModel.edmx.diagram">
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
     </Content>
-    <Content Include="BulkUploadFiles\BulkAddLecturer.csv" />
-    <Content Include="BulkUploadFiles\BulkAddStudent.csv" />
-    <Content Include="GradingSandbox.snk" />
+    <None Include="Properties\PublishProfiles\IIS.pubxml" />
+    <None Include="Properties\PublishProfiles\TestIIS.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
     <Content Include="Scripts\indexscript.js" />
@@ -339,6 +344,7 @@
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.csv.min.js" />
+    <Content Include="Scripts\jquery.hotkeys.js" />
     <Content Include="Scripts\jquery.tablesorter.combined.js" />
     <Content Include="Scripts\jquery.tablesorter.js" />
     <Content Include="Scripts\jquery.tablesorter.min.js" />
@@ -351,8 +357,10 @@
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\updateassignmentscript.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="TestCase\testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -409,7 +417,6 @@
     </Content>
     <Content Include="Views\Account\ConfirmEmailMessage.cshtml" />
     <Content Include="Views\Lecturer\ManageAssignments.cshtml" />
-    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <Content Include="Views\Admin\Purge.cshtml" />
     <Content Include="Views\Admin\AddOneAdmin.cshtml" />
     <Content Include="Views\Admin\UpdateAdmin.cshtml" />
@@ -421,10 +428,15 @@
     <Content Include="Views\Lecturer\AddOneStudent.cshtml" />
     <Content Include="Views\Admin\ManageCourse.cshtml" />
     <Content Include="Views\Admin\ManageAdmin.cshtml" />
+    <Content Include="Views\Admin\UpdateModule.cshtml" />
+    <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
     <None Include="Web.Release.Config">
+      <DependentUpon>Web.Config</DependentUpon>
+    </None>
+    <None Include="Web.TestIIS.config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
   </ItemGroup>
@@ -432,11 +444,9 @@
     <Folder Include="App_Data\Uploads\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="Migrations\img\" />
-    <Folder Include="Properties\" />
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />
     <Folder Include="TempSubmissions\" />
-    <Folder Include="TestCase\" />
     <Folder Include="ViewModels\Accounts\" />
   </ItemGroup>
   <ItemGroup>

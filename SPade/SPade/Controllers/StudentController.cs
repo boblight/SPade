@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security.AntiXss;
 
 namespace SPade.Controllers
 {
@@ -28,8 +29,11 @@ namespace SPade.Controllers
 
         //POST: SubmitAssignment
         [HttpPost]
-        public async Task<ActionResult> SubmitAssignment(HttpPostedFileBase file)
+        public ActionResult SubmitAssignment(HttpPostedFileBase file)
         {
+            decimal result = 0;
+            string submissionName = "";
+
             Submission submission = new Submission();
             int assgnId = (int)Session["assignmentId"];
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
@@ -50,9 +54,9 @@ namespace SPade.Controllers
                     file.SaveAs(zipLocation);
 
                     string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
-                    string submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
+                    submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
                     var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower());
-                    var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName + "/");
+                    var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
                     System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
 
                     if (fileDirectory.Exists)
@@ -79,13 +83,7 @@ namespace SPade.Controllers
                     //3 for infinite loop
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
                     //decimal result = grader.grade();
-                    decimal result = sandBoxedGrading.runSandboxedGrading();
-
-                    submission.Grade = result;
-                    submission.AssignmentID = assgnId;
-                    submission.AdminNo = User.Identity.GetUserName();
-                    submission.FilePath = submissionName;
-                    submission.Timestamp = DateTime.Now;
+                    result = sandBoxedGrading.runSandboxedGrading();
                 }
             }
             else if (file == null)
@@ -100,6 +98,12 @@ namespace SPade.Controllers
                 Session["UploadError"] = "Only zip files are allowed. Please zip up your project before uploading.";
                 return RedirectToAction("SubmitAssignment", assgnId);
             }
+
+            submission.Grade = result;
+            submission.AssignmentID = assgnId;
+            submission.AdminNo = User.Identity.GetUserName();
+            submission.FilePath = submissionName;
+            submission.Timestamp = DateTime.Now;
 
             db.Submissions.Add(submission);
             db.SaveChanges();
@@ -117,8 +121,11 @@ namespace SPade.Controllers
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
             svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
 
+
+
             Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
             svm.Module = module.ModuleCode + " " + module.ModuleName;
+            svm.IssuedBy = db.Lecturers.ToList().Find(lc => lc.StaffID == assignment.CreateBy).Name.ToString();
 
             //start a session to check which assignment student is viewing
             Session["assignmentId"] = id;
@@ -130,6 +137,9 @@ namespace SPade.Controllers
             }
 
             svm.assignment = assignment;
+
+            //encode the richtext from the DB 
+            svm.assignment.Describe = AntiXssEncoder.HtmlEncode(svm.assignment.Describe, false);
 
             return View(svm);
         }//end of get SubmitAssignment
