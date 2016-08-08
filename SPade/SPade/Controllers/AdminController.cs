@@ -94,12 +94,12 @@ namespace SPade.Controllers
             else
             {
                 // Upload file is invalid
-                string err = "Uploaded file is invalid ! Please try again!";
+                string err = "Uploaded file is invalid! Please try again!";
                 TempData["InputWarning"] = err;
                 return View();
             }
 
-            return View("ManageLecturer");
+            return RedirectToAction("ManageLecturer");
         }
 
 
@@ -112,6 +112,7 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult BulkAddStudent(HttpPostedFileBase file)
         {
+            
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
                 //Upload and save the file
@@ -147,11 +148,11 @@ namespace SPade.Controllers
             else
             {
                 // Upload file is invalid
-                string err = "Uploaded file is invalid ! Please try again!";
+                string err = "Uploaded file is invalid! Please try again!";
                 TempData["InputWarning"] = err;
                 return View();
             }
-            return View("ManageStudent");
+            return RedirectToAction("ManageStudent");
         }
 
         [HttpPost]
@@ -161,10 +162,10 @@ namespace SPade.Controllers
             {
                 var user = new ApplicationUser { UserName = model.AdminNo, Email = model.Email };
                 user.EmailConfirmed = true;
-                UserManager.AddToRole(user.Id, "Student");
                 var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                 if (result.Succeeded)
                 {
+                    UserManager.AddToRole(user.Id, "Student");
                     var student = new Student()
                     {
                         AdminNo = model.AdminNo.Trim(),
@@ -311,10 +312,10 @@ namespace SPade.Controllers
             {
                 var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
                 user.EmailConfirmed = true;
-                UserManager.AddToRole(user.Id, "Lecturer");
                 var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                 if (result.Succeeded)
                 {
+                    UserManager.AddToRole(user.Id, "Lecturer");
                     var lecturer = new Lecturer()
                     {
                         StaffID = model.StaffID,
@@ -915,7 +916,7 @@ namespace SPade.Controllers
             model.AdminID = id;
             model.FullName = admin.FullName;
             model.ContactNo = admin.ContactNo;
-            
+
             return View(model);
         }
 
@@ -1086,10 +1087,10 @@ namespace SPade.Controllers
             //create default account
             var user = new ApplicationUser { UserName = model.AdminID, Email = model.Email };
             user.EmailConfirmed = true;
-            UserManager.AddToRole(user.Id, "Admin");
             var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
             if (result.Succeeded)
             {
+                UserManager.AddToRole(user.Id, "Admin");
                 Admin admin = new Admin();
                 admin.AdminID = model.AdminID;
                 admin.FullName = model.FullName;
