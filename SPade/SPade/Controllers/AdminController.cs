@@ -94,7 +94,7 @@ namespace SPade.Controllers
             else
             {
                 // Upload file is invalid
-                string err = "Uploaded file is invalid ! Please try again!";
+                string err = "Uploaded file is invalid! Please try again!";
                 TempData["InputWarning"] = err;
                 return View();
             }
@@ -148,7 +148,7 @@ namespace SPade.Controllers
             else
             {
                 // Upload file is invalid
-                string err = "Uploaded file is invalid ! Please try again!";
+                string err = "Uploaded file is invalid! Please try again!";
                 TempData["InputWarning"] = err;
                 return View();
             }
