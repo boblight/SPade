@@ -21,19 +21,18 @@ namespace SPade.Grading
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private bool isTestCasePresnt = false;
-        private string[] arguments; //to be used for sandboxing
         XmlNode docNode, bodyNode, solutionsNode;
         XmlDocument slnDoc = new XmlDocument();
+        Compiler c;
 
         //Lecturer use this
         public Grader(string filePath, string fileName, string assignmentTitle, string language, bool isTestCasePresent)
         {
-            this.filePath = filePath;
+            c = new Compiler(language, filePath, fileName);
+
             //fileName is the subfolder that contains the solution
-            this.fileName = fileName;
             //this is just the assignment title
             this.assignmentTitle = assignmentTitle;
-            this.language = language;
             this.isTestCasePresnt = isTestCasePresent;
 
         }//end of constructor
@@ -233,17 +232,32 @@ namespace SPade.Grading
 
         public int RunLecturerSolution()
         {
-            switch (language)
+            //switch (language)
+            //{
+            //    case "Java":
+            //        processForJava();
+            //        break;
+            //    case "C#":
+            //        processForCS();
+            //        break;
+            //    default:
+            //        processForJava();
+            //        break;
+            //}
+
+            if (language == "Java")
             {
-                case "Java":
-                    processForJava();
-                    break;
-                case "C#":
-                    processForCS();
-                    break;
-                default:
-                    processForJava();
-                    break;
+                proc = new Process();
+                procInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/java.exe", c.getExePath());
+            }
+            else if (language == "C#")
+            {
+                proc = new Process();
+                procInfo = new ProcessStartInfo(c.getExePath());
+            }
+            else
+            {
+                return 5;
             }
 
             procInfo.CreateNoWindow = true;

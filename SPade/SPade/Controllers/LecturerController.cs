@@ -831,7 +831,7 @@ namespace SPade.Controllers
             }
 
             //get the modules 
-            List<Module> allModules = db.Modules.ToList();
+            List<Module> allModules = db.Modules.ToList().FindAll(mod => mod.DeletedAt == null);
 
             aaVM.IsTestCasePresent = true;
             aaVM.ClassList = ac;
@@ -897,6 +897,15 @@ namespace SPade.Controllers
                                 ogPath = slnFilePath + "/" + fileName + ".cs";
                                 newPath = path + "/" + fileName + ".cs";
                             }
+                            else
+                            {
+                                //solution stuck in infinite loop
+                                DeleteFile(fileName, assignmentTitle, true);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The program uploaded is unpoorted by the compiler used for this module. Please upload "
+                                    + "program coded in the appropriate programming language or ensure you have selected the correct module.";
+                                return View(addAssgn);
+                            }
 
                             System.IO.File.Move(ogPath, newPath);
 
@@ -914,6 +923,7 @@ namespace SPade.Controllers
                             //2 is test case submitted could not be read
                             //3 is program has failed to run
                             //4 is program was caught in an infinite loop
+                            //5 is Unsupported Language Type
                             int exitCode = g.RunLecturerSolution();
 
                             if (exitCode == 1)
@@ -955,6 +965,16 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.ToList();
                                 TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program";
+                                return View(addAssgn);
+                            }
+                            else if (exitCode == 5)
+                            {
+                                //solution stuck in infinite loop
+                                DeleteFile(fileName, assignmentTitle, true);
+                                addAssgn.Modules = db.Modules.ToList();
+                                TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
+                                    + "program coded in the appropriate programming language or ensure you have selected the correct module." +
+                                    " Support for that language could also not be added yet.";
                                 return View(addAssgn);
                             }
                         }
