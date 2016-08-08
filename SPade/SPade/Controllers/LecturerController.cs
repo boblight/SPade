@@ -178,7 +178,7 @@ namespace SPade.Controllers
                 return View();
             }
 
-            return View("ManageClassesAndStudents");
+            return RedirectToAction("ManageClassesAndStudents");
         }
 
         public ActionResult AddOneStudent()
