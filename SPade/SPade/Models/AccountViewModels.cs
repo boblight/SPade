@@ -98,10 +98,9 @@ namespace SPade.Models
         public int ContactNo { get; set; }
 
         public List<string> classID  { get; set; }
-
+        public List<string> classNames { get; set; }
         public List<Class> classList { get; set; }
 
-        public List<string> classNames { get; set; }
     }
 
     public class ResetPasswordViewModel

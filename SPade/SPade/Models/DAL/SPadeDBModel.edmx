@@ -86,7 +86,7 @@
             <PropertyRef Name="AssignmentID" />
           </Key>
           <Property Name="AssignmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Describe" Type="varchar" MaxLength="5000" Nullable="false" />
+          <Property Name="Describe" Type="varchar(max)" Nullable="false" />
           <Property Name="MaxAttempt" Type="int" Nullable="false" />
           <Property Name="DueDate" Type="datetime" Nullable="false" />
           <Property Name="Solution" Type="varchar" MaxLength="200" Nullable="false" />
@@ -548,7 +548,7 @@
             <PropertyRef Name="AssignmentID" />
           </Key>
           <Property Name="AssignmentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Describe" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Describe" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="MaxAttempt" Type="Int32" Nullable="false" />
           <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Solution" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />

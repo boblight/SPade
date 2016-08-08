@@ -16,6 +16,8 @@
 
             <legend>Update Student</legend>
 
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+
             @Html.Hidden("AdminNo")
 
             <!-- studentNameInput-->
@@ -39,38 +41,40 @@
                 </div>
             </div>
 
-            <!-- studentEmail-->
-            <div class="form-group">
-                <div class="col-md-12">
-
-                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-md", required = "required" })
-                    <span class="help-block">@Html.ValidationMessage("Email", new { @class = "text-danger" })</span>
-
-                </div>
-            </div>
-
             <!-- studentContactNo-->
             <div class="form-group">
                 <div class="col-md-12">
-                    @Html.LabelFor(m => m.ContactNo, new { @class = "control-label" })
+                    <label class="control-label">Contact No.</label>
                     @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control input-md", required = "required" })
                     <span class="help-block">@Html.ValidationMessage("ContactNo", new { @class = "text-danger" })</span>
                 </div>
             </div>
 
-
-
             <div class="form-group">
                 <div class="col-md-12">
                     <input type="submit" value="Update" name="command" class="btn btn-primary"/>
-                    <input type="submit" value="Delete" name="command" class="btn btn-danger"
-                           onclick="return confirm('Are you sure?')"  />
                     <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                    <button class="btn btn-danger pull-right" data-toggle="modal" data-target="#modal">Delete</button>
                     <!-- Show alert-->
                     @Html.Raw(TempData["msg"])
                 </div>
             </div>
+
+            <div class="modal" id="modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Are you sure you want to delete?</h4>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <input type="submit" value="Delete" name="command" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </fieldset>
     </div>
 </div>

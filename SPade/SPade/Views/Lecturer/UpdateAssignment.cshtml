@@ -1,148 +1,268 @@
 ﻿@model SPade.ViewModels.Lecturer.UpdateAssignmentViewModel
+
 @{
     ViewBag.Title = "Update Assignment";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 @Scripts.Render("~/bundles/jqueryval")
-@Scripts.Render("~/bundles/addassignmentscripts")
+@Scripts.Render("~/bundles/updateassignmentscripts")
+@Scripts.Render("~/bundles/wysiwygscripts")
 
-@using (Html.BeginForm("UpdateAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data", id = "updateAssignmentForm" }))
+@using (Html.BeginForm("UpdateAssignment", "Lecturer", FormMethod.Post, new { enctype = "multipart/form-data", id = "submitAssignmentForm" }))
 {
+    <div class="container">
 
-<div class="container">
+        <div class="col-md-10 col-md-offset-1 form-horizontal">
+            <fieldset>
+                <legend>Update Assignment</legend>
 
-    <div class="col-md-4 col-md-offset-4 form-horizontal">
-        <fieldset>
-            <legend>Update Assignment</legend>
+                <p>1. To set a question, please type the question into the text area below.</p>
+                <p>
+                    2. Please ensure that solutions uploaded are working as the system will compile the
+                    solution uploaded.
+                </p>
+                <p>
+                    3. <a href="DownloadTestCase">
+                        <i class="glyphicon glyphicon-file"></i>Download
+                        this .xml file
+                    </a> and input the test cases in a similar format as presented inside.
+                </p>
 
-            <p>1. To update a question, please type the question into the text area below.</p>
-            <p>2. Please ensure that solutions uploaded are working as the system will compile the solution uploaded. </p>
-            <p>
-                3. <a href="XMLdownload/testcase.xml">
-                    <i class="glyphicon glyphicon-file"></i>Download
-                    this .xml file
-                </a> and input the test cases in a similar format as presented inside.
-            </p>
+                <span class="help-block">
+                    <span class="text-danger" id="slnRunError">@TempData["GeneralError"]</span>
+                </span>
 
-            <span class="help-block">
-                <span class="text-danger" id="slnRunError">@TempData["GeneralError"]</span>
-            </span>
+                <!--Assignment Title-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Assignment Name</label>
+                        @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control", @required = "required" })
+                        @Html.HiddenFor(m => Model.AssignmentId);
+                        <span class="help-block">@Html.ValidationMessage("AssgnTitle", new { @class = "text-danger" })</span>
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label>Assignment Name</label>
-                    @Html.TextBoxFor(m => Model.AssgnTitle, new { @class = "form-control", @required = "required" })
-                    <span class="help-block">@Html.ValidationMessage("AssgnTitle", new { @class = "text-danger" })</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label>
-                        Question
-                    </label>
-                    @Html.TextAreaFor(m => Model.Describe, new { @class = "col-md-12- form-control", @row = "4", @required = "required" })
-                    <span class="help-block">@Html.ValidationMessage("Describe", new { @class = "text-danger" })</span>
+                <!--Assignment Module-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Assignment Module</label>
+                        @{
+                            @Html.DropDownListFor(c => Model.ModuleId, new SelectList(Model.Modules, "ModuleCode", "ModuleName", Model.SelectedModuleId), new { @class = "form-control" })
+                        }
+                    </div>
                 </div>
-            </div>
-            <!--Upload solutions file-->
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
-                    <input id="solutionsFilUpload" name="solutionsFileUpload" class="form-control" type="file" style="border: solid 1px red" />
-                    <span class="help-block">
-                        <span class="text-danger" id="testCaseError">@TempData["SlnWarning"]</span>
-                    </span>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    @Html.CheckBoxFor(m => Model.IsTestCasePresent)
-                    This assignment requires testcases
-                    <input name="IsTestCasePresent" type="hidden" value="false" />
-                </div>
-            </div>
+                <!-- WYSIWYG Toolbar-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>
+                            Question
+                        </label>
+                        <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor">
+                            <div class="btn-group">
+                                <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" title="" data-original-title="Font"><i class="glyphicon glyphicon-font"></i><b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a data-edit="fontName Serif" style="font-family: 'Serif'">Serif</a></li>
+                                    <li><a data-edit="fontName Sans" style="font-family: 'Sans'">Sans</a></li>
+                                    <li><a data-edit="fontName Arial" style="font-family: 'Arial'">Arial</a></li>
+                                    <li><a data-edit="fontName Arial Black" style="font-family: 'Arial Black'">Arial Black</a></li>
+                                    <li><a data-edit="fontName Courier" style="font-family: 'Courier'">Courier</a></li>
+                                    <li><a data-edit="fontName Courier New" style="font-family: 'Courier New'">Courier New</a></li>
+                                    <li><a data-edit="fontName Comic Sans MS" style="font-family: 'Comic Sans MS'">Comic Sans MS</a></li>
+                                    <li><a data-edit="fontName Helvetica" style="font-family: 'Helvetica'">Helvetica</a></li>
+                                    <li><a data-edit="fontName Impact" style="font-family: 'Impact'">Impact</a></li>
+                                    <li><a data-edit="fontName Lucida Grande" style="font-family: 'Lucida Grande'">Lucida Grande</a></li>
+                                    <li><a data-edit="fontName Lucida Sans" style="font-family: 'Lucida Sans'">Lucida Sans</a></li>
+                                    <li><a data-edit="fontName Tahoma" style="font-family: 'Tahoma'">Tahoma</a></li>
+                                    <li><a data-edit="fontName Times" style="font-family: 'Times'">Times</a></li>
+                                    <li><a data-edit="fontName Times New Roman" style="font-family: 'Times New Roman'">Times New Roman</a></li>
+                                    <li><a data-edit="fontName Verdana" style="font-family: 'Verdana'">Verdana</a></li>
+                                </ul>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" title="" data-original-title="Font Size"><i class="glyphicon glyphicon-text-height"></i>&nbsp;<b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li>
+                                    <li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li>
+                                    <li><a data-edit="fontSize 1"><font size="1">Small</font></a></li>
+                                </ul>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-primary" data-edit="bold" title="" data-original-title="Bold (Ctrl/Cmd+B)"><i class="glyphicon glyphicon-bold"></i></a>
+                                <a class="btn btn-primary" data-edit="italic" title="" data-original-title="Italic (Ctrl/Cmd+I)"><i class="glyphicon glyphicon-italic"></i></a>
+                                <a class="btn btn-primary" data-edit="underline" title="" data-original-title="Underline (Ctrl/Cmd+U)"><i class="glyphicon glyphicon-text-width"></i></a>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-primary" data-edit="insertunorderedlist" title="" data-original-title="Bullet list"><i class="glyphicon glyphicon-list"></i></a>
+                                <a class="btn btn-primary" data-edit="insertorderedlist" title="" data-original-title="Number list"><i class="glyphicon glyphicon-list-alt"></i></a>
+                                <a class="btn btn-primary" data-edit="outdent" title="" data-original-title="Reduce indent (Shift+Tab)"><i class="glyphicon glyphicon-indent-left"></i></a>
+                                <a class="btn btn-primary" data-edit="indent" title="" data-original-title="Indent (Tab)"><i class="glyphicon glyphicon-indent-right"></i></a>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-primary" data-edit="justifyleft" title="" data-original-title="Align Left (Ctrl/Cmd+L)"><i class="glyphicon glyphicon-align-left"></i></a>
+                                <a class="btn btn-primary" data-edit="justifycenter" title="" data-original-title="Center (Ctrl/Cmd+E)"><i class="glyphicon glyphicon-align-center"></i></a>
+                                <a class="btn btn-primary" data-edit="justifyright" title="" data-original-title="Align Right (Ctrl/Cmd+R)"><i class="glyphicon glyphicon-align-right"></i></a>
+                                <a class="btn btn-primary" data-edit="justifyfull" title="" data-original-title="Justify (Ctrl/Cmd+J)"><i class="glyphicon glyphicon-align-justify"></i></a>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" title="" data-original-title="Hyperlink"><i class="glyphicon glyphicon-link"></i></a>
+                                <div class="dropdown-menu input-append">
+                                    <input class="span2" placeholder="URL" type="text" data-edit="createLink">
+                                    <button class="btn" type="button">Add</button>
+                                </div>
+                                <a class="btn btn-primary" data-edit="unlink" title="" data-original-title="Remove Hyperlink"><i class="glyphicon glyphicon-remove"></i></a>
 
-            <!--Upload test case-->
-            <div class="form-group" id="testCaseGroup">
-                <div class="col-md-12">
-                    <label class="control-label" for="SolutionsFile">Upload Test Cases</label>
-                    <input id="testCaseUpload" name="testCaseUpload" class="form-control" type="file" style="border: solid 1px red" />
-                    <span class="help-block">
-                        <span class="text-danger" id="testCaseError">@TempData["TcWarning"]</span>
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label class="control-label" for="daterange">Select start and end date</label>
-                    @Html.TextBoxFor(m => Model.DateRange, new { @class = "form-control", @placeholder = "Select start and end date", @readonly = "true" })
-                    @Html.HiddenFor(m => Model.StartDate)
-                    @Html.HiddenFor(m => Model.DueDate)
-                    <span class="help-block">@Html.ValidationMessage("DateRange", new { @class = "text-danger", @id = "DateError", @name = "DateError" })</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label class="control-label">
-                        Select classes to allocate assignment to
-                    </label>
-                    @Html.TextBoxFor(m => m.SelectedClasses, new { @class = "form-control", @placeholder = "Select classes...", @readonly = "true" })
-                    <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    <label class="control-label">
-                        Select maximum attempts allowed
-                    </label>
-                    @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "1", @max = "10", @type = "number" })
-                    <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
-                </div>
-            </div>
-
-            <!-- Modal for choosing class-->
-
-            <div name="classModal" id="classModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title">Choose classes to allocate assignment to</h4>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-primary" title="" id="pictureBtn" data-original-title="Insert picture (or just drag &amp; drop)"><i class="glyphicon glyphicon-picture"></i></a>
+                                <input type="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" style="opacity: 0; position: absolute; top: 0px; left: 0px; width: 37px; height: 30px;">
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-primary" data-edit="undo" title="" data-original-title="Undo (Ctrl/Cmd+Z)"><i class="glyphicon glyphicon-backward"></i></a>
+                                <a class="btn btn-primary" data-edit="redo" title="" data-original-title="Redo (Ctrl/Cmd+Y)"><i class="glyphicon glyphicon-forward"></i></a>
+                            </div>
                         </div>
 
-                        <div class="modal-body">
-                            @{
-                                for (var i = 0; i < Model.ClassList.Count(); i++)
-                                {
-                                    @Html.HiddenFor(m => Model.ClassList[i].ClassId)
-                                    @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
-                                    @Model.ClassList[i].ClassName
-                                }
-                            }
-                        </div>
-                        <div class="modal-footer">
-                            <button name="modalSelect" id="modalSelect" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                    </div>
+                </div>
+
+                <!--Editor-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div id="editor" name="editor" class="well ">
                         </div>
                     </div>
                 </div>
-            </div>
 
+                @Html.HiddenFor(m => Model.Describe)
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
-                    <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
-                    <a href="ManageAssignments" class="btn btn-danger pull-right">Delete</a>
+                <!--Checkbox to see if they need to update the solution-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.CheckBoxFor(m => Model.UpdateSolution)
+                        This assignment solution needs to be updated
+                        <input name="UpdateSolution" type="hidden" value="false" />
+                    </div>
                 </div>
 
-            </div>
-        </fieldset>
+                <div id="solutionGroup">
+                    <!--Upload solutions file-->
+                    <div class="form-group" id="solutionGroup">
+                        <div class="col-md-12">
+                            <label class="control-label" for="SolutionsFile">Upload Solutions File</label>
+                            <input id="solutionsFilUpload" name="solutionsFileUpload" class="form-control" type="file" style="border: solid 1px red" />
+                            <span class="help-block">
+                                <span class="text-danger" id="testCaseError">@TempData["SlnWarning"]</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!--Test case checkbox-->
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @Html.CheckBoxFor(m => Model.IsTestCasePresent)
+                            This assignment requires testcases
+                            <input name="IsTestCasePresent" type="hidden" value="false" />
+                        </div>
+                    </div>
+
+                    <!--Upload test case-->
+                    <div class="form-group" id="testCaseGroup">
+                        <div class="col-md-12">
+                            <label class="control-label" for="SolutionsFile">Upload Test Cases</label>
+                            <input id="testCaseUpload" name="testCaseUpload" class="form-control" type="file" style="border: solid 1px red" />
+                            <span class="help-block">
+                                <span class="text-danger" id="testCaseError">@TempData["TcWarning"]</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Start Date-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label" for="StartDate">Select Assignment Start Date</label>
+                        @Html.TextBoxFor(m => Model.StartDate, new { @class = "form-control", @placeholder = "Select start date", @readonly = "true" })
+                    </div>
+                </div>
+
+                <!--Due Date-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label" for="DueDate">Select Assignment Due Date</label>
+                        @Html.TextBoxFor(m => Model.DueDate, new { @class = "form-control", @placeholder = "Select due date", @readonly = "true" })
+                        <span class="help-block">@Html.ValidationMessage("DueDate", new { @class = "text-danger", @id = "DateError", @name = "DateError" })</span>
+                    </div>
+                </div>
+
+                <!--Button for resetting the datepickers-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="button" id="resetBtn" name="resetBtn" class="btn btn-primary" value="Reset Dates" />
+                        <input type="button" id="resetDefaultDate" name="resetDefaultDate" class="btn btn-primary" value="Reset to Default Date" />
+                    </div>
+                </div>
+
+                <!--Classes-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">
+                            Select classes to allocate assignment to
+                        </label>
+                        @Html.TextBoxFor(m => m.SelectedClasses, new { @class = "form-control", @placeholder = "Select classes...", @readonly = "true" })
+                        <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <!--Max Attempts-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">
+                            Select maximum attempts allowed
+                        </label>
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "1", @max = "10", @type = "number" })
+                        <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+
+                <!--Modal for selecting clas-->
+                <div name="classModal" id="classModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Choose classes to allocate assignment to</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                @{
+                                    for (var i = 0; i < Model.ClassList.Count(); i++)
+                                    {
+                                        <div>
+                                            @Html.HiddenFor(m => Model.ClassList[i].ClassId)
+                                            @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
+                                            @Model.ClassList[i].ClassName
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button name="modalSelect" id="modalSelect" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="submit" id="submitBtn" name="submitBtn" value="Submit" class="btn btn-primary" />
+                        <a href="javascript:history.back()" class="btn btn-default">Cancel</a>
+                        <a href="ManageAssignments" class="btn btn-danger pull-right">Delete</a>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
     </div>
-</div>
-}
+                                    }            

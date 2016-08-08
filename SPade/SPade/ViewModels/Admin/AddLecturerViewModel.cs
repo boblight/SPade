@@ -1,4 +1,5 @@
 ﻿using SPade.Models.DAL;
+using SPade.ViewModels.Lecturer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -27,5 +28,7 @@ namespace SPade.ViewModels.Admin
         public List<Class> Classes { get; set; }
         public string ClassName { get; set; }
         public int ClassID { get; set; }
+        public string SelectedClasses { get; set; }
+        public List<AssignmentClass> ClassList { get; set; }
     }
 }

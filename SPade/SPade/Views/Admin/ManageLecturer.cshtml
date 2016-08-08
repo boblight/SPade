@@ -52,7 +52,7 @@
                                 <td>@Html.DisplayFor(Model => item.Email)</td>
                                 <td>@Html.DisplayFor(Model => item.CreatedBy)</td>
                                 <td>@Html.DisplayFor(Model => item.NumClasses)</td>
-                                <td>@Html.ActionLink("Update", "UpdateLecturer", "Admin", new { StaffID = item.StaffID }, new { id = "UpdateLecturer", @class = "btn btn-primary" })</td>
+                                <td><a href="/admin/updatelecturer/@item.StaffID.ToLower()" class="btn btn-primary">Update</a></td>
                             </tr>                      
                              
                          }
