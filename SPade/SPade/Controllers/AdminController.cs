@@ -853,38 +853,42 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateModule(AddModuleViewModel model, string command)
         {
-            if (command.Equals("Update"))
+            try
             {
-                Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
-                module.ModuleName = model.ModuleName;
-                module.UpdatedAt = DateTime.Now;
-                module.UpdatedBy = User.Identity.Name;
-                db.SaveChanges();
-                return RedirectToAction("Dashboard");
-            }
-            else if (command.Equals("Delete"))
-            {
-                //check if there is any assignment that is still tied to it
-                if (db.Assignments.ToList().FindAll(a => a.ModuleCode == model.ModuleCode && a.DeletedAt == null).Count == 0)
+                if (command.Equals("Update"))
                 {
                     Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
-                    module.DeletedAt = DateTime.Now;
-                    module.DeletedBy = User.Identity.Name;
+                    module.ModuleName = model.ModuleName;
+                    module.UpdatedAt = DateTime.Now;
+                    module.UpdatedBy = User.Identity.Name;
                     db.SaveChanges();
-
-                    return RedirectToAction("ManageModule");
                 }
-                else
+                else if (command.Equals("Delete"))
                 {
-                    ModelState.AddModelError("DeleteError", "An assignment belonging to this module is still active, please delete that assignment before attempting to "
-                        + "delete this module.");
-                    return View(model);
+                    //check if there is any assignment that is still tied to it
+                    if (db.Assignments.ToList().FindAll(a => a.ModuleCode == model.ModuleCode && a.DeletedAt == null).Count == 0)
+                    {
+                        Module module = db.Modules.ToList().Find(m => m.ModuleCode == model.ModuleCode);
+                        module.DeletedAt = DateTime.Now;
+                        module.DeletedBy = User.Identity.Name;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("DeleteError", "An assignment belonging to this module is still active, please delete that assignment before attempting to "
+                            + "delete this module.");
+                        return View(model);
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
+                TempData["GeneralError"] = "Failed to update module. Please try again !";
                 return View(model);
             }
+
+            //run successfully
+            return RedirectToAction("ManageModule");
         }
 
         //Manage + Add + Update/Delete Course
