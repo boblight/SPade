@@ -883,7 +883,7 @@ namespace SPade.Controllers
             }
             catch (Exception ex)
             {
-                TempData["GeneralError"] = "Failed to update module. Please try again !";
+                TempData["Error"] = "Failed to update module. Please try again !";
                 return View(model);
             }
 
