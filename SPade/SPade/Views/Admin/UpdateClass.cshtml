@@ -1,7 +1,7 @@
 ﻿@model SPade.ViewModels.Admin.UpdateClassViewModel
 
 @{
-    ViewBag.Title = "UpdateClass";
+    ViewBag.Title = "Update Class";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -12,8 +12,9 @@
 
     <div class="col-md-6 col-md-offset-3 form-horizontal">
         <fieldset>
-            @Html.AntiForgeryToken()
             <legend>Update Class</legend>
+
+            @Html.ValidationSummary("", new { @class = "text-danger" })
 
             @Html.Hidden("ClassID")
 
@@ -70,4 +71,4 @@
     @Scripts.Render("~/bundles/jqueryval")
 }
 
-    }
+}
