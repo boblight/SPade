@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace SPade.Grading
 {
@@ -19,31 +20,47 @@ namespace SPade.Grading
             switch (language)
             {
                 case "Java":
-                    //compile java program
-                    compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
+                    try
+                    {
+                        //compile java program
+                        compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
 
-                    compileInfo.CreateNoWindow = true;
-                    compileInfo.UseShellExecute = false;
-                    compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
-                    compile = Process.Start(compileInfo);
+                        compileInfo.CreateNoWindow = true;
+                        compileInfo.UseShellExecute = false;
+                        compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
+                        compile = Process.Start(compileInfo);
 
-                    compile.WaitForExit(5000);//compilation process ends
-
+                        compile.WaitForExit(5000);//compilation process ends
+                        
+                        //procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
+                    }
+                    catch (Exception e)
+                    {
+                        pathToExecutable = "error";//signal that compilation error
+                        break;
+                    }
                     pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
-                    //procInfo = new ProcessStartInfo("java", "-cp " + filePath + " " + fileName.ToLower() + "." + fileName);
                     break;
                 case "C#":
-                    //compile c# program
-                    compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", fileName + ".cs");
-                    compileInfo.CreateNoWindow = true;
-                    compileInfo.UseShellExecute = false;
-                    compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
-                    compile = Process.Start(compileInfo);
+                    try
+                    {
+                        //compile c# program
+                        compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", fileName + ".cs");
+                        compileInfo.CreateNoWindow = true;
+                        compileInfo.UseShellExecute = false;
+                        compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
+                        compile = Process.Start(compileInfo);
 
-                    compile.WaitForExit();//compilation process ends
+                        compile.WaitForExit();//compilation process ends
 
+                        //procInfo = new ProcessStartInfo(filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe");
+                    }
+                    catch (Exception e)
+                    {
+                        pathToExecutable = "error";//signal that compilation error
+                        break;
+                    }
                     pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".exe";
-                    //procInfo = new ProcessStartInfo(filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe");
                     break;
                 default:
                     //should never reach default

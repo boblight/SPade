@@ -81,6 +81,7 @@ namespace SPade.Controllers
                     //if result is more than 1 then is error code
                     //2 for program failure
                     //3 for infinite loop
+                    //4 for compilation error
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
                     //decimal result = grader.grade();
                     result = sandBoxedGrading.runSandboxedGrading();
@@ -246,6 +247,11 @@ namespace SPade.Controllers
             {
                 ModelState.AddModelError("SubmissionError", "Your program has encountered an infinite loop. Please check through your program and make appropriate " +
                     "modification.");
+                submission.Grade = 0;
+            }
+            else if (submission.Grade == 4)
+            {
+                ModelState.AddModelError("SubmissionError", "Compilation error has occured. Please check through your code for syntax errors or missing parenthesis.");
                 submission.Grade = 0;
             }
             else if (submission.Grade < 1)
