@@ -9,7 +9,6 @@ namespace SPade.ViewModels.Admin
 {
     public class UpdateStudentViewModel
     {
-
         public string AdminNo { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
@@ -17,7 +16,5 @@ namespace SPade.ViewModels.Admin
         public List<Class> Classes { get; set; }
         public string ClassName { get; set; }
         public int ClassID { get; set; }
-
-
     }
 }

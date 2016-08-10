@@ -32,7 +32,7 @@
                     <tr>
                         <th>Class</th>
                         <th>No. of Students</th>
-                        <th class="sorter-false">View Class</th>
+                        <th class="sorter-false">Manage Class</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,9 +46,7 @@
                             <td>
                                 @Html.DisplayFor(model => item.NumberOfStudents)
                             </td>
-                            <td>
-                                @Html.ActionLink("View Class", "ViewStudentsByClass", "Lecturer", new { ClassID = item.Id }, new { @id = "classId", @class = "btn btn-primary" })
-                            </td>
+                            <td><a href="/Lecturer/ViewStudentsByClass/@item.Id" class="btn btn-primary">Manage Class</a></td>
                         </tr>
                     }
                 </tbody>

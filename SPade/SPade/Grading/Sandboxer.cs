@@ -21,10 +21,11 @@ namespace SPade.Grading
         private List<object> testcases = new List<object>();
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
+        private Compiler c;
         //private bool isTestCasePresnt = false;
 
-        //const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
-        const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
+        const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
+        //const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
         //const string pathToUntrusted = @"C:/inetpub/wwwroot/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
@@ -38,9 +39,9 @@ namespace SPade.Grading
         //constructor
         public Sandboxer(string filePath, string fileName, int assgnId, string language)
         {
-            Compiler c = new Compiler(language, filePath, fileName);
+            c = new Compiler(language, filePath, fileName);
             this.assgnId = assgnId;
-            
+
             parameters[0] = c.getExePath();
             parameters[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
             parameters[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
@@ -49,6 +50,11 @@ namespace SPade.Grading
 
         public decimal runSandboxedGrading()
         {
+            //if (c.getExePath().Equals("error"))
+            //{
+            //    return 4;
+            //}
+
             //Code taken from: https://msdn.microsoft.com/en-us/library/bb763046(v=vs.110).aspx
 
             //Setting the AppDomainSetup. It is very important to set the ApplicationBase to a folder 
@@ -91,7 +97,7 @@ namespace SPade.Grading
 
             return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
         }
-        
+
         public decimal ExecuteUntrustedCode(string assemblyName, string typeName, string entryPoint, string[] parameters)
         {
             //code taken from: https://msdn.microsoft.com/en-us/library/bb763046(v=vs.110).aspx

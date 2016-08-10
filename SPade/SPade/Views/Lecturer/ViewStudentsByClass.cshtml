@@ -49,9 +49,7 @@
                                     <td>
                                         @Html.DisplayFor(Model => s.ContactNo)
                                     </td>
-                                    <td>
-                                        @Html.ActionLink("Update Student", "UpdateStudent", "Lecturer", new { StudentId = s.AdminNo }, new { @id = "studentId", @class = "btn btn-primary" })
-                                    </td>
+                                    <td><a href="/Lecturer/UpdateStudent/@s.AdminNo.ToLower()" class="btn btn-primary">Update Student</a></td>
                                 </tr>
                             }
                         }
