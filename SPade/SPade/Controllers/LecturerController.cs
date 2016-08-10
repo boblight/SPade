@@ -1052,7 +1052,8 @@ namespace SPade.Controllers
                             testCaseUpload.SaveAs(filePath);
 
                             //get the language and pass into grader
-                            Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
+                            //Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
+                            Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
 
                             //exit codes returned from grader 
                             //1 is successfully done everything
@@ -1060,7 +1061,8 @@ namespace SPade.Controllers
                             //3 is program has failed to run
                             //4 is program was caught in an infinite loop
                             //5 is Unsupported Language Type
-                            int exitCode = g.RunLecturerSolution();
+                            //int exitCode = g.RunLecturerSolution();
+                            int exitCode = (int)sandbox.runSandboxedGrading();
 
                             if (exitCode == 1)
                             {
