@@ -101,9 +101,9 @@ namespace SPade.Controllers
 
         }
 
-        public ActionResult ViewStudentsByClass(string classID)
+        public ActionResult ViewStudentsByClass(string Id)
         {
-            int cID = Int32.Parse(classID);
+            int cID = Int32.Parse(Id);
 
             List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
             List<Student> sList = new List<Student>();
