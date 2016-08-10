@@ -264,8 +264,8 @@ namespace SPade.Controllers
                 {
                     ClassName = model.ClassName,
                     CourseID = model.CourseID,
-                    CreatedBy = "Admin",
-                    UpdatedBy = "Admin",
+                    CreatedBy = User.Identity.Name,
+                    UpdatedBy = User.Identity.Name,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
 
@@ -693,7 +693,7 @@ namespace SPade.Controllers
                 {
                     if (C.ClassID.Equals(ClassID))
                     {
-                        C.UpdatedBy = "ADMIN";
+                        C.UpdatedBy = User.Identity.Name;
                         C.UpdatedAt = DateTime.Now;
                         try
                         {
@@ -734,7 +734,7 @@ namespace SPade.Controllers
                 {
                     if (C.ClassID.Equals(ClassID))
                     {
-                        C.DeletedBy = "ADMIN";
+                        C.DeletedBy = User.Identity.Name;
                         C.DeletedAt = DateTime.Now;
                         try
                         {
@@ -1114,6 +1114,6 @@ namespace SPade.Controllers
                 }
                 return View(model);
             }
-        }//
+        }
     }
 }

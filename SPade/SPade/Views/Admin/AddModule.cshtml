@@ -41,7 +41,7 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <label>Programming Language</label>
-                        @Html.DropDownListFor(m => Model.ProgLangId, new SelectList(Model.Languages, "LanguageId", "LangageType"), new { @class = "form-control" })
+                        @Html.DropDownListFor(m => Model.ProgLangId, new SelectList(Model.Languages, "LanguageId", "LangageType"), "--Select a Programming Language--", new { @class = "form-control" })
                     </div>
                 </div>
 
