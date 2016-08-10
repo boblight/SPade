@@ -88,37 +88,22 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddOneClass(AddClassViewModel model)
+        public ActionResult AddOneClass(ViewModels.Admin.AddClassViewModel model, FormCollection formCollection)
         {
-            //Get all classes
-            List<Course> allCourses = db.Courses.ToList();
-            model.Courses = allCourses;
-            List<Lecturer> allLecturer = db.Lecturers.ToList();
-            model.Lecturers = allLecturer;
-
             try
             {
                 var class1 = new Class()
                 {
                     ClassName = model.ClassName,
-                    CourseID = model.CourseID,
+                    CourseID = int.Parse(formCollection["CourseID"].ToString()),
                     CreatedBy = User.Identity.Name,
                     UpdatedBy = User.Identity.Name,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
-
-                };
-                var lec_class = new Lec_Class()
-                {
-                    ClassID = model.ClassID,
-                    StaffID = model.StaffID,
-
                 };
 
                 db.Classes.Add(class1);
-                db.Lec_Class.Add(lec_class);
                 db.SaveChanges();
-
             }
             catch (Exception e)
             {
