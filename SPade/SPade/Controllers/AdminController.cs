@@ -124,7 +124,7 @@ namespace SPade.Controllers
             catch (Exception e)
             {
                 //if fail
-                TempData["Error"] = "Failed to save class to database. Pease try again!";
+                TempData["Error"] = "Failed to save class to database. Pease try again !";
                 return View(model);
             }
 
@@ -132,59 +132,127 @@ namespace SPade.Controllers
             return RedirectToAction("Dashboard", "Admin");
         }
 
-        public ActionResult UpdateClass(string id)
+        public ActionResult UpdateClass(string ClassID)
         {
-            ViewModels.Admin.UpdateClassViewModel model = new ViewModels.Admin.UpdateClassViewModel();
+            UpdateClassViewModel model = new UpdateClassViewModel();
+            //Get all courses
+            List<Course> allCourses = db.Courses.ToList();
+            model.Courses = allCourses;
+
+            //Get all lecturer
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
+
+            List<Lec_Class> all_Lec_Class = db.Lec_Class.ToList();
+            model.Lec_Classes = all_Lec_Class;
+
+
+            //Get Class           
+            List<Class> Classes = db.Classes.ToList();
+
+            foreach (Class C in Classes)
+            {
+                if (C.ClassID.Equals(ClassID))
+                {
+                    model.CourseID = C.CourseID;
+                    model.ClassID = C.ClassID;
+                    model.ClassName = C.ClassName;
+                }
+            }
+            foreach (Lec_Class LC in all_Lec_Class)
+            {
+                if (LC.ClassID.Equals(ClassID))
+                {
+                    model.StaffID = LC.StaffID;
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateClass(UpdateClassViewModel model, string command, string ClassID)
+        {
 
             //Get all courses
             List<Course> allCourses = db.Courses.ToList();
             model.Courses = allCourses;
 
-            //Get class
-            Class c = db.Classes.ToList().Find(cl => cl.ClassID == int.Parse(id));
+            //Get all lecturer
+            List<Lecturer> allLecturer = db.Lecturers.ToList();
+            model.Lecturers = allLecturer;
 
-            model.ClassName = c.ClassName;
-            model.ClassID = c.ClassID;
-            model.CourseID = c.CourseID;
-            model.Courses = allCourses;
-            return View(model);
+            //Get all lec_class
+            List<Lec_Class> all_Lec_Class = db.Lec_Class.ToList();
+            model.Lec_Classes = all_Lec_Class;
 
-        }
+            //Get Class           
+            List<Class> Classes = db.Classes.ToList();
 
-        [HttpPost]
-        public ActionResult UpdateClass(ViewModels.Admin.UpdateClassViewModel model, string command, string id)
-        {
-            List<Course> allCourses = db.Courses.ToList();
-            model.Courses = allCourses;
-            int classId = int.Parse(id);
-            Class c = db.Classes.Where(cl => cl.ClassID == classId).FirstOrDefault();
-
-            //Update Class information
             if (command.Equals("Update"))
             {
-                c.ClassID = model.ClassID;
-                c.ClassName = model.ClassName;
-                c.CourseID = model.CourseID;
-                db.SaveChanges();
-                return RedirectToAction("ManageClass");
+                foreach (Class C in Classes)
+                {
+                    if (C.ClassID.Equals(ClassID))
+                    {
+                        C.UpdatedBy = User.Identity.GetUserName();
+                        C.UpdatedAt = DateTime.Now;
+                        try
+                        {
+                            TryUpdateModel(C, "", new string[] { "CourseID", "ClassName", "UpdatedBy", "UpdatedAt" });
+                            db.SaveChanges();
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Update unsuccessful');</script>";
+                        }
+                    };
+                }
+                foreach (Lec_Class LC in all_Lec_Class)
+                {
+                    if (LC.ClassID.Equals(ClassID))
+                    {
+                        try
+                        {
+                            TryUpdateModel(LC, "", new string[] { "StaffID", "ClassID" });
+                            db.SaveChanges();
+                            //Show alert
+                            TempData["msg"] = "<script>alert('Updated successfully');</script>";
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Update unsuccessful');</script>";
+                        }
+                    };
+                }
             }
-            //Delete Class
             else
             {
-                if (db.Students.Where(s => s.ClassID == classId).Count() == 0 && db.Lec_Class.Where(lc=>lc.ClassID==classId).Count()==0)
+                foreach (Class C in Classes)
                 {
-                    c.DeletedAt = DateTime.Now;
-                    c.DeletedBy = User.Identity.Name;
-
-                    db.SaveChanges();
-                    return RedirectToAction("ManageClass");
-                }
-                else
-                {
-                    ModelState.AddModelError("DeleteError", "There are still students or lecturers tied to this class. You have to purge data from the database before deleting.");
-                    return View(model);
+                    if (C.ClassID.Equals(ClassID))
+                    {
+                        C.DeletedBy = User.Identity.GetUserName();
+                        C.DeletedAt = DateTime.Now;
+                        try
+                        {
+                            TryUpdateModel(C, "", new string[] { "DeletedBy", "DeletedAt" });
+                            db.SaveChanges();
+                            TempData["msg"] = "<script>alert('Deleted successfully');</script>";
+                        }
+                        catch (DataException /* dex */)
+                        {
+                            //Log the error (uncomment dex variable name and add a line here to write a log.
+                            ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                            TempData["msg"] = "<script>alert('Unable to delete successfully');</script>";
+                        }
+                    };
                 }
             }
+            return View(model);
         }
 
         //Common method for BulkUploadStudent/BulkUploadLecturer
@@ -709,7 +777,6 @@ namespace SPade.Controllers
             }
         }
 
-
         //Manage + Add + Update/Delete Modules 
         public ActionResult ManageModule()
         {
@@ -765,7 +832,7 @@ namespace SPade.Controllers
             catch (Exception ex)
             {
                 addModuleVM.Languages = db.ProgLanguages.ToList();
-                TempData["Error"] = "Failed to save module. Please try again!";
+                TempData["Error"] = "Failed to save module. Please try again !";
                 return View(addModuleVM);
             }
 
@@ -816,7 +883,7 @@ namespace SPade.Controllers
             }
             catch (Exception ex)
             {
-                TempData["GeneralError"] = "Failed to update module. Please try again!";
+                TempData["Error"] = "Failed to update module. Please try again !";
                 return View(model);
             }
 
@@ -873,7 +940,7 @@ namespace SPade.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Failed to save module. Please try again!";
+                TempData["Error"] = "Failed to save module. Please try again !";
                 return View(aCVM);
             }
             return RedirectToAction("ManageCourse", "Admin");
