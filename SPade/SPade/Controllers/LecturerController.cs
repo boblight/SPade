@@ -59,7 +59,7 @@ namespace SPade.Controllers
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
-           
+
 
             string loggedInLecturer = User.Identity.GetUserName();
 
@@ -85,7 +85,7 @@ namespace SPade.Controllers
 
                 ManageClassesViewModel e = new ManageClassesViewModel();
                 //match the class ID of student wit hthe class ID of the managed Classes
-                var count = db.Students.Where(s => s.ClassID == c.ClassID).Where(s=>s.DeletedAt==null).Count();
+                var count = db.Students.Where(s => s.ClassID == c.ClassID).Where(s => s.DeletedAt == null).Count();
 
                 Course cs = db.Courses.Where(cx => cx.CourseID == c.CourseID).First();
 
@@ -1072,10 +1072,8 @@ namespace SPade.Controllers
                                     TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
                                     return View(addAssgn);
                                 }
-
                                 //delete the uploaded sln
                                 DeleteFile(fileName, assignmentTitle, false);
-
                             }//end of run succesfully method 
 
                             else if (exitCode == 2)
@@ -1141,7 +1139,6 @@ namespace SPade.Controllers
                     return View(addAssgn);
                 }
             }//end of run with testcase
-
             //run without testcase 
             else if (addAssgn.IsTestCasePresent == false)
             {
@@ -1407,13 +1404,13 @@ namespace SPade.Controllers
 
             List<Lec_Class> lec_classes = db.Lec_Class.Where(lc => lc.StaffID == loggedInLecturer).ToList();
 
-            foreach(Lec_Class lc in lec_classes)
+            foreach (Lec_Class lc in lec_classes)
             {
-                List<Class> temp= db.Classes.Where(c => c.DeletedAt == null).Where(c => c.ClassID == lc.ClassID).ToList();
+                List<Class> temp = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.ClassID == lc.ClassID).ToList();
                 managedClasses.AddRange(temp);
             }
-            
-                      
+
+
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
 

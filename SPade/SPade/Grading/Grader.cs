@@ -28,8 +28,9 @@ namespace SPade.Grading
         //Lecturer use this
         public Grader(string filePath, string fileName, string assignmentTitle, string language, bool isTestCasePresent)
         {
-            c = new Compiler(language, filePath, fileName);
-
+            //c = new Compiler(language, filePath, fileName);
+            this.filePath = filePath;
+            this.fileName = fileName;
             //fileName is the subfolder that contains the solution
             //this is just the assignment title
             this.assignmentTitle = assignmentTitle;
@@ -101,7 +102,6 @@ namespace SPade.Grading
                     processForJava();
                     break;
             }
-
 
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
