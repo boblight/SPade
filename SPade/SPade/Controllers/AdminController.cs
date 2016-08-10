@@ -85,7 +85,6 @@ namespace SPade.Controllers
             List<Lecturer> allLecturer = db.Lecturers.ToList();
             model.Lecturers = allLecturer;
             return View(model);
-
         }
 
         [HttpPost]
@@ -103,8 +102,8 @@ namespace SPade.Controllers
                 {
                     ClassName = model.ClassName,
                     CourseID = model.CourseID,
-                    CreatedBy = "Admin",
-                    UpdatedBy = "Admin",
+                    CreatedBy = User.Identity.Name,
+                    UpdatedBy = User.Identity.Name,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
 
