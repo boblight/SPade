@@ -57,7 +57,7 @@ namespace SPade.Grading
             compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
             compile = Process.Start(compileInfo);
 
-            compile.WaitForExit();//compilation process ends
+            compile.WaitForExit(5000);//compilation process ends
 
             //run program with Java
             //pathToExecutable = "java " + "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
@@ -75,7 +75,7 @@ namespace SPade.Grading
             compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
             compile = Process.Start(compileInfo);
 
-            compile.WaitForExit();//compilation process ends
+            compile.WaitForExit(5000);//compilation process ends
 
             //pathToExecutable = filePath + "/" + fileName.ToLower() + "/" + fileName + ".exe";
             procInfo = new ProcessStartInfo("\"C:/Program Files/Sandboxie/Start.exe\"", fileName + ".exe");
@@ -233,33 +233,33 @@ namespace SPade.Grading
 
         public int RunLecturerSolution()
         {
-            //switch (language)
-            //{
-            //    case "Java":
-            //        processForJava();
-            //        break;
-            //    case "C#":
-            //        processForCS();
-            //        break;
-            //    default:
-            //        processForJava();
-            //        break;
-            //}
+            switch (language)
+            {
+                case "Java":
+                    processForJava();
+                    break;
+                case "C#":
+                    processForCS();
+                    break;
+                default:
+                    processForJava();
+                    break;
+            }
 
-            if (language == "Java")
-            {
-                proc = new Process();
-                procInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/java.exe", c.getExePath());
-            }
-            else if (language == "C#")
-            {
-                proc = new Process();
-                procInfo = new ProcessStartInfo(c.getExePath());
-            }
-            else
-            {
-                return 5;
-            }
+            //if (language == "Java")
+            //{
+            //    proc = new Process();
+            //    procInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/java.exe", c.getExePath());
+            //}
+            //else if (language == "C#")
+            //{
+            //    proc = new Process();
+            //    procInfo = new ProcessStartInfo(c.getExePath());
+            //}
+            //else
+            //{
+            //    return 5;
+            //}
 
             procInfo.CreateNoWindow = true;
             procInfo.UseShellExecute = false;
