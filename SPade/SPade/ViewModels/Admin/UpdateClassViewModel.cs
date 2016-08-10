@@ -8,8 +8,6 @@ namespace SPade.ViewModels.Admin
 {
     public class UpdateClassViewModel
     {
-        internal string StaffID;
-
         public int ClassID { get; set; }
         public string ClassName { get; set; }
         public int CourseID { get; set; }
