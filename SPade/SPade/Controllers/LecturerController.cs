@@ -136,7 +136,7 @@ namespace SPade.Controllers
             ViewModels.Lecturer.UpdateStudentViewModel model = new ViewModels.Lecturer.UpdateStudentViewModel();
 
             //Get all classes
-            List<Class> allClasses = db.Classes.ToList();
+            List<Class> allClasses = db.Classes.Where(cl => cl.DeletedAt==null).ToList();
 
             foreach (Class c in allClasses)
             {
@@ -259,7 +259,7 @@ namespace SPade.Controllers
         public ActionResult AddOneStudent()
         {
             AddStudentViewModel model = new AddStudentViewModel();
-            List<Class> allClasses = db.Classes.ToList();
+            List<Class> allClasses = db.Classes.Where(cl => cl.DeletedAt == null).ToList();
 
             foreach (Class c in allClasses)
             {
@@ -334,6 +334,7 @@ namespace SPade.Controllers
                             where ca.AssignmentID.Equals(a.AssignmentID)
                             join cl in db.Lec_Class on c.ClassID equals cl.ClassID
                             where cl.StaffID.Equals(lecturerID)
+                            where c.DeletedAt==null
                             select c;
 
                 classAssgn = query.ToList();
@@ -411,13 +412,13 @@ namespace SPade.Controllers
             List<Course> courseList = new List<Course>();
 
             //get the assignment details from the DB
-            assgn = db.Assignments.Where(a => a.AssignmentID == i).FirstOrDefault();
+            assgn = db.Assignments.Where(a => a.AssignmentID == i).Where(assn => assn.DeletedAt == null).FirstOrDefault();
 
             //get all courses
             courseList = db.Courses.ToList();
 
             //get the classes that this lecturer manages 
-            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) select c;
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt==null select c;
             classList = query.ToList();
 
             //now we get the classses that are assigned this assignment 
@@ -453,7 +454,7 @@ namespace SPade.Controllers
             }
 
             //get all the modules
-            modList = db.Modules.ToList();
+            modList = db.Modules.Where(mod => mod.DeletedAt==null).ToList();
 
             //set the data for the assignment 
             model.AssgnTitle = assgn.AssgnTitle;
@@ -947,7 +948,7 @@ namespace SPade.Controllers
             var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
-            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) select c;
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt==null select c;
             managedClasses = query.ToList();
 
             //we loop through the managedClasses to fill up the assignmentclass -> which is used to populate checkboxes

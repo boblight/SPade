@@ -633,7 +633,7 @@ namespace SPade.Controllers
             ViewModels.Admin.UpdateStudentViewModel model = new ViewModels.Admin.UpdateStudentViewModel();
 
             //Get all classes
-            List<Class> allClasses = db.Classes.ToList();
+            List<Class> allClasses = db.Classes.Where(cl=>cl.DeletedAt==null).ToList();
 
             foreach (Class c in allClasses)
             {
@@ -1016,6 +1016,13 @@ namespace SPade.Controllers
             pvm.allAssignments = db.Assignments.ToList();
             pvm.allSubmission = db.Submissions.ToList();
             pvm.allClasses = db.Classes.ToList();
+            foreach (Class c in pvm.allClasses)
+            {
+                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String className = courseAbbr + "/" + c.ClassName;
+
+                c.ClassName = className;
+            }
             pvm.classAssgnRel = db.Class_Assgn.ToList();
 
             return View(pvm);
