@@ -748,7 +748,7 @@ namespace SPade.Controllers
             catch (Exception ex)
             {
                 addModuleVM.Languages = db.ProgLanguages.ToList();
-                TempData["Error"] = "Failed to save module. Please try again!";
+                TempData["Error"] = "Failed to save module. Please try again later with a valid module code.";
                 return View(addModuleVM);
             }
 
