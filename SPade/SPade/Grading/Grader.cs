@@ -35,8 +35,7 @@ namespace SPade.Grading
             //this is just the assignment title
             this.assignmentTitle = assignmentTitle;
             this.isTestCasePresnt = isTestCasePresent;
-            this.language = language; 
-
+            this.language = language;
         }//end of constructor
 
         //student use this
