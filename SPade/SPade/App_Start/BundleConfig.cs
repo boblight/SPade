@@ -36,7 +36,8 @@ namespace SPade
                       "~/Scripts/indexscript.js"));
 
             bundles.Add(new StyleBundle("~/bundles/indexstyle").Include(
-                      "~/Content/indexstyle.css"));
+                      "~/Content/indexstyle.css",
+                      new CssRewriteUrlTransform()));
 
             bundles.Add(new ScriptBundle("~/bundles/script").Include(
                         "~/Scripts/jquery-1.10.2.min.js",
@@ -63,7 +64,8 @@ namespace SPade
                     "~/Scripts/initializetablesorter.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/tablestyle").Include(
-                      "~/Content/theme.bootstrap.css" //css for tablesorter
+                      "~/Content/theme.bootstrap.css",
+                      new CssRewriteUrlTransform()//css for tablesorter
             ));
 
         }
