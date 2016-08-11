@@ -260,3 +260,15 @@ ModelManifest.xml
 /SPade/SPade/Web.TestIIS.config
 /SPade/SPade/Properties/PublishProfiles/IIS.pubxml
 /SPade/SPade/Properties/PublishProfiles/TestIIS.pubxml
+/SPade/SPade/TempStudentCSV/BulkAddStudent3.csv
+/SPade/SPade/TempStudentCSV/BulkAddStudent2.csv
+/SPade/SPade/TempStudentCSV/BulkAddStudent1.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer8.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer7.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer6.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer5.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer4.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer3.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer2.csv
+/SPade/SPade/TempLecturerCSV/BulkAddLecturer1.csv
+/SPade/SPade/App_Data/Uploads/BulkAddStudent.csv
