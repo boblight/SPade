@@ -51,11 +51,11 @@
       <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9f5eeeebc011402e, processorArchitecture=MSIL">
+    <Reference Include="Hangfire.Core, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Hangfire.Core.1.6.2\lib\net45\Hangfire.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9f5eeeebc011402e, processorArchitecture=MSIL">
+    <Reference Include="Hangfire.SqlServer, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Hangfire.SqlServer.1.6.2\lib\net45\Hangfire.SqlServer.dll</HintPath>
     </Reference>
