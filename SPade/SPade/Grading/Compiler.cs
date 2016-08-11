@@ -62,6 +62,9 @@ namespace SPade.Grading
                     }
                     pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".exe";
                     break;
+                case "Python":
+                    pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".py";
+                    break;
                 default:
                     //should never reach default
                     pathToExecutable = "";
