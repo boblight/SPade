@@ -1,7 +1,7 @@
 ﻿using Microsoft.Owin;
 using Owin;
 using Hangfire;
-using Hangfire.SqlServer; 
+using Hangfire.SqlServer;
 using SPade.Models.DAL;
 
 
@@ -16,7 +16,8 @@ namespace SPade
 
             SPadeDBEntities db = new SPadeDBEntities();
             GlobalConfiguration.Configuration.UseSqlServerStorage(db.Database.Connection.ConnectionString);
-            app.UseHangfireDashboard();
+            var options = new DashboardOptions { AppPath = "/Admin/Dashboard" };
+            app.UseHangfireDashboard("/HangfireDashboard", options);
             app.UseHangfireServer();
         }
     }
