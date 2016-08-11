@@ -16,31 +16,31 @@ namespace SPade.Grading
     {
         private List<String> subList = new List<String>();
         private int assgnId;
-        private ProcessStartInfo compileInfo;
-        private Process compile;
         private List<object> testcases = new List<object>();
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private Compiler c;
-        //private bool isTestCasePresnt = false;
 
+        //replace with your own machine name
         const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
         //const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
         //const string pathToUntrusted = @"C:/inetpub/wwwroot/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
-        const string entryPoint = "Grading"; //method name
+        string entryPoint; //method name
         private static string[] parameters = new string[4];
+        private bool isTestCasePresnt;
 
         public Sandboxer()
         {
         }
 
-        //constructor
+        //constructor submission
         public Sandboxer(string filePath, string fileName, int assgnId, string language)
         {
             c = new Compiler(language, filePath, fileName);
             this.assgnId = assgnId;
+            entryPoint = "Grading";
 
             parameters[0] = c.getExePath();
             parameters[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
@@ -48,13 +48,27 @@ namespace SPade.Grading
             parameters[3] = language;
         }
 
+        //constructor for lecturer's adding assignment
+        public Sandboxer (string filePath, string fileName, string assignmentTitle, string language, bool isTestCasePresent)
+        {
+            c = new Compiler(language, filePath, fileName);
+            entryPoint = "createSolution";
+
+            parameters[0] = c.getExePath();
+            parameters[1] = language;
+            parameters[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
+            if (isTestCasePresent == true)
+            {
+                parameters[3] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
+            }
+            else
+            {
+                parameters[3] = "";
+            }
+        }
+
         public decimal runSandboxedGrading()
         {
-            //if (c.getExePath().Equals("error"))
-            //{
-            //    return 4;
-            //}
-
             //Code taken from: https://msdn.microsoft.com/en-us/library/bb763046(v=vs.110).aspx
 
             //Setting the AppDomainSetup. It is very important to set the ApplicationBase to a folder 
@@ -77,6 +91,7 @@ namespace SPade.Grading
             newDomain.SetData("param2", parameters[1]);
             newDomain.SetData("param3", parameters[2]);
             newDomain.SetData("param4", parameters[3]);
+            newDomain.SetData("entryPoint", entryPoint);
 
             //Use CreateInstanceFrom to load an instance of the Sandboxer class into the
             //new AppDomain.
@@ -94,6 +109,7 @@ namespace SPade.Grading
             parameters[1] = newDomain.GetData("param2").ToString();
             parameters[2] = newDomain.GetData("param3").ToString();
             parameters[3] = newDomain.GetData("param4").ToString();
+            this.entryPoint = newDomain.GetData("entryPoint").ToString();
 
             return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
         }
