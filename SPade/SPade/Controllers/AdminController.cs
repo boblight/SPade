@@ -1005,7 +1005,7 @@ namespace SPade.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("ManageADmin");
+            return RedirectToAction("ManageAdmin");
         }
 
         //Purge Files 
