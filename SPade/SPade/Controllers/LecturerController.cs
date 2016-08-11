@@ -213,7 +213,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        public async Task<ActionResult> BulkAddStudent(HttpPostedFileBase file)
         {
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
@@ -231,17 +231,40 @@ namespace SPade.Controllers
                     if (!string.IsNullOrEmpty(lines[i]))
                     {
                         Student s = new Student();
-                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-                        s.AdminNo = lines[i].Split(',')[1];
-                        s.Name = lines[i].Split(',')[2];
-                        s.Email = lines[i].Split(',')[3];
-                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                        string courseAbbr = lines[i].Split(',')[0];
+                        string className = lines[i].Split(',')[1];
+                        s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+
+                        s.AdminNo = lines[i].Split(',')[2];
+                        s.Name = lines[i].Split(',')[3];
+                        s.Email = lines[i].Split(',')[4];
+                        s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
                         s.CreatedAt = DateTime.Now;
                         s.CreatedBy = User.Identity.GetUserName();
                         s.UpdatedAt = DateTime.Now;
                         s.UpdatedBy = User.Identity.GetUserName();
 
                         slist.Add(s);
+
+                        var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
+                        user.EmailConfirmed = true;
+                        var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                        if (result.Succeeded)
+                        {
+                            UserManager.AddToRole(user.Id, "Student");
+                        }
+                        else
+                        {
+                            string errors = "";
+
+                            foreach (string err in result.Errors)
+                            {
+                                errors += err + "\n";
+                            }
+
+                            ModelState.AddModelError("", errors);
+                            return View();
+                        }
                     }
                 }
                 db.Students.AddRange(slist);

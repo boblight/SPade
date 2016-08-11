@@ -322,7 +322,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddLecturer(HttpPostedFileBase file)
+        public async Task<ActionResult> BulkAddLecturer(HttpPostedFileBase file)
         {
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
@@ -358,6 +358,26 @@ namespace SPade.Controllers
                         lect.UpdatedBy = User.Identity.GetUserName();
 
                         lectlist.Add(lect);
+
+                        var user = new ApplicationUser { UserName = lect.StaffID, Email = lect.Email };
+                        user.EmailConfirmed = true;
+                        var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                        if (result.Succeeded)
+                        {
+                            UserManager.AddToRole(user.Id, "Lecturer");
+                        }
+                        else
+                        {
+                            string errors = "";
+
+                            foreach (string err in result.Errors)
+                            {
+                                errors += err + "\n";
+                            }
+
+                            ModelState.AddModelError("", errors);
+                            return View();
+                        }
                     }
                 }
                 db.Lecturers.AddRange(lectlist);
@@ -577,7 +597,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        public async Task<ActionResult> BulkAddStudent(HttpPostedFileBase file)
         {
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
@@ -600,20 +620,47 @@ namespace SPade.Controllers
                 List<Student> slist = new List<Student>();
                 for (int i = 1; i < lines.Length; i++)
                 {
+
                     if (!string.IsNullOrEmpty(lines[i]))
                     {
                         Student s = new Student();
-                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-                        s.AdminNo = lines[i].Split(',')[1];
-                        s.Name = lines[i].Split(',')[2];
-                        s.Email = lines[i].Split(',')[3];
-                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                        //s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
+
+                        string courseAbbr = lines[i].Split(',')[0];
+                        string className = lines[i].Split(',')[1];
+
+                        s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+
+                        s.AdminNo = lines[i].Split(',')[2];
+                        s.Name = lines[i].Split(',')[3];
+                        s.Email = lines[i].Split(',')[4];
+                        s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
                         s.CreatedAt = DateTime.Now;
                         s.CreatedBy = User.Identity.GetUserName();
                         s.UpdatedAt = DateTime.Now;
                         s.UpdatedBy = User.Identity.GetUserName();
 
                         slist.Add(s);
+
+                        var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
+                        user.EmailConfirmed = true;
+                        var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                        if (result.Succeeded)
+                        {
+                            UserManager.AddToRole(user.Id, "Student");
+                        }
+                        else
+                        {
+                            string errors = "";
+
+                            foreach (string err in result.Errors)
+                            {
+                                errors += err + "\n";
+                            }
+
+                            ModelState.AddModelError("", errors);
+                            return View();
+                        }
                     }
                 }
                 db.Students.AddRange(slist);
@@ -635,7 +682,7 @@ namespace SPade.Controllers
             ViewModels.Admin.UpdateStudentViewModel model = new ViewModels.Admin.UpdateStudentViewModel();
 
             //Get all classes
-            List<Class> allClasses = db.Classes.Where(cl=>cl.DeletedAt==null).ToList();
+            List<Class> allClasses = db.Classes.Where(cl => cl.DeletedAt == null).ToList();
 
             foreach (Class c in allClasses)
             {
