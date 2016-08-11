@@ -149,6 +149,8 @@ namespace SPade.Controllers
                 c.ClassID = model.ClassID;
                 c.ClassName = model.ClassName;
                 c.CourseID = model.CourseID;
+                c.UpdatedAt = DateTime.Now;
+                c.UpdatedBy = User.Identity.Name;
                 db.SaveChanges();
                 return RedirectToAction("ManageClass");
             }
@@ -670,6 +672,8 @@ namespace SPade.Controllers
                 student.Name = model.Name;
                 student.ContactNo = model.ContactNo;
                 student.ClassID = model.ClassID;
+                student.UpdatedAt = DateTime.Now;
+                student.UpdatedBy = User.Identity.Name;
                 db.SaveChanges();
                 return RedirectToAction("ManageStudent");
             }

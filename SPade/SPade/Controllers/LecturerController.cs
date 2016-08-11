@@ -173,6 +173,8 @@ namespace SPade.Controllers
                 student.Name = model.Name;
                 student.ContactNo = model.ContactNo;
                 student.ClassID = model.ClassID;
+                student.UpdatedAt = DateTime.Now;
+                student.UpdatedBy = User.Identity.Name;
                 db.SaveChanges();
                 return RedirectToAction("ManageClassesAndStudents");
             }
