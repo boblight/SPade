@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security.AntiXss;
+using Hangfire;
 
 namespace SPade.Controllers
 {
@@ -136,7 +137,7 @@ namespace SPade.Controllers
             ViewModels.Lecturer.UpdateStudentViewModel model = new ViewModels.Lecturer.UpdateStudentViewModel();
 
             //Get all classes
-            List<Class> allClasses = db.Classes.Where(cl => cl.DeletedAt==null).ToList();
+            List<Class> allClasses = db.Classes.Where(cl => cl.DeletedAt == null).ToList();
 
             foreach (Class c in allClasses)
             {
@@ -173,6 +174,8 @@ namespace SPade.Controllers
                 student.Name = model.Name;
                 student.ContactNo = model.ContactNo;
                 student.ClassID = model.ClassID;
+                student.UpdatedAt = DateTime.Now;
+                student.UpdatedBy = User.Identity.Name;
                 db.SaveChanges();
                 return RedirectToAction("ManageClassesAndStudents");
             }
@@ -211,7 +214,7 @@ namespace SPade.Controllers
         }
 
         [HttpPost]
-        public ActionResult BulkAddStudent(HttpPostedFileBase file)
+        public async Task<ActionResult> BulkAddStudent(HttpPostedFileBase file)
         {
             if ((file != null && Path.GetExtension(file.FileName) == ".csv") && (file.ContentLength > 0))
             {
@@ -229,17 +232,40 @@ namespace SPade.Controllers
                     if (!string.IsNullOrEmpty(lines[i]))
                     {
                         Student s = new Student();
-                        s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-                        s.AdminNo = lines[i].Split(',')[1];
-                        s.Name = lines[i].Split(',')[2];
-                        s.Email = lines[i].Split(',')[3];
-                        s.ContactNo = Int32.Parse(lines[i].Split(',')[4]);
+                        string courseAbbr = lines[i].Split(',')[0];
+                        string className = lines[i].Split(',')[1];
+                        s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+
+                        s.AdminNo = lines[i].Split(',')[2];
+                        s.Name = lines[i].Split(',')[3];
+                        s.Email = lines[i].Split(',')[4];
+                        s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
                         s.CreatedAt = DateTime.Now;
                         s.CreatedBy = User.Identity.GetUserName();
                         s.UpdatedAt = DateTime.Now;
                         s.UpdatedBy = User.Identity.GetUserName();
 
                         slist.Add(s);
+
+                        var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
+                        user.EmailConfirmed = true;
+                        var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                        if (result.Succeeded)
+                        {
+                            UserManager.AddToRole(user.Id, "Student");
+                        }
+                        else
+                        {
+                            string errors = "";
+
+                            foreach (string err in result.Errors)
+                            {
+                                errors += err + "\n";
+                            }
+
+                            ModelState.AddModelError("", errors);
+                            return View();
+                        }
                     }
                 }
                 db.Students.AddRange(slist);
@@ -334,7 +360,7 @@ namespace SPade.Controllers
                             where ca.AssignmentID.Equals(a.AssignmentID)
                             join cl in db.Lec_Class on c.ClassID equals cl.ClassID
                             where cl.StaffID.Equals(lecturerID)
-                            where c.DeletedAt==null
+                            where c.DeletedAt == null
                             select c;
 
                 classAssgn = query.ToList();
@@ -418,7 +444,7 @@ namespace SPade.Controllers
             courseList = db.Courses.ToList();
 
             //get the classes that this lecturer manages 
-            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt==null select c;
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
             classList = query.ToList();
 
             //now we get the classses that are assigned this assignment 
@@ -454,7 +480,7 @@ namespace SPade.Controllers
             }
 
             //get all the modules
-            modList = db.Modules.Where(mod => mod.DeletedAt==null).ToList();
+            modList = db.Modules.Where(mod => mod.DeletedAt == null).ToList();
 
             //set the data for the assignment 
             model.AssgnTitle = assgn.AssgnTitle;
@@ -948,7 +974,7 @@ namespace SPade.Controllers
             var x = User.Identity.GetUserName();
 
             //get the classes managed by the lecturer 
-            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt==null select c;
+            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
             managedClasses = query.ToList();
 
             //we loop through the managedClasses to fill up the assignmentclass -> which is used to populate checkboxes

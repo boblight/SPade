@@ -9,12 +9,12 @@ namespace SPade.ViewModels.Admin
 {
     public class AddModuleViewModel
     {
-        [Required(ErrorMessage = "Please do not leave the Module Code blank !")]
+        [Required(ErrorMessage = "Please do not leave the Module Code blank!")]
         [StringLength(50)]
         [Display(Name = "Module Code")]
         public string ModuleCode { get; set; }
 
-        [Required(ErrorMessage = "Please do not leave the Module Name blank !")]
+        [Required(ErrorMessage = "Please do not leave the Module Name blank!")]
         [StringLength(100)]
         [Display(Name = "Module Name")]
         public string ModuleName { get; set; }
