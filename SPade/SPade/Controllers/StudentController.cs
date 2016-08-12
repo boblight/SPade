@@ -212,13 +212,16 @@ namespace SPade.Controllers
                 Result.Add((int)Math.Round(r.grade * 100) + "%");
 
                 if (r.grade >= 0.5M)
+                {
                     Overall.Add("Pass");
+                }
                 else
+                {
                     Overall.Add("Fail");
+                }
 
                 SubmittedOn.Add(r.timestamp.ToString());
                 Submission.Add("/Student/Download/?file=" + Regex.Replace(r.assgntitle, @"\s+", "") + r.assignmentid);
-
             }
 
             vrvm.Assignment = Assignment;
