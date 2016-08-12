@@ -23,8 +23,8 @@ namespace SPade.Grading
 
         //replace with your own machine name
         //const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
-        //const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
-        const string pathToUntrusted = "C:/inetpub/wwwroot/Grading";
+        const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
+        //const string pathToUntrusted = "C:/inetpub/wwwroot/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
         string entryPoint; //method name

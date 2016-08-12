@@ -81,8 +81,7 @@ namespace SPade.Controllers
             }
 
             //check for deleted accounts
-            string identifier = model.UserName.Substring(0);
-            if (identifier.Contains("p"))
+            if (db.Students.Where(s => s.AdminNo == model.UserName).Count() != 0)
             {
                 if (db.Students.ToList().Find(s => s.AdminNo == model.UserName).DeletedAt != null)
                 {
@@ -90,7 +89,7 @@ namespace SPade.Controllers
                     return View(model);
                 }
             }
-            else if (identifier.Contains("s"))
+            else if (db.Lecturers.Where(l => l.StaffID == model.UserName).Count() != 0)
             {
                 if (db.Lecturers.ToList().Find(s => s.StaffID == model.UserName).DeletedAt != null)
                 {
@@ -98,7 +97,7 @@ namespace SPade.Controllers
                     return View(model);
                 }
             }
-            else if (identifier.Contains("a"))
+            else if (db.Admins.Where(a => a.AdminID == model.UserName).Count() != 0)
             {
                 if (db.Admins.ToList().Find(s => s.AdminID == model.UserName).DeletedAt != null)
                 {
