@@ -1021,6 +1021,7 @@ namespace SPade.Controllers
             aaVM.IsTestCasePresent = true;
             aaVM.ClassList = ac;
             aaVM.Modules = allModules;
+            aaVM.IsPostBack = 0;
 
             return View(aaVM);
         }
@@ -1093,6 +1094,8 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                ModelState.Remove("IsPostBack");
+                                addAssgn.IsPostBack = 1;
                                 TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
                                     + "program coded in the appropriate programming language or ensure you have selected the correct module.";
                                 return View(addAssgn);
@@ -1128,6 +1131,8 @@ namespace SPade.Controllers
                                     DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                    ModelState.Remove("IsPostBack");
+                                    addAssgn.IsPostBack = 1;
                                     TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
                                     return View(addAssgn);
                                 }
@@ -1140,6 +1145,8 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                ModelState.Remove("IsPostBack");
+                                addAssgn.IsPostBack = 1;
                                 TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                 return View(addAssgn);
                             }
@@ -1150,6 +1157,8 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                ModelState.Remove("IsPostBack");
+                                addAssgn.IsPostBack = 1;
                                 TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
                                 return View(addAssgn);
                             }
@@ -1159,6 +1168,8 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                ModelState.Remove("IsPostBack");
+                                addAssgn.IsPostBack = 1;
                                 TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                 return View(addAssgn);
                             }
@@ -1168,6 +1179,8 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                ModelState.Remove("IsPostBack");
+                                addAssgn.IsPostBack = 1;
                                 TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
                                     + "program coded in the appropriate programming language or ensure you have selected the correct module." +
                                     " Support for that language could also not be added yet.";
@@ -1179,6 +1192,8 @@ namespace SPade.Controllers
                             //uploaded file is more than 150MB
                             addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                             addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                            ModelState.Remove("IsPostBack");
+                            addAssgn.IsPostBack = 1;
                             TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
                         }
@@ -1188,6 +1203,8 @@ namespace SPade.Controllers
                         //uploaded file is empty 
                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                        ModelState.Remove("IsPostBack");
+                        addAssgn.IsPostBack = 1;
                         string err = "Uploaded file is invalid! Please try again.";
                         TempData["SlnWarning"] = err;
                         TempData["TcWarning"] = err;
@@ -1199,6 +1216,8 @@ namespace SPade.Controllers
                     //uploaded file is invalid
                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                    ModelState.Remove("IsPostBack");
+                    addAssgn.IsPostBack = 1;
                     string err = "Uploaded file is invalid! Please try again.";
                     TempData["SlnWarning"] = err;
                     TempData["TcWarning"] = err;
@@ -1215,7 +1234,6 @@ namespace SPade.Controllers
                     {
                         if (solutionsFileUpload.ContentLength < 104857600)
                         {
-
                             string slnFilePath = "";
                             string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
                             string fileName = "";
@@ -1278,6 +1296,8 @@ namespace SPade.Controllers
                                     DeleteFile(fileName, assignmentTitle, false);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                    ModelState.Remove("IsPostBack");
+                                    addAssgn.IsPostBack = 1;
                                     TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
                                     return View(addAssgn);
                                 }
@@ -1292,6 +1312,8 @@ namespace SPade.Controllers
                                 DeleteFile(fileName, assignmentTitle, false);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                ModelState.Remove("IsPostBack");
+                                addAssgn.IsPostBack = 1;
                                 TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                 return View(addAssgn);
                             }
@@ -1301,6 +1323,8 @@ namespace SPade.Controllers
                             //uploaded file is more than 150MB
                             addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                             addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                            ModelState.Remove("IsPostBack");
+                            addAssgn.IsPostBack = 1;
                             TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
                         }
@@ -1310,6 +1334,8 @@ namespace SPade.Controllers
                         //uploaded file is empty 
                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                        ModelState.Remove("IsPostBack");
+                        addAssgn.IsPostBack = 1;
                         TempData["SlnWarning"] = "Uploaded file is empty! Please try again.";
                         return View(addAssgn);
                     }
@@ -1319,6 +1345,8 @@ namespace SPade.Controllers
                     //uploaded file is invalid 
                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                    ModelState.Remove("IsPostBack");
+                    addAssgn.IsPostBack = 1;
                     TempData["SlnWarning"] = "Uploaded file is invalid! Please try again.";
                     return View(addAssgn);
                 }

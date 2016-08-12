@@ -131,11 +131,10 @@
                     <div class="col-md-12">
                         <div id="editor" name="editor" class="well ">
                         </div>
+                        <span class="help-block">@Html.ValidationMessage("Describe", new { @class = "text-danger" })</span>
                     </div>
                 </div>
-
                 @Html.HiddenFor(m => Model.Describe)
-                <span class="help-block">@Html.ValidationMessage("Describe", new { @class = "text-danger" })</span>
 
                 <!--Upload solutions file-->
                 <div class="form-group">
@@ -167,6 +166,9 @@
                         </span>
                     </div>
                 </div>
+
+                <!--Value for checking for PostBack (used to set the datepicker)-->
+                @Html.HiddenFor(m => m.IsPostBack)
 
                 <!--Start Date-->
                 <div class="form-group">

@@ -374,6 +374,7 @@
     <Content Include="Scripts\updateassignmentscript.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="TestCase\testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -443,6 +444,7 @@
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <Content Include="TempLecturerCSV\BulkAddLecturer0.csv" />
     <Content Include="TempStudentCSV\BulkAddStudent0.csv" />
+    <Content Include="TempLecturerCSV\BulkAddStudent1.csv" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -460,7 +462,6 @@
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />
     <Folder Include="TempSubmissions\" />
-    <Folder Include="TestCase\" />
     <Folder Include="ViewModels\Accounts\" />
   </ItemGroup>
   <ItemGroup>
