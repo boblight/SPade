@@ -594,16 +594,13 @@ namespace SPade.Controllers
                                     fileInfo.Directory.Create();
                                     testCaseUpload.SaveAs(filePath);
 
-                                    //get the language and pass into grader
-
-                                    Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
-
                                     //exit codes returned from grader 
                                     //1 is successfully done everything
                                     //2 is test case submitted could not be read
                                     //3 is program has failed to run
                                     //4 is program was caught in an infinite loop
 
+                                    Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
                                     int exitCode = (int)sandbox.runSandboxedGrading();
 
                                     if (exitCode == 1)
@@ -1284,9 +1281,9 @@ namespace SPade.Controllers
 
                             System.IO.File.Move(ogPath, newPath);
 
-                            Grader g = new Grader(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
+                            Sandboxer sandboxGrading = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
 
-                            int exitCode = g.RunLecturerSolution();
+                            int exitCode = (int)sandboxGrading.runSandboxedGrading();
 
                             if (exitCode == 1)
                             {
