@@ -914,7 +914,7 @@ namespace SPade.Controllers
                 if (isTestCase == true)
                 {
                     var testCasePath = Server.MapPath(@"~/TestCase/");
-                    var oldTestCase = uVM.AssignmentId + "TestCase.xml";
+                    var oldTestCase = uVM.AssignmentId + "testcase.xml";
 
                     //delete the old testcase 
                     if ((di = new DirectoryInfo(testCasePath)).Exists)
