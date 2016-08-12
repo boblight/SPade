@@ -789,7 +789,7 @@ namespace SPade.Controllers
                             return View(uAVM);
                         }
 
-                    }  //end of run without testcase 
+                    }//end of run without testcase 
 
                 }//end of updateSolution
 
@@ -803,7 +803,6 @@ namespace SPade.Controllers
                     TempData["GeneralError"] = "Failed to delete assignment. Please try again!";
                     return View(uAVM);
                 }
-
             }
 
             //successfully updating assignment to DB
@@ -855,12 +854,6 @@ namespace SPade.Controllers
                 updatedAssignment.UpdatedBy = User.Identity.GetUserName();
                 updatedAssignment.UpdatedAt = DateTime.Now;
 
-                //users choose to update the assignment solution
-                if (updateSln == true)
-                {
-                    updatedAssignment.Solution = "~/Solutions/" + uVM.AssignmentId + ".xml";
-                }
-
                 //remove previously assigned classes 
                 db.Class_Assgn.RemoveRange(db.Class_Assgn.Where(ca => ca.AssignmentID == uVM.AssignmentId));
 
@@ -879,50 +872,20 @@ namespace SPade.Controllers
 
                 db.Class_Assgn.AddRange(newAssgn);
 
-                //delete the old solution that is stored  
-                var solutionPath = Server.MapPath(@"~/Solutions/");
-                var oldSlnName = uVM.AssignmentId + "solution.xml";
-
-                DirectoryInfo di;
-                if ((di = new DirectoryInfo(solutionPath)).Exists)
+                //runs only IF users want to update their solution
+                if (updateSln == true)
                 {
-                    foreach (FileInfo f in di.GetFiles())
-                    {
-                        //find the original solution 
-                        if (f.Name == oldSlnName)
-                        {
-                            //delete it 
-                            f.IsReadOnly = false;
-                            f.Delete();
-                        }
-                    }
-                }
+                    //delete the old solution that is stored  
+                    var solutionPath = Server.MapPath(@"~/Solutions/");
+                    var oldSlnName = uVM.AssignmentId + "solution.xml";
 
-                //now that the old solution xml is gone, we reaname the new solution file 
-                foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
-                {
-                    if (f.Name == assignmentTitle + ".xml")
-                    {
-                        var sourcePath = solutionPath + f.Name;
-                        var destPath = solutionPath + uVM.AssignmentId + "solution.xml";
-                        FileInfo info = new FileInfo(sourcePath);
-                        info.MoveTo(destPath);
-                    }
-                }
-
-                //this part only runs IF a testcase is present 
-                if (isTestCase == true)
-                {
-                    var testCasePath = Server.MapPath(@"~/TestCase/");
-                    var oldTestCase = uVM.AssignmentId + "testcase.xml";
-
-                    //delete the old testcase 
-                    if ((di = new DirectoryInfo(testCasePath)).Exists)
+                    DirectoryInfo di;
+                    if ((di = new DirectoryInfo(solutionPath)).Exists)
                     {
                         foreach (FileInfo f in di.GetFiles())
                         {
                             //find the original solution 
-                            if (f.Name == oldTestCase)
+                            if (f.Name == oldSlnName)
                             {
                                 //delete it 
                                 f.IsReadOnly = false;
@@ -931,18 +894,54 @@ namespace SPade.Controllers
                         }
                     }
 
-                    //now that it is deleted, we rename the new testcase uploaded
-                    foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                    //now that the old solution xml is gone, we reaname the new solution file 
+                    foreach (FileInfo f in new DirectoryInfo(solutionPath).GetFiles())
                     {
                         if (f.Name == assignmentTitle + ".xml")
                         {
-                            var sourcePath = testCasePath + f.Name;
-                            var destPath = testCasePath + uVM.AssignmentId + "testcase.xml";
+                            var sourcePath = solutionPath + f.Name;
+                            var destPath = solutionPath + uVM.AssignmentId + "solution.xml";
                             FileInfo info = new FileInfo(sourcePath);
                             info.MoveTo(destPath);
                         }
                     }
-                }
+
+                    //this part only runs IF a testcase is present 
+                    if (isTestCase == true)
+                    {
+                        var testCasePath = Server.MapPath(@"~/TestCase/");
+                        var oldTestCase = uVM.AssignmentId + "testcase.xml";
+
+                        //delete the old testcase 
+                        if ((di = new DirectoryInfo(testCasePath)).Exists)
+                        {
+                            foreach (FileInfo f in di.GetFiles())
+                            {
+                                //find the original solution 
+                                if (f.Name == oldTestCase)
+                                {
+                                    //delete it 
+                                    f.IsReadOnly = false;
+                                    f.Delete();
+                                }
+                            }
+                        }
+
+                        //now that it is deleted, we rename the new testcase uploaded
+                        foreach (FileInfo f in new DirectoryInfo(testCasePath).GetFiles())
+                        {
+                            if (f.Name == assignmentTitle + ".xml")
+                            {
+                                var sourcePath = testCasePath + f.Name;
+                                var destPath = testCasePath + uVM.AssignmentId + "testcase.xml";
+                                FileInfo info = new FileInfo(sourcePath);
+                                info.MoveTo(destPath);
+                            }
+                        }
+
+                    }//end of update testcase xml
+
+                }//end of update solution xml
 
                 db.SaveChanges();
 
@@ -951,6 +950,7 @@ namespace SPade.Controllers
             {
                 isFailed = true;
             }
+
 
             return isFailed;
         }
