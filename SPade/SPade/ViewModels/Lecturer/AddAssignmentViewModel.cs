@@ -12,6 +12,7 @@ namespace SPade.ViewModels.Lecturer
     {
         [Required(ErrorMessage = "Please provide a valid assignment title")]
         [StringLength(100, ErrorMessage = "Please keep the title below 100 characters", MinimumLength = 1)]
+        [RegularExpression("^[A-z0-9]+$", ErrorMessage = "Please enter only letters and numbers")]
         [Display(Name = "Assignment Title")]
         public string AssgnTitle { get; set; }
 
