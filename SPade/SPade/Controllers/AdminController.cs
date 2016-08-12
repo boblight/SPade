@@ -942,7 +942,7 @@ namespace SPade.Controllers
                 if (command.Equals("Update"))
                 {
                     c.CourseAbbr = model.CourseAbv;
-                    c.CourseName = model.CourseAbv;
+                    c.CourseName = model.CourseName;
                     c.UpdatedAt = DateTime.Now;
                     c.UpdatedBy = User.Identity.Name;
 
