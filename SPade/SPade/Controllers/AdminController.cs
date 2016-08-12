@@ -305,7 +305,7 @@ namespace SPade.Controllers
                 throw;
 
             }
-            return RedirectToAction("Dashboard");
+            return RedirectToAction("ManageLecturer");
         }
 
         public ActionResult BulkAddLecturer()
@@ -470,10 +470,19 @@ namespace SPade.Controllers
             }
             else
             {
-                lecturer.DeletedAt = DateTime.Now;
-                lecturer.DeletedBy = User.Identity.Name;
+                if (db.Assignments.Where(assgn => assgn.CreateBy == StaffID).Count() == 0 && db.Lec_Class.Where(lcc => lcc.StaffID == StaffID).Count() == 0)
+                {
+                    lecturer.DeletedAt = DateTime.Now;
+                    lecturer.DeletedBy = User.Identity.Name;
 
-                db.SaveChanges();
+                    db.SaveChanges();
+                    return RedirectToAction("ManageLecturer");
+                }
+                else
+                {
+                    ModelState.AddModelError("DeleteError", "There are still assignments or classes tied to this lecturer's account. You have to purge data from the database before deleting.");
+                    return View(model);
+                }
             }
 
             return RedirectToAction("ManageLecturer");
