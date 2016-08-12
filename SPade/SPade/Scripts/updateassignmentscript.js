@@ -162,7 +162,7 @@
         })
     })
 
-    //let users select if they need to update their existing solution
+    //to make the file upload shown or hidden when post back to the page
     if ($("#UpdateSolution").is(":checked")) {
         $("#solutionGroup").show();
 
@@ -170,11 +170,14 @@
         $("#solutionGroup").hide();
     }
 
-    //let users select if they need testcase with their solutions
+    //to make the test case upload shown or hidden during post back 
     if ($("#IsTestCasePresent").is(":checked")) {
         $("#testCaseGroup").show();
+    } else {
+        $("#testCaseGroup").hide();
     }
 
+    //let users select if they need to update testcase
     $("#IsTestCasePresent").click(function () {
         if ($(this).is(":checked")) {
             $("#testCaseGroup").fadeIn();
@@ -183,6 +186,7 @@
         }
     })
 
+    //let users select if they need to update the solution
     $("#UpdateSolution").click(function () {
         if ($(this).is(":checked")) {
             $("#solutionGroup").fadeIn();

@@ -50,13 +50,13 @@ namespace SPade.Controllers
             }
         }
 
-        // GET: Lecturer
+        //Dashboard
         public ActionResult Dashboard()
         {
             return View();
         }
 
-        //Manage Students (View all + Class + Update)
+        //Manage Classes & Manage + Update Student
         public ActionResult ManageClassesAndStudents()
         {
             List<ManageClassesViewModel> manageClassView = new List<ManageClassesViewModel>();
@@ -346,8 +346,8 @@ namespace SPade.Controllers
             var lecturerID = User.Identity.GetUserName();
 
             //get the assignments that this lecturer created
-            lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedBy == null);
-            courseList = db.Courses.ToList();
+            lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedAt == null);
+            courseList = db.Courses.ToList().FindAll(c => c.DeletedAt == null);
 
             //get the details of each assignment and pass to view
             foreach (Assignment a in lecAssgn)
@@ -441,7 +441,7 @@ namespace SPade.Controllers
             assgn = db.Assignments.Where(a => a.AssignmentID == i).Where(assn => assn.DeletedAt == null).FirstOrDefault();
 
             //get all courses
-            courseList = db.Courses.ToList();
+            courseList = db.Courses.Where(c => c.DeletedAt == null).ToList();
 
             //get the classes that this lecturer manages 
             var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
@@ -520,7 +520,7 @@ namespace SPade.Controllers
                     if (UpdateAssignmentToDB(uAVM, false, false) == true)
                     {
                         //failed to update assignment 
-                        uAVM.Modules = db.Modules.ToList();
+                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                         TempData["GeneralError"] = "Failed to update assignment to database. Please try again!";
                         return View(uAVM);
@@ -611,7 +611,7 @@ namespace SPade.Controllers
                                         {
                                             //failed to update DB
                                             DeleteFile(fileName, assignmentTitle, true);
-                                            uAVM.Modules = db.Modules.ToList();
+                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
                                             return View(uAVM);
@@ -625,7 +625,7 @@ namespace SPade.Controllers
                                     else if (exitCode == 2)
                                     {
                                         DeleteFile(fileName, assignmentTitle, true);
-                                        uAVM.Modules = db.Modules.ToList();
+                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                         return View(uAVM);
@@ -635,7 +635,7 @@ namespace SPade.Controllers
                                     {
                                         //solution failed to run 
                                         DeleteFile(fileName, assignmentTitle, true);
-                                        uAVM.Modules = db.Modules.ToList();
+                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "The program has failed to run entirely. Please check your program.";
                                         return View(uAVM);
@@ -644,7 +644,7 @@ namespace SPade.Controllers
                                     {
                                         //solution stuck in infinite loop
                                         DeleteFile(fileName, assignmentTitle, true);
-                                        uAVM.Modules = db.Modules.ToList();
+                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                         return View(uAVM);
@@ -653,7 +653,7 @@ namespace SPade.Controllers
                                 else
                                 {
                                     //more than 150MB                     
-                                    uAVM.Modules = db.Modules.ToList();
+                                    uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                     TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                                     return View(uAVM);
@@ -662,7 +662,7 @@ namespace SPade.Controllers
                             else
                             {
                                 //empty file 
-                                uAVM.Modules = db.Modules.ToList();
+                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                 string err = "Uploaded file is invalid! Please try again.";
                                 TempData["SlnWarning"] = err;
@@ -673,7 +673,7 @@ namespace SPade.Controllers
                         else
                         {
                             //uploaded file is invalid
-                            uAVM.Modules = db.Modules.ToList();
+                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                             string err = "Uploaded file is invalid! Please try again.";
                             TempData["SlnWarning"] = err;
@@ -751,7 +751,7 @@ namespace SPade.Controllers
                                         {
                                             //solution has failed to save to DB
                                             DeleteFile(fileName, assignmentTitle, false);
-                                            uAVM.Modules = db.Modules.ToList();
+                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
                                             return View(uAVM);
@@ -765,7 +765,7 @@ namespace SPade.Controllers
                                     {
                                         //solution failed to run 
                                         DeleteFile(fileName, assignmentTitle, false);
-                                        uAVM.Modules = db.Modules.ToList();
+                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
                                         TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                         return View(uAVM);
@@ -775,7 +775,7 @@ namespace SPade.Controllers
                                 else
                                 {
                                     //file size is more that 150MB
-                                    uAVM.Modules = db.Modules.ToList();
+                                    uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                     TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                                     return View(uAVM);
@@ -784,7 +784,7 @@ namespace SPade.Controllers
                             else
                             {
                                 //empty file 
-                                uAVM.Modules = db.Modules.ToList();
+                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                 string err = "Uploaded file is invalid! Please try again.";
                                 TempData["SlnWarning"] = err;
@@ -795,7 +795,7 @@ namespace SPade.Controllers
                         else
                         {
                             //invalid file 
-                            uAVM.Modules = db.Modules.ToList();
+                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                             string err = "Uploaded file is invalid! Please try again.";
                             TempData["SlnWarning"] = err;
@@ -814,7 +814,7 @@ namespace SPade.Controllers
                 if (DeleteAssignment(uAVM) == true)
                 {
                     //failed to delete assignment 
-                    uAVM.Modules = db.Modules.ToList();
+                    uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                     uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                     TempData["GeneralError"] = "Failed to delete assignment. Please try again!";
                     return View(uAVM);
@@ -873,7 +873,7 @@ namespace SPade.Controllers
                 //remove previously assigned classes 
                 db.Class_Assgn.RemoveRange(db.Class_Assgn.Where(ca => ca.AssignmentID == uVM.AssignmentId));
 
-                //re-assign the assignments 
+                //re-assign the assignments to the classes 
                 List<Class_Assgn> newAssgn = new List<Class_Assgn>();
                 foreach (AssignmentClass ac in uVM.ClassList)
                 {
@@ -967,7 +967,6 @@ namespace SPade.Controllers
                 isFailed = true;
             }
 
-
             return isFailed;
         }
 
@@ -986,6 +985,7 @@ namespace SPade.Controllers
 
             List<AssignmentClass> ac = new List<AssignmentClass>();
             List<Class> managedClasses = new List<Class>();
+            List<Course> courseList = new List<Course>();
 
             var x = User.Identity.GetUserName();
 
@@ -993,15 +993,22 @@ namespace SPade.Controllers
             var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
             managedClasses = query.ToList();
 
+            //get all courses 
+            courseList = db.Courses.Where(c => c.DeletedAt == null).ToList();
+
             //we loop through the managedClasses to fill up the assignmentclass -> which is used to populate checkboxes
             foreach (var c in managedClasses)
             {
                 AssignmentClass a = new AssignmentClass();
 
-                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
-                String className = courseAbbr + "/" + c.ClassName;
-
-                a.ClassName = className;
+                foreach (Course cr in courseList)
+                {
+                    if (c.CourseID == cr.CourseID)
+                    {
+                        //string the course abb + class name together 
+                        a.ClassName = cr.CourseAbbr + "/" + c.ClassName;
+                    }
+                }
 
                 a.ClassId = c.ClassID;
                 a.isSelected = false;
@@ -1084,7 +1091,8 @@ namespace SPade.Controllers
                             {
                                 //solution stuck in infinite loop
                                 DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.ToList();
+                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
                                     + "program coded in the appropriate programming language or ensure you have selected the correct module.";
                                 return View(addAssgn);
@@ -1118,7 +1126,8 @@ namespace SPade.Controllers
                                 {
                                     //failed to save to DB
                                     DeleteFile(fileName, assignmentTitle, true);
-                                    addAssgn.Modules = db.Modules.ToList();
+                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
                                     return View(addAssgn);
                                 }
@@ -1129,7 +1138,8 @@ namespace SPade.Controllers
                             else if (exitCode == 2)
                             {
                                 DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.ToList();
+                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                 return View(addAssgn);
                             }
@@ -1138,7 +1148,8 @@ namespace SPade.Controllers
                             {
                                 //solution failed to run 
                                 DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.ToList();
+                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
                                 return View(addAssgn);
                             }
@@ -1146,7 +1157,8 @@ namespace SPade.Controllers
                             {
                                 //solution stuck in infinite loop
                                 DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.ToList();
+                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                 return View(addAssgn);
                             }
@@ -1154,7 +1166,8 @@ namespace SPade.Controllers
                             {
                                 //solution stuck in infinite loop
                                 DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.ToList();
+                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
                                     + "program coded in the appropriate programming language or ensure you have selected the correct module." +
                                     " Support for that language could also not be added yet.";
@@ -1164,7 +1177,8 @@ namespace SPade.Controllers
                         else
                         {
                             //uploaded file is more than 150MB
-                            addAssgn.Modules = db.Modules.ToList();
+                            addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                            addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                             TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
                         }
@@ -1172,7 +1186,8 @@ namespace SPade.Controllers
                     else
                     {
                         //uploaded file is empty 
-                        addAssgn.Modules = db.Modules.ToList();
+                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                         string err = "Uploaded file is invalid! Please try again.";
                         TempData["SlnWarning"] = err;
                         TempData["TcWarning"] = err;
@@ -1182,13 +1197,15 @@ namespace SPade.Controllers
                 else
                 {
                     //uploaded file is invalid
-                    addAssgn.Modules = db.Modules.ToList();
+                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                     string err = "Uploaded file is invalid! Please try again.";
                     TempData["SlnWarning"] = err;
                     TempData["TcWarning"] = err;
                     return View(addAssgn);
                 }
             }//end of run with testcase
+
             //run without testcase 
             else if (addAssgn.IsTestCasePresent == false)
             {
@@ -1259,7 +1276,8 @@ namespace SPade.Controllers
                                 {
                                     //solution has failed to save to DB
                                     DeleteFile(fileName, assignmentTitle, false);
-                                    addAssgn.Modules = db.Modules.ToList();
+                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
                                     return View(addAssgn);
                                 }
@@ -1272,7 +1290,8 @@ namespace SPade.Controllers
                             {
                                 //solution failed to run 
                                 DeleteFile(fileName, assignmentTitle, false);
-                                addAssgn.Modules = db.Modules.ToList();
+                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                 return View(addAssgn);
                             }
@@ -1280,7 +1299,8 @@ namespace SPade.Controllers
                         else
                         {
                             //uploaded file is more than 150MB
-                            addAssgn.Modules = db.Modules.ToList();
+                            addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                            addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                             TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
                         }
@@ -1288,7 +1308,8 @@ namespace SPade.Controllers
                     else
                     {
                         //uploaded file is empty 
-                        addAssgn.Modules = db.Modules.ToList();
+                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                         TempData["SlnWarning"] = "Uploaded file is empty! Please try again.";
                         return View(addAssgn);
                     }
@@ -1296,7 +1317,8 @@ namespace SPade.Controllers
                 else
                 {
                     //uploaded file is invalid 
-                    addAssgn.Modules = db.Modules.ToList();
+                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                     TempData["SlnWarning"] = "Uploaded file is invalid! Please try again.";
                     return View(addAssgn);
                 }
@@ -1306,7 +1328,6 @@ namespace SPade.Controllers
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
 
-        //used to insert the data into DB. 
         public bool AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
         {
             //now to add into the DB
@@ -1400,7 +1421,7 @@ namespace SPade.Controllers
             return isFailed;
         }
 
-        //used to delete files
+        //Common methods between ADD and UPDATE assignment
         private void DeleteFile(string fileName, string assgnTitle, bool isTestCase)
         {
             //delete their solution + testcase 
@@ -1442,7 +1463,6 @@ namespace SPade.Controllers
             }
         }
 
-        //used to get the list of classes the lecturer manages 
         public List<AssignmentClass> UpdateClassList(List<AssignmentClass> ClassList)
         {
             //classes the lectuer manages 
@@ -1490,9 +1510,7 @@ namespace SPade.Controllers
         public ActionResult ViewResults()
         {
             ViewResultsViewModel vrvm = new ViewResultsViewModel();
-
-            string loggedInLecturer = User.Identity.GetUserName(); //temp 
-
+            string loggedInLecturer = User.Identity.GetUserName();
 
             List<Class> managedClasses = new List<Class>();
 
@@ -1523,13 +1541,12 @@ namespace SPade.Controllers
             vrvm.classNames = classNames;
 
             return View(vrvm);
-
         }
 
         [HttpPost]
         public ActionResult GetAssignment(string Class)
         {
-            string loggedInLecturer = User.Identity.GetUserName(); //temp 
+            string loggedInLecturer = User.Identity.GetUserName();
 
             var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
         new SqlParameter("@inClass", Class),
@@ -1565,7 +1582,6 @@ namespace SPade.Controllers
 
             memoryStream.Seek(0, SeekOrigin.Begin);
             return File(memoryStream, "application/zip", zipname);
-
 
         }
 

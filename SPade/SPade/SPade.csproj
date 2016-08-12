@@ -304,6 +304,7 @@
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Grading\Grade.exe" />
     <Content Include="Ionic.Zip.xml" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
