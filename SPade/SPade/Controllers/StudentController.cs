@@ -79,9 +79,9 @@ namespace SPade.Controllers
 
                     //grade returns an 'exitcode'
                     //if result is more than 1 then is error code
-                    //2 for program failure
+                    //2 for execption thrown
                     //3 for infinite loop
-                    //4 for compilation error
+                    //4 for run error
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
                     //decimal result = grader.grade();
                     result = sandBoxedGrading.runSandboxedGrading();
@@ -239,8 +239,8 @@ namespace SPade.Controllers
 
             if (submission.Grade == 2)
             {
-                ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to logic error or " +
-                    "syntax error in your code. Please check through your program and make the appropriate modification.");
+                ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to an exception being thrown " +
+                    "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error.");
                 submission.Grade = 0;
             }
             else if (submission.Grade == 3)
@@ -251,7 +251,7 @@ namespace SPade.Controllers
             }
             else if (submission.Grade == 4)
             {
-                ModelState.AddModelError("SubmissionError", "Compilation error has occured. Please check through your code for syntax errors or missing parenthesis.");
+                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis.");
                 submission.Grade = 0;
             }
             else if (submission.Grade < 1)
