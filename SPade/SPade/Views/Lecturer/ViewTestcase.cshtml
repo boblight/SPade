@@ -1,0 +1,41 @@
+﻿@model SPade.ViewModels.Lecturer.ViewTestCaseViewModel
+
+@{
+    ViewBag.Title = "ViewTestcase";
+}
+
+@Styles.Render("~/bundles/tablestyle")
+
+<div class="container">
+    <div class="col-md-4 col-md-offset-4 form-horizontal">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Inputs</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int count = 1;
+                    foreach (var testcase in Model.testcases)
+                    {
+                        <tr>
+                            <td>@count</td>
+                            <td>
+                                <ul>
+                                    @foreach (var input in testcase.inputs)
+                                    {
+                                        <li>@input</li>
+                                    }
+                                </ul>
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

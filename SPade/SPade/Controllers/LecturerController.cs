@@ -17,6 +17,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security.AntiXss;
 using Hangfire;
+using System.Xml;
 
 namespace SPade.Controllers
 {
@@ -825,6 +826,7 @@ namespace SPade.Controllers
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
 
+
         public bool DeleteAssignment(UpdateAssignmentViewModel uAVM)
         {
             bool isFailed = false;
@@ -1583,6 +1585,35 @@ namespace SPade.Controllers
             memoryStream.Seek(0, SeekOrigin.Begin);
             return File(memoryStream, "application/zip", zipname);
 
+        }
+
+        public ActionResult ViewTestcase(string assignmentId)
+        {
+            XmlDocument testCaseFile = new XmlDocument();
+            var pathToTestcase = Server.MapPath(@"~/TestCase/" + assignmentId + "testcase.xml");
+            testCaseFile.Load(pathToTestcase);
+            List<TestCase> tc = new List<TestCase>();
+
+            ViewTestCaseViewModel vtcvm = new ViewTestCaseViewModel();
+
+            //vtcvm.testCaseFile = testCaseFile;
+
+            XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
+            foreach (XmlNode node in testcaseList)
+            {
+                List<string> inputs = new List<string>();
+                TestCase testcase = new TestCase();
+
+                foreach (XmlNode input in node.ChildNodes)
+                {
+                    inputs.Add(input.InnerText);
+                }
+                testcase.inputs = inputs;
+                tc.Add(testcase);
+            }
+            vtcvm.testcases = tc;
+
+            return View(vtcvm);
         }
 
         class DBass

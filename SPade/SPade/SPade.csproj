@@ -302,6 +302,7 @@
     <Compile Include="ViewModels\Student\SubmitAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewResultViewModel.cs" />
+    <Compile Include="ViewModels\Lecturer\ViewTestCaseViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Grading\Grade.exe" />
@@ -443,6 +444,7 @@
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
     <Content Include="TempLecturerCSV\BulkAddLecturer0.csv" />
     <Content Include="TempStudentCSV\BulkAddStudent0.csv" />
+    <Content Include="Views\Lecturer\ViewTestcase.cshtml" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>

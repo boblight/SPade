@@ -35,6 +35,7 @@
                         <th>Start Date</th>
                         <th>Due Date</th>
                         <th class="sorter-false">Update</th>
+                        <th class="sorter-false">View Testcase</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,6 +51,9 @@
                                 <td>@Html.DisplayFor(Model => item.Assignment.DueDate)</td>
                                 <td>
                                     @Html.ActionLink("Update", "UpdateAssignment", "Lecturer", new { AssignmentId = item.Assignment.AssignmentID }, new { id = "assignmentId", @class = "btn btn-primary" })
+                                </td>
+                                <td>
+                                    @Html.ActionLink("View", "ViewTestcase", "Lecturer", new { AssignmentId = item.Assignment.AssignmentID }, new { id = "assignmentId", @class = "btn btn-primary" })
                                 </td>
                             </tr>
                         }
