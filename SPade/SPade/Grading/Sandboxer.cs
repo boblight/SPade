@@ -22,8 +22,10 @@ namespace SPade.Grading
         private Compiler c;
 
         //replace with your own machine name
-        const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
+        // const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
+
         //const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
+        const string pathToUntrusted = "E:/School/Y3/SDP/SPade-MVC/SPade/SPade/Grading";
         //const string pathToUntrusted = "C:/inetpub/wwwroot/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
@@ -49,7 +51,7 @@ namespace SPade.Grading
         }
 
         //constructor for lecturer's adding assignment
-        public Sandboxer (string filePath, string fileName, string assignmentTitle, string language, bool isTestCasePresent)
+        public Sandboxer(string filePath, string fileName, string assignmentTitle, string language, bool isTestCasePresent)
         {
             c = new Compiler(language, filePath, fileName);
             entryPoint = "createSolution";

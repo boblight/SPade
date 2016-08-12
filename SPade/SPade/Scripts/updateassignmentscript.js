@@ -220,7 +220,6 @@
                 selectedClasses.push(c)
             }
         })
-        var t = $("#cL").data("class-name");
         $("#SelectedClasses").val(selectedClasses);
     })
 

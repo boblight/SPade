@@ -12,7 +12,7 @@ namespace SPade.ViewModels.Lecturer
     {
         [Required(ErrorMessage = "Please provide a valid assignment title")]
         [StringLength(100, ErrorMessage = "Please keep the title below 100 characters", MinimumLength = 1)]
-        [RegularExpression("^[A-z0-9]+$", ErrorMessage = "Please enter only alphanumeric characters.")]
+        [RegularExpression("^[A-z0-9 ]+$", ErrorMessage = "Please enter only alphanumeric characters.")]
         [Display(Name = "Assignment Title")]
         public string AssgnTitle { get; set; }
 
@@ -47,6 +47,6 @@ namespace SPade.ViewModels.Lecturer
         public string UpdatedBy { get; set; }
         public List<AssignmentClass> ClassList { get; set; }
         public List<Module> Modules { get; set; }
-
+        public int IsPostBack { get; set; }
     }
 }
