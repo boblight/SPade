@@ -113,7 +113,7 @@ namespace SPade.Controllers
             }
 
             //if successful 
-            return RedirectToAction("Dashboard", "Admin");
+            return RedirectToAction("ManageClass", "Admin");
         }
 
         public ActionResult UpdateClass(string id)
@@ -589,7 +589,7 @@ namespace SPade.Controllers
                 throw;
 
             }
-            return RedirectToAction("Dashboard");
+            return RedirectToAction("ManageStudent", "Admin");
         }
 
         public ActionResult BulkAddStudent()
@@ -1018,7 +1018,7 @@ namespace SPade.Controllers
                 db.Admins.Add(admin);
                 db.SaveChanges();
 
-                return RedirectToAction("Dashboard");
+                return RedirectToAction("ManageAdmin", "Admin");
             }
             else
             {
