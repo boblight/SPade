@@ -95,7 +95,6 @@ namespace SPade.Controllers
 
                     Session["TempSub"] = tempSubmission;
                     Session["jobID"] = jobID;
-
                 }
             }
             else if (file == null)
@@ -120,6 +119,11 @@ namespace SPade.Controllers
             //the grading of the assignment is done here (the scheduler adds this to queue)
             Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed);
             result = sandBoxedGrading.runSandboxedGrading();
+
+            if (result > 1)
+            {
+                result = 0;
+            }
 
             return result;
         }
@@ -356,7 +360,8 @@ namespace SPade.Controllers
             }
             else if (submission.Grade == 4)
             {
-                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis.");
+                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
+                    "Also ensure that you have submitted the correct source code.");
                 submission.Grade = 0;
             }
             else if (submission.Grade < 1)

@@ -177,8 +177,22 @@ namespace SPade.Controllers
         {
             //this method is used to delete the CSV file after it has run successfully 
 
-            var filePath = Server.MapPath(@"~/TempCSV/");
+            var filePath = Server.MapPath(@"~/TempStudentCSV/");
             DirectoryInfo di;
+
+            if ((di = new DirectoryInfo(filePath)).Exists)
+            {
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    if (f.Name == fileName)
+                    {
+                        f.IsReadOnly = false;
+                        f.Delete();
+                    }
+                }
+            }
+
+            filePath = Server.MapPath(@"~/TempLecturerCSV/");
 
             if ((di = new DirectoryInfo(filePath)).Exists)
             {
