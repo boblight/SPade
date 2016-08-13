@@ -108,31 +108,39 @@ namespace SPade.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var userid = UserManager.FindByName(model.UserName).Id;
-            ViewBag.errorMessage = "You have not confirmed your email. Please confirm your email before attempting to login.";
-            if (!UserManager.IsEmailConfirmed(userid))
+            try
             {
-                return View("ConfirmEmailMessage");
+                var userid = UserManager.FindByName(model.UserName).Id;
+                ViewBag.errorMessage = "You have not confirmed your email. Please confirm your email before attempting to login.";
+                if (!UserManager.IsEmailConfirmed(userid))
+                {
+                    return View("ConfirmEmailMessage");
+                }
+                var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+
+                switch (result)
+                {
+                    case (SignInStatus.Success):
+                        {
+                            return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
+                            //return RedirectToLocal(returnUrl);
+                        }
+
+                    case SignInStatus.LockedOut:
+                        return View("Lockout");
+                    case SignInStatus.RequiresVerification:
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    case SignInStatus.Failure:
+                    default:
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
+
+                }
             }
-            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
-
-            switch (result)
+            catch (Exception le)
             {
-                case (SignInStatus.Success):
-                    {
-                        return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
-                        //return RedirectToLocal(returnUrl);
-                    }
-
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
             }
         }//end of login
 

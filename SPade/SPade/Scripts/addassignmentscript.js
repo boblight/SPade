@@ -1,22 +1,55 @@
 ﻿$(document).ready(function () {
 
-    var currentDate = moment().format('DD/MM/YYYY h:mm:ss A');
+    var currentDate = moment().format('DD/MM/YYYY h:mm A');
 
     $("#editor").wysiwyg();
     $("#editor").cleanHtml();
 
+    var IsPostBack = $("#IsPostBack").val();
+
+    InitStartDatePicker();
+    InitDueDatePicker();
+    AppendTextToEditor();
+
     //Start Date Selector JS
-    $('input[name="StartDate"]').daterangepicker({
-        opens: "center",
-        singleDatePicker: true,
-        timePicker: true,
-        startDate: currentDate,
-        minDate: currentDate,
-        autoUpdateInput: true,
-        locale: {
-            format: 'DD/MM/YYYY h:mm:ss A'
+    function InitStartDatePicker() {
+
+        //Inits with default value if NOT postback
+        if (IsPostBack == 0) {
+
+            $('input[name="StartDate"]').daterangepicker({
+                opens: "center",
+                singleDatePicker: true,
+                timePicker: true,
+                startDate: currentDate,
+                minDate: currentDate,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'DD/MM/YYYY h:mm A'
+                }
+            })
         }
-    })
+
+        //Inits with previous value IF postback
+        if (IsPostBack == 1) {
+
+            var getStartDate = $("#StartDate").val();
+            var getDueDate = $("#DueDate").val();
+
+            $('input[name="StartDate"]').daterangepicker({
+                opens: "center",
+                singleDatePicker: true,
+                timePicker: true,
+                startDate: getStartDate,
+                minDate: getStartDate,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'DD/MM/YYYY h:mm A'
+                }
+            })
+        }
+
+    }
 
     //bind action when apply is clicked
     $('input[name="StartDate"]').on('apply.daterangepicker', function (ev, picker) {
@@ -32,23 +65,50 @@
             minDate: selectedDate,
             autoUpdateInput: true,
             locale: {
-                format: 'DD/MM/YYYY h:mm:ss A'
+                format: 'DD/MM/YYYY h:mm A'
             }
         })
     });
 
-    //Due Date Selector JS    
-    $('input[name="DueDate"]').daterangepicker({
-        opens: "center",
-        singleDatePicker: true,
-        timePicker: true,
-        startDate: currentDate,
-        minDate: currentDate,
-        autoUpdateInput: true,
-        locale: {
-            format: 'DD/MM/YYYY h:mm:ss A'
+    //Due Date Selector JS  
+    function InitDueDatePicker() {
+
+        //Init due date picker with default value if NOT postback
+        if (IsPostBack == 0) {
+
+            $('input[name="DueDate"]').daterangepicker({
+                opens: "center",
+                singleDatePicker: true,
+                timePicker: true,
+                startDate: currentDate,
+                minDate: currentDate,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'DD/MM/YYYY h:mm A'
+                }
+            })
         }
-    })
+
+        //Init start date picker with previous value IF postback
+        if (IsPostBack == 1) {
+
+            var getStartDate = $("#StartDate").val();
+            var getDueDate = $("#DueDate").val();
+
+            $('input[name="DueDate"]').daterangepicker({
+                opens: "center",
+                singleDatePicker: true,
+                timePicker: true,
+                startDate: getDueDate,
+                minDate: getStartDate,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'DD/MM/YYYY h:mm A'
+                }
+            })
+        }
+
+    }
 
     //used to reset the datepickers 
     $("#resetBtn").click(function () {
@@ -66,7 +126,7 @@
             minDate: currentDate,
             autoUpdateInput: true,
             locale: {
-                format: 'DD/MM/YYYY h:mm:ss A'
+                format: 'DD/MM/YYYY h:mm A'
             }
         })
         //set the action again
@@ -83,7 +143,7 @@
                 minDate: selectedDate,
                 autoUpdateInput: true,
                 locale: {
-                    format: 'DD/MM/YYYY h:mm:ss A'
+                    format: 'DD/MM/YYYY h:mm A'
                 }
             })
         });
@@ -97,29 +157,29 @@
             minDate: currentDate,
             autoUpdateInput: true,
             locale: {
-                format: 'DD/MM/YYYY h:mm:ss A'
+                format: 'DD/MM/YYYY h:mm A'
             }
         })
     })
 
+    //show the modal
     $("#SelectedClasses").click(function () {
         $("#classModal").modal("show");
     })
 
+    //to show which class has been selected
     $("#modalSelect").click(function () {
-
+        var selectedClasses = [];
         $('input[type="checkbox"][name*="isSelected"]').each(function () {
             if (this.checked) {
-                console.log($(this).data("class-name"));
+                var c = $(this).data("class-name");
+                selectedClasses.push(c)
             }
         })
-
-        var t = $("#cL").data("class-name");
-
-        $("#SelectedClasses").val(t)
-
+        $("#SelectedClasses").val(selectedClasses);
     })
 
+    //let users select if they need testcase or not 
     $("#IsTestCasePresent").click(function () {
         if ($(this).is(":checked")) {
             $("#testCaseGroup").fadeIn();
@@ -128,8 +188,20 @@
         }
     })
 
+    //show or hide the test case upload during postback
     if ($("#IsTestCasePresent").is(":checked")) {
         $("#testCaseGroup").show();
+    } else {
+        $("#testCaseGroup").hide();
+    }
+
+    //we reappend the text to the editor after postback
+    function AppendTextToEditor() {
+
+        if (IsPostBack == 1) {
+            var des = $("#Describe").val()
+            $("#editor").html(des)
+        }
     }
 
     $("#submitBtn").click(function () {
