@@ -95,7 +95,6 @@ namespace SPade.Controllers
 
                     Session["TempSub"] = tempSubmission;
                     Session["jobID"] = jobID;
-
                 }
             }
             else if (file == null)
@@ -120,6 +119,11 @@ namespace SPade.Controllers
             //the grading of the assignment is done here (the scheduler adds this to queue)
             Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed);
             result = sandBoxedGrading.runSandboxedGrading();
+
+            if (result > 1)
+            {
+                result = 0;
+            }
 
             return result;
         }
