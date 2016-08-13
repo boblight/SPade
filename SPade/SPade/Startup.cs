@@ -1,5 +1,6 @@
 ﻿using Microsoft.Owin;
 using Owin;
+using Newtonsoft.Json;
 using Hangfire;
 using Hangfire.SqlServer;
 using SPade.Models.DAL;
@@ -19,6 +20,9 @@ namespace SPade
             var options = new DashboardOptions { AppPath = "/Admin/Dashboard" };
             app.UseHangfireDashboard("/HangfireDashboard", options);
             app.UseHangfireServer();
+
+
+
         }
     }
 }

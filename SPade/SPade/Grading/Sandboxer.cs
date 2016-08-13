@@ -9,6 +9,7 @@ using System.Security.Permissions;
 using System.Security.Policy;
 using System.Web;
 using System.Xml;
+using System.Web.Hosting;
 
 namespace SPade.Grading
 {
@@ -44,9 +45,11 @@ namespace SPade.Grading
             this.assgnId = assgnId;
             entryPoint = "Grading";
 
+           // HttpContext.Current = ctx;
+
             parameters[0] = c.getExePath();
-            parameters[1] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
-            parameters[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
+            parameters[1] = HostingEnvironment.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
+            parameters[2] = HostingEnvironment.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
             parameters[3] = language;
         }
 
