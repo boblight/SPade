@@ -84,6 +84,11 @@ namespace SPade.Controllers
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
              
                     result = sandBoxedGrading.runSandboxedGrading();
+
+                    if (result > 1)
+                    {
+                        result = 0;
+                    }
                 }
             }
             else if (file == null)
@@ -234,7 +239,7 @@ namespace SPade.Controllers
             return View(vrvm);
         }
 
-        // GET: PostSubmission
+        // GET:
         public ActionResult PostSubmission()
         {
             Submission submission = (Submission)Session["submission"];
