@@ -11,6 +11,7 @@ using System.Data;
 using System.Data.Entity.Validation;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -82,8 +83,6 @@ namespace SPade.Controllers
             //Get all classes
             List<Course> allCourses = db.Courses.Where(c => c.DeletedAt == null).ToList();
             model.Courses = allCourses;
-            List<Lecturer> allLecturer = db.Lecturers.ToList();
-            model.Lecturers = allLecturer;
             return View(model);
         }
 
@@ -125,7 +124,7 @@ namespace SPade.Controllers
             model.Courses = allCourses;
 
             //Get class
-            Class c = db.Classes.ToList().Find(cl => cl.ClassID == int.Parse(id));
+            Class c = db.Classes.ToList().Find(cl => cl.ClassID == int.Parse(id) && cl.DeletedAt == null);
 
             model.ClassName = c.ClassName;
             model.ClassID = c.ClassID;
@@ -357,6 +356,23 @@ namespace SPade.Controllers
                         lect.UpdatedAt = DateTime.Now;
                         lect.UpdatedBy = User.Identity.GetUserName();
 
+                        //check through and validate all details
+                        //check staff id
+                        var match = Regex.Match(lect.StaffID, "^[s0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the staff id is invalid");
+                            return View();
+                        }
+
+                        //check contact no.
+                        match = Regex.Match(lect.ContactNo.ToString(), "^[0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the contact number is invalid");
+                            return View();
+                        }
+
                         lectlist.Add(lect);
 
                         var user = new ApplicationUser { UserName = lect.StaffID, Email = lect.Email };
@@ -401,7 +417,7 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
 
             //Get Lecturer
-            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id);
+            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id && l.DeletedAt == null) ;
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == id).ToList();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
 
@@ -438,7 +454,7 @@ namespace SPade.Controllers
         public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command, string StaffID)
         {
             Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == StaffID);
-            List<Lecturer> Lecturers = db.Lecturers.ToList();
+            //List<Lecturer> Lecturers = db.Lecturers.ToList();
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == StaffID).ToList();
 
             if (command.Equals("Update"))
@@ -638,7 +654,15 @@ namespace SPade.Controllers
                         string courseAbbr = lines[i].Split(',')[0];
                         string className = lines[i].Split(',')[1];
 
-                        s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                        try
+                        {
+                            s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                        }
+                        catch (Exception excp)
+                        {
+                            ModelState.AddModelError("", "There is an invalid course abbreviation or class name");
+                            return View();
+                        }
 
                         s.AdminNo = lines[i].Split(',')[2];
                         s.Name = lines[i].Split(',')[3];
@@ -648,6 +672,23 @@ namespace SPade.Controllers
                         s.CreatedBy = User.Identity.GetUserName();
                         s.UpdatedAt = DateTime.Now;
                         s.UpdatedBy = User.Identity.GetUserName();
+
+                        //check through and validate all details
+                        //check staff id
+                        var match = Regex.Match(s.AdminNo, "^[p0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the administrative number is invalid");
+                            return View();
+                        }
+
+                        //check contact no.
+                        match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the contact number is invalid");
+                            return View();
+                        }
 
                         slist.Add(s);
 
@@ -704,7 +745,7 @@ namespace SPade.Controllers
             model.Classes = allClasses;
 
             //Get Student           
-            Student student = db.Students.ToList().Find(st => st.AdminNo == id);
+            Student student = db.Students.ToList().Find(st => st.AdminNo == id && st.DeletedAt == null);
 
             model.AdminNo = student.AdminNo;
             model.Name = student.Name;
@@ -925,7 +966,7 @@ namespace SPade.Controllers
         public ActionResult UpdateCourse(int id)
         {
             AddCourseViewModel acvm = new AddCourseViewModel();
-            Course c = db.Courses.Where(course => course.CourseID == id).FirstOrDefault();
+            Course c = db.Courses.Where(course => course.CourseID == id && course.DeletedAt == null).FirstOrDefault();
             acvm.CourseAbv = c.CourseAbbr;
             acvm.CourseName = c.CourseName;
             acvm.CourseID = id;
@@ -1035,7 +1076,7 @@ namespace SPade.Controllers
         {
             UpdateAdminViewModel model = new UpdateAdminViewModel();
             //Get Lecturer
-            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == id);
+            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == id && ad.DeletedAt == null);
             model.AdminID = id;
             model.FullName = admin.FullName;
             model.ContactNo = admin.ContactNo;

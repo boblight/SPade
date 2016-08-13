@@ -18,6 +18,7 @@ using System.Web.Mvc;
 using System.Web.Security.AntiXss;
 using Hangfire;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace SPade.Controllers
 {
@@ -235,7 +236,16 @@ namespace SPade.Controllers
                         Student s = new Student();
                         string courseAbbr = lines[i].Split(',')[0];
                         string className = lines[i].Split(',')[1];
-                        s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+
+                        try
+                        {
+                            s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                        }
+                        catch (Exception excp)
+                        {
+                            ModelState.AddModelError("", "There is an invalid course abbreviation or class name");
+                            return View();
+                        }
 
                         s.AdminNo = lines[i].Split(',')[2];
                         s.Name = lines[i].Split(',')[3];
@@ -245,6 +255,23 @@ namespace SPade.Controllers
                         s.CreatedBy = User.Identity.GetUserName();
                         s.UpdatedAt = DateTime.Now;
                         s.UpdatedBy = User.Identity.GetUserName();
+
+                        //check through and validate all details
+                        //check staff id
+                        var match = Regex.Match(s.AdminNo, "^[p0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the administrative number is invalid");
+                            return View();
+                        }
+
+                        //check contact no.
+                        match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the contact number is invalid");
+                            return View();
+                        }
 
                         slist.Add(s);
 
