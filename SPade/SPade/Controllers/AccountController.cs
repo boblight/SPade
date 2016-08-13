@@ -116,37 +116,25 @@ namespace SPade.Controllers
                 {
                     return View("ConfirmEmailMessage");
                 }
+                var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
 
-                //make sure only 1 user logged into 1 account at a time
-                if (db.AspNetUsers.Where(u => u.Id == userid).FirstOrDefault().IsLoggedIn != true)
+                switch (result)
                 {
-                    var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+                    case (SignInStatus.Success):
+                        {
+                            return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
+                            //return RedirectToLocal(returnUrl);
+                        }
 
-                    switch (result)
-                    {
-                        case (SignInStatus.Success):
-                            {
-                                db.AspNetUsers.Where(u => u.Id == userid).FirstOrDefault().IsLoggedIn = true;
-                                db.SaveChanges();
-                                return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
-                                //return RedirectToLocal(returnUrl);
-                            }
+                    case SignInStatus.LockedOut:
+                        return View("Lockout");
+                    case SignInStatus.RequiresVerification:
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    case SignInStatus.Failure:
+                    default:
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
 
-                        case SignInStatus.LockedOut:
-                            return View("Lockout");
-                        case SignInStatus.RequiresVerification:
-                            return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                        case SignInStatus.Failure:
-                        default:
-                            ModelState.AddModelError("", "Invalid login attempt.");
-                            return View(model);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "This account is already logged in from another device, please log out from that device before " + 
-                        "attempting to log in here.");
-                    return View(model);
                 }
             }
             catch (Exception le)
@@ -542,9 +530,6 @@ namespace SPade.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            string userid = User.Identity.GetUserId();
-            db.AspNetUsers.Where(u => u.Id == userid).FirstOrDefault().IsLoggedIn = false;
-            db.SaveChanges();
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }
