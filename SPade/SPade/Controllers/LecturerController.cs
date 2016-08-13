@@ -1194,7 +1194,8 @@ namespace SPade.Controllers
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
                                         addAssgn.IsPostBack = 1;
-                                        TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                        string err = (string)TempData["Exception"];
+                                        TempData["GeneralError"] = err;
                                         return View(addAssgn);
                                     }
                                     //delete the uploaded sln
@@ -1646,7 +1647,8 @@ namespace SPade.Controllers
 
             catch (Exception ex)
             {
-                //failed to save to DB. will show something to user
+                //failed to save to DB. will show something to user\
+                TempData["Exception"] = ex.Message;
                 isFailed = true;
             }
             return isFailed;
