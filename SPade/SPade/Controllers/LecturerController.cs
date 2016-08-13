@@ -15,8 +15,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Security.AntiXss;
 using Hangfire;
+using Newtonsoft.Json;
 using System.Xml;
 using System.Text.RegularExpressions;
 
@@ -1056,6 +1056,10 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload)
         {
+            int exitCode = 0, counter = 0;
+            bool isJobRunning;
+            string currentJobId;
+
             //run solution with testcase
             if (addAssgn.IsTestCasePresent == true)
             {
@@ -1142,73 +1146,123 @@ namespace SPade.Controllers
                             //3 is program has failed to run
                             //4 is program was caught in an infinite loop
                             //5 is Unsupported Language Type
-                            Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
-                            int exitCode = (int)sandbox.runSandboxedGrading();
 
-                            if (exitCode == 1)
+                            //add the running of solution to queue
+                            currentJobId = BackgroundJob.Enqueue(() => ProcessSubmission(slnFilePath, fileName, assignmentTitle, lang.LangageType, true));
+
+                            //check with DB if the job has finished running
+                            do
                             {
-                                //save to DB + rename solution/testcase
-                                if (AddAssignmentToDB(addAssgn, fileName, true) == true)
+                                isJobRunning = QueryJobFinish(currentJobId);
+                                counter++;
+
+                            } while (isJobRunning && counter < 10000);
+
+
+                            //Finished processing the assignment
+                            if (isJobRunning == false)
+                            {
+                                //this is the result reutrned from after the assignment has been processed
+                                if (counter >= 10000)
                                 {
-                                    //failed to save to DB
+                                    //the program was caught in infinite loop and the scheduler cannot process in time
+                                    exitCode = 2952;
+                                    //we delete the job
+                                    BackgroundJob.Delete(currentJobId);
+                                }
+                                else
+                                {
+                                    //program was run on time
+                                    exitCode = (int)TempData["ExitCode"];
+                                }
+
+                                //post back results 
+                                if (exitCode == 1)
+                                {
+                                    //save to DB + rename solution/testcase
+                                    if (AddAssignmentToDB(addAssgn, fileName, true) == true)
+                                    {
+                                        //failed to save to DB
+                                        DeleteFile(fileName, assignmentTitle, true);
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                        return View(addAssgn);
+                                    }
+                                    //delete the uploaded sln
+                                    DeleteFile(fileName, assignmentTitle, false);
+
+                                }//end of run succesfully condition
+
+                                else if (exitCode == 2)
+                                {
                                     DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
                                     addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                    TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                     return View(addAssgn);
-                                }
-                                //delete the uploaded sln
-                                DeleteFile(fileName, assignmentTitle, false);
-                            }//end of run succesfully method 
 
-                            else if (exitCode == 2)
-                            {
-                                DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                ModelState.Remove("IsPostBack");
-                                addAssgn.IsPostBack = 1;
-                                TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
-                                return View(addAssgn);
-                            }
+                                }//end of failed testcase condition
 
-                            else if (exitCode == 3)
-                            {
-                                //solution failed to run 
-                                DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                ModelState.Remove("IsPostBack");
-                                addAssgn.IsPostBack = 1;
-                                TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
-                                return View(addAssgn);
-                            }
-                            else if (exitCode == 4)
-                            {
-                                //solution stuck in infinite loop
-                                DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                ModelState.Remove("IsPostBack");
-                                addAssgn.IsPostBack = 1;
-                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                return View(addAssgn);
-                            }
-                            else if (exitCode == 5)
-                            {
-                                //solution stuck in infinite loop
-                                DeleteFile(fileName, assignmentTitle, true);
-                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                ModelState.Remove("IsPostBack");
-                                addAssgn.IsPostBack = 1;
-                                TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
-                                    + "program coded in the appropriate programming language or ensure you have selected the correct module." +
-                                    " Support for that language could also not be added yet.";
-                                return View(addAssgn);
-                            }
+                                else if (exitCode == 3)
+                                {
+                                    //solution failed to run 
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                    ModelState.Remove("IsPostBack");
+                                    addAssgn.IsPostBack = 1;
+                                    TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                                    return View(addAssgn);
+
+                                }//end of program failed to run condition
+
+                                else if (exitCode == 4)
+                                {
+                                    //solution stuck in infinite loop
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                    ModelState.Remove("IsPostBack");
+                                    addAssgn.IsPostBack = 1;
+                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
+                                    return View(addAssgn);
+
+                                }//end of infinite loop condition
+
+                                else if (exitCode == 5)
+                                {
+                                    //unsupported langugage
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                    ModelState.Remove("IsPostBack");
+                                    addAssgn.IsPostBack = 1;
+                                    TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
+                                        + "program coded in the appropriate programming language or ensure you have selected the correct module." +
+                                        " Support for that language could also not be added yet.";
+                                    return View(addAssgn);
+
+                                }//end of unsupported language condition
+
+                                else if (exitCode == 2952)
+                                {
+                                    //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                    DeleteFile(fileName, assignmentTitle, true);
+                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                    ModelState.Remove("IsPostBack");
+                                    addAssgn.IsPostBack = 1;
+                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to generate answers on time. Please upload your solution and try again !";
+                                    return View(addAssgn);
+
+                                }//end of scheduler failed to run
+
+                            }//end of assignment processing
                         }
                         else
                         {
@@ -1219,7 +1273,8 @@ namespace SPade.Controllers
                             addAssgn.IsPostBack = 1;
                             TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
-                        }
+
+                        }//end of file too big condition
                     }
                     else
                     {
@@ -1232,7 +1287,8 @@ namespace SPade.Controllers
                         TempData["SlnWarning"] = err;
                         TempData["TcWarning"] = err;
                         return View(addAssgn);
-                    }
+
+                    }//end of empty file condition
                 }
                 else
                 {
@@ -1245,7 +1301,9 @@ namespace SPade.Controllers
                     TempData["SlnWarning"] = err;
                     TempData["TcWarning"] = err;
                     return View(addAssgn);
-                }
+
+                }//end of invalid file condition
+
             }//end of run with testcase
 
             //run without testcase 
@@ -1306,39 +1364,80 @@ namespace SPade.Controllers
 
                             System.IO.File.Move(ogPath, newPath);
 
-                            Sandboxer sandboxGrading = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
-                            int exitCode = (int)sandboxGrading.runSandboxedGrading();
+                            //add the grading to queue
+                            currentJobId = BackgroundJob.Enqueue(() => ProcessSubmission(slnFilePath, fileName, assignmentTitle, lang.LangageType, false));
 
-                            if (exitCode == 1)
+                            //check if the job has finished processing
+                            do
                             {
-                                //save to DB + rename solution file
-                                if (AddAssignmentToDB(addAssgn, fileName, false) == true)
+                                isJobRunning = QueryJobFinish(currentJobId);
+                                counter++;
+
+                            } while (isJobRunning && counter < 10000);
+
+                            //job has finishd processing
+                            if (isJobRunning == false)
+                            {
+                                //get the exit code which is generated from the processing of the assignment
+                                if (counter >= 10000)
                                 {
-                                    //solution has failed to save to DB
+                                    //the program was caught in infinite loop and the scheduler cannot process in time
+                                    exitCode = 2952;
+                                    //we delete the job
+                                    BackgroundJob.Delete(currentJobId);
+                                }
+                                else
+                                {
+                                    //program was run on time
+                                    exitCode = (int)TempData["ExitCode"];
+                                }
+
+                                //post back result
+                                if (exitCode == 1)
+                                {
+                                    //save to DB + rename solution file
+                                    if (AddAssignmentToDB(addAssgn, fileName, false) == true)
+                                    {
+                                        //solution has failed to save to DB
+                                        DeleteFile(fileName, assignmentTitle, false);
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
+                                        return View(addAssgn);
+                                    }
+
+                                    //delete the uploaded sln
+                                    DeleteFile(fileName, assignmentTitle, false);
+
+                                }
+                                else if (exitCode == 3)
+                                {
+                                    //solution failed to run 
                                     DeleteFile(fileName, assignmentTitle, false);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
                                     addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
+                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                     return View(addAssgn);
                                 }
 
-                                //delete the uploaded sln
-                                DeleteFile(fileName, assignmentTitle, false);
+                                else if (exitCode == 2952)
+                                {
+                                    //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                    DeleteFile(fileName, assignmentTitle, false);
+                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                    ModelState.Remove("IsPostBack");
+                                    addAssgn.IsPostBack = 1;
+                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to generate answers on time. Please upload your solution and try again !";
+                                    return View(addAssgn);
 
-                            }
-                            else if (exitCode == 3)
-                            {
-                                //solution failed to run 
-                                DeleteFile(fileName, assignmentTitle, false);
-                                addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                ModelState.Remove("IsPostBack");
-                                addAssgn.IsPostBack = 1;
-                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                return View(addAssgn);
-                            }
+                                }//end of scheduler failed to run
+
+                            }//end of solution processing
                         }
                         else
                         {
@@ -1349,7 +1448,8 @@ namespace SPade.Controllers
                             addAssgn.IsPostBack = 1;
                             TempData["SlnWarning"] = "Please make sure that your file is less than 150MB!";
                             return View(addAssgn);
-                        }
+
+                        }//end of file too big condition
                     }
                     else
                     {
@@ -1360,7 +1460,8 @@ namespace SPade.Controllers
                         addAssgn.IsPostBack = 1;
                         TempData["SlnWarning"] = "Uploaded file is empty! Please try again.";
                         return View(addAssgn);
-                    }
+
+                    }//end of empty file condition (seriously?)
                 }
                 else
                 {
@@ -1371,11 +1472,85 @@ namespace SPade.Controllers
                     addAssgn.IsPostBack = 1;
                     TempData["SlnWarning"] = "Uploaded file is invalid! Please try again.";
                     return View(addAssgn);
-                }
+
+                }//end of invalid file upload function
+
             }//end of run without testcase
 
             //everything all okay 
             return RedirectToAction("ManageAssignments", "Lecturer");
+        }
+
+        //for Hangfire to run the submission
+        public int ProcessSubmission(string slnFilePath, string fileName, string assignmentTitle, string langType, bool isTestCasePresent)
+        {
+            int exitCode = 0;
+
+            //run the assignment grading in scheduler
+            Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, langType, isTestCasePresent);
+            exitCode = (int)sandbox.runSandboxedGrading();
+
+            return exitCode;
+        }
+
+        //check if the current JOB has finished running
+        public bool QueryJobFinish(string jobId)
+        {
+            //this method is to check the DB IF the job is finished
+            bool runningJob = true;
+            int runningJobId = Int32.Parse(jobId);
+            //this is the row with all the necessary data we need
+            State finalState = new State();
+
+            //we check the Hangfire.State table to see if our current job has succeeded running 
+            var stateList = db.States.Where(s => s.JobId == runningJobId).ToList();
+
+            //why stateList must be 3 then it will find the data
+            //Hangfire stores 3 job states -> Enqueued, Processing, Succeeded/Failure (found in Hangfire.State in DB)
+            //the return value is stored in the last state, which is either succeeded or failed
+            //to reduce workload on the server when querying job status, thats why it only goes into the loop when it has 'completed' the job
+            if (stateList.Count() == 3)
+            {
+                foreach (State s in stateList)
+                {
+                    if (s.Name == "Succeeded")
+                    {
+                        runningJob = false;
+                        finalState = s;
+                    }
+                    if (s.Name == "Failed")
+                    {
+                        //job has failed. break away from looping
+                        runningJob = false;
+                        finalState = s;
+
+                        //also, stop the job immediately as hangfire WILL re-try
+                        BackgroundJob.Delete(jobId);
+                    }
+                }
+            }
+
+            //IF the job has been run, we get the result and add it togther with the earlier submission model we partially filled up
+            if (runningJob == false)
+            {
+                //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
+                HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
+
+                //if the job was completed succeessfully -> means the work got graded
+                if (finalState.Name == "Succeeded")
+                {
+                    TempData["ExitCode"] = (int)dataObj.Result;
+                }
+
+                //if the job failed -> means the work didnt get graded and/or ran into some errors somewhere somehow
+                if (finalState.Name == "Failed")
+                {
+                    TempData["ExitCode"] = 3;
+                }
+            }
+
+            //this is to indicate if the job has finished running or not
+            return runningJob;
         }
 
         public bool AddAssignmentToDB(AddAssignmentViewModel addAssgn, string fileName, bool isTestCase)
