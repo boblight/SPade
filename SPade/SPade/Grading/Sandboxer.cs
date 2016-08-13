@@ -23,15 +23,14 @@ namespace SPade.Grading
         private Compiler c;
 
         //replace with your own machine name
-        const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
+        //const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
         //const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
-        //const string pathToUntrusted = "E:/School/Y3/SDP/SPade-MVC/SPade/SPade/Grading";
+        const string pathToUntrusted = "E:/School/Y3/SDP/SPade-MVC/SPade/SPade/Grading";
         //const string pathToUntrusted = "C:/inetpub/wwwroot/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
         string entryPoint; //method name
         private static string[] parameters = new string[4];
-        private bool isTestCasePresnt;
 
         public Sandboxer()
         {
@@ -44,7 +43,7 @@ namespace SPade.Grading
             this.assgnId = assgnId;
             entryPoint = "Grading";
 
-           // HttpContext.Current = ctx;
+            // HttpContext.Current = ctx;
 
             parameters[0] = c.getExePath();
             parameters[1] = HostingEnvironment.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
@@ -60,10 +59,10 @@ namespace SPade.Grading
 
             parameters[0] = c.getExePath();
             parameters[1] = language;
-            parameters[2] = HttpContext.Current.Server.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
+            parameters[2] = HostingEnvironment.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
             if (isTestCasePresent == true)
             {
-                parameters[3] = HttpContext.Current.Server.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
+                parameters[3] = HostingEnvironment.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
             }
             else
             {

@@ -1,6 +1,7 @@
 ﻿using Ionic.Zip;
 using Microsoft.AspNet.Identity;
 using SPade.Grading;
+using SPade.Models;
 using SPade.Models.DAL;
 using SPade.ViewModels.Student;
 using System;
@@ -16,14 +17,13 @@ using System.Web.Security.AntiXss;
 using Hangfire;
 using Newtonsoft.Json;
 
+
 namespace SPade.Controllers
 {
     [Authorize(Roles = "Student")]
     public class StudentController : Controller
     {
         private SPadeDBEntities db = new SPadeDBEntities();
-        private decimal Result;
-        private string jobID = "";
 
         // GET: Dashboard
         public ActionResult Dashboard()
@@ -112,6 +112,7 @@ namespace SPade.Controllers
             return RedirectToAction("PostSubmission");
         }//end of submit assignment
 
+        //the method which we call the scheduler to run
         public decimal ProcessSubmission(string filePathForGrade, string fileName, int assgnId, string langUsed)
         {
             decimal result;
@@ -123,20 +124,13 @@ namespace SPade.Controllers
             return result;
         }
 
-        public class DataObj
-        {
-            //this object is for the data that is retreived from the Hangfire State column
-            public DateTime SucceededAt { get; set; }
-            public int PerformanceDuration { get; set; }
-            public int Latency { get; set; }
-            public decimal Result { get; set; }
-        }
-
+        //Check the DB if a job has finished running
         public bool QueryJobFinish(string jobId)
         {
             //this method is to check the DB IF the job is finished
             bool runningJob = true;
             int runningJobId = Int32.Parse(jobId);
+            //this is the row with all the necessary data we need
             State succeededState = new State();
 
             //we check the Hangfire.State table to see if our current job has succeeded running 
@@ -155,11 +149,11 @@ namespace SPade.Controllers
             if (runningJob == false)
             {
                 //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
-                DataObj dObj = JsonConvert.DeserializeObject<DataObj>(succeededState.Data);
+                HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(succeededState.Data);
                 //Retrieve the earlier submission model here
                 Submission sub = (Submission)Session["TempSub"];
 
-                sub.Grade = dObj.Result;
+                sub.Grade = dataObj.Result;
 
                 db.Submissions.Add(sub);
                 db.SaveChanges();
