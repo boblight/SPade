@@ -554,15 +554,21 @@ namespace SPade.Controllers
         {
             AddStudentViewModel model = new AddStudentViewModel();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+            List<string> classnames = new List<string>();
+            List<int> classids = new List<int>();
 
             foreach (Class c in allClasses)
             {
                 String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
                 String className = courseAbbr + "/" + c.ClassName;
 
-                c.ClassName = className;
+                classids.Add(c.ClassID);
+                classnames.Add(className);
+                //c.ClassName = className;
             }
 
+            model.className = classnames;
+            model.classID = classids;
             model.Classes = allClasses;
             return View(model);
         }

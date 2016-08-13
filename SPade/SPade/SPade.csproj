@@ -220,6 +220,9 @@
     <Compile Include="Models\DAL\AspNetUserLogin.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\AspNetUserRole.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DAL\Assignment.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
@@ -477,10 +480,7 @@
     <Content Include="Views\Admin\ManageAdmin.cshtml" />
     <Content Include="Views\Admin\UpdateModule.cshtml" />
     <Content Include="Views\Lecturer\AddAssignment.cshtml" />
-    <Content Include="TempLecturerCSV\BulkAddLecturer0.csv" />
-    <Content Include="TempStudentCSV\BulkAddStudent0.csv" />
     <Content Include="Views\Lecturer\ViewTestcase.cshtml" />
-    <Content Include="TempLecturerCSV\BulkAddStudent1.csv" />
     <None Include="Web.Debug.Config">
       <DependentUpon>Web.Config</DependentUpon>
     </None>
@@ -497,6 +497,8 @@
     <Folder Include="Migrations\img\" />
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />
+    <Folder Include="TempLecturerCSV\" />
+    <Folder Include="TempStudentCSV\" />
     <Folder Include="TempSubmissions\" />
     <Folder Include="ViewModels\Accounts\" />
   </ItemGroup>

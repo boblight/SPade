@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Policy;
-using System.Web;
-using System.Xml;
 using System.Web.Hosting;
 
 namespace SPade.Grading
@@ -24,9 +21,9 @@ namespace SPade.Grading
 
         //replace with your own machine name
         //const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
-        // const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
-        const string pathToUntrusted = "E:/School/Y3/SDP/SPade-MVC/SPade/SPade/Grading";
-        //const string pathToUntrusted = "C:/inetpub/wwwroot/Grading";
+        //const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
+        //const string pathToUntrusted = "E:/School/Y3/SDP/SPade-MVC/SPade/SPade/Grading";
+        const string pathToUntrusted = "C:/inetpub/wwwroot/Grading";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
         string entryPoint; //method name
