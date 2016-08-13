@@ -1820,27 +1820,35 @@ namespace SPade.Controllers
         {
             XmlDocument testCaseFile = new XmlDocument();
             var pathToTestcase = Server.MapPath(@"~/TestCase/" + assignmentId + "testcase.xml");
-            testCaseFile.Load(pathToTestcase);
-            List<TestCase> tc = new List<TestCase>();
-
             ViewTestCaseViewModel vtcvm = new ViewTestCaseViewModel();
 
-            //vtcvm.testCaseFile = testCaseFile;
-
-            XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
-            foreach (XmlNode node in testcaseList)
+            try
             {
-                List<string> inputs = new List<string>();
-                TestCase testcase = new TestCase();
+                testCaseFile.Load(pathToTestcase);
+                List<TestCase> tc = new List<TestCase>();
 
-                foreach (XmlNode input in node.ChildNodes)
+                XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
+                foreach (XmlNode node in testcaseList)
                 {
-                    inputs.Add(input.InnerText);
+                    List<string> inputs = new List<string>();
+                    TestCase testcase = new TestCase();
+
+                    foreach (XmlNode input in node.ChildNodes)
+                    {
+                        inputs.Add(input.InnerText);
+                    }
+                    testcase.inputs = inputs;
+                    tc.Add(testcase);
                 }
-                testcase.inputs = inputs;
-                tc.Add(testcase);
+                vtcvm.IsTestCasePresent = true;
+                vtcvm.testcases = tc;
             }
-            vtcvm.testcases = tc;
+            catch (Exception ex)
+            {
+                //exception means no test case OR test case not present (which should not happen)
+                vtcvm.IsTestCasePresent = false;
+                vtcvm.NoTestCasePresent = "There are no test case available for this assignement";
+            }
 
             return View(vtcvm);
         }
