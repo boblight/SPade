@@ -135,17 +135,34 @@ namespace SPade.Controllers
             bool runningJob = true;
             int runningJobId = Int32.Parse(jobId);
             //this is the row with all the necessary data we need
-            State succeededState = new State();
+            State finalState = new State();
 
             //we check the Hangfire.State table to see if our current job has succeeded running 
             var stateList = db.States.Where(s => s.JobId == runningJobId).ToList();
 
-            foreach (State s in stateList)
+            //why stateList must be 3 then it will find the data
+            //Hangfire stores 3 job states -> Enqueued, Processing, Succeeded/Failure (found in Hangfire.State in DB)
+            //the return value is stored in the last state, which is either succeeded or failed
+            //to reduce workload on the server when querying job status, thats why it only goes into the loop when it has 'completed' the job
+            if (stateList.Count() == 3)
             {
-                if (s.Name == "Succeeded")
+                foreach (State s in stateList)
                 {
-                    runningJob = false;
-                    succeededState = s;
+                    if (s.Name == "Succeeded")
+                    {
+                        runningJob = false;
+                        finalState = s;
+                    }
+                    if (s.Name == "Failed")
+                    {
+                        //job has failed. break away from looping
+                        runningJob = false;
+                        finalState = s;
+
+                        //also, stop the job immediately as hangfire WILL re-try
+                        BackgroundJob.Delete(jobId);
+
+                    }
                 }
             }
 
@@ -153,14 +170,26 @@ namespace SPade.Controllers
             if (runningJob == false)
             {
                 //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
-                HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(succeededState.Data);
+                HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
                 //Retrieve the earlier submission model here
                 Submission sub = (Submission)Session["TempSub"];
 
-                sub.Grade = dataObj.Result;
+                //if the job was completed succeessfully -> means the work got graded
+                if (finalState.Name == "Succeeded")
+                {
+                    sub.Grade = dataObj.Result;
+                    db.Submissions.Add(sub);
+                    db.SaveChanges();
+                }
 
-                db.Submissions.Add(sub);
-                db.SaveChanges();
+                //if the job failed -> means the work didnt get graded and/or ran into some errors somewhere somehow
+                if (finalState.Name == "Failed")
+                {
+                    sub.Grade = 2;
+                    db.Submissions.Add(sub);
+                    db.SaveChanges();
+                }
+
                 Session.Remove("TempSub");
                 //now we store the completed submission model in a session to use for the post assignment page
                 Session["submission"] = sub;
@@ -294,6 +323,9 @@ namespace SPade.Controllers
             //this is to get the job running status
             bool isJobRunning;
 
+            //this is to count for any infinite loop
+            int counter = 0;
+
             //we get the job code that is assigned to it
             string jobSessionId = (string)Session["jobID"];
 
@@ -301,10 +333,18 @@ namespace SPade.Controllers
             {
                 //check if the job has finished running or not
                 isJobRunning = QueryJobFinish(jobSessionId);
-
-            } while (isJobRunning);
+                counter++;
+            } while (isJobRunning && counter < 10000);
 
             Submission submission = (Submission)Session["submission"];
+
+            if (counter >= 10000) //ran into infinite loop
+            {
+                //cancel job 
+                BackgroundJob.Delete(jobSessionId);
+                //set if run into infinite loop
+                submission.Grade = 3;
+            }
 
             if (submission.Grade == 2)
             {
