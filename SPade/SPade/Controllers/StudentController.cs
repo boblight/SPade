@@ -320,7 +320,8 @@ namespace SPade.Controllers
             }
             else if (submission.Grade == 4)
             {
-                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis.");
+                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
+                    "Also ensure that you have submitted the correct source code.");
                 submission.Grade = 0;
             }
             else if (submission.Grade < 1)
