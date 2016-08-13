@@ -82,8 +82,6 @@ namespace SPade.Controllers
             //Get all classes
             List<Course> allCourses = db.Courses.Where(c => c.DeletedAt == null).ToList();
             model.Courses = allCourses;
-            List<Lecturer> allLecturer = db.Lecturers.ToList();
-            model.Lecturers = allLecturer;
             return View(model);
         }
 
@@ -125,7 +123,7 @@ namespace SPade.Controllers
             model.Courses = allCourses;
 
             //Get class
-            Class c = db.Classes.ToList().Find(cl => cl.ClassID == int.Parse(id));
+            Class c = db.Classes.ToList().Find(cl => cl.ClassID == int.Parse(id) && cl.DeletedAt == null);
 
             model.ClassName = c.ClassName;
             model.ClassID = c.ClassID;
@@ -401,7 +399,7 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
 
             //Get Lecturer
-            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id);
+            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id && l.DeletedAt == null) ;
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == id).ToList();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
 
@@ -438,7 +436,7 @@ namespace SPade.Controllers
         public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command, string StaffID)
         {
             Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == StaffID);
-            List<Lecturer> Lecturers = db.Lecturers.ToList();
+            //List<Lecturer> Lecturers = db.Lecturers.ToList();
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == StaffID).ToList();
 
             if (command.Equals("Update"))
@@ -704,7 +702,7 @@ namespace SPade.Controllers
             model.Classes = allClasses;
 
             //Get Student           
-            Student student = db.Students.ToList().Find(st => st.AdminNo == id);
+            Student student = db.Students.ToList().Find(st => st.AdminNo == id && st.DeletedAt == null);
 
             model.AdminNo = student.AdminNo;
             model.Name = student.Name;
@@ -925,7 +923,7 @@ namespace SPade.Controllers
         public ActionResult UpdateCourse(int id)
         {
             AddCourseViewModel acvm = new AddCourseViewModel();
-            Course c = db.Courses.Where(course => course.CourseID == id).FirstOrDefault();
+            Course c = db.Courses.Where(course => course.CourseID == id && course.DeletedAt == null).FirstOrDefault();
             acvm.CourseAbv = c.CourseAbbr;
             acvm.CourseName = c.CourseName;
             acvm.CourseID = id;
@@ -1035,7 +1033,7 @@ namespace SPade.Controllers
         {
             UpdateAdminViewModel model = new UpdateAdminViewModel();
             //Get Lecturer
-            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == id);
+            Admin admin = db.Admins.ToList().Find(ad => ad.AdminID == id && ad.DeletedAt == null);
             model.AdminID = id;
             model.FullName = admin.FullName;
             model.ContactNo = admin.ContactNo;
