@@ -30,6 +30,7 @@ namespace SPade.Models.DAL
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
+        public virtual DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
         public virtual DbSet<Assignment> Assignments { get; set; }
         public virtual DbSet<Class> Classes { get; set; }
@@ -41,6 +42,7 @@ namespace SPade.Models.DAL
         public virtual DbSet<ProgLanguage> ProgLanguages { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Submission> Submissions { get; set; }
+        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<AggregatedCounter> AggregatedCounters { get; set; }
         public virtual DbSet<Counter> Counters { get; set; }
         public virtual DbSet<Hash> Hashes { get; set; }
