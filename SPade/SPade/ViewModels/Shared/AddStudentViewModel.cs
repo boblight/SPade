@@ -1,8 +1,5 @@
-﻿using System;
+﻿using SPade.Models.DAL;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using SPade.Models.DAL;
 using System.ComponentModel.DataAnnotations;
 
 namespace SPade.ViewModels.Shared
@@ -25,7 +22,7 @@ namespace SPade.ViewModels.Shared
         [Display(Name = "Contact Number")]
         public int ContactNo { get; set; }
         public List<Class> Classes { get; set; }
-        public string ClassName { get; set; }
-        public int ClassID { get; set; }
+        public List<string> className { get; set; }
+        public List<int> classID { get; set; }
     }
 }
