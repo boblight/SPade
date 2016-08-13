@@ -11,6 +11,7 @@ using System.Data;
 using System.Data.Entity.Validation;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -355,6 +356,23 @@ namespace SPade.Controllers
                         lect.UpdatedAt = DateTime.Now;
                         lect.UpdatedBy = User.Identity.GetUserName();
 
+                        //check through and validate all details
+                        //check staff id
+                        var match = Regex.Match(lect.StaffID, "^[s0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the staff id is invalid");
+                            return View();
+                        }
+
+                        //check contact no.
+                        match = Regex.Match(lect.ContactNo.ToString(), "^[0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the contact number is invalid");
+                            return View();
+                        }
+
                         lectlist.Add(lect);
 
                         var user = new ApplicationUser { UserName = lect.StaffID, Email = lect.Email };
@@ -636,7 +654,15 @@ namespace SPade.Controllers
                         string courseAbbr = lines[i].Split(',')[0];
                         string className = lines[i].Split(',')[1];
 
-                        s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                        try
+                        {
+                            s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                        }
+                        catch (Exception excp)
+                        {
+                            ModelState.AddModelError("", "There is an invalid course abbreviation or class name");
+                            return View();
+                        }
 
                         s.AdminNo = lines[i].Split(',')[2];
                         s.Name = lines[i].Split(',')[3];
@@ -646,6 +672,23 @@ namespace SPade.Controllers
                         s.CreatedBy = User.Identity.GetUserName();
                         s.UpdatedAt = DateTime.Now;
                         s.UpdatedBy = User.Identity.GetUserName();
+
+                        //check through and validate all details
+                        //check staff id
+                        var match = Regex.Match(s.AdminNo, "^[p0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the administrative number is invalid");
+                            return View();
+                        }
+
+                        //check contact no.
+                        match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
+                        if (!match.Success)
+                        {
+                            ModelState.AddModelError("", "One of the contact number is invalid");
+                            return View();
+                        }
 
                         slist.Add(s);
 
