@@ -350,7 +350,8 @@ namespace SPade.Controllers
             if (submission.Grade == 2)
             {
                 ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to an exception being thrown " +
-                    "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error.");
+                    "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error and make sure " +
+                    "you have uploaded the correct program.");
                 submission.Grade = 0;
             }
             else if (submission.Grade == 3)

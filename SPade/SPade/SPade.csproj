@@ -415,7 +415,6 @@
     <Content Include="Scripts\updateassignmentscript.js" />
     <Content Include="Scripts\wow.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="TestCase\testcase.xml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -505,6 +504,7 @@
     <Folder Include="TempLecturerCSV\" />
     <Folder Include="TempStudentCSV\" />
     <Folder Include="TempSubmissions\" />
+    <Folder Include="TestCase\" />
     <Folder Include="ViewModels\Accounts\" />
   </ItemGroup>
   <ItemGroup>
