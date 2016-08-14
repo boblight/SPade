@@ -229,72 +229,81 @@ namespace SPade.Controllers
 
                 string[] lines = System.IO.File.ReadAllLines(path);
                 List<Student> slist = new List<Student>();
-                for (int i = 1; i < lines.Length; i++)
+
+                try
                 {
-                    if (!string.IsNullOrEmpty(lines[i]))
+                    for (int i = 1; i < lines.Length; i++)
                     {
-                        Student s = new Student();
-                        string courseAbbr = lines[i].Split(',')[0];
-                        string className = lines[i].Split(',')[1];
-
-                        try
+                        if (!string.IsNullOrEmpty(lines[i]))
                         {
-                            s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
-                        }
-                        catch (Exception excp)
-                        {
-                            ModelState.AddModelError("", "There is an invalid course abbreviation or class name");
-                            return View();
-                        }
+                            Student s = new Student();
+                            string courseAbbr = lines[i].Split(',')[0];
+                            string className = lines[i].Split(',')[1];
 
-                        s.AdminNo = lines[i].Split(',')[2];
-                        s.Name = lines[i].Split(',')[3];
-                        s.Email = lines[i].Split(',')[4];
-                        s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
-                        s.CreatedAt = DateTime.Now;
-                        s.CreatedBy = User.Identity.GetUserName();
-                        s.UpdatedAt = DateTime.Now;
-                        s.UpdatedBy = User.Identity.GetUserName();
-
-                        //check through and validate all details
-                        //check staff id
-                        var match = Regex.Match(s.AdminNo, "^[p0-9]{8,8}$");
-                        if (!match.Success)
-                        {
-                            ModelState.AddModelError("", "One of the administrative number is invalid");
-                            return View();
-                        }
-
-                        //check contact no.
-                        match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
-                        if (!match.Success)
-                        {
-                            ModelState.AddModelError("", "One of the contact number is invalid");
-                            return View();
-                        }
-
-                        slist.Add(s);
-
-                        var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
-                        user.EmailConfirmed = true;
-                        var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
-                        if (result.Succeeded)
-                        {
-                            UserManager.AddToRole(user.Id, "Student");
-                        }
-                        else
-                        {
-                            string errors = "";
-
-                            foreach (string err in result.Errors)
+                            try
                             {
-                                errors += err + "\n";
+                                s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                            }
+                            catch (Exception excp)
+                            {
+                                ModelState.AddModelError("", "There is an invalid course abbreviation or class name");
+                                return View();
                             }
 
-                            ModelState.AddModelError("", errors);
-                            return View();
+                            s.AdminNo = lines[i].Split(',')[2];
+                            s.Name = lines[i].Split(',')[3];
+                            s.Email = lines[i].Split(',')[4];
+                            s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
+                            s.CreatedAt = DateTime.Now;
+                            s.CreatedBy = User.Identity.GetUserName();
+                            s.UpdatedAt = DateTime.Now;
+                            s.UpdatedBy = User.Identity.GetUserName();
+
+                            //check through and validate all details
+                            //check staff id
+                            var match = Regex.Match(s.AdminNo, "^[p0-9]{8,8}$");
+                            if (!match.Success)
+                            {
+                                ModelState.AddModelError("", "One of the administrative number is invalid");
+                                return View();
+                            }
+
+                            //check contact no.
+                            match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
+                            if (!match.Success)
+                            {
+                                ModelState.AddModelError("", "One of the contact number is invalid");
+                                return View();
+                            }
+
+                            slist.Add(s);
+
+                            var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
+                            user.EmailConfirmed = true;
+                            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                            if (result.Succeeded)
+                            {
+                                UserManager.AddToRole(user.Id, "Student");
+                            }
+                            else
+                            {
+                                string errors = "";
+
+                                foreach (string err in result.Errors)
+                                {
+                                    errors += err + "\n";
+                                }
+
+                                ModelState.AddModelError("", errors);
+                                return View();
+                            }
                         }
                     }
+                }
+                catch (Exception bulkExc)
+                {
+                    ModelState.AddModelError("", "Error while process bulk upload. Ensure data and format is correct.");
+                    return View();
                 }
                 db.Students.AddRange(slist);
                 db.SaveChanges();

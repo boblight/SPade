@@ -356,59 +356,68 @@ namespace SPade.Controllers
 
                 string[] lines = System.IO.File.ReadAllLines(path);
                 List<Lecturer> lectlist = new List<Lecturer>();
-                for (int i = 1; i < lines.Length; i++)
+
+                try
                 {
-                    if (!string.IsNullOrEmpty(lines[i]))
+                    for (int i = 1; i < lines.Length; i++)
                     {
-                        Lecturer lect = new Lecturer();
-                        lect.StaffID = lines[i].Split(',')[0];
-                        lect.Name = lines[i].Split(',')[1];
-                        lect.Email = lines[i].Split(',')[2];
-                        lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
-                        lect.CreatedAt = DateTime.Now;
-                        lect.CreatedBy = User.Identity.GetUserName();
-                        lect.UpdatedAt = DateTime.Now;
-                        lect.UpdatedBy = User.Identity.GetUserName();
-
-                        //check through and validate all details
-                        //check staff id
-                        var match = Regex.Match(lect.StaffID, "^[s0-9]{8,8}$");
-                        if (!match.Success)
+                        if (!string.IsNullOrEmpty(lines[i]))
                         {
-                            ModelState.AddModelError("", "One of the staff id is invalid");
-                            return View();
-                        }
+                            Lecturer lect = new Lecturer();
+                            lect.StaffID = lines[i].Split(',')[0];
+                            lect.Name = lines[i].Split(',')[1];
+                            lect.Email = lines[i].Split(',')[2];
+                            lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
+                            lect.CreatedAt = DateTime.Now;
+                            lect.CreatedBy = User.Identity.GetUserName();
+                            lect.UpdatedAt = DateTime.Now;
+                            lect.UpdatedBy = User.Identity.GetUserName();
 
-                        //check contact no.
-                        match = Regex.Match(lect.ContactNo.ToString(), "^[0-9]{8,8}$");
-                        if (!match.Success)
-                        {
-                            ModelState.AddModelError("", "One of the contact number is invalid");
-                            return View();
-                        }
-
-                        lectlist.Add(lect);
-
-                        var user = new ApplicationUser { UserName = lect.StaffID, Email = lect.Email };
-                        user.EmailConfirmed = true;
-                        var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
-                        if (result.Succeeded)
-                        {
-                            UserManager.AddToRole(user.Id, "Lecturer");
-                        }
-                        else
-                        {
-                            string errors = "";
-
-                            foreach (string err in result.Errors)
+                            //check through and validate all details
+                            //check staff id
+                            var match = Regex.Match(lect.StaffID, "^[s0-9]{8,8}$");
+                            if (!match.Success)
                             {
-                                errors += err + "\n";
+                                ModelState.AddModelError("", "One of the staff id is invalid");
+                                return View();
                             }
 
-                            ModelState.AddModelError("", errors);
-                            return View();
+                            //check contact no.
+                            match = Regex.Match(lect.ContactNo.ToString(), "^[0-9]{8,8}$");
+                            if (!match.Success)
+                            {
+                                ModelState.AddModelError("", "One of the contact number is invalid");
+                                return View();
+                            }
+
+                            lectlist.Add(lect);
+
+                            var user = new ApplicationUser { UserName = lect.StaffID, Email = lect.Email };
+                            user.EmailConfirmed = true;
+                            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                            if (result.Succeeded)
+                            {
+                                UserManager.AddToRole(user.Id, "Lecturer");
+                            }
+                            else
+                            {
+                                string errors = "";
+
+                                foreach (string err in result.Errors)
+                                {
+                                    errors += err + "\n";
+                                }
+
+                                ModelState.AddModelError("", errors);
+                                return View();
+                            }
                         }
                     }
+                }
+                catch (Exception bulkEx)
+                {
+                    ModelState.AddModelError("", "Error while process bulk upload. Ensure data and format is correct.");
+                    return View();
                 }
                 db.Lecturers.AddRange(lectlist);
                 db.SaveChanges();
@@ -431,7 +440,7 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
 
             //Get Lecturer
-            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id && l.DeletedAt == null) ;
+            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id && l.DeletedAt == null);
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == id).ToList();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
 
@@ -663,76 +672,86 @@ namespace SPade.Controllers
 
                 string[] lines = System.IO.File.ReadAllLines(path);
                 List<Student> slist = new List<Student>();
-                for (int i = 1; i < lines.Length; i++)
+
+                try
                 {
-
-                    if (!string.IsNullOrEmpty(lines[i]))
+                    for (int i = 1; i < lines.Length; i++)
                     {
-                        Student s = new Student();
-                        //s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
 
-                        string courseAbbr = lines[i].Split(',')[0];
-                        string className = lines[i].Split(',')[1];
-
-                        try
+                        if (!string.IsNullOrEmpty(lines[i]))
                         {
-                            s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
-                        }
-                        catch (Exception excp)
-                        {
-                            ModelState.AddModelError("", "There is an invalid course abbreviation or class name");
-                            return View();
-                        }
+                            Student s = new Student();
+                            //s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
 
-                        s.AdminNo = lines[i].Split(',')[2];
-                        s.Name = lines[i].Split(',')[3];
-                        s.Email = lines[i].Split(',')[4];
-                        s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
-                        s.CreatedAt = DateTime.Now;
-                        s.CreatedBy = User.Identity.GetUserName();
-                        s.UpdatedAt = DateTime.Now;
-                        s.UpdatedBy = User.Identity.GetUserName();
+                            string courseAbbr = lines[i].Split(',')[0];
+                            string className = lines[i].Split(',')[1];
 
-                        //check through and validate all details
-                        //check staff id
-                        var match = Regex.Match(s.AdminNo, "^[p0-9]{8,8}$");
-                        if (!match.Success)
-                        {
-                            ModelState.AddModelError("", "One of the administrative number is invalid");
-                            return View();
-                        }
-
-                        //check contact no.
-                        match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
-                        if (!match.Success)
-                        {
-                            ModelState.AddModelError("", "One of the contact number is invalid");
-                            return View();
-                        }
-
-                        slist.Add(s);
-
-                        var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
-                        user.EmailConfirmed = true;
-                        var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
-                        if (result.Succeeded)
-                        {
-                            UserManager.AddToRole(user.Id, "Student");
-                        }
-                        else
-                        {
-                            string errors = "";
-
-                            foreach (string err in result.Errors)
+                            try
                             {
-                                errors += err + "\n";
+                                s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                            }
+                            catch (Exception excp)
+                            {
+                                ModelState.AddModelError("", "There is an invalid course abbreviation or class name");
+                                return View();
                             }
 
-                            ModelState.AddModelError("", errors);
-                            return View();
+                            s.AdminNo = lines[i].Split(',')[2];
+                            s.Name = lines[i].Split(',')[3];
+                            s.Email = lines[i].Split(',')[4];
+                            s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
+                            s.CreatedAt = DateTime.Now;
+                            s.CreatedBy = User.Identity.GetUserName();
+                            s.UpdatedAt = DateTime.Now;
+                            s.UpdatedBy = User.Identity.GetUserName();
+
+                            //check through and validate all details
+                            //check staff id
+                            var match = Regex.Match(s.AdminNo, "^[p0-9]{8,8}$");
+                            if (!match.Success)
+                            {
+                                ModelState.AddModelError("", "One of the administrative number is invalid");
+                                return View();
+                            }
+
+                            //check contact no.
+                            match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
+                            if (!match.Success)
+                            {
+                                ModelState.AddModelError("", "One of the contact number is invalid");
+                                return View();
+                            }
+
+                            slist.Add(s);
+
+                            var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
+                            user.EmailConfirmed = true;
+                            var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
+                            if (result.Succeeded)
+                            {
+                                UserManager.AddToRole(user.Id, "Student");
+                            }
+                            else
+                            {
+                                string errors = "";
+
+                                foreach (string err in result.Errors)
+                                {
+                                    errors += err + "\n";
+                                }
+
+                                ModelState.AddModelError("", errors);
+                                return View();
+                            }
                         }
                     }
                 }
+                catch (Exception BulkEx)
+                {
+                    ModelState.AddModelError("", "Error while process bulk upload. Ensure data and format is correct.");
+                    return View();
+                }
+
                 db.Students.AddRange(slist);
                 db.SaveChanges();
                 DeleteCSV(fileName);
@@ -1120,10 +1139,18 @@ namespace SPade.Controllers
             }
             else
             {
-                admin.DeletedAt = DateTime.Now;
-                admin.DeletedBy = User.Identity.Name;
+                if (admin.AdminID == User.Identity.Name)
+                {
+                    ModelState.AddModelError("", "You are not allowed to delete your own account.");
+                    return View(model);
+                }
+                else
+                {
+                    admin.DeletedAt = DateTime.Now;
+                    admin.DeletedBy = User.Identity.Name;
 
-                db.SaveChanges();
+                    db.SaveChanges();
+                }
             }
 
             return RedirectToAction("ManageAdmin");
