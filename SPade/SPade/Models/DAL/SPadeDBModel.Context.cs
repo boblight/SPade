@@ -42,7 +42,6 @@ namespace SPade.Models.DAL
         public virtual DbSet<ProgLanguage> ProgLanguages { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Submission> Submissions { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<AggregatedCounter> AggregatedCounters { get; set; }
         public virtual DbSet<Counter> Counters { get; set; }
         public virtual DbSet<Hash> Hashes { get; set; }

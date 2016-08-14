@@ -54,11 +54,11 @@
       <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Hangfire.Core, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9f5eeeebc011402e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Hangfire.Core.1.6.2\lib\net45\Hangfire.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Hangfire.SqlServer, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9f5eeeebc011402e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Hangfire.SqlServer.1.6.2\lib\net45\Hangfire.SqlServer.dll</HintPath>
     </Reference>
@@ -194,6 +194,7 @@
     <Compile Include="Controllers\LecturerController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
+    <Compile Include="Filter\HangfireAuthorizationFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -301,9 +302,6 @@
     <Compile Include="Models\DAL\Submission.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\DAL\sysdiagram.cs">
-      <DependentUpon>SPadeDBModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\GmailService.cs" />
     <Compile Include="Models\HangfireData.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -389,8 +387,6 @@
     <Content Include="Models\DAL\SPadeDBModel.edmx.diagram">
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
     </Content>
-    <None Include="Properties\PublishProfiles\IIS.pubxml" />
-    <None Include="Properties\PublishProfiles\TestIIS.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\daterangepicker.js" />
     <Content Include="Scripts\indexscript.js" />
@@ -498,6 +494,7 @@
     <Folder Include="App_Data\Uploads\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="Migrations\img\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Solutions\" />
     <Folder Include="Submissions\" />
     <Folder Include="TempLecturerCSV\" />
@@ -518,12 +515,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Visual Studio 2015\Projects\Grade\Grade\Grade.csproj">
-      <Project>{74fdb689-d5b4-410b-a7b8-5fbd6cacbfdf}</Project>
-      <Name>Grade</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
