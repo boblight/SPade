@@ -20,6 +20,7 @@ namespace SPade.ViewModels.Admin
         public string Name { get; set; }
         [Required]
         [EmailAddress]
+        [MaxLength(50, ErrorMessage = "Email is too long.")]
         public string Email { get; set; }
         [Required]
         [RegularExpression("^[0-9]{8,8}$", ErrorMessage = "Please enter a proper Singapore-based phone number")]
