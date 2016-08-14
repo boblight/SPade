@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPade", "SPade\SPade.csproj", "{263BBC19-8958-48BF-8031-3163A79CF1A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grade", "..\..\..\..\Visual Studio 2015\Projects\Grade\Grade\Grade.csproj", "{74FDB689-D5B4-410B-A7B8-5FBD6CACBFDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{263BBC19-8958-48BF-8031-3163A79CF1A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{263BBC19-8958-48BF-8031-3163A79CF1A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{263BBC19-8958-48BF-8031-3163A79CF1A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74FDB689-D5B4-410B-A7B8-5FBD6CACBFDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74FDB689-D5B4-410B-A7B8-5FBD6CACBFDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74FDB689-D5B4-410B-A7B8-5FBD6CACBFDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74FDB689-D5B4-410B-A7B8-5FBD6CACBFDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

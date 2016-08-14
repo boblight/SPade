@@ -59,8 +59,8 @@ namespace SPade.Controllers
                     submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
                     var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower());
                     var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
-                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
-
+                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePathForGrade);
+                    
                     if (fileDirectory.Exists)
                     {
                         foreach (FileInfo files in fileDirectory.GetFiles())
@@ -72,6 +72,7 @@ namespace SPade.Controllers
                             dir.Delete(true);
                         }
                     }
+
                     fileDirectory.Create(); // Recreates directory to update latest submission
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
