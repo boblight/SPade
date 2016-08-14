@@ -1650,7 +1650,7 @@ namespace SPade.Controllers
                 newAssignment.Describe = addAssgn.Describe;
                 newAssignment.MaxAttempt = addAssgn.MaxAttempt;
                 newAssignment.StartDate = addAssgn.StartDate;
-                //newAssignment.DueDate = addAssgn.DueDate;
+                newAssignment.DueDate = addAssgn.DueDate;
                 newAssignment.Solution = addAssgn.Solution;
                 newAssignment.ModuleCode = addAssgn.ModuleId;
                 newAssignment.CreateBy = User.Identity.GetUserName();
