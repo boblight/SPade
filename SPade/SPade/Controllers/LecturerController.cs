@@ -631,6 +631,11 @@ namespace SPade.Controllers
                                         ogPath = slnFilePath + "/" + fileName + ".cs";
                                         newPath = path + "/" + fileName + ".cs";
                                     }
+                                    else if (lang.LangageType.Equals("Python"))
+                                    {
+                                        ogPath = slnFilePath + "/" + fileName + ".py";
+                                        newPath = path + "/" + fileName + ".py";
+                                    }
 
                                     try
                                     {
@@ -845,6 +850,11 @@ namespace SPade.Controllers
                                     {
                                         ogPath = slnFilePath + "/" + fileName + ".cs";
                                         newPath = path + "/" + fileName + ".cs";
+                                    }
+                                    else if (lang.LangageType.Equals("Python"))
+                                    {
+                                        ogPath = slnFilePath + "/" + fileName + ".py";
+                                        newPath = path + "/" + fileName + ".py";
                                     }
 
                                     try
@@ -1550,6 +1560,11 @@ namespace SPade.Controllers
                             {
                                 ogPath = slnFilePath + "/" + fileName + ".cs";
                                 newPath = path + "/" + fileName + ".cs";
+                            }
+                            else if (lang.LangageType.Equals("Python"))
+                            {
+                                ogPath = slnFilePath + "/" + fileName + ".py";
+                                newPath = path + "/" + fileName + ".py";
                             }
 
                             try
