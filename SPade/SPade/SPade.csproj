@@ -205,6 +205,9 @@
     <Compile Include="Models\DAL\Admin.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\AggregatedCounter.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DAL\AspNetRole.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
@@ -217,6 +220,9 @@
     <Compile Include="Models\DAL\AspNetUserLogin.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\AspNetUserRole.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DAL\Assignment.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
@@ -226,10 +232,25 @@
     <Compile Include="Models\DAL\Class_Assgn.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\Counter.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DAL\Course.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\C__MigrationHistory.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Hash.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Job.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\JobParameter.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\JobQueue.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Lecturer.cs">
@@ -238,10 +259,22 @@
     <Compile Include="Models\DAL\Lec_Class.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\List.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DAL\Module.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\ProgLanguage.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Schema.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Server.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\Set.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\SPadeDBModel.Context.cs">
@@ -258,6 +291,9 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SPadeDBModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\State.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Student.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
