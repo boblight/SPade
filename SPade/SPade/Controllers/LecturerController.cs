@@ -79,13 +79,9 @@ namespace SPade.Controllers
                 managedClasses.AddRange(temp);
             }
 
-
-
-
             //get the students in that classs
             foreach (Class c in managedClasses)
             {
-
                 ManageClassesViewModel e = new ManageClassesViewModel();
                 //match the class ID of student wit hthe class ID of the managed Classes
                 var count = db.Students.Where(s => s.ClassID == c.ClassID).Where(s => s.DeletedAt == null).Count();
@@ -97,11 +93,9 @@ namespace SPade.Controllers
                 e.NumberOfStudents = count;
 
                 manageClassView.Add(e);
-
             }
 
             return View(manageClassView);
-
         }
 
         public ActionResult ViewStudentsByClass(string Id)
@@ -324,7 +318,6 @@ namespace SPade.Controllers
 
                 classids.Add(c.ClassID);
                 classnames.Add(className);
-                //c.ClassName = className;
             }
 
             model.className = classnames;
@@ -545,6 +538,10 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateAssignment(UpdateAssignmentViewModel uAVM, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload, string command)
         {
+            int exitCode = 0, counter = 0;
+            bool isJobRunning;
+            string currentJobId;
+
             //users click the UPDATE button
             if (command.Equals("Update"))
             {
@@ -556,7 +553,8 @@ namespace SPade.Controllers
                         //failed to update assignment 
                         uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                        TempData["GeneralError"] = "Failed to update assignment to database. Please try again!";
+                        string logTitle = (string)TempData["Exception"];
+                        TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
                         return View(uAVM);
                     }
                 }
@@ -634,54 +632,91 @@ namespace SPade.Controllers
                                     //3 is program has failed to run
                                     //4 is program was caught in an infinite loop
 
-                                    Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, true);
-                                    int exitCode = (int)sandbox.runSandboxedGrading();
+                                    //add grading of assignment to scheduler to be schduled to mark
+                                    currentJobId = BackgroundJob.Enqueue(() => ProcessSubmission(slnFilePath, fileName, assignmentTitle, lang.LangageType, true));
 
-                                    if (exitCode == 1)
+                                    //check if the job has successfully run
+                                    do
                                     {
-                                        //update DB + rename solution/testcase
-                                        if (UpdateAssignmentToDB(uAVM, true, true) == true)
+                                        isJobRunning = QueryJobFinish(currentJobId);
+                                        counter++;
+
+                                    } while (isJobRunning && counter < 10000);
+
+                                    if (isJobRunning == false)
+                                    {
+                                        //see the result from the job
+                                        if (counter >= 10000)
                                         {
-                                            //failed to update DB
+                                            //program took too long to process
+                                            exitCode = 2952;
+                                            BackgroundJob.Delete(currentJobId);
+                                        }
+                                        else
+                                        {
+                                            //progra run successfully
+                                            exitCode = (int)TempData["ExitCode"];
+                                        }
+
+                                        if (exitCode == 1)
+                                        {
+                                            //update DB + rename solution/testcase
+                                            if (UpdateAssignmentToDB(uAVM, true, true) == true)
+                                            {
+                                                //failed to update DB
+                                                DeleteFile(fileName, assignmentTitle, true);
+                                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                                string logTitle = (string)TempData["Exception"];
+                                                TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                                return View(uAVM);
+                                            }
+
+                                            //delete the uploaded sln but not test case
+                                            DeleteFile(fileName, assignmentTitle, false);
+
+                                        }//end of run succesfully method 
+
+                                        else if (exitCode == 2)
+                                        {
                                             DeleteFile(fileName, assignmentTitle, true);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                            TempData["GeneralError"] = "Failed to save assignment to database. Please try again.";
+                                            TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                             return View(uAVM);
                                         }
 
-                                        //delete the uploaded sln but not test case
-                                        DeleteFile(fileName, assignmentTitle, false);
+                                        else if (exitCode == 3)
+                                        {
+                                            //solution failed to run 
+                                            DeleteFile(fileName, assignmentTitle, true);
+                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                            TempData["GeneralError"] = "The program has failed to run entirely. Please check your program.";
+                                            return View(uAVM);
+                                        }
 
-                                    }//end of run succesfully method 
+                                        else if (exitCode == 4)
+                                        {
+                                            //solution stuck in infinite loop
+                                            DeleteFile(fileName, assignmentTitle, true);
+                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
+                                            return View(uAVM);
+                                        }
 
-                                    else if (exitCode == 2)
-                                    {
-                                        DeleteFile(fileName, assignmentTitle, true);
-                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                        uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                        TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
-                                        return View(uAVM);
-                                    }
+                                        else if (exitCode == 2952)
+                                        {
+                                            //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                            DeleteFile(fileName, assignmentTitle, true);
+                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
+                                            return View(uAVM);
+                                        }
 
-                                    else if (exitCode == 3)
-                                    {
-                                        //solution failed to run 
-                                        DeleteFile(fileName, assignmentTitle, true);
-                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                        uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                        TempData["GeneralError"] = "The program has failed to run entirely. Please check your program.";
-                                        return View(uAVM);
-                                    }
-                                    else if (exitCode == 4)
-                                    {
-                                        //solution stuck in infinite loop
-                                        DeleteFile(fileName, assignmentTitle, true);
-                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                        uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                        return View(uAVM);
-                                    }
+                                    }//end of processing submission
                                 }
                                 else
                                 {
@@ -713,6 +748,7 @@ namespace SPade.Controllers
                             TempData["TcWarning"] = err;
                             return View(uAVM);
                         }
+
                     }//end of run with testcase
 
                     //run solution without testcase 
@@ -773,34 +809,67 @@ namespace SPade.Controllers
 
                                     System.IO.File.Move(ogPath, newPath);
 
-                                    Sandboxer sandBoxGrading = new Sandboxer(slnFilePath, fileName, assignmentTitle, lang.LangageType, false);
-                                    int exitCode = (int)sandBoxGrading.runSandboxedGrading();
+                                    //schedule the file processing
+                                    currentJobId = BackgroundJob.Enqueue(() => ProcessSubmission(slnFilePath, fileName, assignmentTitle, lang.LangageType, false));
 
-                                    if (exitCode == 1)
+                                    //check if file has been processed
+                                    do
                                     {
-                                        //save to DB + rename the NEW solution file + delete the OLD solution file
-                                        if (UpdateAssignmentToDB(uAVM, true, false) == true)
+                                        isJobRunning = QueryJobFinish(currentJobId);
+                                        counter++;
+
+                                    } while (isJobRunning && counter < 10000);
+
+                                    if (isJobRunning == false)
+                                    {
+                                        if (counter >= 1000)
                                         {
-                                            //solution has failed to save to DB
+                                            exitCode = 2952;
+                                            BackgroundJob.Delete(currentJobId);
+                                        }
+                                        else
+                                        {
+                                            exitCode = (int)TempData["ExitCode"];
+                                        }
+
+                                        if (exitCode == 1)
+                                        {
+                                            //save to DB + rename the NEW solution file + delete the OLD solution file
+                                            if (UpdateAssignmentToDB(uAVM, true, false) == true)
+                                            {
+                                                //solution has failed to save to DB
+                                                DeleteFile(fileName, assignmentTitle, false);
+                                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                                string logTitle = (string)TempData["Exception"];
+                                                TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                                return View(uAVM);
+                                            }
+
+                                            //delete the uploaded sln
+                                            DeleteFile(fileName, assignmentTitle, false);
+
+                                        }
+
+                                        else if (exitCode == 3)
+                                        {
+                                            //solution failed to run 
                                             DeleteFile(fileName, assignmentTitle, false);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                            TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
+                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
+                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                             return View(uAVM);
                                         }
 
-                                        //delete the uploaded sln
-                                        DeleteFile(fileName, assignmentTitle, false);
-
-                                    }
-                                    else if (exitCode == 3)
-                                    {
-                                        //solution failed to run 
-                                        DeleteFile(fileName, assignmentTitle, false);
-                                        uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                        uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
-                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                        return View(uAVM);
+                                        else if (exitCode == 2952)
+                                        {
+                                            //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                            DeleteFile(fileName, assignmentTitle, false);
+                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
+                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
+                                            return View(uAVM);
+                                        }
                                     }
 
                                 }
@@ -839,7 +908,8 @@ namespace SPade.Controllers
 
                 }//end of updateSolution
 
-            }
+            }//end of Update Assignment 
+
             else
             {
                 //delete assignment 
@@ -848,7 +918,8 @@ namespace SPade.Controllers
                     //failed to delete assignment 
                     uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                     uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                    TempData["GeneralError"] = "Failed to delete assignment. Please try again!";
+                    string logTitle = (string)TempData["Exception"];
+                    TempData["GeneralError"] = "Failed to delete assignment from database ! Please contact your administrator with the code " + logTitle + " and try again. ";
                     return View(uAVM);
                 }
             }
@@ -856,7 +927,6 @@ namespace SPade.Controllers
             //successfully updating assignment to DB
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
-
 
         public bool DeleteAssignment(UpdateAssignmentViewModel uAVM)
         {
@@ -875,6 +945,8 @@ namespace SPade.Controllers
             }
             catch (Exception ex)
             {
+                string logName = ErrorLogging(ex.ToString(), "Deleting Assignment");
+                TempData["Exception"] = logName;
                 isFailed = true;
             }
 
@@ -997,6 +1069,8 @@ namespace SPade.Controllers
             }//end of try 
             catch (Exception ex)
             {
+                string logName = ErrorLogging(ex.ToString(), "Updating Assignment");
+                TempData["Exception"] = logName;
                 isFailed = true;
             }
 
@@ -1104,7 +1178,7 @@ namespace SPade.Controllers
                             var path = System.IO.Path.Combine(slnFilePath, toLowerPath);
                             Directory.CreateDirectory(path);
 
-                            ////get the language and pass into grader
+                            //get the language and pass into grader
                             ProgLanguage lang = db.ProgLanguages.ToList().Find(l => l.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == addAssgn.ModuleId).LanguageId);
 
                             var ogPath = "";
@@ -1171,8 +1245,7 @@ namespace SPade.Controllers
                                 //this is the result reutrned from after the assignment has been processed
                                 if (counter >= 10000)
                                 {
-                                    //the program was caught in infinite loop and the scheduler cannot process in time
-                                    exitCode = 2952;
+                                    //the program took too long to process
                                     //we delete the job
                                     BackgroundJob.Delete(currentJobId);
                                 }
@@ -1194,8 +1267,8 @@ namespace SPade.Controllers
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
                                         addAssgn.IsPostBack = 1;
-                                        string err = (string)TempData["Exception"];
-                                        TempData["GeneralError"] = err;
+                                        string logTitle = (string)TempData["Exception"];
+                                        TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
                                         return View(addAssgn);
                                     }
                                     //delete the uploaded sln
@@ -1264,7 +1337,7 @@ namespace SPade.Controllers
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
                                     addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to generate answers on time. Please upload your solution and try again !";
+                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
                                     return View(addAssgn);
 
                                 }//end of scheduler failed to run
@@ -1410,8 +1483,8 @@ namespace SPade.Controllers
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
-                                        addAssgn.IsPostBack = 1;
-                                        TempData["GeneralError"] = "Failed to save assignment to database! Please try again.";
+                                        string logTitle = (string)TempData["Exception"];
+                                        TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
                                         return View(addAssgn);
                                     }
 
@@ -1577,7 +1650,7 @@ namespace SPade.Controllers
                 newAssignment.Describe = addAssgn.Describe;
                 newAssignment.MaxAttempt = addAssgn.MaxAttempt;
                 newAssignment.StartDate = addAssgn.StartDate;
-                newAssignment.DueDate = addAssgn.DueDate;
+                //newAssignment.DueDate = addAssgn.DueDate;
                 newAssignment.Solution = addAssgn.Solution;
                 newAssignment.ModuleCode = addAssgn.ModuleId;
                 newAssignment.CreateBy = User.Identity.GetUserName();
@@ -1648,9 +1721,8 @@ namespace SPade.Controllers
             catch (Exception ex)
             {
                 //failed to save to DB. will show something to user
-                //System.IO.File.AppendAllText("C:/inetpub/wwwroot/debuggg.txt", "" + ex.Message);
-                //failed to save to DB. will show something to user\
-                TempData["Exception"] = ex.Message;
+                string logName = ErrorLogging(ex.ToString(), "Adding Assignment");
+                TempData["Exception"] = logName;
                 isFailed = true;
             }
             return isFailed;
@@ -1741,6 +1813,24 @@ namespace SPade.Controllers
             return ClassList;
         }
 
+        private string ErrorLogging(string ex, string task)
+        {
+            //used to log errors when saving to db. makes it much easier to know whats going on
+            string user = String.Format("Logged in user: {0}" + System.Environment.NewLine, User.Identity.GetUserName());
+            string userTask = String.Format("User task: {0} " + System.Environment.NewLine, task);
+            string exception = String.Format("Exception Log: {0} " + System.Environment.NewLine, ex);
+
+            string log = user + userTask + System.Environment.NewLine + exception;
+
+            string fileName = "ErrorLog" + DateTime.Now.ToString("ddMMyyyyhhmmss");
+            string filePath = Server.MapPath(@"~/ErrorLogs/");
+            string fullPath = filePath + fileName + ".txt";
+
+            System.IO.File.WriteAllText(fullPath, log);
+
+            return fileName;
+        }
+
         //View Results
         public ActionResult ViewResults()
         {
@@ -1756,7 +1846,6 @@ namespace SPade.Controllers
                 List<Class> temp = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.ClassID == lc.ClassID).ToList();
                 managedClasses.AddRange(temp);
             }
-
 
             List<String> classIds = new List<String>();
             List<String> classNames = new List<String>();
@@ -1803,7 +1892,6 @@ namespace SPade.Controllers
         [HttpGet]
         public ActionResult Download(string file)
         {
-
             string path = "~/Submissions/" + file;
             string zipname = file + ".zip";
 
@@ -1851,7 +1939,7 @@ namespace SPade.Controllers
             {
                 //exception means no test case OR test case not present (which should not happen)
                 vtcvm.IsTestCasePresent = false;
-                vtcvm.NoTestCasePresent = "There are no test case available for this assignement";
+                vtcvm.NoTestCasePresent = "There are no test case available for this assignment";
             }
 
             return View(vtcvm);

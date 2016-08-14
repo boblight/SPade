@@ -431,7 +431,7 @@ namespace SPade.Controllers
             List<AssignmentClass> ac = new List<AssignmentClass>();
 
             //Get Lecturer
-            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id && l.DeletedAt == null) ;
+            Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id && l.DeletedAt == null);
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == id).ToList();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
 
@@ -468,7 +468,6 @@ namespace SPade.Controllers
         public ActionResult UpdateLecturer(UpdateLecturerViewModel model, string command, string StaffID)
         {
             Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == StaffID);
-            //List<Lecturer> Lecturers = db.Lecturers.ToList();
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == StaffID).ToList();
 
             if (command.Equals("Update"))
@@ -564,7 +563,6 @@ namespace SPade.Controllers
 
                 classids.Add(c.ClassID);
                 classnames.Add(className);
-                //c.ClassName = className;
             }
 
             model.className = classnames;
@@ -669,8 +667,6 @@ namespace SPade.Controllers
                     if (!string.IsNullOrEmpty(lines[i]))
                     {
                         Student s = new Student();
-                        //s.ClassID = Int32.Parse(lines[i].Split(',')[0]);
-
                         string courseAbbr = lines[i].Split(',')[0];
                         string className = lines[i].Split(',')[1];
 
