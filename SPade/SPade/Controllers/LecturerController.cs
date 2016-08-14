@@ -1195,6 +1195,7 @@ namespace SPade.Controllers
                                         ModelState.Remove("IsPostBack");
                                         addAssgn.IsPostBack = 1;
                                         string err = (string)TempData["Exception"];
+                                        Session.Remove("Exception");
                                         TempData["GeneralError"] = err;
                                         return View(addAssgn);
                                     }
@@ -1569,6 +1570,9 @@ namespace SPade.Controllers
             string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", "");
             bool isFailed = false; //used to tell the user if the assignment has already been successfully save to DB
 
+            var sqlFormattedSDate = addAssgn.StartDate.Date.ToString("yyyy-MM-dd HH:mm:ss");
+            var sqlFormattedDDate = addAssgn.DueDate.Date.ToString("yyyy-MM-dd HH:mm:ss");
+
             try
             {
                 //save the main assignment to DB
@@ -1576,8 +1580,8 @@ namespace SPade.Controllers
                 newAssignment.AssgnTitle = addAssgn.AssgnTitle;
                 newAssignment.Describe = addAssgn.Describe;
                 newAssignment.MaxAttempt = addAssgn.MaxAttempt;
-                newAssignment.StartDate = addAssgn.StartDate;
-                newAssignment.DueDate = addAssgn.DueDate;
+                newAssignment.StartDate = DateTime.Parse(sqlFormattedSDate);
+                newAssignment.DueDate = DateTime.Parse(sqlFormattedDDate);
                 newAssignment.Solution = addAssgn.Solution;
                 newAssignment.ModuleCode = addAssgn.ModuleId;
                 newAssignment.CreateBy = User.Identity.GetUserName();
@@ -1650,7 +1654,7 @@ namespace SPade.Controllers
                 //failed to save to DB. will show something to user
                 //System.IO.File.AppendAllText("C:/inetpub/wwwroot/debuggg.txt", "" + ex.Message);
                 //failed to save to DB. will show something to user\
-                TempData["Exception"] = ex.Message;
+                TempData["Exception"] = ex.InnerException.Message;
                 isFailed = true;
             }
             return isFailed;
