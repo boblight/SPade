@@ -123,7 +123,6 @@ namespace SPade.Controllers
                     case (SignInStatus.Success):
                         {
                             return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
-                            //return RedirectToLocal(returnUrl);
                         }
 
                     case SignInStatus.LockedOut:
@@ -239,7 +238,6 @@ namespace SPade.Controllers
                 List<Student> studlist = db.Students.ToList();
 
                 //check if email and admin no. has alr been used
-                //if (db.Students.ToList().Find(a => a.Email == model.Email).Equals(null))
                 if (studlist.FindAll(s => s.Email == model.Email).Count == 0)
                 {
                     if (db.Students.ToList().FindAll(s => s.AdminNo == model.AdminNo).Count == 0)

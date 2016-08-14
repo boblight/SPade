@@ -345,6 +345,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Grading\Grade.exe" />
+    <Content Include="img\bg-home.jpg" />
+    <Content Include="img\favicon.ico" />
+    <Content Include="img\logo.png" />
+    <Content Include="img\logo2.png" />
+    <Content Include="img\screenshot.png" />
     <Content Include="Ionic.Zip.xml" />
     <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
@@ -493,6 +498,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Uploads\" />
+    <Folder Include="ErrorLogs\" />
     <Folder Include="fonts\font-awesome\" />
     <Folder Include="Migrations\img\" />
     <Folder Include="Properties\PublishProfiles\" />
