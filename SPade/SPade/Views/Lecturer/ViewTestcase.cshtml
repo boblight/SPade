@@ -7,35 +7,47 @@
 @Styles.Render("~/bundles/tablestyle")
 
 <div class="container">
-    <div class="col-md-4 col-md-offset-4 form-horizontal">
+    <div class="col-md-8 col-md-offset-2">
+
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Inputs</th>
+                    <th>Testcase Inputs</th>
                 </tr>
             </thead>
             <tbody>
                 @{
-                    int count = 1;
-                    foreach (var testcase in Model.testcases)
+                    if (Model.IsTestCasePresent == true)
+                    {
+
+                        int count = 1;
+                        foreach (var testcase in Model.testcases)
+                        {
+                            <tr>
+                                <td>@count</td>
+                                <td>
+                                    <ol type="i">
+                                        @foreach (var input in testcase.inputs)
+                                        {
+                                            <li>@input</li>
+                                        }
+                                    </ol>
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@count</td>
-                            <td>
-                                <ul>
-                                    @foreach (var input in testcase.inputs)
-                                    {
-                                        <li>@input</li>
-                                    }
-                                </ul>
-                            </td>
+                            @Html.DisplayFor(m => m.NoTestCasePresent)
                         </tr>
-
-                        count++;
                     }
                 }
             </tbody>
         </table>
+
     </div>
 </div>

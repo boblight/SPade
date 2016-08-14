@@ -123,7 +123,6 @@ namespace SPade.Controllers
                     case (SignInStatus.Success):
                         {
                             return RedirectToAction("RedirectLogin", new { ReturnUrl = returnUrl });
-                            //return RedirectToLocal(returnUrl);
                         }
 
                     case SignInStatus.LockedOut:
@@ -214,7 +213,7 @@ namespace SPade.Controllers
         {
             RegisterViewModel rvm = new RegisterViewModel();
             List<Class> managedClasses = db.Classes.Where(c2 => c2.DeletedAt == null).ToList();
-            
+
             foreach (Class c in managedClasses)
             {
                 String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
@@ -222,7 +221,7 @@ namespace SPade.Controllers
 
                 c.ClassName = className;
             }
-            
+
             rvm.classList = managedClasses;
 
             return View(rvm);
@@ -239,7 +238,6 @@ namespace SPade.Controllers
                 List<Student> studlist = db.Students.ToList();
 
                 //check if email and admin no. has alr been used
-                //if (db.Students.ToList().Find(a => a.Email == model.Email).Equals(null))
                 if (studlist.FindAll(s => s.Email == model.Email).Count == 0)
                 {
                     if (db.Students.ToList().FindAll(s => s.AdminNo == model.AdminNo).Count == 0)

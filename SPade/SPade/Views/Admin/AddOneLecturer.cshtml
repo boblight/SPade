@@ -39,8 +39,7 @@
                     <label class="control-label">
                         Select classes to allocate lecturer to
                     </label>
-                    @*@Html.TextBoxFor(m => m.SelectedClasses, new { @class = "form-control", @placeholder = "Select classes...", @readonly = "true", @data-toggle = "modal", @data-target = "#myModal"})*@
-                    <input class="form-control" type="text" readonly="readonly" placeholder="Select classes..." data-toggle="modal" data-target="#classModal"/>
+                    <input class="form-control" id="selectedClasses" name="selectedClasses" type="text" readonly="readonly" placeholder="Select classes..." data-toggle="modal" data-target="#classModal" />
                     <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
                 </div>
             </div>
@@ -80,7 +79,7 @@
                                     @Html.HiddenFor(m => Model.ClassList[i].ClassId)
                                     @Html.CheckBoxFor(m => Model.ClassList[i].isSelected, new { @id = "cL", @data_class_name = @Model.ClassList[i].ClassName })
                                     @Model.ClassList[i].ClassName
-                                    <br/>
+                                    <br />
                                 }
                             }
                         </div>
@@ -90,6 +89,19 @@
                     </div>
                 </div>
             </div>
+
+            <script>
+                $("#modalSelect").click(function () {
+                    var selectedClasses = [];
+                    $('input[type="checkbox"][name*="isSelected"]').each(function () {
+                        if (this.checked) {
+                            var c = $(this).data("class-name");
+                            selectedClasses.push(c)
+                        }
+                    })
+                    $("#selectedClasses").val(selectedClasses);
+                })
+            </script>
 
             <div class="form-group">
                 <div class="col-md-12">

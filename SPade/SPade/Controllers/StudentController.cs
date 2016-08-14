@@ -1,6 +1,7 @@
 ﻿using Ionic.Zip;
 using Microsoft.AspNet.Identity;
 using SPade.Grading;
+using SPade.Models;
 using SPade.Models.DAL;
 using SPade.ViewModels.Student;
 using System;
@@ -13,6 +14,9 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security.AntiXss;
+using Hangfire;
+using Newtonsoft.Json;
+
 
 namespace SPade.Controllers
 {
@@ -31,10 +35,8 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult SubmitAssignment(HttpPostedFileBase file)
         {
-            decimal result = 0;
             string submissionName = "";
-
-            Submission submission = new Submission();
+            Submission tempSubmission = new Submission();
             int assgnId = (int)Session["assignmentId"];
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
             //query for which programming language needed to be used for this assignment
@@ -57,8 +59,8 @@ namespace SPade.Controllers
                     submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
                     var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower());
                     var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
-                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePath);
-
+                    System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePathForGrade);
+                    
                     if (fileDirectory.Exists)
                     {
                         foreach (FileInfo files in fileDirectory.GetFiles())
@@ -70,31 +72,34 @@ namespace SPade.Controllers
                             dir.Delete(true);
                         }
                     }
+
                     fileDirectory.Create(); // Recreates directory to update latest submission
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
                     //grade submission
-                    Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed.LangageType);
-
                     //grade returns an 'exitcode'
                     //if result is more than 1 then is error code
                     //2 for execption thrown
                     //3 for infinite loop
                     //4 for run error
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
-             
-                    result = sandBoxedGrading.runSandboxedGrading();
 
-                    if (result > 1)
-                    {
-                        result = 0;
-                    }
+                    //this part is grading the assignment. we add to the scheduler to process it
+                    var jobID = BackgroundJob.Enqueue(() => ProcessSubmission(filePathForGrade, fileName, assgnId, langUsed.LangageType));
+
+                    //fill up the the submission model partially 
+                    //only result not in -> this will come AFTER the scheduler successfully runs the assignment
+                    tempSubmission.AssignmentID = assgnId;
+                    tempSubmission.AdminNo = User.Identity.GetUserName();
+                    tempSubmission.FilePath = submissionName;
+                    tempSubmission.Timestamp = DateTime.Now;
+
+                    Session["TempSub"] = tempSubmission;
+                    Session["jobID"] = jobID;
                 }
             }
             else if (file == null)
             {
-                //Session["UploadError"] = "Please select a file to upload.";
-                //return RedirectToAction("SubmitAssignment", assgnId);
                 ModelState.AddModelError("UploadError", "Please select a file to upload.");
                 return View();
             }
@@ -104,19 +109,96 @@ namespace SPade.Controllers
                 return RedirectToAction("SubmitAssignment", assgnId);
             }
 
-            submission.Grade = result;
-            submission.AssignmentID = assgnId;
-            submission.AdminNo = User.Identity.GetUserName();
-            submission.FilePath = submissionName;
-            submission.Timestamp = DateTime.Now;
-
-            db.Submissions.Add(submission);
-            db.SaveChanges();
-
-            Session["submission"] = submission;
-
             return RedirectToAction("PostSubmission");
         }//end of submit assignment
+
+        //the method which we call the scheduler to run
+        public decimal ProcessSubmission(string filePathForGrade, string fileName, int assgnId, string langUsed)
+        {
+            decimal result;
+
+            //the grading of the assignment is done here (the scheduler adds this to queue)
+            Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed);
+            result = sandBoxedGrading.runSandboxedGrading();
+
+            if (result > 1)
+            {
+                result = 0;
+            }
+
+            return result;
+        }
+
+        //Check the DB if a job has finished running
+        public bool QueryJobFinish(string jobId)
+        {
+            //this method is to check the DB IF the job is finished
+            bool runningJob = true;
+            int runningJobId = Int32.Parse(jobId);
+            //this is the row with all the necessary data we need
+            State finalState = new State();
+
+            //we check the Hangfire.State table to see if our current job has succeeded running 
+            var stateList = db.States.Where(s => s.JobId == runningJobId).ToList();
+
+            //why stateList must be 3 then it will find the data
+            //Hangfire stores 3 job states -> Enqueued, Processing, Succeeded/Failure (found in Hangfire.State in DB)
+            //the return value is stored in the last state, which is either succeeded or failed
+            //to reduce workload on the server when querying job status, thats why it only goes into the loop when it has 'completed' the job
+            if (stateList.Count() == 3)
+            {
+                foreach (State s in stateList)
+                {
+                    if (s.Name == "Succeeded")
+                    {
+                        runningJob = false;
+                        finalState = s;
+                    }
+                    if (s.Name == "Failed")
+                    {
+                        //job has failed. break away from looping
+                        runningJob = false;
+                        finalState = s;
+
+                        //also, stop the job immediately as hangfire WILL re-try
+                        BackgroundJob.Delete(jobId);
+
+                    }
+                }
+            }
+
+            //IF the job has been run, we get the result and add it togther with the earlier submission model we partially filled up
+            if (runningJob == false)
+            {
+                //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
+                HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
+                //Retrieve the earlier submission model here
+                Submission sub = (Submission)Session["TempSub"];
+
+                //if the job was completed succeessfully -> means the work got graded
+                if (finalState.Name == "Succeeded")
+                {
+                    sub.Grade = dataObj.Result;
+                    db.Submissions.Add(sub);
+                    db.SaveChanges();
+                }
+
+                //if the job failed -> means the work didnt get graded and/or ran into some errors somewhere somehow
+                if (finalState.Name == "Failed")
+                {
+                    sub.Grade = 2;
+                    db.Submissions.Add(sub);
+                    db.SaveChanges();
+                }
+
+                Session.Remove("TempSub");
+                //now we store the completed submission model in a session to use for the post assignment page
+                Session["submission"] = sub;
+            }
+
+            //this is to indicate if the job has finished running or not
+            return runningJob;
+        }
 
         // GET: SubmitAssignment
         public ActionResult SubmitAssignment(int id)
@@ -125,8 +207,6 @@ namespace SPade.Controllers
             SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
             svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
-
-
 
             Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
             svm.Module = module.ModuleCode + " " + module.ModuleName;
@@ -148,7 +228,6 @@ namespace SPade.Controllers
 
             return View(svm);
         }//end of get SubmitAssignment
-
 
         // GET: ViewAssignment
         public ActionResult ViewAssignment()
@@ -239,15 +318,40 @@ namespace SPade.Controllers
             return View(vrvm);
         }
 
-        // GET:
+        // GET: PostSubmission
         public ActionResult PostSubmission()
         {
+            //this is to get the job running status
+            bool isJobRunning;
+
+            //this is to count for any infinite loop
+            int counter = 0;
+
+            //we get the job code that is assigned to it
+            string jobSessionId = (string)Session["jobID"];
+
+            do
+            {
+                //check if the job has finished running or not
+                isJobRunning = QueryJobFinish(jobSessionId);
+                counter++;
+            } while (isJobRunning && counter < 10000);
+
             Submission submission = (Submission)Session["submission"];
+
+            if (counter >= 10000) //ran into infinite loop
+            {
+                //cancel job 
+                BackgroundJob.Delete(jobSessionId);
+                //set if run into infinite loop
+                submission.Grade = 3;
+            }
 
             if (submission.Grade == 2)
             {
                 ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to an exception being thrown " +
-                    "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error.");
+                    "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error and make sure " +
+                    "you have uploaded the correct program.");
                 submission.Grade = 0;
             }
             else if (submission.Grade == 3)
@@ -258,7 +362,8 @@ namespace SPade.Controllers
             }
             else if (submission.Grade == 4)
             {
-                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis.");
+                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
+                    "Also ensure that you have submitted the correct source code.");
                 submission.Grade = 0;
             }
             else if (submission.Grade < 1)
