@@ -26,6 +26,5 @@ namespace SPade.Models.DAL
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
         public string UserName { get; set; }
-        public bool IsLoggedIn { get; set; }
     }
 }

@@ -80,7 +80,6 @@
           <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="UserName" Type="varchar" MaxLength="20" Nullable="false" />
-          <Property Name="IsLoggedIn" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Assignment">
           <Key>
@@ -633,7 +632,6 @@
           <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
           <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
           <Property Name="UserName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="IsLoggedIn" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="Assignment">
           <Key>
@@ -1212,7 +1210,6 @@
                 <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
                 <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="IsLoggedIn" ColumnName="IsLoggedIn" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

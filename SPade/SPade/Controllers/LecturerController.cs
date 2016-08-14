@@ -1571,7 +1571,7 @@ namespace SPade.Controllers
             try
             {
                 //save the main assignment to DB
-                addAssgn.Solution = "~/Solutions/" + assignmentTitle + ".xml";
+                addAssgn.Solution = Server.MapPath(@"~/Solutions/") + assignmentTitle + ".xml";
                 newAssignment.AssgnTitle = addAssgn.AssgnTitle;
                 newAssignment.Describe = addAssgn.Describe;
                 newAssignment.MaxAttempt = addAssgn.MaxAttempt;
@@ -1647,6 +1647,7 @@ namespace SPade.Controllers
             catch (Exception ex)
             {
                 //failed to save to DB. will show something to user
+                //System.IO.File.AppendAllText("C:/inetpub/wwwroot/debuggg.txt", "" + ex.Message);
                 isFailed = true;
             }
             return isFailed;
