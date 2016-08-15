@@ -589,6 +589,7 @@ namespace SPade.Controllers
                                         {
                                             foreach (FileInfo files in fileDirectory.GetFiles())
                                             {
+                                                files.IsReadOnly = false;
                                                 files.Delete();
                                             }
                                             foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
@@ -809,6 +810,7 @@ namespace SPade.Controllers
                                         {
                                             foreach (FileInfo files in fileDirectory.GetFiles())
                                             {
+                                                files.IsReadOnly = false;
                                                 files.Delete();
                                             }
                                             foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
@@ -1228,6 +1230,7 @@ namespace SPade.Controllers
                                 {
                                     foreach (FileInfo files in fileDirectory.GetFiles())
                                     {
+                                        files.IsReadOnly = false;
                                         files.Delete();
                                     }
                                     foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
@@ -1517,6 +1520,7 @@ namespace SPade.Controllers
                                 {
                                     foreach (FileInfo files in fileDirectory.GetFiles())
                                     {
+                                        files.IsReadOnly = false;
                                         files.Delete();
                                     }
                                     foreach (DirectoryInfo dir in fileDirectory.GetDirectories())
