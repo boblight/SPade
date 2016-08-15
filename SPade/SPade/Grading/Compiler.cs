@@ -23,8 +23,8 @@ namespace SPade.Grading
                     try
                     {
                         //compile java program
-                        //compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
-                        compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_101/bin/javac.exe", fileName + ".java");
+                        compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
+                        //compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_101/bin/javac.exe", fileName + ".java");
                         compileInfo.CreateNoWindow = true;
                         compileInfo.UseShellExecute = false;
                         compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
@@ -43,8 +43,8 @@ namespace SPade.Grading
                     try
                     {
                         //compile c# program
-                        //compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", fileName + ".cs");
-                        compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework/v4.0.30319/csc.exe", fileName + ".cs");
+                        compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", fileName + ".cs");
+                        //compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework/v4.0.30319/csc.exe", fileName + ".cs");
                         compileInfo.CreateNoWindow = true;
                         compileInfo.UseShellExecute = false;
                         compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
