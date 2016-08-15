@@ -67,6 +67,7 @@ namespace SPade.Models
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
+        [MaxLength(50, ErrorMessage = "Email is too long.")]
         public string Email { get; set; }
 
         [Required]

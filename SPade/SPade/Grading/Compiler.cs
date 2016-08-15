@@ -34,7 +34,7 @@ namespace SPade.Grading
                     }
                     catch (Exception e)
                     {
-                        pathToExecutable = e.Message;//signal that compilation error
+                        pathToExecutable = "";//signal that compilation error
                         break;
                     }
                     pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
@@ -54,7 +54,7 @@ namespace SPade.Grading
                     }
                     catch (Exception e)
                     {
-                        pathToExecutable = "" + e.Message;//signal that compilation error
+                        pathToExecutable = "";//signal that compilation error
                         break;
                     }
                     pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".exe";

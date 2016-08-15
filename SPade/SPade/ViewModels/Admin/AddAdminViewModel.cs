@@ -14,6 +14,7 @@ namespace SPade.ViewModels.Admin
         public int ContactNo { get; set; }
         [Required]
         [EmailAddress]
+        [MaxLength(50, ErrorMessage = "Email is too long.")]
         public string Email { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Do not exceed 50 characters")]
