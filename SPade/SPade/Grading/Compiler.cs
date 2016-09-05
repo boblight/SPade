@@ -29,7 +29,7 @@ namespace SPade.Grading
                     compileInfo.RedirectStandardError = true;
                     compile = Process.Start(compileInfo);
 
-                    if (compile.StandardError != null)
+                    if (!compile.StandardError.ReadToEnd().Equals(""))
                     {
                         pathToExecutable = "";//signal that compilation error
                     }
@@ -50,7 +50,7 @@ namespace SPade.Grading
                     compileInfo.RedirectStandardError = true;
                     compile = Process.Start(compileInfo);
 
-                    if (compile.StandardError != null)
+                    if (!compile.StandardError.ReadToEnd().Equals(""))
                     {
                         pathToExecutable = "";//signal that compilation error
                     }

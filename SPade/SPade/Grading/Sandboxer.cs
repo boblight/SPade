@@ -68,7 +68,7 @@ namespace SPade.Grading
         {
             if (parameters[0] == "")
             {
-                return 5;
+                return 5; //no compiled filepath
             }
 
             pathToUntrusted = Path.Combine(HttpRuntime.AppDomainAppPath, "Grading/");
