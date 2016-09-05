@@ -20,44 +20,46 @@ namespace SPade.Grading
             switch (language)
             {
                 case "Java":
-                    try
-                    {
-                        //compile java program
-                        compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
-                        //compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_101/bin/javac.exe", fileName + ".java");
-                        compileInfo.CreateNoWindow = true;
-                        compileInfo.UseShellExecute = false;
-                        compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
-                        compile = Process.Start(compileInfo);
+                    //compile java program
+                    compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
+                    //compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_101/bin/javac.exe", fileName + ".java");
+                    compileInfo.CreateNoWindow = true;
+                    compileInfo.UseShellExecute = false;
+                    compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
+                    compileInfo.RedirectStandardError = true;
+                    compile = Process.Start(compileInfo);
 
-                        compile.WaitForExit(5000);//compilation process ends
-                    }
-                    catch (Exception e)
+                    if (compile.StandardError != null)
                     {
                         pathToExecutable = "";//signal that compilation error
-                        break;
                     }
-                    pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
+                    else
+                    {
+                        pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
+                    }
+
+                    compile.WaitForExit(5000);//compilation process ends
                     break;
                 case "C#":
-                    try
-                    {
-                        //compile c# program
-                        compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", fileName + ".cs");
-                        //compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework/v4.0.30319/csc.exe", fileName + ".cs");
-                        compileInfo.CreateNoWindow = true;
-                        compileInfo.UseShellExecute = false;
-                        compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
-                        compile = Process.Start(compileInfo);
+                    //compile c# program
+                    compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", fileName + ".cs");
+                    //compileInfo = new ProcessStartInfo("C:/Windows/Microsoft.NET/Framework/v4.0.30319/csc.exe", fileName + ".cs");
+                    compileInfo.CreateNoWindow = true;
+                    compileInfo.UseShellExecute = false;
+                    compileInfo.WorkingDirectory = filePath + "/" + fileName.ToLower();
+                    compileInfo.RedirectStandardError = true;
+                    compile = Process.Start(compileInfo);
 
-                        compile.WaitForExit();//compilation process ends
-                    }
-                    catch (Exception e)
+                    if (compile.StandardError != null)
                     {
                         pathToExecutable = "";//signal that compilation error
-                        break;
                     }
-                    pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".exe";
+                    else
+                    {
+                        pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".exe";
+                    }
+
+                    compile.WaitForExit();//compilation process ends
                     break;
                 case "Python":
                     pathToExecutable = filePath + "\\" + fileName.ToLower() + "\\" + fileName + ".py";

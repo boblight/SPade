@@ -66,6 +66,11 @@ namespace SPade.Grading
 
         public decimal runSandboxedGrading()
         {
+            if (parameters[0] == "")
+            {
+                return 5;
+            }
+
             pathToUntrusted = Path.Combine(HttpRuntime.AppDomainAppPath, "Grading/");
 
             //Setting the AppDomainSetup. It is very important to set the ApplicationBase to a folder 

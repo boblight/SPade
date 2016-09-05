@@ -82,6 +82,7 @@ namespace SPade.Controllers
                     //2 for execption thrown
                     //3 for infinite loop
                     //4 for run error
+                    //5 for compilation error
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
 
                     //this part is grading the assignment. we add to the scheduler to process it
@@ -362,6 +363,11 @@ namespace SPade.Controllers
             {
                 ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
                     "Also ensure that you have submitted the correct source code.");
+                toUpdate.Grade = 0;
+            }
+            else if (submission.Grade == 5)
+            {
+                ModelState.AddModelError("SubmissionError", "Program cannot be compiled, ensure you submit the correct source code.");
                 toUpdate.Grade = 0;
             }
             else if (submission.Grade < 1)
