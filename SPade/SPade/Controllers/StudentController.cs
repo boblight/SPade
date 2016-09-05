@@ -60,7 +60,7 @@ namespace SPade.Controllers
                     var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower());
                     var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
                     System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePathForGrade);
-                    
+
                     if (fileDirectory.Exists)
                     {
                         foreach (FileInfo files in fileDirectory.GetFiles())
@@ -101,7 +101,8 @@ namespace SPade.Controllers
             else if (file == null)
             {
                 ModelState.AddModelError("UploadError", "Please select a file to upload.");
-                return View();
+                //return View();
+                return RedirectToAction("SubmitAssignment", assgnId);
             }
             else if (Path.GetExtension(file.FileName) != ".zip")
             {
@@ -120,11 +121,6 @@ namespace SPade.Controllers
             //the grading of the assignment is done here (the scheduler adds this to queue)
             Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed);
             result = sandBoxedGrading.runSandboxedGrading();
-
-            if (result > 1)
-            {
-                result = 0;
-            }
 
             return result;
         }
@@ -347,30 +343,33 @@ namespace SPade.Controllers
                 submission.Grade = 3;
             }
 
+            Submission toUpdate = db.Submissions.Where(s => s.SubmissionID == submission.SubmissionID).FirstOrDefault();
+
             if (submission.Grade == 2)
             {
                 ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to an exception being thrown " +
                     "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error and make sure " +
                     "you have uploaded the correct program.");
-                submission.Grade = 0;
+                toUpdate.Grade = 0;
             }
             else if (submission.Grade == 3)
             {
                 ModelState.AddModelError("SubmissionError", "Your program has encountered an infinite loop. Please check through your program and make appropriate " +
                     "modification.");
-                submission.Grade = 0;
+                toUpdate.Grade = 0;
             }
             else if (submission.Grade == 4)
             {
                 ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
                     "Also ensure that you have submitted the correct source code.");
-                submission.Grade = 0;
+                toUpdate.Grade = 0;
             }
             else if (submission.Grade < 1)
             {
                 ModelState.AddModelError("SubmissionError", "Program has failed a couple of test cases. Please check through your program and make appropriate " +
                     "modification to meet the requirements stated in the assignment description.");
             }
+            db.SaveChanges();
 
             Session.Remove("submission"); //clear session
             return View(submission);

@@ -10,7 +10,7 @@
         @using (Html.BeginForm("SubmitAssignment", "Student", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.ValidationSummary("", new { @class = "text-danger" })
 
             <!-- To change assignment id to assignment title when database updated -->
             <legend>@Html.DisplayFor(modelItem => modelItem.assignment.AssgnTitle)</legend>

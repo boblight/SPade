@@ -6,6 +6,7 @@ using System.Runtime.Remoting;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Policy;
+using System.Web;
 using System.Web.Hosting;
 
 namespace SPade.Grading
@@ -18,12 +19,8 @@ namespace SPade.Grading
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private Compiler c;
-
-        //replace with your own machine name
-        //const string pathToUntrusted = "C:/Users/tongliang/Documents/Visual Studio 2015/Projects/Grade/Grade/bin/Debug/";
-        const string pathToUntrusted = "C:/Users/tongliang/Documents/FYP/projectfiles/SPade/SPade/SPade/Grading";
-        //const string pathToUntrusted = "E:/School/Y3/SDP/SPade-MVC/SPade/SPade/Grading";
-        //const string pathToUntrusted = "C:/inetpub/wwwroot/Grading";
+                
+        string pathToUntrusted = "";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
         string entryPoint; //method name
@@ -69,7 +66,7 @@ namespace SPade.Grading
 
         public decimal runSandboxedGrading()
         {
-            //Code taken from: https://msdn.microsoft.com/en-us/library/bb763046(v=vs.110).aspx
+            pathToUntrusted = Path.Combine(HttpRuntime.AppDomainAppPath, "Grading/");
 
             //Setting the AppDomainSetup. It is very important to set the ApplicationBase to a folder 
             //other than the one in which the sandboxer resides.
@@ -92,6 +89,7 @@ namespace SPade.Grading
             newDomain.SetData("param3", parameters[2]);
             newDomain.SetData("param4", parameters[3]);
             newDomain.SetData("entryPoint", entryPoint);
+            newDomain.SetData("uPath", pathToUntrusted);
 
             //Use CreateInstanceFrom to load an instance of the Sandboxer class into the
             //new AppDomain.
@@ -110,6 +108,7 @@ namespace SPade.Grading
             parameters[2] = newDomain.GetData("param3").ToString();
             parameters[3] = newDomain.GetData("param4").ToString();
             this.entryPoint = newDomain.GetData("entryPoint").ToString();
+            this.pathToUntrusted = newDomain.GetData("uPath").ToString();
 
             return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
         }
