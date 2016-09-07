@@ -60,7 +60,7 @@ namespace SPade.Controllers
                     var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower());
                     var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
                     System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePathForGrade);
-                    
+
                     if (fileDirectory.Exists)
                     {
                         foreach (FileInfo files in fileDirectory.GetFiles())
@@ -147,53 +147,36 @@ namespace SPade.Controllers
             //to reduce workload on the server when querying job status, thats why it only goes into the loop when it has 'completed' the job
             if (stateList.Count() == 3)
             {
-                foreach (State s in stateList)
-                {
-                    if (s.Name == "Succeeded")
-                    {
-                        runningJob = false;
-                        finalState = s;
-                    }
-                    if (s.Name == "Failed")
-                    {
-                        //job has failed. break away from looping
-                        runningJob = false;
-                        finalState = s;
+                //3 means job has finished running. now is to check the results 
+                runningJob = false;
+                finalState = stateList.Last();
+                Submission sub = (Submission)Session["TempSub"]; //Retrieve the earlier submission model here
 
-                        //also, stop the job immediately as hangfire WILL re-try
-                        BackgroundJob.Delete(jobId);
-
-                    }
-                }
-            }
-
-            //IF the job has been run, we get the result and add it togther with the earlier submission model we partially filled up
-            if (runningJob == false)
-            {
-                //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
-                HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
-                //Retrieve the earlier submission model here
-                Submission sub = (Submission)Session["TempSub"];
-
-                //if the job was completed succeessfully -> means the work got graded
                 if (finalState.Name == "Succeeded")
                 {
+                    //job finished running and successfully run. 
+
+                    //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
+                    HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
+
+                    //get the grade and add to database
                     sub.Grade = dataObj.Result;
                     db.Submissions.Add(sub);
                     db.SaveChanges();
                 }
-
-                //if the job failed -> means the work didnt get graded and/or ran into some errors somewhere somehow
-                if (finalState.Name == "Failed")
+                else
                 {
+                    //job finished but failed to run the solution
                     sub.Grade = 2;
                     db.Submissions.Add(sub);
                     db.SaveChanges();
                 }
 
                 Session.Remove("TempSub");
-                //now we store the completed submission model in a session to use for the post assignment page
+
+                //store the completed submission obj for use in the post submission page
                 Session["submission"] = sub;
+
             }
 
             //this is to indicate if the job has finished running or not

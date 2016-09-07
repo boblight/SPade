@@ -13,6 +13,8 @@
 
     setInitialClass();
 
+    $("#deleteProgress").hide();
+
     //Start Date Selector JS
     $('input[name="StartDate"]').daterangepicker({
         opens: "center",
@@ -24,13 +26,13 @@
         locale: {
             format: 'DD/MM/YYYY h:mm A'
         }
-    })
+    });
 
     //bind action when apply is clicked
     $('input[name="StartDate"]').on('apply.daterangepicker', function (ev, picker) {
 
         //if user selects a start date, reinit duedate selector with new values 
-        var selectedDate = $('#StartDate').val()
+        var selectedDate = $('#StartDate').val();
 
         $('input[name="DueDate"]').daterangepicker({
             opens: "center",
@@ -42,7 +44,7 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
+        });
     });
 
     //Due Date Selector JS    
@@ -56,14 +58,14 @@
         locale: {
             format: 'DD/MM/YYYY h:mm A'
         }
-    })
+    });
 
     //used to reset the datepickers 
     $("#resetBtn").click(function () {
 
         //remove the old pickers
-        $("#StartDate").data("daterangepicker").remove()
-        $("#DueDate").data("daterangepicker").remove()
+        $("#StartDate").data("daterangepicker").remove();
+        $("#DueDate").data("daterangepicker").remove();
 
         //bind the picker again
         $('input[name="StartDate"]').daterangepicker({
@@ -76,12 +78,12 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
+        });
         //set the action again
         $('input[name="StartDate"]').on('apply.daterangepicker', function (ev, picker) {
 
             //if user selects a start date, reinit duedate selector with new values 
-            var selectedDate = $('#StartDate').val()
+            var selectedDate = $('#StartDate').val();
 
             $('input[name="DueDate"]').daterangepicker({
                 opens: "center",
@@ -93,7 +95,7 @@
                 locale: {
                     format: 'DD/MM/YYYY h:mm A'
                 }
-            })
+            });
         });
 
         //bind the picker again
@@ -107,15 +109,15 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
-    })
+        });
+    });
 
     //used to reset the datepickers to the original dates from the assignment 
     $("#resetDefaultDate").click(function () {
 
         //remove the old pickers
-        $("#StartDate").data("daterangepicker").remove()
-        $("#DueDate").data("daterangepicker").remove()
+        $("#StartDate").data("daterangepicker").remove();
+        $("#DueDate").data("daterangepicker").remove();
 
         //bind the picker again
         $('input[name="StartDate"]').daterangepicker({
@@ -128,12 +130,12 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
+        });
         //set the action again
         $('input[name="StartDate"]').on('apply.daterangepicker', function (ev, picker) {
 
             //if user selects a start date, reinit duedate selector with new values 
-            var selectedDate = $('#StartDate').val()
+            var selectedDate = $('#StartDate').val();
 
             $('input[name="DueDate"]').daterangepicker({
                 opens: "center",
@@ -145,7 +147,7 @@
                 locale: {
                     format: 'DD/MM/YYYY h:mm A'
                 }
-            })
+            });
         });
 
         //bind the picker again
@@ -159,8 +161,8 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
-    })
+        });
+    });
 
     //to make the file upload shown or hidden when post back to the page
     if ($("#UpdateSolution").is(":checked")) {
@@ -184,7 +186,7 @@
         } else {
             $("#testCaseGroup").fadeOut();
         }
-    })
+    });
 
     //let users select if they need to update the solution
     $("#UpdateSolution").click(function () {
@@ -193,21 +195,28 @@
         } else {
             $("#solutionGroup").fadeOut();
         }
-    })
+    });
 
     //select class modal
     $("#SelectedClasses").click(function () {
+
+        //setting modal options
+        $("#classModal").modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+
         $("#classModal").modal("show");
-    })
+    });
 
     function setInitialClass() {
         var selectedClasses = [];
         $('input[type="checkbox"][name*="isSelected"]').each(function () {
             if (this.checked) {
                 var c = $(this).data("class-name");
-                selectedClasses.push(c)
+                selectedClasses.push(c);
             }
-        })
+        });
         $("#SelectedClasses").val(selectedClasses);
     }
 
@@ -217,14 +226,29 @@
         $('input[type="checkbox"][name*="isSelected"]').each(function () {
             if (this.checked) {
                 var c = $(this).data("class-name");
-                selectedClasses.push(c)
+                selectedClasses.push(c);
             }
-        })
+        });
         $("#SelectedClasses").val(selectedClasses);
-    })
+    });
 
-    $("#submitBtn").click(function () {
+    $("#updateBtn").click(function () {
         var qns = $("#editor").html();
-        $("#Describe").val(qns)
-    })
-})
+        $("#Describe").val(qns);
+
+        //setting modal options
+        $("#progressModal").modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+        $("#progressModal").modal("show");
+    });
+
+    //for the deletion modal
+    $("#deleteBtn").click(function () {
+        $("#deleteMsg").hide();
+        $("#deleteBtnGrp").hide();
+        $("#deleteProgress").show();
+    });
+
+});

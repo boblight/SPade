@@ -27,7 +27,7 @@
                 locale: {
                     format: 'DD/MM/YYYY h:mm A'
                 }
-            })
+            });
         }
 
         //Inits with previous value IF postback
@@ -46,7 +46,7 @@
                 locale: {
                     format: 'DD/MM/YYYY h:mm A'
                 }
-            })
+            });
         }
 
     }
@@ -55,7 +55,7 @@
     $('input[name="StartDate"]').on('apply.daterangepicker', function (ev, picker) {
 
         //if user selects a start date, reinit duedate selector with new values 
-        var selectedDate = $('#StartDate').val()
+        var selectedDate = $('#StartDate').val();
 
         $('input[name="DueDate"]').daterangepicker({
             opens: "center",
@@ -67,7 +67,7 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
+        });
     });
 
     //Due Date Selector JS  
@@ -86,7 +86,7 @@
                 locale: {
                     format: 'DD/MM/YYYY h:mm A'
                 }
-            })
+            });
         }
 
         //Init start date picker with previous value IF postback
@@ -105,7 +105,7 @@
                 locale: {
                     format: 'DD/MM/YYYY h:mm A'
                 }
-            })
+            });
         }
 
     }
@@ -114,8 +114,8 @@
     $("#resetBtn").click(function () {
 
         //remove the old pickers
-        $("#StartDate").data("daterangepicker").remove()
-        $("#DueDate").data("daterangepicker").remove()
+        $("#StartDate").data("daterangepicker").remove();
+        $("#DueDate").data("daterangepicker").remove();
 
         //bind the picker again
         $('input[name="StartDate"]').daterangepicker({
@@ -128,12 +128,12 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
+        });
         //set the action again
         $('input[name="StartDate"]').on('apply.daterangepicker', function (ev, picker) {
 
             //if user selects a start date, reinit duedate selector with new values 
-            var selectedDate = $('#StartDate').val()
+            var selectedDate = $('#StartDate').val();
 
             $('input[name="DueDate"]').daterangepicker({
                 opens: "center",
@@ -145,7 +145,7 @@
                 locale: {
                     format: 'DD/MM/YYYY h:mm A'
                 }
-            })
+            });
         });
 
         //bind the picker again
@@ -159,13 +159,17 @@
             locale: {
                 format: 'DD/MM/YYYY h:mm A'
             }
-        })
-    })
+        });
+    });
 
     //show the modal
     $("#SelectedClasses").click(function () {
+        $("#classModal").modal({
+            backdrop: 'static',
+            keyboard: false
+        });
         $("#classModal").modal("show");
-    })
+    });
 
     //to show which class has been selected
     $("#modalSelect").click(function () {
@@ -173,11 +177,11 @@
         $('input[type="checkbox"][name*="isSelected"]').each(function () {
             if (this.checked) {
                 var c = $(this).data("class-name");
-                selectedClasses.push(c)
+                selectedClasses.push(c);
             }
-        })
+        });
         $("#SelectedClasses").val(selectedClasses);
-    })
+    });
 
     //let users select if they need testcase or not 
     $("#IsTestCasePresent").click(function () {
@@ -186,7 +190,7 @@
         } else {
             $("#testCaseGroup").fadeOut();
         }
-    })
+    });
 
     //show or hide the test case upload during postback
     if ($("#IsTestCasePresent").is(":checked")) {
@@ -199,13 +203,22 @@
     function AppendTextToEditor() {
 
         if (IsPostBack == 1) {
-            var des = $("#Describe").val()
-            $("#editor").html(des)
+            var des = $("#Describe").val();
+            $("#editor").html(des);
         }
     }
 
     $("#submitBtn").click(function () {
         var qns = $("#editor").html();
-        $("#Describe").val(qns)
-    })
-})
+        $("#Describe").val(qns);
+
+        $("#progressModal").modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+
+        $("#progressModal").modal("show");
+    });
+
+
+});

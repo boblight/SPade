@@ -13,8 +13,15 @@
     <h2><span id="changingtext">Singapore Polytechnic Auto-Grading</span></h2>
 
     <br />
-    <a id="btnLogin" href="/Account/Login" class="btn btn-primary btn-lg btn-fixed-width">Login</a>
-    <a id="btnRegister" href="/Account/Register" class="btn btn-default btn-lg btn-fixed-width">Register</a>
+
+    @{
+
+        if (!User.Identity.IsAuthenticated)
+        {
+            <a id="btnLogin" href="/Account/Login" class="btn btn-primary btn-lg btn-fixed-width">Login</a>
+            <a id="btnRegister" href="/Account/Register" class="btn btn-default btn-lg btn-fixed-width">Register</a>
+        }
+    }
 </div>
 
 <div class="jumbotron" id="section2">
@@ -72,14 +79,21 @@
 
 <div class="jumbotron" id="section4">
     <div class="container">
-        <div class="row">
 
-            <h1 class="wow slideInUp">Get started now</h1>
-            <br />
-            <a href="/Account/Login" class="btn btn-primary btn-lg btn-fixed-width wow fadeInUp" data-wow-delay=".3s">Login</a>
-            <a href="/Account/Register" class="btn btn-default btn-lg btn-fixed-width wow fadeInUp" data-wow-delay=".3s">Register</a>
+        @{
+            if (!User.Identity.IsAuthenticated)
+            {
 
-        </div>
+                <div class="row">
+
+                    <h1 class="wow slideInUp">Get started now</h1>
+                    <br />
+                    <a href="/Account/Login" class="btn btn-primary btn-lg btn-fixed-width wow fadeInUp" data-wow-delay=".3s">Login</a>
+                    <a href="/Account/Register" class="btn btn-default btn-lg btn-fixed-width wow fadeInUp" data-wow-delay=".3s">Register</a>
+
+                </div>
+            }
+        }
     </div>
 </div>
 
