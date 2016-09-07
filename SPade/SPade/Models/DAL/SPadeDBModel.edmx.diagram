@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="cc94424149494687a5691b5aebafa145" Name="Diagram1">
+      <Diagram DiagramId="c2c36b16c5e44432a24ab6dac696cc96" Name="Diagram1">
         <EntityTypeShape EntityType="SPadeDBModel.C__MigrationHistory" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.Admin" Width="1.5" PointX="8.75" PointY="10.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SPadeDBModel.AspNetRole" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
