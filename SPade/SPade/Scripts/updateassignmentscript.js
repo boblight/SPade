@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
 
+    var IsUpdate = false;
     var currentDate = moment().format('DD/MM/YYYY h:mm A');
 
     $("#editor").wysiwyg();
@@ -232,17 +233,30 @@
         $("#SelectedClasses").val(selectedClasses);
     });
 
+    $(function () {
+        $("#submitAssignmentForm").submit(function () {
+            if ($(this).valid()) {
+
+                //only shows the loading modal IF users wants to update the form
+                if (IsUpdate == true) {
+                    //setting modal options
+                    $("#progressModal").modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    $("#progressModal").modal("show");
+                }
+
+            }
+        })
+    })
+
     $("#updateBtn").click(function () {
         var qns = $("#editor").html();
         $("#Describe").val(qns);
-
-        //setting modal options
-        $("#progressModal").modal({
-            backdrop: 'static',
-            keyboard: false
-        });
-        $("#progressModal").modal("show");
-    });
+        //to show update modal or not
+        IsUpdate = true;
+    })
 
     //for the deletion modal
     $("#deleteBtn").click(function () {

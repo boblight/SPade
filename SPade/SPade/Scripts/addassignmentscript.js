@@ -208,17 +208,14 @@
         }
     }
 
-    $("#submitBtn").click(function () {
-        var qns = $("#editor").html();
-        $("#Describe").val(qns);
-
-        $("#progressModal").modal({
-            backdrop: 'static',
-            keyboard: false
+    $(function () {
+        $("#submitAssignmentForm").submit(function () {
+            //only show the progress modal when form is validated
+            if ($(this).valid()) {
+                var qns = $("#editor").html();
+                $("#Describe").val(qns);
+                $("#progressModal").modal("show");
+            }
         });
-
-        $("#progressModal").modal("show");
     });
-
-
 });
