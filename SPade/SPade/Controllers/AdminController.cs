@@ -145,29 +145,48 @@ namespace SPade.Controllers
             //Update Class information
             if (command.Equals("Update"))
             {
-                c.ClassID = model.ClassID;
-                c.ClassName = model.ClassName;
-                c.CourseID = model.CourseID;
-                c.UpdatedAt = DateTime.Now;
-                c.UpdatedBy = User.Identity.Name;
-                db.SaveChanges();
-                return RedirectToAction("ManageClass");
+                if (classId == 0)
+                {
+                    ModelState.AddModelError("", "This class holds all students that are not assigned to any class and cannot be updated.");
+                    return View(model);
+                }
+                else
+                {
+                    c.ClassID = model.ClassID;
+                    c.ClassName = model.ClassName;
+                    c.CourseID = model.CourseID;
+                    c.UpdatedAt = DateTime.Now;
+                    c.UpdatedBy = User.Identity.Name;
+                    db.SaveChanges();
+                    return RedirectToAction("ManageClass");
+                }
             }
             //Delete Class
             else
             {
-                if (db.Students.Where(s => s.ClassID == classId).Count() == 0 && db.Lec_Class.Where(lc => lc.ClassID == classId).Count() == 0)
+                if (classId == 0)
+                {
+                    ModelState.AddModelError("", "This class holds all students that are not assigned to any class and cannot be deleted.");
+                    return View(model);
+                }
+                else
                 {
                     c.DeletedAt = DateTime.Now;
                     c.DeletedBy = User.Identity.Name;
 
+                    //remove class from lec_class and class_assgn relationship
+                    //set student classid to 0
+                    db.Lec_Class.Remove(db.Lec_Class.Where(lc => lc.ClassID == classId).FirstOrDefault());
+                    db.Class_Assgn.Remove(db.Class_Assgn.Where(ca => ca.ClassID == classId).FirstOrDefault());
+                    List<Student> studs = db.Students.ToList().FindAll(s => s.ClassID == classId && s.DeletedAt == null);
+
+                    foreach (Student stud in studs)
+                    {
+                        stud.ClassID = 0;
+                    }
+
                     db.SaveChanges();
                     return RedirectToAction("ManageClass");
-                }
-                else
-                {
-                    ModelState.AddModelError("DeleteError", "There are still students or lecturers tied to this class. You have to purge data from the database before deleting.");
-                    return View(model);
                 }
             }
         }
@@ -509,8 +528,18 @@ namespace SPade.Controllers
             }
             else
             {
-                if (db.Assignments.Where(assgn => assgn.CreateBy == StaffID).Count() == 0 && db.Lec_Class.Where(lcc => lcc.StaffID == StaffID).Count() == 0)
+                if (db.Assignments.Where(assgn => assgn.CreateBy == StaffID).Count() == 0)
                 {
+                    AspNetUser user = db.AspNetUsers.Where(u => u.UserName == StaffID).FirstOrDefault();
+                    db.AspNetUserRoles.Remove(db.AspNetUserRoles.Where(ur => ur.UserId == user.Id).FirstOrDefault());
+                    db.AspNetUsers.Remove(user);
+
+                    if (db.Lec_Class.Where(lcc => lcc.StaffID == StaffID).Count() > 0)
+                    {
+                        db.Lec_Class.Remove(db.Lec_Class.Where(lcc => lcc.StaffID == StaffID).FirstOrDefault());
+                    }
+
+                    //db.Lecturers.Remove(db.Lecturers.Where(l => l.StaffID == StaffID).FirstOrDefault());
                     lecturer.DeletedAt = DateTime.Now;
                     lecturer.DeletedBy = User.Identity.Name;
 
@@ -818,6 +847,10 @@ namespace SPade.Controllers
             {
                 if (db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
                 {
+                    AspNetUser user = db.AspNetUsers.Where(u => u.UserName == AdminNo).FirstOrDefault();
+                    db.AspNetUserRoles.Remove(db.AspNetUserRoles.Where(ur => ur.UserId == user.Id).FirstOrDefault());
+                    db.AspNetUsers.Remove(user);
+
                     student.DeletedAt = DateTime.Now;
                     student.DeletedBy = User.Identity.Name;
 
@@ -1146,6 +1179,10 @@ namespace SPade.Controllers
                 }
                 else
                 {
+                    AspNetUser user = db.AspNetUsers.Where(u => u.UserName == AdminID).FirstOrDefault();
+                    db.AspNetUserRoles.Remove(db.AspNetUserRoles.Where(ur => ur.UserId == user.Id).FirstOrDefault());
+                    db.AspNetUsers.Remove(user);
+
                     admin.DeletedAt = DateTime.Now;
                     admin.DeletedBy = User.Identity.Name;
 

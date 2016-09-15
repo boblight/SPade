@@ -179,6 +179,10 @@ namespace SPade.Controllers
             {
                 if (db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
                 {
+                    AspNetUser user = db.AspNetUsers.Where(u => u.UserName == AdminNo).FirstOrDefault();
+                    db.AspNetUserRoles.Remove(db.AspNetUserRoles.Where(ur => ur.UserId == user.Id).FirstOrDefault());
+                    db.AspNetUsers.Remove(user);
+
                     student.DeletedAt = DateTime.Now;
                     student.DeletedBy = User.Identity.Name;
 

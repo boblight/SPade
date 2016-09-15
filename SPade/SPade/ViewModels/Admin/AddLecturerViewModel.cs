@@ -11,8 +11,7 @@ namespace SPade.ViewModels.Admin
     public class AddLecturerViewModel
     {
         [Required]
-        [StringLength(8, ErrorMessage = "Please enter a valid Staff number")]
-        [RegularExpression("^[s0-9]{8,8}$", ErrorMessage = "Please enter valid Staff number")]
+        [RegularExpression("^[s0-9]{2,50}$", ErrorMessage = "Please enter valid Staff number")]
         public string StaffID { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Do not exceed 50 characters")]
