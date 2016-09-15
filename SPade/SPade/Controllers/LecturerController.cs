@@ -1864,6 +1864,7 @@ namespace SPade.Controllers
 
                 foreach (DirectoryInfo dr in di.GetDirectories())
                 {
+                    DeleteFile(fileName, assgnTitle, isTestCase);
                     dr.Delete(true);
                 }
 
