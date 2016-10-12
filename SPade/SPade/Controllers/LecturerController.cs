@@ -1267,6 +1267,18 @@ namespace SPade.Controllers
                                     exitCode = (int)TempData["ExitCode"];
                                 }
 
+                                //clear away files from TempSubmissions
+                                var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                DirectoryInfo di = new DirectoryInfo(tempPath);
+                                foreach (FileInfo file in di.GetFiles())
+                                {
+                                    file.Delete();
+                                }
+                                foreach (DirectoryInfo dir in di.GetDirectories())
+                                {
+                                    dir.Delete(true);
+                                }
+
                                 //post back results 
                                 if (exitCode == 1)
                                 {
@@ -1284,13 +1296,13 @@ namespace SPade.Controllers
                                         return View(addAssgn);
                                     }
                                     //delete the uploaded sln
-                                    DeleteFile(fileName, assignmentTitle, false);
+                                    //DeleteFile(fileName, assignmentTitle, false);
 
                                 }//end of run succesfully condition
 
                                 else if (exitCode == 2)
                                 {
-                                    DeleteFile(fileName, assignmentTitle, true);
+                                    //DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
@@ -1303,7 +1315,7 @@ namespace SPade.Controllers
                                 else if (exitCode == 3)
                                 {
                                     //solution failed to run 
-                                    DeleteFile(fileName, assignmentTitle, true);
+                                    //DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
@@ -1316,7 +1328,7 @@ namespace SPade.Controllers
                                 else if (exitCode == 4)
                                 {
                                     //solution stuck in infinite loop
-                                    DeleteFile(fileName, assignmentTitle, true);
+                                    //DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
@@ -1329,7 +1341,7 @@ namespace SPade.Controllers
                                 else if (exitCode == 5)
                                 {
                                     //unsupported langugage
-                                    DeleteFile(fileName, assignmentTitle, true);
+                                    //DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
@@ -1344,7 +1356,7 @@ namespace SPade.Controllers
                                 else if (exitCode == 2952)
                                 {
                                     //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                    DeleteFile(fileName, assignmentTitle, true);
+                                    //DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");

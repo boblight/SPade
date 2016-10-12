@@ -176,8 +176,17 @@ namespace SPade.Controllers
 
                     //remove class from lec_class and class_assgn relationship
                     //set student classid to 0
-                    db.Lec_Class.Remove(db.Lec_Class.Where(lc => lc.ClassID == classId).FirstOrDefault());
-                    db.Class_Assgn.Remove(db.Class_Assgn.Where(ca => ca.ClassID == classId).FirstOrDefault());
+                    List<Lec_Class> lecclass = db.Lec_Class.ToList().FindAll(lc => lc.ClassID == classId);
+                    foreach(Lec_Class lecc in lecclass)
+                    {
+                        db.Lec_Class.Remove(lecc);
+                    }
+
+                    List<Class_Assgn> classassgn = db.Class_Assgn.ToList().FindAll(ca => ca.ClassID == classId);
+                    foreach(Class_Assgn ca in classassgn)
+                    {
+                        db.Class_Assgn.Remove(ca);
+                    }
                     List<Student> studs = db.Students.ToList().FindAll(s => s.ClassID == classId && s.DeletedAt == null);
 
                     foreach (Student stud in studs)
