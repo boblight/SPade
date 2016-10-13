@@ -603,7 +603,18 @@ namespace SPade.Controllers
                                     catch (Exception ex)
                                     {
                                         //failed to save file
-                                        DeleteFile(fileName, assignmentTitle, true);
+                                        //clear away files from TempSubmissions
+                                        var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                        DirectoryInfo di = new DirectoryInfo(tempPath);
+                                        foreach (FileInfo file in di.GetFiles())
+                                        {
+                                            file.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in di.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
+                                        //DeleteFile(fileName, assignmentTitle, true);
                                         uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "Failed to save uploaded file. Please reupload and try again";
@@ -621,7 +632,18 @@ namespace SPade.Controllers
                                         if (moveFailed == true)
                                         {
                                             //this can happen if a user submits the wrong file for the module (say java files for c# file)
-                                            DeleteFile(fileName, assignmentTitle, true);
+                                            //clear away files from TempSubmissions
+                                            var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                            DirectoryInfo di = new DirectoryInfo(tempPath);
+                                            foreach (FileInfo file in di.GetFiles())
+                                            {
+                                                file.Delete();
+                                            }
+                                            foreach (DirectoryInfo dir in di.GetDirectories())
+                                            {
+                                                dir.Delete(true);
+                                            }
+                                            //DeleteFile(fileName, assignmentTitle, true);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "The file uploaded may be incompatible with the language. Please reupload and try again";
@@ -631,7 +653,18 @@ namespace SPade.Controllers
                                     catch (Exception ex)
                                     {
                                         //this can happen if a user submits the wrong file for the module (say java files for c# file)
-                                        DeleteFile(fileName, assignmentTitle, true);
+                                        //clear away files from TempSubmissions
+                                        var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                        DirectoryInfo di = new DirectoryInfo(tempPath);
+                                        foreach (FileInfo file in di.GetFiles())
+                                        {
+                                            file.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in di.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
+                                        //DeleteFile(fileName, assignmentTitle, true);
                                         uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
@@ -672,6 +705,18 @@ namespace SPade.Controllers
                                             exitCode = (int)TempData["ExitCode"];
                                         }
 
+                                        //clear away files from TempSubmissions
+                                        var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                        DirectoryInfo di = new DirectoryInfo(tempPath);
+                                        foreach (FileInfo file in di.GetFiles())
+                                        {
+                                            file.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in di.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
+
                                         //return result based on exit code
                                         if (exitCode == 1)
                                         {
@@ -679,7 +724,7 @@ namespace SPade.Controllers
                                             if (UpdateAssignmentToDB(uAVM, true, true) == true)
                                             {
                                                 //failed to update DB
-                                                DeleteFile(fileName, assignmentTitle, true);
+                                                //DeleteFile(fileName, assignmentTitle, true);
                                                 uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                                 uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                                 string logTitle = (string)TempData["Exception"];
@@ -688,13 +733,13 @@ namespace SPade.Controllers
                                             }
 
                                             //delete the uploaded sln but not test case
-                                            DeleteFile(fileName, assignmentTitle, false);
+                                            //DeleteFile(fileName, assignmentTitle, false);
 
                                         }//end of run succesfully method 
 
                                         else if (exitCode == 2)
                                         {
-                                            DeleteFile(fileName, assignmentTitle, true);
+                                            //DeleteFile(fileName, assignmentTitle, true);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
@@ -704,7 +749,7 @@ namespace SPade.Controllers
                                         else if (exitCode == 3)
                                         {
                                             //solution failed to run 
-                                            DeleteFile(fileName, assignmentTitle, true);
+                                            //DeleteFile(fileName, assignmentTitle, true);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "The program has failed to run entirely. Please check your program.";
@@ -714,7 +759,7 @@ namespace SPade.Controllers
                                         else if (exitCode == 4)
                                         {
                                             //solution stuck in infinite loop
-                                            DeleteFile(fileName, assignmentTitle, true);
+                                            //DeleteFile(fileName, assignmentTitle, true);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
@@ -724,7 +769,7 @@ namespace SPade.Controllers
                                         else if (exitCode == 2952)
                                         {
                                             //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                            DeleteFile(fileName, assignmentTitle, true);
+                                            //DeleteFile(fileName, assignmentTitle, true);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
@@ -785,8 +830,18 @@ namespace SPade.Controllers
                                     }
                                     catch (Exception ex)
                                     {
-                                        //failed to save file
-                                        DeleteFile(fileName, assignmentTitle, false);
+                                        //failed to save file//clear away files from TempSubmissions
+                                        var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                        DirectoryInfo di = new DirectoryInfo(tempPath);
+                                        foreach (FileInfo file in di.GetFiles())
+                                        {
+                                            file.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in di.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
+                                        //DeleteFile(fileName, assignmentTitle, false);
                                         uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "Failed to save uploaded file. Please reupload and try again";
@@ -803,7 +858,18 @@ namespace SPade.Controllers
                                         moveFailed = MoveSolutionToLowerCasedFolder(fileName, lang.LangageType);
                                         if (moveFailed == true)
                                         {
-                                            DeleteFile(fileName, assignmentTitle, false);
+                                            //clear away files from TempSubmissions
+                                            var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                            DirectoryInfo di = new DirectoryInfo(tempPath);
+                                            foreach (FileInfo file in di.GetFiles())
+                                            {
+                                                file.Delete();
+                                            }
+                                            foreach (DirectoryInfo dir in di.GetDirectories())
+                                            {
+                                                dir.Delete(true);
+                                            }
+                                            //DeleteFile(fileName, assignmentTitle, false);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                             TempData["GeneralError"] = "The file uploaded may be incompatible with the language. Please reupload and try again";
@@ -813,7 +879,18 @@ namespace SPade.Controllers
                                     catch (Exception ex)
                                     {
                                         //this can happen if a user submits the wrong file for the module (say java files for c# file)
-                                        DeleteFile(fileName, assignmentTitle, false);
+                                        //clear away files from TempSubmissions
+                                        var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                        DirectoryInfo di = new DirectoryInfo(tempPath);
+                                        foreach (FileInfo file in di.GetFiles())
+                                        {
+                                            file.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in di.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
+                                        //DeleteFile(fileName, assignmentTitle, false);
                                         uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
@@ -846,6 +923,18 @@ namespace SPade.Controllers
                                             exitCode = (int)TempData["ExitCode"];
                                         }
 
+                                        //clear away files from TempSubmissions
+                                        var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                        DirectoryInfo di = new DirectoryInfo(tempPath);
+                                        foreach (FileInfo file in di.GetFiles())
+                                        {
+                                            file.Delete();
+                                        }
+                                        foreach (DirectoryInfo dir in di.GetDirectories())
+                                        {
+                                            dir.Delete(true);
+                                        }
+
                                         //return result based on exit code
                                         if (exitCode == 1)
                                         {
@@ -853,7 +942,7 @@ namespace SPade.Controllers
                                             if (UpdateAssignmentToDB(uAVM, true, false) == true)
                                             {
                                                 //solution has failed to save to DB
-                                                DeleteFile(fileName, assignmentTitle, false);
+                                                //DeleteFile(fileName, assignmentTitle, false);
                                                 uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                                 uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                                 string logTitle = (string)TempData["Exception"];
@@ -862,14 +951,14 @@ namespace SPade.Controllers
                                             }
 
                                             //delete the uploaded sln
-                                            DeleteFile(fileName, assignmentTitle, false);
+                                            //DeleteFile(fileName, assignmentTitle, false);
 
                                         }
 
                                         else if (exitCode == 3)
                                         {
                                             //solution failed to run 
-                                            DeleteFile(fileName, assignmentTitle, false);
+                                            //DeleteFile(fileName, assignmentTitle, false);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
                                             TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
@@ -879,7 +968,7 @@ namespace SPade.Controllers
                                         else if (exitCode == 2952)
                                         {
                                             //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                            DeleteFile(fileName, assignmentTitle, false);
+                                            //DeleteFile(fileName, assignmentTitle, false);
                                             uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
                                             TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
@@ -1189,7 +1278,18 @@ namespace SPade.Controllers
                             catch (Exception ex)
                             {
                                 //failed to save file
-                                DeleteFile(fileName, assignmentTitle, true);
+                                //clear away files from TempSubmissions
+                                var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                DirectoryInfo di = new DirectoryInfo(tempPath);
+                                foreach (FileInfo file in di.GetFiles())
+                                {
+                                    file.Delete();
+                                }
+                                foreach (DirectoryInfo dir in di.GetDirectories())
+                                {
+                                    dir.Delete(true);
+                                }
+                                //DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 ModelState.Remove("IsPostBack");
@@ -1210,7 +1310,18 @@ namespace SPade.Controllers
 
                                 if (moveFailed == true)
                                 {
-                                    DeleteFile(fileName, assignmentTitle, true);
+                                    //clear away files from TempSubmissions
+                                    var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                    DirectoryInfo di = new DirectoryInfo(tempPath);
+                                    foreach (FileInfo file in di.GetFiles())
+                                    {
+                                        file.Delete();
+                                    }
+                                    foreach (DirectoryInfo dir in di.GetDirectories())
+                                    {
+                                        dir.Delete(true);
+                                    }
+                                    //DeleteFile(fileName, assignmentTitle, true);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
@@ -1223,7 +1334,18 @@ namespace SPade.Controllers
                             catch (Exception ex)
                             {
                                 //this can happen if a user submits the wrong file for the module (say java files for c# file)
-                                DeleteFile(fileName, assignmentTitle, true);
+                                //clear away files from TempSubmissions
+                                var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                DirectoryInfo di = new DirectoryInfo(tempPath);
+                                foreach (FileInfo file in di.GetFiles())
+                                {
+                                    file.Delete();
+                                }
+                                foreach (DirectoryInfo dir in di.GetDirectories())
+                                {
+                                    dir.Delete(true);
+                                }
+                                //DeleteFile(fileName, assignmentTitle, true);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 ModelState.Remove("IsPostBack");
@@ -1286,7 +1408,7 @@ namespace SPade.Controllers
                                     if (AddAssignmentToDB(addAssgn, fileName, true) == true)
                                     {
                                         //failed to save to DB
-                                        DeleteFile(fileName, assignmentTitle, true);
+                                        //DeleteFile(fileName, assignmentTitle, true);
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
@@ -1429,8 +1551,20 @@ namespace SPade.Controllers
                             }
                             catch (Exception ex)
                             {
+                                //clear away files from TempSubmissions
+                                var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                DirectoryInfo di = new DirectoryInfo(tempPath);
+                                foreach (FileInfo file in di.GetFiles())
+                                {
+                                    file.Delete();
+                                }
+                                foreach (DirectoryInfo dir in di.GetDirectories())
+                                {
+                                    dir.Delete(true);
+                                }
+
                                 //failed to save file
-                                DeleteFile(fileName, assignmentTitle, false);
+                                //DeleteFile(fileName, assignmentTitle, false);
                                 addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                 addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                 ModelState.Remove("IsPostBack");
@@ -1501,6 +1635,18 @@ namespace SPade.Controllers
                                     exitCode = (int)TempData["ExitCode"];
                                 }
 
+                                //clear away files from TempSubmissions
+                                var tempPath = Server.MapPath(@"~/TempSubmissions/");
+                                DirectoryInfo di = new DirectoryInfo(tempPath);
+                                foreach (FileInfo file in di.GetFiles())
+                                {
+                                    file.Delete();
+                                }
+                                foreach (DirectoryInfo dir in di.GetDirectories())
+                                {
+                                    dir.Delete(true);
+                                }
+
                                 //post back result
                                 if (exitCode == 1)
                                 {
@@ -1508,7 +1654,7 @@ namespace SPade.Controllers
                                     if (AddAssignmentToDB(addAssgn, fileName, false) == true)
                                     {
                                         //solution has failed to save to DB
-                                        DeleteFile(fileName, assignmentTitle, false);
+                                        //DeleteFile(fileName, assignmentTitle, false);
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
@@ -1518,12 +1664,12 @@ namespace SPade.Controllers
                                     }
 
                                     //delete the uploaded sln
-                                    DeleteFile(fileName, assignmentTitle, false);
+                                    //DeleteFile(fileName, assignmentTitle, false);
                                 }
                                 else if (exitCode == 3)
                                 {
                                     //solution failed to run 
-                                    DeleteFile(fileName, assignmentTitle, false);
+                                    //DeleteFile(fileName, assignmentTitle, false);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
@@ -1535,7 +1681,7 @@ namespace SPade.Controllers
                                 else if (exitCode == 2952)
                                 {
                                     //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                    DeleteFile(fileName, assignmentTitle, false);
+                                    //DeleteFile(fileName, assignmentTitle, false);
                                     addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                     addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                     ModelState.Remove("IsPostBack");
