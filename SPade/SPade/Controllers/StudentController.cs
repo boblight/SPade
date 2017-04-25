@@ -49,15 +49,23 @@ namespace SPade.Controllers
             {
                 if (file.ContentLength > 0)
                 {
+
+
+                    //Get file extension to set file path
+                    var fileExtensionName = Path.GetExtension(file.FileName);
+                    var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+
+
+
+
                     //save zip file in submissions directory temporarily
                     //next unzip it into the same folder while replacing existing submissions
-                    var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                    var zipLocation = Server.MapPath(@"~/Submissions/" + file);
-                    file.SaveAs(zipLocation);
+                    //var zipLocation = Server.MapPath(@"~/Submissions/" + file);
+                    //file.SaveAs(zipLocation);
 
                     string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
                     submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
-                    var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower());
+                    var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower() + fileExtensionName);
                     var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
                     System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePathForGrade);
 
@@ -74,7 +82,20 @@ namespace SPade.Controllers
                     }
 
                     fileDirectory.Create(); // Recreates directory to update latest submission
-                    System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
+                    //System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
+
+
+                    //Create the file and save it under the given directory file path
+                    var fileInfo = new FileInfo(filePath);
+                    fileInfo.Directory.Create();
+                    file.SaveAs(filePath);
+
+
+
+
+
+
+
 
                     //grade submission
                     //grade returns an 'exitcode'
@@ -105,11 +126,11 @@ namespace SPade.Controllers
                 //return View();
                 return RedirectToAction("SubmitAssignment", assgnId);
             }
-            else if (Path.GetExtension(file.FileName) != ".zip")
-            {
-                Session["UploadError"] = "Only zip files are allowed. Please zip up your project before uploading.";
-                return RedirectToAction("SubmitAssignment", assgnId);
-            }
+            //else if (Path.GetExtension(file.FileName) != ".zip")
+            //{
+            //    Session["UploadError"] = "Only zip files are allowed. Please zip up your project before uploading.";
+            //    return RedirectToAction("SubmitAssignment", assgnId);
+            //}
 
             return RedirectToAction("PostSubmission");
         }//end of submit assignment
@@ -183,6 +204,51 @@ namespace SPade.Controllers
         // GET: SubmitAssignment
         public ActionResult SubmitAssignment(int id)
         {
+
+            // student can only check those assignments that they are allowed to see
+            // student cannot see other courses assignments
+
+
+            //Use id to check if there is an assignment associated with this user
+            List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == db.Students.Where(stud => stud.AdminNo == User.Identity.Name).FirstOrDefault().ClassID && c.AssignmentID == id);
+            var viewableAssignment = false;
+
+
+
+            if (ca.Count == 0)
+            {
+                return RedirectToAction("ViewAssignment", "Student");
+            }
+            else
+            {
+                //Check if assignment is available to be viewed
+                foreach (var oneClassAssgn in ca)
+                {
+                    var today = DateTime.Today.Date;
+                    var oneAssignment = db.Assignments.Where(assgn => assgn.AssignmentID == oneClassAssgn.AssignmentID).Single();
+                    if (today >= oneAssignment.StartDate.Date && today <= oneAssignment.DueDate.Date)
+                    {
+                        viewableAssignment = true;
+                    }
+                }
+
+            }
+
+
+
+
+            if (viewableAssignment != true)
+            {
+                return RedirectToAction("ViewAssignment", "Student");
+            }
+
+
+
+
+            /*
+             -------------------------ORIGINAL CODE-------------------------
+             */
+
             //List<Assignment> pass = new List<Assignment>();
             SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
@@ -224,24 +290,29 @@ namespace SPade.Controllers
 
                 foreach (Assignment a in assignments)
                 {
-                    ViewAssignmentViewModel v = new ViewAssignmentViewModel();
-                    v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID).Count();
-                    v.assignment = a;
+                    var today = DateTime.Today.Date;
 
-                    Module module = db.Modules.ToList().Find(m => m.ModuleCode == a.ModuleCode);
-                    v.Module = module.ModuleCode + " " + module.ModuleName;
+                    if (today >= a.StartDate.Date && today <= a.DueDate.Date)
+                    {
+                        ViewAssignmentViewModel v = new ViewAssignmentViewModel();
+                        v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID).Count();
+                        v.assignment = a;
 
-                    //check if the assignment has been attempted before
-                    if (db.Submissions.ToList().FindAll(s => s.AdminNo == User.Identity.GetUserName() && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
-                    {
-                        v.timestamp = db.Submissions.ToList().Find(s => s.AssignmentID == a.AssignmentID).Timestamp;
-                        v.submitted = true;
+                        Module module = db.Modules.ToList().Find(m => m.ModuleCode == a.ModuleCode);
+                        v.Module = module.ModuleCode + " " + module.ModuleName;
+
+                        //check if the assignment has been attempted before
+                        if (db.Submissions.ToList().FindAll(s => s.AdminNo == User.Identity.GetUserName() && s.AssignmentID == a.AssignmentID).Count() > 0) //hardcoded admin number to be replaced by session admin numer
+                        {
+                            v.timestamp = db.Submissions.ToList().Find(s => s.AssignmentID == a.AssignmentID).Timestamp;
+                            v.submitted = true;
+                        }
+                        else
+                        {
+                            v.submitted = false;
+                        }
+                        vm.Add(v);
                     }
-                    else
-                    {
-                        v.submitted = false;
-                    }
-                    vm.Add(v);
                 }
             }
             return View(vm);
@@ -256,7 +327,7 @@ namespace SPade.Controllers
 
 
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, s1.assignmentid, a.assignmentid, a.assgntitle, a.startdate, a.duedate, s1.grade, s1.filepath, s1.timestamp from submission s1 inner join( select max(submissionid) submissionid, adminno, assignmentid, max(timestamp) timestamp from submission group by adminno, assignmentid ) s2 on s1.submissionid = s2.submissionid inner join( select * from assignment where deletedat is null ) a on s1.assignmentid = a.assignmentid where s1.adminno = @inStudent",
-    new SqlParameter("@inStudent", loggedInStudent)).ToList();
+                new SqlParameter("@inStudent", loggedInStudent)).ToList();
 
             List<String> Assignment = new List<String>();
             List<String> AssignmentId = new List<String>();
@@ -332,20 +403,20 @@ namespace SPade.Controllers
             if (submission.Grade == 2)
             {
                 ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to an exception being thrown " +
-                    "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error and make sure " +
-                    "you have uploaded the correct program.");
+                                                            "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error and make sure " +
+                                                            "you have uploaded the correct program.");
                 toUpdate.Grade = 0;
             }
             else if (submission.Grade == 3)
             {
                 ModelState.AddModelError("SubmissionError", "Your program has encountered an infinite loop. Please check through your program and make appropriate " +
-                    "modification.");
+                                                            "modification.");
                 toUpdate.Grade = 0;
             }
             else if (submission.Grade == 4)
             {
                 ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
-                    "Also ensure that you have submitted the correct source code.");
+                                                            "Also ensure that you have submitted the correct source code.");
                 toUpdate.Grade = 0;
             }
             else if (submission.Grade == 5)
@@ -356,7 +427,7 @@ namespace SPade.Controllers
             else if (submission.Grade < 1)
             {
                 ModelState.AddModelError("SubmissionError", "Program has failed a couple of test cases. Please check through your program and make appropriate " +
-                    "modification to meet the requirements stated in the assignment description.");
+                                                            "modification to meet the requirements stated in the assignment description.");
             }
             db.SaveChanges();
 

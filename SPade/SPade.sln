@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{118A2935-31FF-4025-AE76-F9BD4A021327}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPade", "SPade\SPade.csproj", "{263BBC19-8958-48BF-8031-3163A79CF1A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grade", "..\..\..\..\Visual Studio 2015\Projects\Grade\Grade\Grade.csproj", "{74FDB689-D5B4-410B-A7B8-5FBD6CACBFDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grade", "..\..\..\Visual Studio 2015\Projects\Grade\Grade\Grade.csproj", "{74FDB689-D5B4-410B-A7B8-5FBD6CACBFDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
