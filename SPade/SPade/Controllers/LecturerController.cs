@@ -192,7 +192,7 @@ namespace SPade.Controllers
                 else
                 {
                     ModelState.AddModelError("DeleteError", "There are still submissions that are tied to this student's account. " +
-                        "Contact an Admin to purge all submissions made by this student before deleting.");
+                                                            "Contact an Admin to purge all submissions made by this student before deleting.");
                     return View(model);
                 }
             }
@@ -386,12 +386,12 @@ namespace SPade.Controllers
 
                 //get all the classes that are assigned the particular assignment under this lecturer + the classes they manage only ! 
                 var query = from c in db.Classes
-                            join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
-                            where ca.AssignmentID.Equals(a.AssignmentID)
-                            join cl in db.Lec_Class on c.ClassID equals cl.ClassID
-                            where cl.StaffID.Equals(lecturerID)
-                            where c.DeletedAt == null
-                            select c;
+                    join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+                    where ca.AssignmentID.Equals(a.AssignmentID)
+                    join cl in db.Lec_Class on c.ClassID equals cl.ClassID
+                    where cl.StaffID.Equals(lecturerID)
+                    where c.DeletedAt == null
+                    select c;
 
                 classAssgn = query.ToList();
 
@@ -668,8 +668,8 @@ namespace SPade.Controllers
                                         uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
-                                        + "program coded in the appropriate programming language or ensure you have selected the correct module." +
-                                        " Support for that language could also not be added yet.";
+                                                                   + "program coded in the appropriate programming language or ensure you have selected the correct module." +
+                                                                   " Support for that language could also not be added yet.";
                                         return View(uAVM);
                                     }
 
@@ -894,8 +894,8 @@ namespace SPade.Controllers
                                         uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         uAVM.ClassList = UpdateClassList(uAVM.ClassList);
                                         TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
-                                        + "program coded in the appropriate programming language or ensure you have selected the correct module." +
-                                        " Support for that language could also not be added yet.";
+                                                                   + "program coded in the appropriate programming language or ensure you have selected the correct module." +
+                                                                   " Support for that language could also not be added yet.";
                                         return View(uAVM);
                                     }
 
@@ -1261,7 +1261,7 @@ namespace SPade.Controllers
             //run solution with testcase
             if (addAssgn.IsTestCasePresent == true)
             {
-                if ((solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip") && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
+                if ((solutionsFileUpload != null) && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
                 {
                     if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                     {
@@ -1327,7 +1327,7 @@ namespace SPade.Controllers
                                     ModelState.Remove("IsPostBack");
                                     addAssgn.IsPostBack = 1;
                                     TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
-                                        + "program coded in the appropriate programming language or ensure you have selected the correct module.";
+                                                               + "program coded in the appropriate programming language or ensure you have selected the correct module.";
                                     return View(addAssgn);
                                 }
                             }
@@ -1402,91 +1402,72 @@ namespace SPade.Controllers
                                 }
 
                                 //post back results 
-                                if (exitCode == 1)
+                                switch (exitCode)
                                 {
-                                    //save to DB + rename solution/testcase
-                                    if (AddAssignmentToDB(addAssgn, fileName, true) == true)
-                                    {
-                                        //failed to save to DB
+                                    case 3:
+                                        //save to DB + rename solution/testcase
+                                        if (AddAssignmentToDB(addAssgn, fileName, true) == true)
+                                        {
+                                            //failed to save to DB
+                                            //DeleteFile(fileName, assignmentTitle, true);
+                                            addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                            addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                            ModelState.Remove("IsPostBack");
+                                            addAssgn.IsPostBack = 1;
+                                            string logTitle = (string)TempData["Exception"];
+                                            TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                            return View(addAssgn);
+                                        }
+                                        //delete the uploaded sln
+                                        //DeleteFile(fileName, assignmentTitle, false);
+                                        break;
+                                    case 2:
                                         //DeleteFile(fileName, assignmentTitle, true);
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
                                         addAssgn.IsPostBack = 1;
-                                        string logTitle = (string)TempData["Exception"];
-                                        TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                        TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                         return View(addAssgn);
-                                    }
-                                    //delete the uploaded sln
-                                    //DeleteFile(fileName, assignmentTitle, false);
-
-                                }//end of run succesfully condition
-
-                                else if (exitCode == 2)
-                                {
-                                    //DeleteFile(fileName, assignmentTitle, true);
-                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                    ModelState.Remove("IsPostBack");
-                                    addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
-                                    return View(addAssgn);
-
-                                }//end of failed testcase condition
-
-                                else if (exitCode == 3)
-                                {
-                                    //solution failed to run 
-                                    //DeleteFile(fileName, assignmentTitle, true);
-                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                    ModelState.Remove("IsPostBack");
-                                    addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
-                                    return View(addAssgn);
-
-                                }//end of program failed to run condition
-
-                                else if (exitCode == 4)
-                                {
-                                    //solution stuck in infinite loop
-                                    //DeleteFile(fileName, assignmentTitle, true);
-                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                    ModelState.Remove("IsPostBack");
-                                    addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                    return View(addAssgn);
-
-                                }//end of infinite loop condition
-
-                                else if (exitCode == 5)
-                                {
-                                    //unsupported langugage
-                                    //DeleteFile(fileName, assignmentTitle, true);
-                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                    ModelState.Remove("IsPostBack");
-                                    addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
-                                        + "program coded in the appropriate programming language or ensure you have selected the correct module." +
-                                        " Support for that language could also not be added yet.";
-                                    return View(addAssgn);
-
-                                }//end of unsupported language condition
-
-                                else if (exitCode == 2952)
-                                {
-                                    //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                    //DeleteFile(fileName, assignmentTitle, true);
-                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                    ModelState.Remove("IsPostBack");
-                                    addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
-                                    return View(addAssgn);
-
-                                }//end of scheduler failed to run
+                                    case 1:
+                                        //solution failed to run 
+                                        //DeleteFile(fileName, assignmentTitle, true);
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "The program has failed to run entirely. Please check your program";
+                                        return View(addAssgn);
+                                    case 4:
+                                        //solution stuck in infinite loop
+                                        //DeleteFile(fileName, assignmentTitle, true);
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
+                                        return View(addAssgn);
+                                    case 5:
+                                        //unsupported langugage
+                                        //DeleteFile(fileName, assignmentTitle, true);
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
+                                                                   + "program coded in the appropriate programming language or ensure you have selected the correct module." +
+                                                                   " Support for that language could also not be added yet.";
+                                        return View(addAssgn);
+                                    case 2952:
+                                        //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                        //DeleteFile(fileName, assignmentTitle, true);
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
+                                        return View(addAssgn);
+                                }
 
                             }//end of assignment processing
                         }
@@ -1535,7 +1516,7 @@ namespace SPade.Controllers
             //run without testcase 
             else if (addAssgn.IsTestCasePresent == false)
             {
-                if (solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip")
+                if (solutionsFileUpload != null)
                 {
                     if (solutionsFileUpload.ContentLength > 0)
                     {
@@ -1591,7 +1572,7 @@ namespace SPade.Controllers
                                     ModelState.Remove("IsPostBack");
                                     addAssgn.IsPostBack = 1;
                                     TempData["GeneralError"] = "The program uploaded is unsupported by the compiler used for this module. Please upload "
-                                        + "program coded in the appropriate programming language or ensure you have selected the correct module.";
+                                                               + "program coded in the appropriate programming language or ensure you have selected the correct module.";
                                     return View(addAssgn);
                                 }
                             }
@@ -1616,13 +1597,13 @@ namespace SPade.Controllers
                                 isJobRunning = QueryJobFinish(currentJobId);
                                 counter++;
 
-                            } while (isJobRunning && counter < 1500);
+                            } while (isJobRunning && counter < 3000);
 
                             //job has finishd processing OR it has exceeded the time given for it to run
-                            if (isJobRunning == false || counter >= 1500)
+                            if (isJobRunning == false || counter >= 3000)
                             {
                                 //get the exit code which is generated from the processing of the assignment
-                                if (counter >= 1500)
+                                if (counter >= 3000)
                                 {
                                     //the program was caught in infinite loop and the scheduler cannot process in time
                                     exitCode = 2952;
@@ -1648,48 +1629,44 @@ namespace SPade.Controllers
                                 }
 
                                 //post back result
-                                if (exitCode == 1)
+                                switch (exitCode)
                                 {
-                                    //save to DB + rename solution file
-                                    if (AddAssignmentToDB(addAssgn, fileName, false) == true)
-                                    {
-                                        //solution has failed to save to DB
+                                    case 3:
+                                        //save to DB + rename solution file
+                                        if (AddAssignmentToDB(addAssgn, fileName, false) == true)
+                                        {
+                                            //solution has failed to save to DB
+                                            //DeleteFile(fileName, assignmentTitle, false);
+                                            addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                            addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                            ModelState.Remove("IsPostBack");
+                                            string logTitle = (string)TempData["Exception"];
+                                            TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                            return View(addAssgn);
+                                        }
+
+                                        //delete the uploaded sln
+                                        //DeleteFile(fileName, assignmentTitle, false);
+                                        break;
+                                    case 1:
+                                        //solution failed to run 
                                         //DeleteFile(fileName, assignmentTitle, false);
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
-                                        string logTitle = (string)TempData["Exception"];
-                                        TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                         return View(addAssgn);
-                                    }
-
-                                    //delete the uploaded sln
-                                    //DeleteFile(fileName, assignmentTitle, false);
+                                    case 2952:
+                                        //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                        //DeleteFile(fileName, assignmentTitle, false);
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to generate answers on time. Please upload your solution and try again !";
+                                        return View(addAssgn);
                                 }
-                                else if (exitCode == 3)
-                                {
-                                    //solution failed to run 
-                                    //DeleteFile(fileName, assignmentTitle, false);
-                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                    ModelState.Remove("IsPostBack");
-                                    addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                    return View(addAssgn);
-                                }
-
-                                else if (exitCode == 2952)
-                                {
-                                    //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                    //DeleteFile(fileName, assignmentTitle, false);
-                                    addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                    addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
-                                    ModelState.Remove("IsPostBack");
-                                    addAssgn.IsPostBack = 1;
-                                    TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to generate answers on time. Please upload your solution and try again !";
-                                    return View(addAssgn);
-
-                                }//end of scheduler failed to run
 
                             }//end of solution processing
                         }
@@ -1895,12 +1872,17 @@ namespace SPade.Controllers
             folderName = Path.GetFileNameWithoutExtension(uploadedSolution.FileName);
             lowerCasedFolderName = folderName.ToLower();
 
+
+            //Get the file extension to set solutionPath
+            var fileExtension = Path.GetExtension(uploadedSolution.FileName);
+
             //save the uploaded file
-            zipLoc = Server.MapPath(@"~/TempSubmissions/" + uploadedSolution);
-            uploadedSolution.SaveAs(zipLoc);
+            //zipLoc = Server.MapPath(@"~/TempSubmissions/" + uploadedSolution);
+            //uploadedSolution.SaveAs(zipLoc);
 
             //unzip the file
             solutionFilePath = Server.MapPath(@"~/TempSubmissions/" + folderName);
+            var solutionPath = Server.MapPath(@"~/TempSubmissions/" + folderName + "/" + folderName + fileExtension);
 
             //check for existing files + delete IF any existing ones
             DirectoryInfo fileDirectory = new DirectoryInfo(solutionFilePath);
@@ -1932,9 +1914,18 @@ namespace SPade.Controllers
                 }
             }
 
-            //upzip the folder 
+            //Create the file directory
             fileDirectory.Create();
-            System.IO.Compression.ZipFile.ExtractToDirectory(zipLoc, solutionFilePath);
+            //System.IO.Compression.ZipFile.ExtractToDirectory(zipLoc, solutionFilePath);
+
+
+            //Save the solution file inside the solutionPath
+            var solutionFileInfo = new FileInfo(solutionPath);
+            solutionFileInfo.Directory.Create();
+            uploadedSolution.SaveAs(solutionPath);
+
+
+
 
             //create lower cased folder 
             lowerCasedPath = Path.Combine(solutionFilePath, lowerCasedFolderName);
@@ -2161,8 +2152,8 @@ namespace SPade.Controllers
             string loggedInLecturer = User.Identity.GetUserName();
 
             var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
-        new SqlParameter("@inClass", Class),
-        new SqlParameter("@inCreator", loggedInLecturer)).ToList();
+                new SqlParameter("@inClass", Class),
+                new SqlParameter("@inCreator", loggedInLecturer)).ToList();
 
             return Json(assignments);
         }
@@ -2171,8 +2162,8 @@ namespace SPade.Controllers
         public ActionResult ViewResults(string Class, string Assignment)
         {
             var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
-        new SqlParameter("@inClass", Class),
-        new SqlParameter("@inAssignment", Assignment)).ToList();
+                new SqlParameter("@inClass", Class),
+                new SqlParameter("@inAssignment", Assignment)).ToList();
 
             return Json(results);
         }
