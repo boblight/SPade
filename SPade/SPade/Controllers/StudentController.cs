@@ -39,6 +39,8 @@ namespace SPade.Controllers
             Submission tempSubmission = new Submission();
             int assgnId = (int)Session["assignmentId"];
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
+
+
             //query for which programming language needed to be used for this assignment
             //for "Scalability sake"
             ProgLanguage langUsed = db.ProgLanguages.ToList().Find(p => p.LanguageId == db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode).LanguageId);
@@ -56,12 +58,6 @@ namespace SPade.Controllers
                     var fileName = Path.GetFileNameWithoutExtension(file.FileName);
 
 
-
-
-                    //save zip file in submissions directory temporarily
-                    //next unzip it into the same folder while replacing existing submissions
-                    //var zipLocation = Server.MapPath(@"~/Submissions/" + file);
-                    //file.SaveAs(zipLocation);
 
                     string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
                     submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
@@ -82,17 +78,13 @@ namespace SPade.Controllers
                     }
 
                     fileDirectory.Create(); // Recreates directory to update latest submission
-                    //System.IO.Compression.ZipFile.ExtractToDirectory(zipLocation, filePath);
 
 
                     //Create the file and save it under the given directory file path
+                    //E.g    tempsubmission/sampleqns1/sampleqns1.java
                     var fileInfo = new FileInfo(filePath);
                     fileInfo.Directory.Create();
                     file.SaveAs(filePath);
-
-
-
-
 
 
 
@@ -126,11 +118,7 @@ namespace SPade.Controllers
                 //return View();
                 return RedirectToAction("SubmitAssignment", assgnId);
             }
-            //else if (Path.GetExtension(file.FileName) != ".zip")
-            //{
-            //    Session["UploadError"] = "Only zip files are allowed. Please zip up your project before uploading.";
-            //    return RedirectToAction("SubmitAssignment", assgnId);
-            //}
+            
 
             return RedirectToAction("PostSubmission");
         }//end of submit assignment
@@ -292,6 +280,9 @@ namespace SPade.Controllers
                 {
                     var today = DateTime.Today.Date;
 
+
+                    //Check if student is able to look at the assignment
+                    //prior to the start date and due date
                     if (today >= a.StartDate.Date && today <= a.DueDate.Date)
                     {
                         ViewAssignmentViewModel v = new ViewAssignmentViewModel();
