@@ -4,47 +4,47 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="c2c36b16c5e44432a24ab6dac696cc96" Name="Diagram1">
-        <EntityTypeShape EntityType="SPadeDBModel.C__MigrationHistory" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Admin" Width="1.5" PointX="8.75" PointY="10.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetRole" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetUserClaim" Width="1.5" PointX="12.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetUserLogin" Width="1.5" PointX="12.75" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetUserRole" Width="1.5" PointX="12.75" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AspNetUser" Width="1.5" PointX="12.75" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Assignment" Width="1.5" PointX="8.25" PointY="5.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Class" Width="1.5" PointX="0.75" PointY="6" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Class_Assgn" Width="1.5" PointX="10.5" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Course" Width="1.5" PointX="1.5" PointY="10.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Lec_Class" Width="1.5" PointX="3" PointY="1.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Lecturer" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Module" Width="1.5" PointX="6" PointY="6.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.ProgLanguage" Width="1.5" PointX="3.75" PointY="6.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Student" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Submission" Width="1.5" PointX="10.5" PointY="3.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.AggregatedCounter" Width="1.5" PointX="14.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Counter" Width="1.5" PointX="0.75" PointY="14.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Hash" Width="1.5" PointX="14.75" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Job" Width="1.5" PointX="3.75" PointY="12.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.JobParameter" Width="1.5" PointX="6" PointY="11.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.JobQueue" Width="1.5" PointX="14.75" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.List" Width="1.5" PointX="8.75" PointY="14.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Schema" Width="1.5" PointX="14.75" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Server" Width="1.5" PointX="10.75" PointY="14.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.Set" Width="1.5" PointX="14.75" PointY="11.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SPadeDBModel.State" Width="1.5" PointX="6" PointY="13.75" IsExpanded="true" />
-        <AssociationConnector Association="SPadeDBModel.assgn_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.FK_Submission_ToTable" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.Module_fk_constrain" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.class_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.class_fk2" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.classcrse_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.staff_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.staff_fkk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.Language_fk_constrain" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.substud_fk" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.FK_HangFire_JobParameter_Job" ManuallyRouted="false" />
-        <AssociationConnector Association="SPadeDBModel.FK_HangFire_State_Job" ManuallyRouted="false" />
+      <Diagram DiagramId="931a1ac3f4f044468a4e714cba955d37" Name="Diagram1" ZoomLevel="91">
+        <EntityTypeShape EntityType="SPadeDBModelModel.C__MigrationHistory" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Admin" Width="1.5" PointX="8.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.AspNetRole" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.AspNetUserClaim" Width="1.5" PointX="12.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.AspNetUserLogin" Width="1.5" PointX="12.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.AspNetUserRole" Width="1.5" PointX="12.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.AspNetUser" Width="1.5" PointX="12.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Assignment" Width="1.5" PointX="8.25" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Class" Width="1.5" PointX="0.75" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Class_Assgn" Width="1.5" PointX="10.5" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Course" Width="1.5" PointX="1.5" PointY="10.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Lec_Class" Width="1.5" PointX="3" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Lecturer" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Module" Width="1.5" PointX="6" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.ProgLanguage" Width="1.5" PointX="3.75" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Student" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Submission" Width="1.5" PointX="10.5" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.AggregatedCounter" Width="1.5" PointX="14.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Counter" Width="1.5" PointX="0.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Hash" Width="1.5" PointX="14.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Job" Width="1.5" PointX="3.75" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.JobParameter" Width="1.5" PointX="6" PointY="11.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.JobQueue" Width="1.5" PointX="14.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.List" Width="1.5" PointX="8.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Schema" Width="1.5" PointX="14.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Server" Width="1.5" PointX="10.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.Set" Width="1.5" PointX="14.75" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SPadeDBModelModel.State" Width="1.5" PointX="6" PointY="13.75" IsExpanded="true" />
+        <AssociationConnector Association="SPadeDBModelModel.assgn_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.FK_Submission_ToTable" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.Module_fk_constrain" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.class_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.class_fk2" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.classcrse_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.staff_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.staff_fkk" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.Language_fk_constrain" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.substud_fk" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.FK_HangFire_JobParameter_Job" ManuallyRouted="false" />
+        <AssociationConnector Association="SPadeDBModelModel.FK_HangFire_State_Job" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

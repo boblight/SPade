@@ -104,27 +104,43 @@ namespace SPade.Controllers
             List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
             List<Student> sList = new List<Student>();
 
-            sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
 
-            Class c = db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
 
-            int courseId = c.CourseID;
-            string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
+            var lecturerEmail = UserManager.GetEmail(User.Identity.GetUserId());
+            var lecturer = db.Lecturers.Where(lec => lec.Email == lecturerEmail).Single();
+            var isAssociated = db.Lec_Class.Any(associated => associated.ClassID == cID 
+                                                           && associated.StaffID==lecturer.StaffID);
 
-            foreach (Student s in sList)
+
+
+
+            if (isAssociated)
             {
-                ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
 
-                vm.AdminNo = s.AdminNo.ToUpper();
-                vm.Name = s.Name;
-                vm.Email = s.Email;
-                vm.ContactNo = s.ContactNo;
+                sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
 
-                studList.Add(vm);
+                Class c = db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
+
+                int courseId = c.CourseID;
+                string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
+
+                foreach (Student s in sList)
+                {
+                    ViewStudentsByClassViewModel vm = new ViewStudentsByClassViewModel();
+
+                    vm.AdminNo = s.AdminNo.ToUpper();
+                    vm.Name = s.Name;
+                    vm.Email = s.Email;
+                    vm.ContactNo = s.ContactNo;
+
+                    studList.Add(vm);
+                }
+
+                ViewBag.ClassName = courseAbbr + "/" + c.ClassName;
+                return View(studList);
             }
 
-            ViewBag.ClassName = courseAbbr + "/" + c.ClassName;
-            return View(studList);
+            return RedirectToAction("ManageClassesAndStudents","Lecturer");
         }
 
         public ActionResult UpdateStudent(string id)
