@@ -188,16 +188,16 @@
                         }
                     });
 
-                $("#modalSelect").click(function () {
+                $("#modalSelect").click(function() {
                     var selectedClasses = [];
-                    $('input[type="checkbox"][name*="isSelected"]').each(function () {
+                    $('input[type="checkbox"][name*="isSelected"]').each(function() {
                         if (this.checked) {
                             var c = $(this).data("class-name");
                             selectedClasses.push(c)
                         }
                     });
                     $("#selectedClasses").val(selectedClasses);
-                })
+                });
             </script>
 
             <div class="form-group">

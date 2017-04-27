@@ -291,6 +291,7 @@ namespace SPade.Controllers
         {
             try
             {
+
                 var isModuleCoordinator = model.ModuleCoordinator;
                 var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
                 user.EmailConfirmed = true;
