@@ -265,6 +265,7 @@ namespace SPade.Controllers
             AddLecturerViewModel model = new AddLecturerViewModel();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
             List<AssignmentClass> ac = new List<AssignmentClass>();
+            List<Module> modules = db.Modules.ToList().FindAll(c => c.DeletedAt == null);
 
             foreach (var c in allClasses)
             {
@@ -281,6 +282,7 @@ namespace SPade.Controllers
             }
             model.ClassList = ac;
             model.Classes = allClasses;
+            model.ModuleList = modules;
             return View(model);
         }
 
@@ -289,12 +291,13 @@ namespace SPade.Controllers
         {
             try
             {
+                var isModuleCoordinator = model.ModuleCoordinator;
                 var user = new ApplicationUser { UserName = model.StaffID, Email = model.Email };
                 user.EmailConfirmed = true;
                 var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                 if (result.Succeeded)
                 {
-                    UserManager.AddToRole(user.Id, "Lecturer");
+                    
                     var lecturer = new Lecturer()
                     {
                         StaffID = model.StaffID,
@@ -305,18 +308,34 @@ namespace SPade.Controllers
                         UpdatedBy = User.Identity.Name,
                         CreatedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
+                        IsModuleCoordinator = isModuleCoordinator
                     };
 
-                    foreach (AssignmentClass ac in model.ClassList)
+
+                    //If you are adding a lecturer
+                    if (!isModuleCoordinator)
                     {
-                        if (ac.isSelected == true)
+                        UserManager.AddToRole(user.Id, "Lecturer");
+                        foreach (AssignmentClass ac in model.ClassList)
                         {
-                            db.Lec_Class.Add(new Lec_Class
+                            if (ac.isSelected == true)
                             {
-                                ClassID = ac.ClassId,
-                                StaffID = model.StaffID
-                            });
+                                db.Lec_Class.Add(new Lec_Class
+                                {
+                                    ClassID = ac.ClassId,
+                                    StaffID = model.StaffID
+                                });
+                            }
                         }
+                    }
+                    else //If you are adding a module coordinator
+                    {
+                        UserManager.AddToRole(user.Id, "Module Coordinator");
+                        db.ModuleCoordinators.Add(new ModuleCoordinator
+                        {
+                            LecturerStaffId = model.StaffID,
+                            ModuleCode = model.ModuleCode
+                        });
                     }
                     db.Lecturers.Add(lecturer);
                     db.SaveChanges();

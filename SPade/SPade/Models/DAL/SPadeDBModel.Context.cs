@@ -53,5 +53,6 @@ namespace SPade.Models.DAL
         public virtual DbSet<Server> Servers { get; set; }
         public virtual DbSet<Set> Sets { get; set; }
         public virtual DbSet<State> States { get; set; }
+        public virtual DbSet<ModuleCoordinator> ModuleCoordinators { get; set; }
     }
 }

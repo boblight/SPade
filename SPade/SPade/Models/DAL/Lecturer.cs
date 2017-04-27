@@ -31,6 +31,7 @@ namespace SPade.Models.DAL
         public string UpdatedBy { get; set; }
         public Nullable<System.DateTime> DeletedAt { get; set; }
         public string DeletedBy { get; set; }
+        public Nullable<bool> IsModuleCoordinator { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Lec_Class> Lec_Class { get; set; }

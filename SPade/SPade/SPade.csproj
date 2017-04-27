@@ -266,6 +266,9 @@
     <Compile Include="Models\DAL\Module.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DAL\ModuleCoordinator.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DAL\ProgLanguage.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
