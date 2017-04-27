@@ -32,8 +32,8 @@
                     <span class="help-block">@Html.ValidationMessage("Name", new { @class = "text-danger" })</span>
 
                 </div>
-            </div>            
-            
+            </div>
+
             <div class="form-group">
                 <div class="col-md-12">
                     <label class="control-label">
@@ -42,13 +42,13 @@
                     <input class="form-control" id="selectedMC" name="selectedMC" type="text" readonly="readonly" placeholder="Yes/No" data-toggle="modal" data-target="#classModal2" />
                 </div>
             </div>
-            
+
             <div class="form-group" id="selectModule" hidden>
                 <div class="col-md-12">
                     <label class="control-label">
                         Assign Module
                     </label>
-                    <input class="form-control" id="selectedModule" name="selectedModule" type="text" readonly="readonly" placeholder="Select Module..." data-toggle="modal" data-target="#classModal3" hidden/>
+                    <input class="form-control" id="selectedModule" name="selectedModule" type="text" readonly="readonly" placeholder="Select Module..." data-toggle="modal" data-target="#classModal3" hidden />
                 </div>
             </div>
 
@@ -108,7 +108,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!--Modal for assigning module coordinator-->
             <div name="classModal2" id="classModal2" class="modal fade" role="dialog">
                 <div class="modal-dialog">
@@ -120,11 +120,11 @@
 
                         <div class="modal-body">
                             @{
-                                @Html.RadioButtonFor(m => m.ModuleCoordinator, true, new { @id = "yesMC", @class="MC" })
+                                @Html.RadioButtonFor(m => m.ModuleCoordinator, true, new { @id = "yesMC", @class = "MC" })
                             }Yes
-                            <br/>      
-                            @{                              
-                                @Html.RadioButtonFor(m => m.ModuleCoordinator, false, new { @id = "noMC", @class="MC" })
+                            <br />
+                            @{
+                                @Html.RadioButtonFor(m => m.ModuleCoordinator, false, new { @id = "noMC", @class = "MC" })
                             }No
                             <br />
                         </div>
@@ -134,7 +134,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!--Modal for selecting module-->
             <div name="classModal3" id="classModal3" class="modal fade" role="dialog">
                 <div class="modal-dialog">
@@ -148,9 +148,9 @@
                             @{
                                 for (var i = 0; i < Model.ModuleList.Count(); i++)
                                 {
-                                    @Html.RadioButtonFor(m=>m.ModuleCode,@Model.ModuleList[i].ModuleCode,new { @class="module", @data_class_name = @Model.ModuleList[i].ModuleName });
+                                    @Html.RadioButtonFor(m => m.ModuleCode, @Model.ModuleList[i].ModuleCode, new { @class = "module", @data_class_name = @Model.ModuleList[i].ModuleName });
                                     @Model.ModuleList[i].ModuleName;
-                                    <br/>
+                                    <br />
                                 }
                             }
                         </div>
@@ -164,7 +164,7 @@
             <script>
 
                 $('#modalSelect3').on('click',
-                    function() {
+                    function () {
                         $('#selectedModule').val($('input[class=module]:checked').data('class-name'));
                     });
 
@@ -178,7 +178,7 @@
                             $('#selectClass').hide();
                             $('#selectedClasses').val("");
                             $('#selectModule').show();
-                            
+
                         } else {
                             $('#selectedMC').val("No");
                             $('#selectClass').show();
@@ -190,7 +190,7 @@
 
                 $("#modalSelect").click(function () {
                     var selectedClasses = [];
-                    $('input[type="checkbox"][name*="isSelected"]').each(function() {
+                    $('input[type="checkbox"][name*="isSelected"]').each(function () {
                         if (this.checked) {
                             var c = $(this).data("class-name");
                             selectedClasses.push(c)

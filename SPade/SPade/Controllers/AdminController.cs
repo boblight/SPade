@@ -330,12 +330,14 @@ namespace SPade.Controllers
                     }
                     else //If you are adding a module coordinator
                     {
+
                         UserManager.AddToRole(user.Id, "Module Coordinator");
                         db.ModuleCoordinators.Add(new ModuleCoordinator
                         {
                             LecturerStaffId = model.StaffID,
                             ModuleCode = model.ModuleCode
                         });
+
                     }
                     db.Lecturers.Add(lecturer);
                     db.SaveChanges();
