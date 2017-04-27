@@ -174,12 +174,8 @@
           <Property Name="DeletedAt" Type="datetime" />
           <Property Name="DeletedBy" Type="varchar" MaxLength="20" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ModuleCoordinator">
           <Key>
-            <PropertyRef Name="LecturerStaffId" />
-            <PropertyRef Name="ModuleCode" />
             <PropertyRef Name="MC_Id" />
           </Key>
           <Property Name="LecturerStaffId" Type="varchar" MaxLength="20" Nullable="false" />
@@ -491,6 +487,7 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
           <EntitySet Name="Lec_Class" EntityType="Self.Lec_Class" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Lecturer" EntityType="Self.Lecturer" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Module" EntityType="Self.Module" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ModuleCoordinator" EntityType="Self.ModuleCoordinator" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProgLanguage" EntityType="Self.ProgLanguage" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Submission" EntityType="Self.Submission" Schema="dbo" store:Type="Tables" />
@@ -505,13 +502,6 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
           <EntitySet Name="Server" EntityType="Self.Server" Schema="HangFire" store:Type="Tables" />
           <EntitySet Name="Set" EntityType="Self.Set" Schema="HangFire" store:Type="Tables" />
           <EntitySet Name="State" EntityType="Self.State" Schema="HangFire" store:Type="Tables" />
-          <EntitySet Name="ModuleCoordinator" EntityType="Self.ModuleCoordinator" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [ModuleCoordinator].[LecturerStaffId] AS [LecturerStaffId], 
-    [ModuleCoordinator].[ModuleCode] AS [ModuleCode], 
-    [ModuleCoordinator].[MC_Id] AS [MC_Id]
-    FROM [dbo].[ModuleCoordinator] AS [ModuleCoordinator]</DefiningQuery>
-          </EntitySet>
           <AssociationSet Name="assgn_fk" Association="Self.assgn_fk">
             <End Role="Assignment" EntitySet="Assignment" />
             <End Role="Class_Assgn" EntitySet="Class_Assgn" />
@@ -751,6 +741,14 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
           <NavigationProperty Name="Assignments" Relationship="Self.Module_fk_constrain" FromRole="Module" ToRole="Assignment" />
           <NavigationProperty Name="ProgLanguage" Relationship="Self.Language_fk_constrain" FromRole="Module" ToRole="ProgLanguage" />
         </EntityType>
+        <EntityType Name="ModuleCoordinator">
+          <Key>
+            <PropertyRef Name="MC_Id" />
+          </Key>
+          <Property Name="LecturerStaffId" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ModuleCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MC_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
         <EntityType Name="ProgLanguage">
           <Key>
             <PropertyRef Name="LanguageId" />
@@ -900,16 +898,6 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Data" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Job" Relationship="Self.FK_HangFire_State_Job" FromRole="State" ToRole="Job" />
-        </EntityType>
-        <EntityType Name="ModuleCoordinator">
-          <Key>
-            <PropertyRef Name="LecturerStaffId" />
-            <PropertyRef Name="ModuleCode" />
-            <PropertyRef Name="MC_Id" />
-          </Key>
-          <Property Name="LecturerStaffId" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="ModuleCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="MC_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <Association Name="assgn_fk">
           <End Role="Assignment" Type="Self.Assignment" Multiplicity="1" />
@@ -1074,6 +1062,7 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
           <EntitySet Name="Lec_Class" EntityType="Self.Lec_Class" />
           <EntitySet Name="Lecturers" EntityType="Self.Lecturer" />
           <EntitySet Name="Modules" EntityType="Self.Module" />
+          <EntitySet Name="ModuleCoordinators" EntityType="Self.ModuleCoordinator" />
           <EntitySet Name="ProgLanguages" EntityType="Self.ProgLanguage" />
           <EntitySet Name="Students" EntityType="Self.Student" />
           <EntitySet Name="Submissions" EntityType="Self.Submission" />
@@ -1088,7 +1077,6 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
           <EntitySet Name="Servers" EntityType="Self.Server" />
           <EntitySet Name="Sets" EntityType="Self.Set" />
           <EntitySet Name="States" EntityType="Self.State" />
-          <EntitySet Name="ModuleCoordinators" EntityType="Self.ModuleCoordinator" />
           <AssociationSet Name="assgn_fk" Association="Self.assgn_fk">
             <End Role="Assignment" EntitySet="Assignments" />
             <End Role="Class_Assgn" EntitySet="Class_Assgn" />
@@ -1323,6 +1311,15 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="ModuleCoordinators">
+            <EntityTypeMapping TypeName="SPadeDBModel.ModuleCoordinator">
+              <MappingFragment StoreEntitySet="ModuleCoordinator">
+                <ScalarProperty Name="LecturerStaffId" ColumnName="LecturerStaffId" />
+                <ScalarProperty Name="ModuleCode" ColumnName="ModuleCode" />
+                <ScalarProperty Name="MC_Id" ColumnName="MC_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="ProgLanguages">
             <EntityTypeMapping TypeName="SPadeDBModel.ProgLanguage">
               <MappingFragment StoreEntitySet="ProgLanguage">
@@ -1476,15 +1473,6 @@ warning 6002: The table/view 'SPadeDBModel.dbo.ModuleCoordinator' does not have 
                 <ScalarProperty Name="Reason" ColumnName="Reason" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="Data" ColumnName="Data" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ModuleCoordinators">
-            <EntityTypeMapping TypeName="SPadeDBModel.ModuleCoordinator">
-              <MappingFragment StoreEntitySet="ModuleCoordinator">
-                <ScalarProperty Name="LecturerStaffId" ColumnName="LecturerStaffId" />
-                <ScalarProperty Name="ModuleCode" ColumnName="ModuleCode" />
-                <ScalarProperty Name="MC_Id" ColumnName="MC_Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

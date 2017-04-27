@@ -39,6 +39,7 @@ namespace SPade.Models.DAL
         public virtual DbSet<Lec_Class> Lec_Class { get; set; }
         public virtual DbSet<Lecturer> Lecturers { get; set; }
         public virtual DbSet<Module> Modules { get; set; }
+        public virtual DbSet<ModuleCoordinator> ModuleCoordinators { get; set; }
         public virtual DbSet<ProgLanguage> ProgLanguages { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Submission> Submissions { get; set; }
@@ -53,6 +54,5 @@ namespace SPade.Models.DAL
         public virtual DbSet<Server> Servers { get; set; }
         public virtual DbSet<Set> Sets { get; set; }
         public virtual DbSet<State> States { get; set; }
-        public virtual DbSet<ModuleCoordinator> ModuleCoordinators { get; set; }
     }
 }
