@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using SPade.ViewModels.Student;
 
 namespace SPade.Models
 {
@@ -11,6 +12,6 @@ namespace SPade.Models
         public DateTime SucceededAt { get; set; }
         public int PerformanceDuration { get; set; }
         public int Latency { get; set; }
-        public decimal Result { get; set; }
+        public int Result { get; set; }
     }
 }

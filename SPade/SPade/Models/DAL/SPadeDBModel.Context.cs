@@ -33,6 +33,7 @@ namespace SPade.Models.DAL
         public virtual DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
         public virtual DbSet<Assignment> Assignments { get; set; }
+        public virtual DbSet<AssignmentTestCase> AssignmentTestCases { get; set; }
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<Class_Assgn> Class_Assgn { get; set; }
         public virtual DbSet<Course> Courses { get; set; }

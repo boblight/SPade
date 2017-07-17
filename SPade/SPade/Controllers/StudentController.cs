@@ -24,6 +24,7 @@ namespace SPade.Controllers
     public class StudentController : Controller
     {
         private SPadeDBEntities db = new SPadeDBEntities();
+        private static Dictionary<decimal,List<Result>> descriptionScore = new Dictionary<decimal, List<Result>>();
 
         // GET: Dashboard
         public ActionResult Dashboard()
@@ -39,7 +40,7 @@ namespace SPade.Controllers
             Submission tempSubmission = new Submission();
             int assgnId = (int)Session["assignmentId"];
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == assgnId);
-
+            var classId = db.Students.Single(s => s.AdminNo == User.Identity.Name).ClassID;
 
             //query for which programming language needed to be used for this assignment
             //for "Scalability sake"
@@ -47,7 +48,7 @@ namespace SPade.Controllers
 
             //getting file path
             //first check if file us empty of is not zip file
-            if (file != null && Path.GetExtension(file.FileName) == ".zip")
+            if (file != null)
             {
                 if (file.ContentLength > 0)
                 {
@@ -60,8 +61,8 @@ namespace SPade.Controllers
 
 
                     string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
-                    submissionName = User.Identity.GetUserName() + title + assignment.AssignmentID;
-                    var filePath = Server.MapPath(@"~/Submissions/" + submissionName + "/" + fileName.ToLower() + fileExtensionName);
+                    submissionName = @""+ assignment.AssignmentID + "/" + classId + "/" + User.Identity.GetUserName();
+                    var filePath = Server.MapPath(@"~/Submissions/" + assignment.AssignmentID + "/" + classId + "/" + User.Identity.GetUserName() +  "/" + fileName.ToLower() + "/" + fileName.ToLower() + fileExtensionName);
                     var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
                     System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePathForGrade);
 
@@ -99,13 +100,13 @@ namespace SPade.Controllers
                     //anywhere from 0.0 - 1.0 determines the grade given to the particular submission
 
                     //this part is grading the assignment. we add to the scheduler to process it
-                    var jobID = BackgroundJob.Enqueue(() => ProcessSubmission(filePathForGrade, fileName, assgnId, langUsed.LangageType));
+                    var jobID = BackgroundJob.Enqueue(() => ProcessSubmission(filePathForGrade, fileName, assgnId, langUsed.LangageType,User.Identity.GetUserName()));
 
                     //fill up the the submission model partially 
                     //only result not in -> this will come AFTER the scheduler successfully runs the assignment
                     tempSubmission.AssignmentID = assgnId;
                     tempSubmission.AdminNo = User.Identity.GetUserName();
-                    tempSubmission.FilePath = submissionName;
+                    tempSubmission.FilePath = submissionName + "/" + fileName.ToLower();
                     tempSubmission.Timestamp = DateTime.Now;
 
                     Session["TempSub"] = tempSubmission;
@@ -123,15 +124,29 @@ namespace SPade.Controllers
             return RedirectToAction("PostSubmission");
         }//end of submit assignment
 
+
+
+        [AutomaticRetry(Attempts = 1)]
         //the method which we call the scheduler to run
-        public decimal ProcessSubmission(string filePathForGrade, string fileName, int assgnId, string langUsed)
+        public int ProcessSubmission(string filePathForGrade, string fileName, int assgnId, string langUsed,string userName)
         {
-            decimal result;
+            var descriptionScoreKey = Int32.Parse(userName.Substring(1)+""+assgnId);
 
             //the grading of the assignment is done here (the scheduler adds this to queue)
-            Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed);
-            result = sandBoxedGrading.runSandboxedGrading();
+            Sandboxer sandBoxedGrading = new Sandboxer(filePathForGrade, fileName, assgnId, langUsed,descriptionScoreKey);
+            int result = (int)sandBoxedGrading.runSandboxedGrading();
 
+            
+            //in the event if result returns a decimal that represents an error
+            if (sandBoxedGrading.descriptionScore.Count != 0)
+            {
+                if (descriptionScore.ContainsKey(result))
+                {
+                    descriptionScore.Remove(result);
+                }
+                descriptionScore.Add(result, sandBoxedGrading.descriptionScore);
+                
+            }
             return result;
         }
 
@@ -140,9 +155,12 @@ namespace SPade.Controllers
         {
             //this method is to check the DB IF the job is finished
             bool runningJob = true;
+            decimal totalScore = 0;
+            decimal finalScore = 0;
             int runningJobId = Int32.Parse(jobId);
             //this is the row with all the necessary data we need
             State finalState = new State();
+            List<Result> scores = new List<Result>();
 
             //we check the Hangfire.State table to see if our current job has succeeded running 
             var stateList = db.States.Where(s => s.JobId == runningJobId).ToList();
@@ -160,13 +178,33 @@ namespace SPade.Controllers
 
                 if (finalState.Name == "Succeeded")
                 {
-                    //job finished running and successfully run. 
 
                     //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
                     HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
 
-                    //get the grade and add to database
-                    sub.Grade = dataObj.Result;
+                    //Get the dictionary key to access the related object 
+                    var descriptionScoreKey = dataObj.Result;
+                    if (descriptionScore.TryGetValue(descriptionScoreKey, out scores))
+                    {
+                        Session["TempResults"] = scores;
+                        Session["TempSolutionKey"] = descriptionScoreKey;
+                        foreach (var eachScore in scores)
+                        {
+                            totalScore += eachScore.Score;
+                        }
+                        finalScore = totalScore / scores.Count;
+                    }
+                    else
+                    {
+                        finalScore = descriptionScoreKey > 100 ? 0 : descriptionScoreKey;
+                    }
+
+
+
+
+
+
+                    sub.Grade = finalScore;
                     db.Submissions.Add(sub);
                     db.SaveChanges();
                 }
@@ -198,30 +236,18 @@ namespace SPade.Controllers
 
 
             //Use id to check if there is an assignment associated with this user
-            List<Class_Assgn> ca = db.Class_Assgn.ToList().FindAll(c => c.ClassID == db.Students.Where(stud => stud.AdminNo == User.Identity.Name).FirstOrDefault().ClassID && c.AssignmentID == id);
             var viewableAssignment = false;
-
-
-
-            if (ca.Count == 0)
+            var associatedAssgn = db.Class_Assgn.Where(oneClass => oneClass.ClassID == db.Students.FirstOrDefault(stud => stud.AdminNo == User.Identity.Name).ClassID && oneClass.AssignmentID == id);
+            var today = DateTime.Today.Date;
+            if (associatedAssgn.Any())
             {
-                return RedirectToAction("ViewAssignment", "Student");
-            }
-            else
-            {
-                //Check if assignment is available to be viewed
-                foreach (var oneClassAssgn in ca)
+                var classAssgn = associatedAssgn.Single();
+                var oneAssignment = db.Assignments.Single(assgn => assgn.AssignmentID == classAssgn.AssignmentID);
+                if (today >= oneAssignment.StartDate.Date && today <= oneAssignment.DueDate.Date)
                 {
-                    var today = DateTime.Today.Date;
-                    var oneAssignment = db.Assignments.Where(assgn => assgn.AssignmentID == oneClassAssgn.AssignmentID).Single();
-                    if (today >= oneAssignment.StartDate.Date && today <= oneAssignment.DueDate.Date)
-                    {
-                        viewableAssignment = true;
-                    }
+                    viewableAssignment = true;
                 }
-
             }
-
 
 
 
@@ -346,7 +372,8 @@ namespace SPade.Controllers
                 }
 
                 SubmittedOn.Add(r.timestamp.ToString());
-                Submission.Add("/Student/Download/?file=" + Regex.Replace(r.assgntitle, @"\s+", "") + r.assignmentid);
+                //Submission.Add("/Student/Download/?file=" + Regex.Replace(r.assgntitle, @"\s+", "") + r.assignmentid);
+                Submission.Add("/Student/Download/?file=" + r.filepath );
             }
 
             vrvm.Assignment = Assignment;
@@ -422,15 +449,32 @@ namespace SPade.Controllers
             }
             db.SaveChanges();
 
+            
+            submissionSolution submissions = new submissionSolution();
+            submissions.submission = submission;
+            submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
+
             Session.Remove("submission"); //clear session
-            return View(submission);
+            if (submissions.solution == null)
+            {
+                if (descriptionScore.Count > 0)
+                {
+                    descriptionScore.Remove((int) Session["TempSolutionKey"]);
+                }
+                Session.Remove("TempResults");
+                Session.Remove("TempSolutionKey");
+            }
+            
+
+            return View(submissions);
         }
 
         [HttpGet]
         public ActionResult Download(string file)
         {
-            string path = "~/Submissions/" + User.Identity.GetUserName() + file; //temp
-            string zipname = User.Identity.GetUserName() + file + ".zip"; //temp
+            var path = "~/Submissions/" + file; //temp
+            var fileName = file.Split('/');
+            var zipname = User.Identity.GetUserName() + "(" + fileName[fileName.Length - 1] + ").zip"; //temp
 
             var memoryStream = new MemoryStream();
             using (var zip = new ZipFile())

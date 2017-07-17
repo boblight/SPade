@@ -1,0 +1,9 @@
+Logged in user: s2222222
+User task: Adding Assignment 
+
+Exception Log: System.IO.IOException: Cannot create a file when that file already exists.
+
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.__Error.WinIOError()
+   at System.IO.FileInfo.MoveTo(String destFileName)
+   at SPade.Controllers.LecturerController.AddAssignmentToDB(AddAssignmentViewModel addAssgn, String fileName, Boolean isTestCase) in D:\InternProjV2\SPade-MVC\SPade\SPade\Controllers\LecturerController.cs:line 1987 

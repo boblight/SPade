@@ -253,6 +253,7 @@ namespace SPade.Controllers
                 vm.Email = i.Email;
                 vm.CreatedBy = i.CreatedBy.ToUpper();
                 vm.NumClasses = db.Lec_Class.Where(cl => cl.StaffID == i.StaffID).Count().ToString();
+                vm.ModuleCoordinator = i.IsModuleCoordinator;
 
                 lvm.Add(vm);
             }
@@ -312,34 +313,31 @@ namespace SPade.Controllers
                         IsModuleCoordinator = isModuleCoordinator
                     };
 
+                    UserManager.AddToRole(user.Id, "Lecturer");
 
                     //If you are adding a lecturer
-                    if (!isModuleCoordinator)
+                    if (isModuleCoordinator)
                     {
-                        UserManager.AddToRole(user.Id, "Lecturer");
-                        foreach (AssignmentClass ac in model.ClassList)
-                        {
-                            if (ac.isSelected == true)
-                            {
-                                db.Lec_Class.Add(new Lec_Class
-                                {
-                                    ClassID = ac.ClassId,
-                                    StaffID = model.StaffID
-                                });
-                            }
-                        }
-                    }
-                    else //If you are adding a module coordinator
-                    {
-
-                        UserManager.AddToRole(user.Id, "Module Coordinator");
                         db.ModuleCoordinators.Add(new ModuleCoordinator
                         {
                             LecturerStaffId = model.StaffID,
                             ModuleCode = model.ModuleCode
                         });
+                    }                    
 
+                    foreach (AssignmentClass ac in model.ClassList)
+                    {
+                        if (ac.isSelected == true)
+                        {
+                            db.Lec_Class.Add(new Lec_Class
+                            {
+                                ClassID = ac.ClassId,
+                                StaffID = model.StaffID
+                            });
+                        }
                     }
+
+
                     db.Lecturers.Add(lecturer);
                     db.SaveChanges();
                 }
@@ -493,7 +491,12 @@ namespace SPade.Controllers
             Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == id && l.DeletedAt == null);
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == id).ToList();
             List<Class> allClasses = db.Classes.ToList().FindAll(c => c.DeletedAt == null);
+            List<Module> modules = db.Modules.ToList().FindAll(c => c.DeletedAt == null);
 
+
+
+            var index = 1;
+            var selectedClasses = "";
             foreach (var c in allClasses)
             {
                 AssignmentClass a = new AssignmentClass();
@@ -507,18 +510,35 @@ namespace SPade.Controllers
                 if (lc.FindAll(lec => lec.ClassID == c.ClassID).Count() > 0)
                 {
                     a.isSelected = true;
+                    if (index == lc.Count)
+                    {
+                        selectedClasses += className;
+                    }
+                    else
+                    {
+                        selectedClasses += className + ",";
+                    }
+                    index++;
                 }
                 else
                 {
                     a.isSelected = false;
                 }
                 ac.Add(a);
+                
             }
 
             ulvm.ClassList = ac;
             ulvm.StaffID = id;
             ulvm.Name = lecturer.Name;
             ulvm.ContactNo = lecturer.ContactNo;
+            ulvm.ClassName = selectedClasses;
+            ulvm.ModuleCoordinator = lecturer.IsModuleCoordinator ?? false;
+            if (ulvm.ModuleCoordinator)
+            {
+                ulvm.ModuleCode = db.ModuleCoordinators.Single(a => a.LecturerStaffId == lecturer.StaffID).ModuleCode;
+            }
+            ulvm.ModuleList = modules;
 
             return View(ulvm);
         }
@@ -529,6 +549,10 @@ namespace SPade.Controllers
             Lecturer lecturer = db.Lecturers.ToList().Find(l => l.StaffID == StaffID);
             //List<Lecturer> Lecturers = db.Lecturers.ToList();
             List<Lec_Class> lc = db.Lec_Class.Where(lec => lec.StaffID == StaffID).ToList();
+            
+
+
+            var isModuleCoordinator = model.ModuleCoordinator;
 
             if (command.Equals("Update"))
             {
@@ -542,7 +566,17 @@ namespace SPade.Controllers
                 {
                     db.Lec_Class.Remove(lec);
                 }
+                if (db.ModuleCoordinators.Any(a => a.LecturerStaffId == lecturer.StaffID))
+                {
+                    db.ModuleCoordinators.Remove(
+                        db.ModuleCoordinators.Single(a => a.LecturerStaffId == lecturer.StaffID));
+                }
 
+                db.SaveChanges();
+
+
+                //Adding the updated values
+                lecturer.IsModuleCoordinator = isModuleCoordinator;
                 foreach (AssignmentClass ac in model.ClassList)
                 {
                     if (ac.isSelected == true)
@@ -553,6 +587,15 @@ namespace SPade.Controllers
                             StaffID = model.StaffID
                         });
                     }
+                }
+
+                if (isModuleCoordinator)
+                {
+                    db.ModuleCoordinators.Add(new ModuleCoordinator
+                    {
+                        LecturerStaffId = model.StaffID,
+                        ModuleCode = model.ModuleCode
+                    });
                 }
 
                 db.SaveChanges();
@@ -568,6 +611,11 @@ namespace SPade.Controllers
                     if (db.Lec_Class.Where(lcc => lcc.StaffID == StaffID).Count() > 0)
                     {
                         db.Lec_Class.Remove(db.Lec_Class.Where(lcc => lcc.StaffID == StaffID).FirstOrDefault());
+                    }
+                    if (db.ModuleCoordinators.Any(a => a.LecturerStaffId == lecturer.StaffID))
+                    {
+                        db.ModuleCoordinators.Remove(
+                            db.ModuleCoordinators.Single(a => a.LecturerStaffId == lecturer.StaffID));
                     }
 
                     //db.Lecturers.Remove(db.Lecturers.Where(l => l.StaffID == StaffID).FirstOrDefault());

@@ -1,0 +1,11 @@
+Logged in user: s1234567
+User task: Adding Assignment 
+
+Exception Log: System.InvalidOperationException: Sequence contains no elements
+   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.<GetElementFunction>b__3[TResult](IEnumerable`1 sequence)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.ExecuteSingle[TResult](IEnumerable`1 query, Expression queryRoot)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.System.Linq.IQueryProvider.Execute[TResult](Expression expression)
+   at System.Data.Entity.Internal.Linq.DbQueryProvider.Execute[TResult](Expression expression)
+   at System.Linq.Queryable.Single[TSource](IQueryable`1 source)
+   at SPade.Controllers.LecturerController.AddAssignmentToDB(AddAssignmentViewModel addAssgn, String fileName, Boolean isTestCase) in D:\InternProjV2\SPade-MVC\SPade\SPade\Controllers\LecturerController.cs:line 1893 

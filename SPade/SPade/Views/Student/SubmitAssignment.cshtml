@@ -50,7 +50,7 @@
                     <!-- File Button -->
                     <div class="form-group">
                         <div class="col-md-12">
-                            <label class="control-label" for="AssignmentFile">Upload Solution (Note: Please zip up your project before uploading)</label>
+                            <label class="control-label" for="AssignmentFile">Upload Solution</label>
                             @Html.TextBoxFor(m => m.File, new { type = "file", @class = "form-control", @style = "border: solid 1px red" })
                             @Html.ValidationMessageFor(m => m.File)
                             @*<p class="text-danger">@Html.ValidationMessage("UploadError")</p>*@

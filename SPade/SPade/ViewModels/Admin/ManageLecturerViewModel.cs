@@ -13,5 +13,6 @@ namespace SPade.ViewModels.Admin
         public string Email { get; set; }
         public string CreatedBy { get; set; }
         public string NumClasses { get; set; }
+        public bool? ModuleCoordinator { get; set; }
     }
 }

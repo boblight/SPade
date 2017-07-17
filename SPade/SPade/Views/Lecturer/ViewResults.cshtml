@@ -45,6 +45,12 @@
                     <input id="search" name="search" class="form-control" placeholder="Search" type="text" data-column="any" />
                 </div>
             </div>
+            
+            <div class="form-group">
+                <div>
+                    <button class="btn btn-primary" id="downloadAll">Download class submissions</button>
+                </div>
+            </div>
 
             <table class="table table-striped table-hover tablesorter">
                 <thead>
@@ -92,6 +98,26 @@
         fillTable();
     });
 
+    $('#selectClass').on('change', function () {
+        $('#selectAssignment').empty();
+        getAssgn();
+    })
+
+
+    $('#downloadAll').on('click',
+        function() {
+            $.ajax({
+                type: 'POST',
+                url: 'DownloadAll',
+                data: '{\'Class\':\'' + $('#selectClass').val() + '\', \'Assignment\':\'' + $('#selectAssignment').val() + '\'}',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                success: function(data) {
+                    
+                },
+                error:function() {}
+            });
+        });
 
     function fillTable() {
 
@@ -136,6 +162,12 @@
                     url: updateTable(),
                     success: function () {
                         $('table').trigger("update");
+
+                        if ($('tbody').children().length == 0) {
+                            $('#downloadAll').hide();
+                        } else {
+                            $('#downloadAll').show();
+                        }
                     }
                 });
 
@@ -163,7 +195,7 @@
                              .text(val.AssgnTitle));
 
                 });
-
+                fillTable();
             },
             error: function () {
             }

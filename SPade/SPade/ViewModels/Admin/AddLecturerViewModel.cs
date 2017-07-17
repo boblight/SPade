@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.ModelBinding;
 using System.Web.Mvc;
 
 namespace SPade.ViewModels.Admin
@@ -26,16 +27,20 @@ namespace SPade.ViewModels.Admin
         [RegularExpression("^[0-9]{8,8}$", ErrorMessage = "Please enter a proper Singapore-based phone number")]
         [Display(Name = "Contact Number")]
         public int ContactNo { get; set; }
-        [Required]
         public bool ModuleCoordinator { get; set; }
         public List<Module> ModuleList { get; set; }
         public List<Class> Classes { get; set; }
-        public string ClassName { get; set; }
-        public int ClassID { get; set; }
-        public string SelectedClasses { get; set; }
         public string ModuleCode { get; set; }
         public List<AssignmentClass> ClassList { get; set; }
-        
+
+
+        //Validation Purposes
+        [Required(ErrorMessage = "Please select a choice")]
+        public string ModuleCoordinatorChoice { get; set; }
+        [Required(ErrorMessage = "Please select at least one class to assign")]
+        public string ClassName { get; set; }
+        [Required(ErrorMessage = "Please select a Module")]
+        public string ModuleName { get; set; }
 
 
     }

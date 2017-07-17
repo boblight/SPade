@@ -55,13 +55,13 @@
       <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9f5eeeebc011402e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Hangfire.Core, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.Core.1.6.2\lib\net45\Hangfire.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9f5eeeebc011402e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Hangfire.SqlServer, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.SqlServer.1.6.2\lib\net45\Hangfire.SqlServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
@@ -200,6 +200,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Grading\Compiler.cs" />
+    <Compile Include="Grading\Grade.cs" />
     <Compile Include="Grading\Sandboxer.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -225,6 +226,9 @@
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Assignment.cs">
+      <DependentUpon>SPadeDBModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DAL\AssignmentTestCase.cs">
       <DependentUpon>SPadeDBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DAL\Class.cs">
@@ -338,6 +342,9 @@
     <Compile Include="ViewModels\Lecturer\ViewResultsViewModel.cs" />
     <Compile Include="ViewModels\Lecturer\ViewStudentsByClassViewModel.cs" />
     <Compile Include="ViewModels\Shared\AddStudentViewModel.cs" />
+    <Compile Include="ViewModels\Student\Result.cs" />
+    <Compile Include="Models\SolutionScoreClass.cs" />
+    <Compile Include="ViewModels\Student\submissionSolution.cs" />
     <Compile Include="ViewModels\Student\SubmissionViewModel.cs" />
     <Compile Include="ViewModels\Student\SubmitAssignmentViewModel.cs" />
     <Compile Include="ViewModels\Student\ViewAssignmentViewModel.cs" />
@@ -345,7 +352,6 @@
     <Compile Include="ViewModels\Lecturer\ViewTestCaseViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Grading\Grade.exe" />
     <Content Include="img\bg-home.jpg" />
     <Content Include="img\favicon.ico" />
     <Content Include="img\logo.png" />
@@ -400,13 +406,13 @@
     <Content Include="Scripts\initializetablesorter.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.csv.min.js" />
     <Content Include="Scripts\jquery.hotkeys.js" />
     <Content Include="Scripts\jquery.tablesorter.combined.js" />
     <Content Include="Scripts\jquery.tablesorter.js" />
     <Content Include="Scripts\jquery.tablesorter.min.js" />
     <Content Include="Scripts\jquery.tablesorter.widgets.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />

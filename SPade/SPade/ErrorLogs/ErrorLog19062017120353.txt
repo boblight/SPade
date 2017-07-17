@@ -1,0 +1,5 @@
+Logged in user: s1234567
+User task: Adding Assignment 
+
+Exception Log: System.NullReferenceException: Object reference not set to an instance of an object.
+   at SPade.Controllers.LecturerController.AddAssignmentToDB(AddAssignmentViewModel addAssgn, String fileName, Boolean isTestCase) 

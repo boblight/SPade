@@ -1,4 +1,5 @@
-﻿@model SPade.ViewModels.Admin.UpdateLecturerViewModel
+﻿@using Microsoft.Ajax.Utilities
+@model SPade.ViewModels.Admin.UpdateLecturerViewModel
 
 @{
     ViewBag.Title = "UpdateLecturer";
@@ -41,11 +42,40 @@
                         <label class="control-label">
                             Select classes to allocate assignment to
                         </label>
-                        <input class="form-control" type="text" readonly="readonly" placeholder="Select classes..." data-toggle="modal" data-target="#classModal" />
-                        <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
+                        @*<input class="form-control" id="selectedClasses" type="text" readonly="readonly" placeholder="Select classes..." data-toggle="modal" data-target="#classModal" value="@Model.SelectedClasses" />*@
+                        @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md", required = "required", @readonly = "readonly" })
+                        <span class="help-block">@Html.ValidationMessage("ClassName", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+                
+                
+                <!--Module Coordinator-->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">
+                            Assign as Module Coordinator
+                        </label>
+                        @*<input class="form-control" id="selectedMC" name="selectedMC" type="text" readonly="readonly" placeholder="Yes/No" data-toggle="modal" data-target="#classModal2"
+                               value="@(Model.ModuleCoordinator.Equals(true)?"Yes":"No")"/>*@
+                        @Html.TextBoxFor(m => m.ModuleCoordinatorChoice, new { @class = "form-control input-md", required = "required", @readonly = "readonly"})
+                        <span class="help-block">@Html.ValidationMessage("ModuleCoordinatorChoice", new { @class = "text-danger" })</span>
+                    </div>
+                </div>
+                
+                
+                <div class="form-group" id="selectModule" hidden>
+                    <div class="col-md-12">
+                        <label class="control-label">
+                            Assign Module
+                        </label>
+                        @*<input class="form-control" id="selectedModule" name="selectedModule" type="text" readonly="readonly" placeholder="Select Module..." data-toggle="modal" data-target="#classModal3" hidden 
+                               value="@(Model.ModuleCode.IsNullOrWhiteSpace() == true?"":Model.ModuleCode)"/>*@
+                        @Html.TextBoxFor(m => m.ModuleName, new { @class = "form-control input-md", required = "required", @readonly = "readonly"})
+                        <span class="help-block">@Html.ValidationMessage("ModuleName", new { @class = "text-danger" })</span>
                     </div>
                 </div>
 
+                
                 <!--Modal for selecting clas-->
                 <div name="classModal" id="classModal" class="modal fade" role="dialog">
                     <div class="modal-dialog">
@@ -72,6 +102,65 @@
                         </div>
                     </div>
                 </div>
+                
+                
+                <!--Modal for assigning module coordinator-->
+                <div name="classModal2" id="classModal2" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Assign this lecturer as Module Coordinator?</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                @{
+                                    @Html.RadioButtonFor(m => m.ModuleCoordinator, true, new { @id = "yesMC", @class = "MC" })
+                                }Yes
+                                <br />
+                                @{
+                                    @Html.RadioButtonFor(m => m.ModuleCoordinator, false, new { @id = "noMC", @class = "MC" })
+                                }No
+                                <br />
+                            </div>
+                            <div class="modal-footer">
+                                <button name="modalSelect2" id="modalSelect2" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                <!--Modal for selecting module-->
+                <div name="classModal3" id="classModal3" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Assign module for Module Coordinator</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                @{
+                                    for (var i = 0; i < Model.ModuleList.Count(); i++)
+                                    {
+                                        @Html.RadioButtonFor(m => m.ModuleCode, @Model.ModuleList[i].ModuleCode, new { @class = "module", @data_class_name = @Model.ModuleList[i].ModuleName });
+                                        @Model.ModuleList[i].ModuleName;
+                                        <br />
+                                    }
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button name="modalSelect3" id="modalSelect3" type="button" class="btn btn-default" data-dismiss="modal">Select</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+
 
                 <div class="modal" id="modal">
                     <div class="modal-dialog">
@@ -116,7 +205,74 @@
         </div>
     </div>
 
+    <script>
+
+        function displayModuleCode() {
+
+
+            var mc = $("input[class='MC']:checked").val();
+            var a = $('input[class=module]:checked').data('class-name');
+
+            if (mc == "True") {
+                $('#ModuleCoordinatorChoice').val("Yes");
+                $('#selectModule').show();
+                if (a == null) {
+                    $('input[class=module]')[0].checked = true;
+                    $('#ModuleName').val($('input[class=module]:checked').data('class-name'));
+                    $('#selectModule').show();
+                } else {
+                    $('#ModuleName').val($('input[class=module]:checked').data('class-name'));
+                }
+                
+
+            } else {
+                $('#ModuleCoordinatorChoice').val("No");
+                $('#selectModule').hide();
+                $('#ModuleName').val("");
+                $('input[class=module]')[0].checked = true;
+            }
+
+        }
+        displayModuleCode();
+
+        $('#modalSelect').on('click',
+            function() {
+                var selectedClasses = [];
+                $('input[type="checkbox"][name*="isSelected"]').each(function() {
+                    if (this.checked) {
+                        var c = $(this).data("class-name");
+                        selectedClasses.push(c);
+                    }
+                });
+                $("#ClassName").val(selectedClasses);
+            });
+
+        $('#ModuleCoordinatorChoice').on('click',
+            function () {
+                $('#classModal2').modal('show');
+            });
+        $('#ClassName').on('click',
+            function () {
+                $('#classModal').modal('show');
+            });
+        $('#ModuleName').on('click',
+            function () {
+                $('#classModal3').modal('show');
+            });
+        $('#modalSelect2').on('click',
+            function () {
+                displayModuleCode();
+            });
+        $('#modalSelect3').on('click',
+            function () {
+                displayModuleCode();
+            });
+
+
+    </script>
+}
+
     @section Scripts {
         @Scripts.Render("~/bundles/jqueryval")
     }
-                                    }
+                                    

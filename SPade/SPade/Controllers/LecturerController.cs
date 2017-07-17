@@ -9,7 +9,9 @@ using SPade.ViewModels.Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,15 +21,19 @@ using Hangfire;
 using Newtonsoft.Json;
 using System.Xml;
 using System.Text.RegularExpressions;
+using System.Web.Security;
+using System.Web.WebPages;
 
 namespace SPade.Controllers
 {
-    [Authorize(Roles = "Lecturer")]
+    [Authorize(Roles = "Lecturer,Module Coordinator")]
     public class LecturerController : Controller
     {
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
         private ApplicationUserManager _userManager;
+        private static List<string> testcaseInput = new List<string>();
+        private static List<string> testcaseDescription = new List<string>();
 
         public LecturerController()
         {
@@ -97,9 +103,9 @@ namespace SPade.Controllers
             return View(manageClassView);
         }
 
-        public ActionResult ViewStudentsByClass(string Id)
+        public ActionResult ViewStudentsByClass(string id)
         {
-            int cID = Int32.Parse(Id);
+            int cId = Int32.Parse(id);
 
             List<ViewStudentsByClassViewModel> studList = new List<ViewStudentsByClassViewModel>();
             List<Student> sList = new List<Student>();
@@ -108,7 +114,7 @@ namespace SPade.Controllers
 
             var lecturerEmail = UserManager.GetEmail(User.Identity.GetUserId());
             var lecturer = db.Lecturers.Where(lec => lec.Email == lecturerEmail).Single();
-            var isAssociated = db.Lec_Class.Any(associated => associated.ClassID == cID 
+            var isAssociated = db.Lec_Class.Any(associated => associated.ClassID == cId 
                                                            && associated.StaffID==lecturer.StaffID);
 
 
@@ -117,9 +123,9 @@ namespace SPade.Controllers
             if (isAssociated)
             {
 
-                sList = db.Students.Where(s => s.ClassID == cID && s.DeletedAt == null).ToList();
+                sList = db.Students.Where(s => s.ClassID == cId && s.DeletedAt == null).ToList();
 
-                Class c = db.Classes.Where(cx => cx.ClassID == cID).FirstOrDefault();
+                Class c = db.Classes.Where(cx => cx.ClassID == cId).FirstOrDefault();
 
                 int courseId = c.CourseID;
                 string courseAbbr = db.Courses.ToList().Find(cx => cx.CourseID == courseId).CourseAbbr;
@@ -152,7 +158,7 @@ namespace SPade.Controllers
 
             foreach (Class c in allClasses)
             {
-                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String courseAbbr = db.Courses.FirstOrDefault(courses => courses.CourseID == c.CourseID).CourseAbbr;
                 String className = courseAbbr + "/" + c.ClassName;
 
                 c.ClassName = className;
@@ -196,7 +202,7 @@ namespace SPade.Controllers
                 if (db.Submissions.Where(sub => sub.AdminNo == AdminNo).Count() == 0)
                 {
                     AspNetUser user = db.AspNetUsers.Where(u => u.UserName == AdminNo).FirstOrDefault();
-                    db.AspNetUserRoles.Remove(db.AspNetUserRoles.Where(ur => ur.UserId == user.Id).FirstOrDefault());
+                    db.AspNetUserRoles.Remove(db.AspNetUserRoles.FirstOrDefault(ur => ur.UserId == user.Id));
                     db.AspNetUsers.Remove(user);
 
                     student.DeletedAt = DateTime.Now;
@@ -220,7 +226,7 @@ namespace SPade.Controllers
             string f = Server.MapPath(@"~/BulkUploadFiles/BulkAddStudent.csv");
             byte[] fileBytes = System.IO.File.ReadAllBytes(f);
             string fileName = "BulkAddStudent.csv";
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            return File(fileBytes, "text/csv" , fileName);
         }
 
         public ActionResult BulkAddStudent()
@@ -236,6 +242,7 @@ namespace SPade.Controllers
                 //Upload and save the file
                 // extract only the filename
                 var fileName = Path.GetFileName(file.FileName);
+                var classes = "";
                 // store the file inside ~/App_Data/uploads folder
                 var path = Path.Combine(Server.MapPath("~/App_Data/Uploads"), fileName);
                 file.SaveAs(path);
@@ -249,10 +256,22 @@ namespace SPade.Controllers
                         Student s = new Student();
                         string courseAbbr = lines[i].Split(',')[0];
                         string className = lines[i].Split(',')[1];
+                        if (!classes.Contains(className))
+                        {
+                                classes += className + ",";
+                        }
 
                         try
                         {
-                            s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.Where(co => co.CourseAbbr.Equals(courseAbbr)).FirstOrDefault().CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
+                            var courseId = db.Courses.Single(c => c.CourseAbbr.Equals(courseAbbr)).CourseID;
+                            var firstOrDefault = db.Classes
+                                .FirstOrDefault(cl => cl.CourseID == courseId && cl.ClassName.Equals(className));
+                            if (firstOrDefault != null)
+                            {
+                                s.ClassID = firstOrDefault.ClassID;
+                            }
+
+                            //s.ClassID = db.Classes.Where(cl => cl.CourseID == db.Courses.FirstOrDefault(co => co.CourseAbbr.Equals(courseAbbr)).CourseID).ToList().Find(cl => cl.ClassName.Equals(className)).ClassID;
                         }
                         catch (Exception excp)
                         {
@@ -309,6 +328,14 @@ namespace SPade.Controllers
                         }
                     }
                 }
+
+                var isComma = classes.Substring(classes.Length - 1).Equals(",");
+                if (isComma)
+                {
+                    classes = classes.Substring(0, classes.Length - 1);
+                }
+                
+
                 db.Students.AddRange(slist);
                 db.SaveChanges();
             }
@@ -332,7 +359,7 @@ namespace SPade.Controllers
 
             foreach (Class c in allClasses)
             {
-                String courseAbbr = db.Courses.Where(courses => courses.CourseID == c.CourseID).FirstOrDefault().CourseAbbr;
+                String courseAbbr = db.Courses.FirstOrDefault(courses => courses.CourseID == c.CourseID).CourseAbbr;
                 String className = courseAbbr + "/" + c.ClassName;
 
                 classids.Add(c.ClassID);
@@ -353,13 +380,14 @@ namespace SPade.Controllers
             var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
             if (result.Succeeded)
             {
+                UserManager.AddToRole(user.Id, "Student");
                 var student = new Student()
                 {
                     AdminNo = model.AdminNo.Trim(),
                     Name = model.Name,
                     Email = model.Email,
                     ContactNo = model.ContactNo,
-                    ClassID = Int32.Parse(formCollection["ClassID"].ToString()),
+                    ClassID = Int32.Parse(formCollection["ClassID"]),
                     CreatedBy = User.Identity.Name,
                     UpdatedBy = User.Identity.Name,
                     CreatedAt = DateTime.Now,
@@ -386,85 +414,220 @@ namespace SPade.Controllers
         {
             List<ManageAssignmentViewModel> manageAssgn = new List<ManageAssignmentViewModel>();
             List<Assignment> lecAssgn = new List<Assignment>();
-            List<Class> classAssgn = new List<Class>();
             List<Course> courseList = new List<Course>();
+            IQueryable<Assignment> query;
+
 
             var lecturerID = User.Identity.GetUserName();
-
-            //get the assignments that this lecturer created
-            lecAssgn = db.Assignments.ToList().FindAll(a => a.CreateBy == lecturerID && a.DeletedAt == null);
             courseList = db.Courses.ToList().FindAll(c => c.DeletedAt == null);
+            
 
-            //get the details of each assignment and pass to view
-            foreach (Assignment a in lecAssgn)
+
+            
+            if (!ModuleCoordinator().IsEmpty())
+            {
+                var moduleCode = ModuleCoordinator();
+                query = from c in db.Classes
+                    join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+                    join assg in db.Assignments on ca.AssignmentID equals assg.AssignmentID
+                    join mcs in db.ModuleCoordinators on assg.ModuleCode equals mcs.ModuleCode
+                    where mcs.ModuleCode.Equals(moduleCode)
+                    where assg.DeletedAt == null
+                    select assg;
+
+                query = query.Union(from c in db.Classes
+                    join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+                    join assg in db.Assignments on ca.AssignmentID equals assg.AssignmentID
+                    where c.DeletedAt == null
+                    where assg.CreateBy.Equals(lecturerID)
+                    where assg.DeletedAt == null
+                    select assg);
+
+            }
+            else
+            {
+                query = from c in db.Classes 
+                                join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+                                join assgn in db.Assignments on ca.AssignmentID equals assgn.AssignmentID
+                                join cl in db.Lec_Class on c.ClassID equals cl.ClassID
+                                where cl.StaffID.Equals(lecturerID)
+                                where c.DeletedAt == null
+                                where assgn.DeletedAt == null
+                                select assgn;
+            }
+            lecAssgn = query.ToList();
+
+            foreach (var oneAssgn in lecAssgn)
             {
                 ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
-
-                //get all the classes that are assigned the particular assignment under this lecturer + the classes they manage only ! 
-                var query = from c in db.Classes
-                    join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
-                    where ca.AssignmentID.Equals(a.AssignmentID)
-                    join cl in db.Lec_Class on c.ClassID equals cl.ClassID
-                    where cl.StaffID.Equals(lecturerID)
-                    where c.DeletedAt == null
-                    select c;
-
-                classAssgn = query.ToList();
-
-                string joinedClasses = "";
-
-                //if theres only 1 class assigned that assignment 
-                if (classAssgn.Count() == 1)
+                var classAssgn = oneAssgn.Class_Assgn;
+                if (oneAssgn.Class_Assgn.Count != 0)
                 {
-                    foreach (Course c in courseList)
+                    string joinedClasses = "";
+
+
+                    //if theres only 1 class assigned that assignment 
+                    if (classAssgn.Count() == 1)
                     {
-                        if (c.CourseID == classAssgn.FirstOrDefault().CourseID)
+                        foreach (Course c in courseList)
                         {
-                            joinedClasses = c.CourseAbbr + "/" + classAssgn.FirstOrDefault().ClassName;
+                            var firstOrDefault = classAssgn.FirstOrDefault();
+                            if (firstOrDefault != null && c.CourseID == firstOrDefault.Class.CourseID)
+                            {
+                                joinedClasses = c.CourseAbbr + "/" + firstOrDefault.Class.ClassName;
+                            }
                         }
+
                     }
+
+
+
+                    //if there are more then 1 class assigned that assignment
+                    if (classAssgn.Count() > 1)
+                    {
+                        var listSize = oneAssgn.Class_Assgn.Count();
+                        int listIndex = 0;
+
+                        foreach (var c in classAssgn)
+                        {
+                            listIndex++;
+
+                            if (listIndex != listSize) //not yet the last time
+                            {
+                                foreach (Course cr in courseList)
+                                {
+                                    if (cr.CourseID == c.Class.CourseID)
+                                    {
+                                        joinedClasses += cr.CourseAbbr + "/" + c.Class.ClassName + ", ";
+                                    }
+                                }
+                            }
+
+                            if (listIndex == listSize) //reach the last time 
+                            {
+                                foreach (Course cr in courseList)
+                                {
+                                    if (cr.CourseID == c.Class.CourseID)
+                                    {
+                                        joinedClasses += cr.CourseAbbr + "/" + c.Class.ClassName;
+                                    }
+                                }
+                            }
+                        }
+                    } //end of class loop 
+
+
+
+                    mmvm.Assignment = oneAssgn;
+                    mmvm.Classes = joinedClasses;
+                    manageAssgn.Add(mmvm);
+
+
                 }
-
-                //if there are more then 1 class assigned that assignment
-                if (classAssgn.Count() > 1)
-                {
-                    //get the last item 
-                    var lastItem = classAssgn.LastOrDefault().ClassName;
-                    var listSize = classAssgn.Count();
-                    int listIndex = 0;
-
-                    foreach (Class c in classAssgn)
-                    {
-                        listIndex++;
-
-                        if (listIndex != listSize) //not yet the last time
-                        {
-                            foreach (Course cr in courseList)
-                            {
-                                if (cr.CourseID == c.CourseID)
-                                {
-                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName + ", ";
-                                }
-                            }
-                        }
-
-                        if (listIndex == listSize) //reach the last time 
-                        {
-                            foreach (Course cr in courseList)
-                            {
-                                if (cr.CourseID == c.CourseID)
-                                {
-                                    joinedClasses += cr.CourseAbbr + "/" + c.ClassName;
-                                }
-                            }
-                        }
-                    }
-                }//end of class loop 
-
-                mmvm.Assignment = a;
-                mmvm.Classes = joinedClasses;
-                manageAssgn.Add(mmvm);
             }
+
+
+
+            //get the details of each assignment and pass to view
+            //foreach (Assignment a in lecAssgn)
+            //{
+            //    ManageAssignmentViewModel mmvm = new ManageAssignmentViewModel();
+
+
+            //    if (!ModuleCoordinator().IsEmpty())
+            //    {
+
+            //        //get the class/classes that are assigned the particular assignment
+            //        query = from c in db.Classes
+            //            join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+            //            where ca.AssignmentID.Equals(a.AssignmentID)
+            //            join mcs in db.ModuleCoordinators on a.ModuleCode equals mcs.ModuleCode
+            //            where mcs.LecturerStaffId.Equals(lecturerID)
+            //            where mcs.ModuleCode.Equals(a.ModuleCode)
+            //            select c;
+
+            //        query = query.Union(from c in db.Classes
+            //            join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+            //            where ca.AssignmentID.Equals(a.AssignmentID)
+            //            where c.DeletedAt == null
+            //            where a.CreateBy.Equals(lecturerID) 
+            //            select c);
+            //    }
+            //    else
+            //    {
+            //        //get all the classes that are assigned the particular assignment under this lecturer + the classes they manage only ! 
+            //        query = from c in db.Classes
+            //            join ca in db.Class_Assgn on c.ClassID equals ca.ClassID
+            //            where ca.AssignmentID.Equals(a.AssignmentID)
+            //            join cl in db.Lec_Class on c.ClassID equals cl.ClassID
+            //            where cl.StaffID.Equals(lecturerID)
+            //            where c.DeletedAt == null
+            //            select c;
+
+            //    }
+
+
+            //    classAssgn = query.ToList();
+            //    if (classAssgn.Count != 0)
+            //    {
+            //        string joinedClasses = "";
+
+
+            //        //if theres only 1 class assigned that assignment 
+            //        if (classAssgn.Count() == 1)
+            //        {
+            //            foreach (Course c in courseList)
+            //            {
+            //                if (c.CourseID == classAssgn.FirstOrDefault().CourseID)
+            //                {
+            //                    joinedClasses = c.CourseAbbr + "/" + classAssgn.FirstOrDefault().ClassName;
+            //                }
+            //            }
+            //        }
+
+
+
+            //        //if there are more then 1 class assigned that assignment
+            //        if (classAssgn.Count() > 1)
+            //        {
+            //            //get the last item 
+            //            var lastItem = classAssgn.LastOrDefault().ClassName;
+            //            var listSize = classAssgn.Count();
+            //            int listIndex = 0;
+
+            //            foreach (Class c in classAssgn)
+            //            {
+            //                listIndex++;
+
+            //                if (listIndex != listSize) //not yet the last time
+            //                {
+            //                    foreach (Course cr in courseList)
+            //                    {
+            //                        if (cr.CourseID == c.CourseID)
+            //                        {
+            //                            joinedClasses += cr.CourseAbbr + "/" + c.ClassName + ", ";
+            //                        }
+            //                    }
+            //                }
+
+            //                if (listIndex == listSize) //reach the last time 
+            //                {
+            //                    foreach (Course cr in courseList)
+            //                    {
+            //                        if (cr.CourseID == c.CourseID)
+            //                        {
+            //                            joinedClasses += cr.CourseAbbr + "/" + c.ClassName;
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //        } //end of class loop 
+
+            //        mmvm.Assignment = a;
+            //        mmvm.Classes = joinedClasses;
+            //        manageAssgn.Add(mmvm);
+            //    }
+            //}
 
             return View(manageAssgn);
         }
@@ -483,14 +646,56 @@ namespace SPade.Controllers
             List<AssignmentClass> assgnClassList = new List<AssignmentClass>();
             List<Course> courseList = new List<Course>();
 
+
+            //To check if assignment Id is not related to lecturer
+            var isAssgnAssociated = db.Assignments.Any(assg => assg.CreateBy == x && assg.AssignmentID == i && assg.DeletedAt == null);
+            var lecClass = db.Lec_Class.Where(lecturer => lecturer.StaffID == x);
+            var isClassAssociated = false;
+            foreach (var oneClass in lecClass)
+            {
+                isClassAssociated = db.Class_Assgn.Any(ca => ca.ClassID == oneClass.ClassID && ca.AssignmentID == i);
+                if (isClassAssociated)
+                    break;
+            }
+            IQueryable<Class> query;
+            if (ModuleCoordinator().IsEmpty())
+            {
+                if (!isClassAssociated)
+                {
+                    if (!isAssgnAssociated)
+                    {
+                        return RedirectToAction("ManageAssignments");
+                    }
+                }
+                
+                    //get the classes that this lecturer manages 
+                    query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
+                
+
+            }
+            else
+            {
+                query = db.Classes.Where(each => each.DeletedAt == null);
+                //var moduleCode = db.ModuleCoordinators.Where(mc => mc.LecturerStaffId == x).Single();
+                //var associatedAssignment = db.Assignments.Any(assg => assg.AssignmentID == i && assg.ModuleCode == moduleCode.ModuleCode);
+                //if (!associatedAssignment)
+                //{
+                //    return RedirectToAction("ManageAssignments");
+                //}
+            }
+
+
+
+
+
+
             //get the assignment details from the DB
             assgn = db.Assignments.Where(a => a.AssignmentID == i).Where(assn => assn.DeletedAt == null).FirstOrDefault();
 
             //get all courses
             courseList = db.Courses.Where(c => c.DeletedAt == null).ToList();
 
-            //get the classes that this lecturer manages 
-            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
+            
             classList = query.ToList();
 
             //now we get the classses that are assigned this assignment 
@@ -557,7 +762,8 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult UpdateAssignment(UpdateAssignmentViewModel uAVM, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload, string command)
         {
-            int exitCode = 0, counter = 0;
+            var exitCode = 0;
+            var counter = 0;
             bool isJobRunning;
             string currentJobId;
 
@@ -580,7 +786,7 @@ namespace SPade.Controllers
             if (command.Equals("Update"))
             {
                 //user doesnt wants to update solution
-                if (uAVM.UpdateSolution == false)
+                if (!uAVM.UpdateSolution)
                 {
                     if (UpdateAssignmentToDB(uAVM, false, false) == true)
                     {
@@ -594,15 +800,15 @@ namespace SPade.Controllers
                 }
 
                 //user wants to update solution 
-                if (uAVM.UpdateSolution == true)
+                if (uAVM.UpdateSolution)
                 {
                     string assignmentTitle = (uAVM.AssgnTitle).Replace(" ", "");
                     string fileName, slnFilePath;
 
                     //run solution with testcase
-                    if (uAVM.IsTestCasePresent == true)
+                    if (uAVM.IsTestCasePresent)
                     {
-                        if ((solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip") && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
+                        if (solutionsFileUpload != null && (testCaseUpload != null && Path.GetExtension(testCaseUpload.FileName) == ".xml"))
                         {
                             if (solutionsFileUpload.ContentLength > 0 && testCaseUpload.ContentLength > 0)
                             {
@@ -707,7 +913,7 @@ namespace SPade.Controllers
                                     } while (isJobRunning && counter < 1500);
 
                                     //stops checking for job completion when status has been reported back OR it has timed out
-                                    if (isJobRunning == false || counter >= 1500)
+                                    if (!isJobRunning || counter >= 1500)
                                     {
                                         if (counter >= 1500)
                                         {
@@ -718,7 +924,7 @@ namespace SPade.Controllers
                                         else
                                         {
                                             //program run successfully
-                                            exitCode = (int)TempData["ExitCode"];
+                                            exitCode = (Int32)TempData["exitCode"];
                                         }
 
                                         //clear away files from TempSubmissions
@@ -734,62 +940,53 @@ namespace SPade.Controllers
                                         }
 
                                         //return result based on exit code
-                                        if (exitCode == 1)
+                                        switch (exitCode)
                                         {
-                                            //update DB + rename solution/testcase
-                                            if (UpdateAssignmentToDB(uAVM, true, true) == true)
-                                            {
-                                                //failed to update DB
+                                            case 1:
+                                                //update DB + rename solution/testcase
+                                                if (UpdateAssignmentToDB(uAVM, true, true))
+                                                {
+                                                    //failed to update DB
+                                                    //DeleteFile(fileName, assignmentTitle, true);
+                                                    uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                    uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                                    string logTitle = (string) TempData["Exception"];
+                                                    TempData["GeneralError"] =
+                                                        "Failed to save assignment to database ! Please contact your administrator with the code " +
+                                                        logTitle + " and try again. ";
+                                                    return View(uAVM);
+                                                }
+
+                                                //delete the uploaded sln but not test case
+                                                //DeleteFile(fileName, assignmentTitle, false);
+                                                break;
+                                            case 2:
                                                 //DeleteFile(fileName, assignmentTitle, true);
                                                 uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                                 uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                                string logTitle = (string)TempData["Exception"];
-                                                TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                                TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                                 return View(uAVM);
-                                            }
-
-                                            //delete the uploaded sln but not test case
-                                            //DeleteFile(fileName, assignmentTitle, false);
-
-                                        }//end of run succesfully method 
-
-                                        else if (exitCode == 2)
-                                        {
-                                            //DeleteFile(fileName, assignmentTitle, true);
-                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                            TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
-                                            return View(uAVM);
-                                        }
-
-                                        else if (exitCode == 3)
-                                        {
-                                            //solution failed to run 
-                                            //DeleteFile(fileName, assignmentTitle, true);
-                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                            TempData["GeneralError"] = "The program has failed to run entirely. Please check your program.";
-                                            return View(uAVM);
-                                        }
-
-                                        else if (exitCode == 4)
-                                        {
-                                            //solution stuck in infinite loop
-                                            //DeleteFile(fileName, assignmentTitle, true);
-                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                            return View(uAVM);
-                                        }
-
-                                        else if (exitCode == 2952)
-                                        {
-                                            //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                            //DeleteFile(fileName, assignmentTitle, true);
-                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
-                                            return View(uAVM);
+                                            case 3:
+                                                //solution failed to run 
+                                                //DeleteFile(fileName, assignmentTitle, true);
+                                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                                TempData["GeneralError"] = "The program has failed to run entirely. Please check your program.";
+                                                return View(uAVM);
+                                            case 4:
+                                                //solution stuck in infinite loop
+                                                //DeleteFile(fileName, assignmentTitle, true);
+                                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
+                                                return View(uAVM);
+                                            case 2952:
+                                                //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                                //DeleteFile(fileName, assignmentTitle, true);
+                                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
+                                                return View(uAVM);
                                         }
 
                                     }//end of processing submission
@@ -828,9 +1025,9 @@ namespace SPade.Controllers
                     }//end of run with testcase
 
                     //run solution without testcase 
-                    if (uAVM.IsTestCasePresent == false)
+                    if (!uAVM.IsTestCasePresent)
                     {
-                        if (solutionsFileUpload != null && Path.GetExtension(solutionsFileUpload.FileName) == ".zip")
+                        if (solutionsFileUpload != null)
                         {
                             if (solutionsFileUpload.ContentLength > 0)
                             {
@@ -872,7 +1069,7 @@ namespace SPade.Controllers
                                         //move the solutions file to the lower cased folder
                                         bool moveFailed;
                                         moveFailed = MoveSolutionToLowerCasedFolder(fileName, lang.LangageType);
-                                        if (moveFailed == true)
+                                        if (moveFailed)
                                         {
                                             //clear away files from TempSubmissions
                                             var tempPath = Server.MapPath(@"~/TempSubmissions/");
@@ -927,7 +1124,7 @@ namespace SPade.Controllers
                                     } while (isJobRunning && counter < 1500);
 
                                     //stops checking for job completion when status has been reported back OR it has timed out
-                                    if (isJobRunning == false || counter >= 1500)
+                                    if (!isJobRunning || counter >= 1500)
                                     {
                                         if (counter >= 1500)
                                         {
@@ -936,7 +1133,7 @@ namespace SPade.Controllers
                                         }
                                         else
                                         {
-                                            exitCode = (int)TempData["ExitCode"];
+                                            exitCode = (int)TempData["exitCode"];
                                         }
 
                                         //clear away files from TempSubmissions
@@ -952,43 +1149,40 @@ namespace SPade.Controllers
                                         }
 
                                         //return result based on exit code
-                                        if (exitCode == 1)
+                                        switch (exitCode)
                                         {
-                                            //save to DB + rename the NEW solution file + delete the OLD solution file
-                                            if (UpdateAssignmentToDB(uAVM, true, false) == true)
-                                            {
-                                                //solution has failed to save to DB
+                                            case 1:
+                                                //save to DB + rename the NEW solution file + delete the OLD solution file
+                                                if (UpdateAssignmentToDB(uAVM, true, false) == true)
+                                                {
+                                                    //solution has failed to save to DB
+                                                    //DeleteFile(fileName, assignmentTitle, false);
+                                                    uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                    uAVM.ClassList = UpdateClassList(uAVM.ClassList);
+                                                    string logTitle = (string) TempData["Exception"];
+                                                    TempData["GeneralError"] =
+                                                        "Failed to save assignment to database ! Please contact your administrator with the code " +
+                                                        logTitle + " and try again. ";
+                                                    return View(uAVM);
+                                                }
+
+                                                //delete the uploaded sln
+                                                //DeleteFile(fileName, assignmentTitle, false);
+                                                break;
+                                            case 3:
+                                                //solution failed to run 
                                                 //DeleteFile(fileName, assignmentTitle, false);
                                                 uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList);
-                                                string logTitle = (string)TempData["Exception"];
-                                                TempData["GeneralError"] = "Failed to save assignment to database ! Please contact your administrator with the code " + logTitle + " and try again. ";
+                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
+                                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
                                                 return View(uAVM);
-                                            }
-
-                                            //delete the uploaded sln
-                                            //DeleteFile(fileName, assignmentTitle, false);
-
-                                        }
-
-                                        else if (exitCode == 3)
-                                        {
-                                            //solution failed to run 
-                                            //DeleteFile(fileName, assignmentTitle, false);
-                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
-                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop. Please check your program.";
-                                            return View(uAVM);
-                                        }
-
-                                        else if (exitCode == 2952)
-                                        {
-                                            //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                            //DeleteFile(fileName, assignmentTitle, false);
-                                            uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
-                                            uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
-                                            TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
-                                            return View(uAVM);
+                                            case 2952:
+                                                //scheduler is taking too long to grade/infinite loop. so we post back to user
+                                                //DeleteFile(fileName, assignmentTitle, false);
+                                                uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                                uAVM.ClassList = UpdateClassList(uAVM.ClassList); ;
+                                                TempData["GeneralError"] = "The program uploaded was caught in an infinite loop and was unable to be processed on time. Please re-upload and try again. ";
+                                                return View(uAVM);
                                         }
                                     }
                                 }
@@ -1032,7 +1226,7 @@ namespace SPade.Controllers
             else
             {
                 //delete assignment 
-                if (DeleteAssignment(uAVM) == true)
+                if (DeleteAssignment(uAVM))
                 {
                     //failed to delete assignment 
                     uAVM.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
@@ -1057,7 +1251,7 @@ namespace SPade.Controllers
                 db.Class_Assgn.RemoveRange(db.Class_Assgn.Where(ca => ca.AssignmentID == uAVM.AssignmentId));
 
                 //update the assignment deleted status to something 
-                Assignment a = db.Assignments.Where(at => at.AssignmentID == uAVM.AssignmentId).FirstOrDefault();
+                Assignment a = db.Assignments.FirstOrDefault(at => at.AssignmentID == uAVM.AssignmentId);
                 a.DeletedAt = DateTime.Now;
                 a.DeletedBy = User.Identity.GetUserName();
                 db.SaveChanges();
@@ -1079,7 +1273,7 @@ namespace SPade.Controllers
             string assignmentTitle = (uVM.AssgnTitle).Replace(" ", "");
 
             //get the previous asssignment from db
-            updatedAssignment = db.Assignments.Where(a => a.AssignmentID == uVM.AssignmentId).FirstOrDefault();
+            updatedAssignment = db.Assignments.FirstOrDefault(a => a.AssignmentID == uVM.AssignmentId);
 
             //update the assignment values 
             try
@@ -1213,14 +1407,26 @@ namespace SPade.Controllers
             List<Class> managedClasses = new List<Class>();
             List<Course> courseList = new List<Course>();
 
+            IQueryable<Class> query;
             var x = User.Identity.GetUserName();
+            
 
-            //get the classes managed by the lecturer 
-            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
-            managedClasses = query.ToList();
+            if (!ModuleCoordinator().IsEmpty())
+            {
+                query = db.Classes.Where(c => c.DeletedAt == null);
+            }
+            else
+            {
+                //get the classes managed by the lecturer 
+                query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;               
+            }
+
+            
 
             //get all courses 
             courseList = db.Courses.Where(c => c.DeletedAt == null).ToList();
+            managedClasses = query.ToList();
+
 
             //we loop through the managedClasses to fill up the assignmentclass -> which is used to populate checkboxes
             foreach (var c in managedClasses)
@@ -1255,7 +1461,8 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult AddAssignment(AddAssignmentViewModel addAssgn, HttpPostedFileBase solutionsFileUpload, HttpPostedFileBase testCaseUpload)
         {
-            int exitCode = 0, counter = 0;
+            var exitCode = 0;
+            var counter = 0;
             bool isJobRunning;
             string currentJobId;
             string assignmentTitle = (addAssgn.AssgnTitle).Replace(" ", ""); //used to name the testcase/solution temporarily until get assignmentID 
@@ -1402,7 +1609,7 @@ namespace SPade.Controllers
                                 else
                                 {
                                     //program was run on time
-                                    exitCode = (int)TempData["ExitCode"];
+                                    exitCode = (int)TempData["exitCode"];
                                 }
 
                                 //clear away files from TempSubmissions
@@ -1417,15 +1624,15 @@ namespace SPade.Controllers
                                     dir.Delete(true);
                                 }
 
-                                //post back results 
+                                //post back results
                                 switch (exitCode)
                                 {
-                                    case 3:
-                                        //save to DB + rename solution/testcase
+                                    case 1:
+                                        //save to DB + rename solution / testcase
                                         if (AddAssignmentToDB(addAssgn, fileName, true) == true)
                                         {
                                             //failed to save to DB
-                                            //DeleteFile(fileName, assignmentTitle, true);
+                                            DeleteFile(fileName, assignmentTitle, true);
                                             addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                             addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                             ModelState.Remove("IsPostBack");
@@ -1445,7 +1652,7 @@ namespace SPade.Controllers
                                         addAssgn.IsPostBack = 1;
                                         TempData["GeneralError"] = "The test case submitted could not be read properly. Please check your test case file.";
                                         return View(addAssgn);
-                                    case 1:
+                                    case 3:
                                         //solution failed to run 
                                         //DeleteFile(fileName, assignmentTitle, true);
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
@@ -1475,8 +1682,8 @@ namespace SPade.Controllers
                                                                    " Support for that language could also not be added yet.";
                                         return View(addAssgn);
                                     case 2952:
-                                        //scheduler is taking too long to grade/infinite loop. so we post back to user
-                                        //DeleteFile(fileName, assignmentTitle, true);
+                                        //scheduler is taking too long to grade / infinite loop.so we post back to user
+                                        DeleteFile(fileName, assignmentTitle, true);
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
                                         addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
                                         ModelState.Remove("IsPostBack");
@@ -1613,13 +1820,13 @@ namespace SPade.Controllers
                                 isJobRunning = QueryJobFinish(currentJobId);
                                 counter++;
 
-                            } while (isJobRunning && counter < 3000);
+                            } while (isJobRunning && counter < 5000);
 
                             //job has finishd processing OR it has exceeded the time given for it to run
-                            if (isJobRunning == false || counter >= 3000)
+                            if (isJobRunning == false || counter >= 5000)
                             {
                                 //get the exit code which is generated from the processing of the assignment
-                                if (counter >= 3000)
+                                if (counter >= 5000)
                                 {
                                     //the program was caught in infinite loop and the scheduler cannot process in time
                                     exitCode = 2952;
@@ -1629,7 +1836,7 @@ namespace SPade.Controllers
                                 else
                                 {
                                     //program was run on time
-                                    exitCode = (int)TempData["ExitCode"];
+                                    exitCode = (int)TempData["exitCode"];
                                 }
 
                                 //clear away files from TempSubmissions
@@ -1644,10 +1851,13 @@ namespace SPade.Controllers
                                     dir.Delete(true);
                                 }
 
+
+
+
                                 //post back result
                                 switch (exitCode)
                                 {
-                                    case 3:
+                                    case 1:
                                         //save to DB + rename solution file
                                         if (AddAssignmentToDB(addAssgn, fileName, false) == true)
                                         {
@@ -1664,7 +1874,15 @@ namespace SPade.Controllers
                                         //delete the uploaded sln
                                         //DeleteFile(fileName, assignmentTitle, false);
                                         break;
-                                    case 1:
+                                    default:
+                                        addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
+                                        addAssgn.ClassList = UpdateClassList(addAssgn.ClassList);
+                                        ModelState.Remove("IsPostBack");
+                                        addAssgn.IsPostBack = 1;
+                                        TempData["GeneralError"] = "The program has encountered an error uploading the file. Please contact the administrator.";
+                                        return View(addAssgn);
+                                        break;
+                                    case 3:
                                         //solution failed to run 
                                         //DeleteFile(fileName, assignmentTitle, false);
                                         addAssgn.Modules = db.Modules.Where(m => m.DeletedAt == null).ToList();
@@ -1728,6 +1946,9 @@ namespace SPade.Controllers
             return RedirectToAction("ManageAssignments", "Lecturer");
         }
 
+
+
+        [AutomaticRetry(Attempts = 1)]
         //for Hangfire to run the submission
         public int ProcessSubmission(string slnFilePath, string fileName, string assignmentTitle, string langType, bool isTestCasePresent)
         {
@@ -1736,6 +1957,11 @@ namespace SPade.Controllers
             //run the assignment grading in scheduler
             Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, langType, isTestCasePresent);
             exitCode = (int)sandbox.runSandboxedGrading();
+            if (sandbox.testcaseInput.Count != 0)
+            {
+                testcaseInput = sandbox.testcaseInput;
+                testcaseDescription = sandbox.testcaseDescription;
+            }
 
             return exitCode;
         }
@@ -1764,9 +1990,10 @@ namespace SPade.Controllers
                 //if the job was completed succeessfully -> means the work got graded
                 if (finalState.Name == "Succeeded")
                 {
+
                     //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
                     HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
-                    TempData["ExitCode"] = (int)dataObj.Result;
+                    TempData["exitCode"] = dataObj.Result;
                 }
 
                 //if the job failed -> means the work didnt get graded and/or ran into some errors somewhere somehow
@@ -1776,7 +2003,7 @@ namespace SPade.Controllers
                     //any other state that is not 'Succeeded' we cancel the job immediately
                     //tell the user that error was encountered
                     BackgroundJob.Delete(jobId);
-                    TempData["ExitCode"] = 3;
+                    TempData["exitCode"] = 3;
                 }
             }
 
@@ -1812,8 +2039,16 @@ namespace SPade.Controllers
                 db.SaveChanges();
 
                 //get the assignment ID 
-                var assgnId = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle).Select(s => s.AssignmentID).ToList().First();
+                var assgn = db.Assignments.Where(a => a.AssgnTitle == addAssgn.AssgnTitle && a.DeletedAt == null);
 
+                var assgnId = 0;
+                foreach (var eachAssgn in assgn)
+                {
+                    if (eachAssgn.CreateBy == User.Identity.GetUserName())
+                    {
+                        assgnId = eachAssgn.AssignmentID;
+                    }
+                }
                 //insert into Class_Assgn
                 foreach (AssignmentClass a in addAssgn.ClassList)
                 {
@@ -1825,6 +2060,8 @@ namespace SPade.Controllers
                         db.SaveChanges();
                     }
                 }
+
+
 
                 //rename the solution here
                 var solutionPath = Server.MapPath(@"~/Solutions/");
@@ -1863,7 +2100,30 @@ namespace SPade.Controllers
                             FileInfo info = new FileInfo(sourcePath);
                             info.MoveTo(destPath);
                         }
+                     }
+
+                    
+
+                    for (int i = 0; i < testcaseInput.Count; i++)
+                    {
+                        AssignmentTestCase atc = new AssignmentTestCase
+                        {
+                            AssignmentID = newAssignment.AssignmentID,
+                            Input = testcaseInput[i],
+                            Description = testcaseDescription.Count == 1
+                                ? testcaseDescription[0]
+                                : testcaseDescription[i]
+                        };
+
+                        var testcaseNo = i + 1;
+                        atc.TestCaseNo = testcaseNo;
+                        db.AssignmentTestCases.Add(atc);
+                        db.SaveChanges();
                     }
+
+                    
+
+
                 }
 
             }//end of try 
@@ -2165,9 +2425,38 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult GetAssignment(string Class)
         {
-            string loggedInLecturer = User.Identity.GetUserName();
+            var loggedInLecturer = User.Identity.GetUserName();
+            var associatedAssignment = "";
+            //SELECT Orders.OrderID, Customers.CustomerName, Shippers.ShipperName
+            //FROM((Orders
+            //    INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID)
+            //INNER JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID)
+            //where Orders.OrderID = 10248;
+            if (ModuleCoordinator().IsEmpty())
+            {
+                associatedAssignment = "select assg.* from Assignment assg " +
+                                       "INNER JOIN Class_Assgn ca ON assg.AssignmentID = ca.AssignmentID " +
+                                       "INNER JOIN Lec_Class cl ON ca.ClassID = cl.ClassID " +
+                                       "where ca.ClassID = @inClass and cl.StaffID = @inCreator and assg.DeletedAt is null";
+            }
+            else
+            {
+                associatedAssignment =
+                    "select assg.* from Assignment assg " +
+                    "INNER JOIN Class_Assgn ca ON assg.AssignmentID = ca.AssignmentID " +
+                    "INNER JOIN ModuleCoordinator mc ON assg.ModuleCode = mc.ModuleCode " +
+                    "where assg.DeletedAt is null " +
+                    "and ca.ClassID = @inClass " +
+                    "UNION " +
+                    "select assg.* from Assignment assg " +
+                    "INNER JOIN Class_Assgn ca ON assg.AssignmentID = ca.AssignmentID " +
+                    "INNER JOIN Lec_Class cl ON ca.ClassID = cl.ClassID " +
+                    "where assg.CreateBy = @inCreator " +
+                    "and ca.ClassID = @inClass " +
+                    "and assg.DeletedAt is null";
+            }
 
-            var assignments = db.Database.SqlQuery<DBass>("select ca.*, a.AssgnTitle from Class_Assgn ca inner join(select * from Assignment) a on ca.AssignmentID = a.AssignmentID where classid = @inClass and createby = @inCreator and deletedat is null",
+            var assignments = db.Database.SqlQuery<DBass>(associatedAssignment,
                 new SqlParameter("@inClass", Class),
                 new SqlParameter("@inCreator", loggedInLecturer)).ToList();
 
@@ -2177,18 +2466,25 @@ namespace SPade.Controllers
         [HttpPost]
         public ActionResult ViewResults(string Class, string Assignment)
         {
-            var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
-                new SqlParameter("@inClass", Class),
-                new SqlParameter("@inAssignment", Assignment)).ToList();
+            if (Assignment.Equals("null"))
+            {
+                return null;
+            }else
+            {
+                var results = db.Database.SqlQuery<DBres>("select s1.submissionid, s1.adminno, stud.name, s1.assignmentid, s1.grade, s1.filepath from submission s1 inner join ( select adminno, max(submissionid) submissionid, assignmentid from submission group by adminno, assignmentid) s2 on s1.submissionid = s2.submissionid inner join ( select * from student where classid = @inClass) stud on s1.adminno = stud.adminno where s1.assignmentid = @inAssignment",
+                                new SqlParameter("@inClass", Class),
+                                new SqlParameter("@inAssignment", Assignment)).ToList();
 
-            return Json(results);
+                return Json(results);
+            }            
         }
 
         [HttpGet]
         public ActionResult Download(string file)
         {
             string path = "~/Submissions/" + file;
-            string zipname = file + ".zip";
+            var fileName = file.Split('/');
+            var zipname = fileName[fileName.Length - 2] + "(" + fileName[fileName.Length - 1] + ").zip"; //temp
 
             var memoryStream = new MemoryStream();
             using (var zip = new ZipFile())
@@ -2205,9 +2501,50 @@ namespace SPade.Controllers
 
         public ActionResult ViewTestcase(string assignmentId)
         {
+            var assgnID = Int32.Parse(assignmentId);
+            var loginUser = User.Identity.GetUserName();
+            //var lecClassId = db.Lec_Class.Single(lecturer => lecturer.StaffID == loginUser).ClassID;
+            //var isClassAssociated = db.Class_Assgn.Any(ca => ca.ClassID == lecClassId && ca.AssignmentID == assgnID);
+            var isAssgnAssociated = db.Assignments.Any(assg => assg.CreateBy == loginUser || assg.AssignmentID == assgnID && assg.DeletedAt == null);
+            var lecClass = db.Lec_Class.Where(lecturer => lecturer.StaffID == loginUser);
+            var isClassAssociated = false;
+            foreach (var oneClass in lecClass)
+            {
+                isClassAssociated = db.Class_Assgn.Any(ca => ca.ClassID == oneClass.ClassID && ca.AssignmentID == assgnID);
+                if (isClassAssociated)
+                    break;
+            }
+
+
+
+            if (ModuleCoordinator().IsEmpty())
+            {
+                if (!isClassAssociated)
+                {
+                    if (!isAssgnAssociated)
+                    {
+                        return RedirectToAction("ManageAssignments");
+                    }
+                }
+            }
+            //else
+            //{
+            //    var moduleCode = db.ModuleCoordinators.Single(mc => mc.LecturerStaffId == loginUser).ModuleCode;
+            //    var associatedAssgn = db.Assignments.Any(assg => assg.AssignmentID == assgnID && assg.ModuleCode == moduleCode && assg.DeletedAt == null);
+            //    if (!associatedAssgn)
+            //    {
+            //        return RedirectToAction("ManageAssignments");
+            //    }
+
+            //}
+
+
+
             XmlDocument testCaseFile = new XmlDocument();
             var pathToTestcase = Server.MapPath(@"~/TestCase/" + assignmentId + "testcase.xml");
             ViewTestCaseViewModel vtcvm = new ViewTestCaseViewModel();
+
+
 
             try
             {
@@ -2239,6 +2576,54 @@ namespace SPade.Controllers
 
             return View(vtcvm);
         }
+
+        [HttpPost]
+        public ActionResult DownloadAll(string Class, string Assignment)
+        {
+            var classId = Int32.Parse(Class);
+            var assignmentId = Int32.Parse(Assignment);
+            var className = db.Classes.Single(c => c.ClassID == classId).ClassName;
+            var assignmentName = db.Assignments.Single(a => a.AssignmentID == assignmentId).AssgnTitle;
+
+            var path = "~/Submissions/" + Assignment + "/" + Class;
+            var zipname = assignmentName + "(" + className + ").zip";
+
+            //var fileName = file.Split('/');
+            //var zipname = fileName[fileName.Length - 2] + "(" + fileName[fileName.Length - 1] + ").zip"; //temp
+
+            var memoryStream = new MemoryStream();
+
+            try
+            {
+                using (var zip = new ZipFile())
+                {
+
+                    zip.AddDirectory(Server.MapPath(path));
+                    zip.Save(memoryStream);
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", zipname);
+        }
+
+        private string ModuleCoordinator()
+        {
+            var lecturerId = User.Identity.GetUserName();
+            var isModuleCoordinator = db.ModuleCoordinators.Where(mc => mc.LecturerStaffId == lecturerId);
+            if (isModuleCoordinator.Any())
+            {
+                var moduleCoordinator = isModuleCoordinator.Single();
+                return moduleCoordinator.ModuleCode;
+            }
+            return "";
+        }
+
 
         class DBass
         {

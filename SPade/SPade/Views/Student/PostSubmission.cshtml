@@ -1,17 +1,42 @@
-﻿@model SPade.Models.DAL.Submission
+﻿@model SPade.ViewModels.Student.submissionSolution
 
 @{
     ViewBag.Title = "Post Submission";
 }
 
-<div class="col-md-4 col-md-offset-4 form-horizontal jumbotron">
-    <fieldset>
+<div class="jumbotron" style="width: 70%; margin: 0 auto;">
+    <fieldset style="width: 90%; margin: 0 auto;">
         <legend>Results</legend>
 
-        <p>Completed By: @Html.DisplayFor(modelItem => modelItem.AdminNo)</p>
-        <p>Submitted On: @Html.DisplayFor(modelItem => modelItem.Timestamp)</p>
-        <p>Grade: @Math.Round(Model.Grade * 100)% </p>
+        <p>Completed By: @Html.DisplayFor(modelItem => modelItem.submission.AdminNo)</p>
+        <p>Submitted On: @Html.DisplayFor(modelItem => modelItem.submission.Timestamp)</p>
+        <p>Grade: @Math.Round(Model.submission.Grade * 100)% </p>
         <p>@Html.ValidationMessage("SubmissionError")</p>
+        <br/>
+        @if (Model.solution.Count != 0)
+        {
+        @*<p>@Html.ValidationMessage("SubmissionError")</p>*@
+            <table class="table table-hover" style="border-width: 0;">
+                <tr style="font-size: 150%;">
+                    <th>Input Description</th>
+                    <th></th>
+                    <th>Result</th>
+                    <th></th>
+                </tr>
+                    @foreach (var solution in Model.solution)
+                    {
+                        if (!solution.Description.Equals(""))
+                        {
+                            <tr style="font-size: 150%;">
+                                <td>@solution.Description</td>
+                                <td></td>
+                                <td>@(solution.Score == 1 ? "Pass" : "Fail")</td>
+                                <td></td>
+                            </tr>
+                        }
+                    }
+            </table>
+        }
         <p><a href="/Student/ViewAssignment" class="btn btn-default">Back to view Assignments</a></p>
 
     </fieldset>

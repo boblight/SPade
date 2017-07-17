@@ -39,7 +39,9 @@
                     <label class="control-label">
                         Assign as Module Coordinator
                     </label>
-                    <input class="form-control" id="selectedMC" name="selectedMC" type="text" readonly="readonly" placeholder="Yes/No" data-toggle="modal" data-target="#classModal2" />
+                    @*<input class="form-control" id="selectedMC" name="selectedMC" type="text" readonly="readonly" placeholder="Yes/No" data-toggle="modal" data-target="#classModal2"/>*@
+                    @Html.TextBoxFor(m => m.ModuleCoordinatorChoice, new { @class = "form-control input-md", required = "required", @readonly = "readonly"})
+                    <span class="help-block">@Html.ValidationMessage("ModuleCoordinatorChoice", new { @class = "text-danger" })</span>
                 </div>
             </div>
 
@@ -48,18 +50,21 @@
                     <label class="control-label">
                         Assign Module
                     </label>
-                    <input class="form-control" id="selectedModule" name="selectedModule" type="text" readonly="readonly" placeholder="Select Module..." data-toggle="modal" data-target="#classModal3" hidden />
+                    @*<input class="form-control" id="selectedModule" name="selectedModule" type="text" readonly="readonly" placeholder="Select Module..." data-toggle="modal" data-target="#classModal3" hidden />*@
+                    @Html.TextBoxFor(m => m.ModuleName, new { @class = "form-control input-md", required = "required", @readonly = "readonly" })
+                    <span class="help-block">@Html.ValidationMessage("ModuleName", new { @class = "text-danger" })</span>
                 </div>
             </div>
 
             <!--Classes-->
-            <div id="selectClass" class="form-group" hidden>
+            <div id="selectClass" class="form-group">
                 <div class="col-md-12">
                     <label class="control-label">
                         Select classes to allocate lecturer to
                     </label>
-                    <input class="form-control" id="selectedClasses" name="selectedClasses" type="text" readonly="readonly" placeholder="Select classes..." data-toggle="modal" data-target="#classModal" />
-                    <span class="help-block">@Html.ValidationMessage("SelectedClasses", new { @class = "text-danger" })</span>
+                    @*<input class="form-control" id="selectedClasses" name="selectedClasses" type="text" readonly="readonly" placeholder="Select classes..." data-toggle="modal" data-target="#classModal" />*@
+                    @Html.TextBoxFor(m => m.ClassName, new { @class = "form-control input-md", required = "required", @readonly = "readonly" })
+                    <span class="help-block">@Html.ValidationMessage("ClassName", new { @class = "text-danger" })</span>
                 </div>
             </div>
 
@@ -163,40 +168,48 @@
 
             <script>
 
+                $('#ModuleCoordinatorChoice').on('click',
+                    function() {
+                        $('#classModal2').modal('show');
+                    });
+                $('#ClassName').on('click',
+                    function () {
+                        $('#classModal').modal('show');
+                    });
+                $('#ModuleName').on('click',
+                    function () {
+                        $('#classModal3').modal('show');
+                    });
                 $('#modalSelect3').on('click',
                     function () {
-                        $('#selectedModule').val($('input[class=module]:checked').data('class-name'));
+                        $('#ModuleName').val($('input[class=module]:checked').data('class-name'));
                     });
-
                 $('#modalSelect2').on('click',
                     function () {
 
                         var mc = $("input[class='MC']:checked").val();
 
                         if (mc == "True") {
-                            $('#selectedMC').val("Yes");
-                            $('#selectClass').hide();
-                            $('#selectedClasses').val("");
+                            $('#ModuleCoordinatorChoice').val("Yes");
                             $('#selectModule').show();
 
                         } else {
-                            $('#selectedMC').val("No");
+                            $('#ModuleCoordinatorChoice').val("No");
                             $('#selectClass').show();
                             $('#selectModule').hide();
                             $('#selectedModule').val("");
 
                         }
                     });
-
                 $("#modalSelect").click(function() {
                     var selectedClasses = [];
                     $('input[type="checkbox"][name*="isSelected"]').each(function() {
                         if (this.checked) {
                             var c = $(this).data("class-name");
-                            selectedClasses.push(c)
+                            selectedClasses.push(c);
                         }
                     });
-                    $("#selectedClasses").val(selectedClasses);
+                    $("#ClassName").val(selectedClasses);
                 });
             </script>
 

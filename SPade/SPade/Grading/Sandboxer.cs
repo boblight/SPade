@@ -8,6 +8,8 @@ using System.Security.Permissions;
 using System.Security.Policy;
 using System.Web;
 using System.Web.Hosting;
+using SPade.Models;
+using SPade.ViewModels.Student;
 
 namespace SPade.Grading
 {
@@ -19,19 +21,22 @@ namespace SPade.Grading
         private List<string> answers = new List<string>();
         public string filePath, fileName, assignmentTitle, language, pathToExecutable;
         private Compiler c;
+        public List<Result> descriptionScore = new List<Result>();
+        public List<string> testcaseInput = new List<string>();
+        public List<string> testcaseDescription = new List<string>();
                 
         string pathToUntrusted = "";
         const string untrustedAssembly = "Grade";
         const string untrustedClass = "Grade.Program";
         string entryPoint; //method name
-        private static string[] parameters = new string[4];
+        private static string[] parameters = new string[5];
 
         public Sandboxer()
         {
         }
 
         //constructor submission
-        public Sandboxer(string filePath, string fileName, int assgnId, string language)
+        public Sandboxer(string filePath, string fileName, int assgnId, string language,decimal solutionScoreKey)
         {
             c = new Compiler(language, filePath, fileName);
             this.assgnId = assgnId;
@@ -43,6 +48,7 @@ namespace SPade.Grading
             parameters[1] = HostingEnvironment.MapPath(@"~/TestCase/" + assgnId + "testcase.xml");
             parameters[2] = HostingEnvironment.MapPath(@"~/Solutions/" + assgnId + "solution.xml");
             parameters[3] = language;
+            parameters[4] = solutionScoreKey.ToString();
         }
 
         //constructor for lecturer's adding assignment
@@ -54,6 +60,7 @@ namespace SPade.Grading
             parameters[0] = c.getExePath();
             parameters[1] = language;
             parameters[2] = HostingEnvironment.MapPath(@"~/Solutions/" + assignmentTitle + ".xml");
+            parameters[4] = "";
             if (isTestCasePresent == true)
             {
                 parameters[3] = HostingEnvironment.MapPath(@"~/TestCase/" + assignmentTitle + ".xml");
@@ -93,6 +100,7 @@ namespace SPade.Grading
             newDomain.SetData("param2", parameters[1]);
             newDomain.SetData("param3", parameters[2]);
             newDomain.SetData("param4", parameters[3]);
+            newDomain.SetData("param5", parameters[4]);
             newDomain.SetData("entryPoint", entryPoint);
             newDomain.SetData("uPath", pathToUntrusted);
 
@@ -112,24 +120,47 @@ namespace SPade.Grading
             parameters[1] = newDomain.GetData("param2").ToString();
             parameters[2] = newDomain.GetData("param3").ToString();
             parameters[3] = newDomain.GetData("param4").ToString();
+            parameters[4] = newDomain.GetData("param5").ToString();
             this.entryPoint = newDomain.GetData("entryPoint").ToString();
             this.pathToUntrusted = newDomain.GetData("uPath").ToString();
-
-            return newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
+            SolutionScoreClass solution = newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
+            this.descriptionScore = solution.descriptionScore;
+            testcaseInput = solution.testcaseInput;
+            testcaseDescription = solution.testcaseDescription;
+            return solution.solutionScoreKey;
         }
 
-        public decimal ExecuteUntrustedCode(string assemblyName, string typeName, string entryPoint, string[] parameters)
+        public SolutionScoreClass ExecuteUntrustedCode(string assemblyName, string typeName, string entryPoint, string[] parameters)
         {
             //code taken from: https://msdn.microsoft.com/en-us/library/bb763046(v=vs.110).aspx
 
             //Load the MethodInfo for a method in the new Assembly. This might be a method you know, or 
             //you can use Assembly.EntryPoint to get to the main function in an executable.
-            MethodInfo target = Assembly.Load(assemblyName).GetType(typeName).GetMethod(entryPoint);
+            //MethodInfo target = Assembly.Load(assemblyName).GetType(typeName).GetMethod(entryPoint);
 
+            //Grade gradingSystem = new Grade();
+            SolutionScoreClass solution = new SolutionScoreClass();
+            
             try
             {
                 //Now invoke the method.
-                return (decimal)target.Invoke(null, new Object[] { parameters });
+                //return (decimal)target.Invoke(null, new Object[] { parameters });
+                
+                if (entryPoint.Equals("createSolution"))
+                {
+
+                    solution.solutionScoreKey = (int)Grade.createSolution(parameters);
+                    solution.testcaseInput = Grade.testcaseInput;
+                    solution.testcaseDescription = Grade.testcaseDescription;
+                    return solution;
+                }
+                else
+                {
+                    solution.solutionScoreKey = (int)Grade.Grading(parameters);
+                    solution.descriptionScore = Grade.descriptionScore;
+                    return solution;
+                }
+                
             }
             catch (Exception ex)
             {
@@ -138,7 +169,9 @@ namespace SPade.Grading
                 (new PermissionSet(PermissionState.Unrestricted)).Assert();
                 //Console.WriteLine("SecurityException caught:\n{0}", ex.ToString());
                 CodeAccessPermission.RevertAssert();
-                return 2;
+                solution.solutionScoreKey = 2;
+                solution.descriptionScore = null;
+                return solution;
             }
         }
     }//end of sandboxer

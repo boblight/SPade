@@ -222,7 +222,7 @@
                         <label class="control-label">
                             Select maximum attempts allowed
                         </label>
-                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "1", @max = "10", @type = "number" })
+                        @Html.TextBoxFor(m => m.MaxAttempt, new { @class = "form-control", @min = "1", @max = "100", @type = "number" })
                         <span class="help-block">@Html.ValidationMessage("MaxAttempt", new { @class = "text-danger" })</span>
                     </div>
                 </div>

@@ -2,22 +2,26 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-using System.Web.Configuration;
+using System.Linq;
+using System.Web;
 using System.Xml;
+using SPade.Models.DAL;
+using SPade.ViewModels.Student;
 
-namespace Grade
+namespace SPade.Grading
 {
-    public class Program
+    public class Grade
     {
         static Process proc;
         static ProcessStartInfo procInfo;
-        private static string javaPath = "C:/Program Files/Java/jdk1.8.0_45/bin/java.exe";
+        private static string javaPath = "C:/Program Files/Java/jdk1.8.0_131/bin/java.exe";
         private static string pythonPath = "C:/Python36/python.exe";
-        private static Dictionary<decimal, List<object>> aaaaa = new Dictionary<decimal, List<object>>();
+        private SPadeDBEntities db = new SPadeDBEntities();
+        public static List<Result> descriptionScore = new List<Result>();
+        public static List<string> testcaseInput = new List<string>();
+        public static List<string> testcaseDescription = new List<string>();
 
-        public Program()
+        public Grade()
         {
 
         }
@@ -28,10 +32,9 @@ namespace Grade
 
         public static decimal Grading(string[] args)
         {
-            string pathToExe = "", testcase = "", solution = "",solutionScoreKey = "";//all filepaths
+            string pathToExe = "", testcase = "", solution = "", descriptionScoreKey = "";//all filepaths
             string ans = "", error = "", subOut = "", solOut = "", language;//string outputs
             List<String> subList = new List<String>();
-            decimal testCasePassed = 0;
             int exitcode;
             int noOfTestCase = 0;
             List<object> testcases = new List<object>();
@@ -42,7 +45,7 @@ namespace Grade
             testcase = args[1];
             solution = args[2];
             language = args[3];
-            solutionScoreKey = args[4];
+            descriptionScoreKey = args[4];
 
             if (language == "Java")
             {
@@ -77,8 +80,8 @@ namespace Grade
             //load test cases if any
             XmlDocument testCaseFile = new XmlDocument();
             XmlDocument solutionFile = new XmlDocument();
+            Result result;
 
-            List<object> d = new List<object>();
 
             try
             {
@@ -88,6 +91,7 @@ namespace Grade
                 foreach (XmlNode node in testcaseList)
                 {
                     List<string> inputs = new List<string>();
+                    result = new Result();
 
                     noOfTestCase++;
 
@@ -106,9 +110,16 @@ namespace Grade
 
                     foreach (XmlNode input in node.ChildNodes)
                     {
-                        inputs.Add(input.InnerText);
-                        sw.WriteLine(input.InnerText);
-                        sw.Flush();
+                        if (input.Name.Equals("input"))
+                        {
+                            inputs.Add(input.InnerText);
+                            sw.WriteLine(input.InnerText);
+                            sw.Flush();
+                        }
+                        else
+                        {
+                            result.Description = input.InnerText;
+                        }
                     }//end of inputs
 
 
@@ -128,7 +139,7 @@ namespace Grade
                     if (error.Equals(""))
                     {
                         //scan through all lines of standard output to retrieve anything
-                        
+
                         do
                         {
                             checkEmpty = proc.StandardOutput.ReadLine();
@@ -143,40 +154,19 @@ namespace Grade
                     else
                     {
                         checkEmpty = proc.StandardError.ReadLine();
+                        subOut = proc.StandardError.ToString();
                     }//check if error
 
                     //get the output from solution
                     solutionFile.Load(solution);
 
                     XmlNodeList solutions = solutionFile.SelectNodes("/body/solution");
-                    //loop through all the solutions to find matching
-                    //foreach (XmlNode sol in solutions)
-                    //{
-                    //    if (subOut.Equals(sol.InnerText))
-                    //    {
-                    //        testCasePassed++;
-                    //        break;
-                    //    }
-                    //}//end of foreach loop
-                    
 
-                    if (subOut.Equals(solutions[noOfTestCase - 1].InnerText))
-                    {
-                        testCasePassed++;
-                        d.Add(new
-                        {
-                            a = solutions[noOfTestCase - 1].InnerText,
-                            b = 1
-                        });
-                    }
-                    else
-                    {
-                        d.Add(new
-                        {
-                            a = solutions[noOfTestCase - 1].InnerText,
-                            b = 0
-                        });
-                    }
+
+                    result.Score = subOut.Equals(solutions[noOfTestCase - 1].InnerText) ? 1 : 0;
+                    descriptionScore.Add(result);
+
+
 
                     if (!proc.WaitForExit(10000))
                     {
@@ -185,9 +175,8 @@ namespace Grade
                     }
                 }//end of test case loop
 
-                aaaaa.Add(Int32.Parse(solutionScoreKey),d);
 
-                return (testCasePassed / noOfTestCase);
+                return (Int32.Parse(descriptionScoreKey));
             }
             catch (Exception e) //when exception occures means failed to retrieve testcase, in turn means program does not take in inputs
             {//start catch, application does not accept input
@@ -195,6 +184,7 @@ namespace Grade
                 try
                 {
                     proc = Process.Start(procInfo);
+                    result = new Result {Description = ""};
                 }
                 catch (Exception exc)
                 {
@@ -221,29 +211,37 @@ namespace Grade
                 //get the output from solution
                 solutionFile.Load(solution);
                 solOut = solutionFile.SelectSingleNode("/body/solution").InnerText;
+                
 
                 if (exitcode == 0 && error.Equals("")) //if submission properly ran and produced desired outcome
                 {
                     if (ans.Equals(solOut))
                     {
-                        return 1;
+                        
+                        result.Score = 1 ;
+                        descriptionScore.Add(result);
+                        return Int32.Parse(descriptionScoreKey);
                     }
                     else
                     {
+                        result.Score = 0;
+                        descriptionScore.Add(result);
                         return 0;
                     }
+
                 }
                 else //means fail
                 {
                     return 2;
                 }
+
             }//end of catch
         }
 
         public static decimal createSolution(string[] args)
         {
             XmlNode docNode, bodyNode, solutionsNode;
-            string pathToExe = "", pathToSol = "", pathToTestCase = "", hasTestCase = "", subOut = "", error="";
+            string pathToExe = "", pathToSol = "", pathToTestCase = "", hasTestCase = "", subOut = "", error = "";
             string language = "";
             bool programFailed = false;
             XmlDocument slnDoc = new XmlDocument();
@@ -301,7 +299,7 @@ namespace Grade
 
                     //to delete process if it enters an infinite loop
                     if (!proc.WaitForExit(40000))
-                        {
+                    {
                         proc.Kill();
                         return 3;
                     }
@@ -369,12 +367,19 @@ namespace Grade
                     subOut = "";
 
                     System.IO.StreamWriter sw = proc.StandardInput;
-                    
+
                     foreach (XmlNode input in testcase.ChildNodes)
                     {
-                        inputs.Add(input.InnerText);
-                        sw.WriteLine(input.InnerText);
-                        sw.Flush();
+                        if (input.Name.Equals("description"))
+                        {
+                            testcaseDescription.Add(input.InnerText);
+                        }
+                        else
+                        {
+                            inputs.Add(input.InnerText);
+                            sw.WriteLine(input.InnerText);
+                            sw.Flush();
+                        }
                     }//end of inputs
 
                     //check if there is another error thrown by program
@@ -394,6 +399,7 @@ namespace Grade
                         foreach (string input in inputs)
                         {
                             subOut += input;
+                            testcaseInput.Add(input);
                         }
 
                         solutionsNode = slnDoc.CreateElement("solution");
@@ -437,6 +443,5 @@ namespace Grade
                 return 2;
             }
         }//end of createSolution
-
     }
 }

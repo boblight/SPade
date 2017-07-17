@@ -335,15 +335,13 @@ namespace SPade.Controllers
                 var user = await UserManager.FindByEmailAsync(model.Email);
 
                 ViewBag.errorMessage = "You have not confirmed your email. Please confirm your email before attempting to login.";
-                if (!UserManager.IsEmailConfirmed(user.Id))
-                {
-                    return View("ConfirmEmailMessage");
-                }
+
 
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    ViewBag.errorMessage = "Sorry there was an error with your account, Please contact an administrator for assistance!";
+                    return View("ConfirmEmailMessage");
                 }
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
