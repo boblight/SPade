@@ -32,8 +32,6 @@ namespace SPade.Controllers
         //init the db
         private SPadeDBEntities db = new SPadeDBEntities();
         private ApplicationUserManager _userManager;
-        private static List<string> testcaseInput = new List<string>();
-        private static List<string> testcaseDescription = new List<string>();
 
         public LecturerController()
         {
@@ -1957,11 +1955,6 @@ namespace SPade.Controllers
             //run the assignment grading in scheduler
             Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, langType, isTestCasePresent);
             exitCode = (int)sandbox.runSandboxedGrading();
-            if (sandbox.testcaseInput.Count != 0)
-            {
-                testcaseInput = sandbox.testcaseInput;
-                testcaseDescription = sandbox.testcaseDescription;
-            }
 
             return exitCode;
         }
@@ -2102,26 +2095,58 @@ namespace SPade.Controllers
                         }
                      }
 
-                    
 
-                    for (int i = 0; i < testcaseInput.Count; i++)
+                    //Save testcases inside database
+                    XmlDocument testCaseFile = new XmlDocument();
+                    var pathToTestcase = Server.MapPath(@"~/TestCase/" + newAssignment.AssignmentID + "testcase.xml");
+                    testCaseFile.Load(pathToTestcase);
+
+                    //get testcases by getting the nodes name
+                    XmlNodeList testcaseList = testCaseFile.SelectNodes("/body/testcase");
+
+
+                    //setting testCase number for the database
+                    var testcaseNo = 1;
+
+                    foreach (XmlNode node in testcaseList)
                     {
-                        AssignmentTestCase atc = new AssignmentTestCase
+                        List<string> inputs = new List<string>();
+                        
+                        var description = "";
+                        AssignmentTestCase atc = new AssignmentTestCase();
+
+
+                        //loops through each testcase input and saves it in the 
+                        // "input" list
+                        foreach (XmlNode input in node.ChildNodes)
                         {
-                            AssignmentID = newAssignment.AssignmentID,
-                            Input = testcaseInput[i],
-                            Description = testcaseDescription.Count == 1
-                                ? testcaseDescription[0]
-                                : testcaseDescription[i]
-                        };
+                            if (input.Name.Equals("description"))
+                            {
+                                description = input.InnerText;
+                            }
+                            else
+                            {
+                                inputs.Add(input.InnerText);
+                            }
+                        }
 
-                        var testcaseNo = i + 1;
-                        atc.TestCaseNo = testcaseNo;
-                        db.AssignmentTestCases.Add(atc);
-                        db.SaveChanges();
+
+                        //loops through "input" list to save data to DB
+                        foreach (var eachInput in inputs)
+                        {
+                            atc.Input = eachInput;
+                            atc.Description = description;
+                            atc.AssignmentID = newAssignment.AssignmentID;
+                            atc.TestCaseNo = testcaseNo;
+                            db.AssignmentTestCases.Add(atc);
+                            db.SaveChanges();
+                        }
+                        
+                        testcaseNo++;
                     }
-
                     
+
+
 
 
                 }

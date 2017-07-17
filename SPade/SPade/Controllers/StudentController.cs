@@ -60,6 +60,9 @@ namespace SPade.Controllers
 
 
 
+
+                    //File format would be:  
+                    // "assignmentId/classId/studentadmissionNumber/lowerCaseFileName/lowerCasefile.py or .java or  .net
                     string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
                     submissionName = @""+ assignment.AssignmentID + "/" + classId + "/" + User.Identity.GetUserName();
                     var filePath = Server.MapPath(@"~/Submissions/" + assignment.AssignmentID + "/" + classId + "/" + User.Identity.GetUserName() +  "/" + fileName.ToLower() + "/" + fileName.ToLower() + fileExtensionName);

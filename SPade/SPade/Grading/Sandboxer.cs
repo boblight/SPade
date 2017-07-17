@@ -125,8 +125,6 @@ namespace SPade.Grading
             this.pathToUntrusted = newDomain.GetData("uPath").ToString();
             SolutionScoreClass solution = newDomainInstance.ExecuteUntrustedCode(untrustedAssembly, untrustedClass, entryPoint, parameters);
             this.descriptionScore = solution.descriptionScore;
-            testcaseInput = solution.testcaseInput;
-            testcaseDescription = solution.testcaseDescription;
             return solution.solutionScoreKey;
         }
 
@@ -146,12 +144,12 @@ namespace SPade.Grading
                 //Now invoke the method.
                 //return (decimal)target.Invoke(null, new Object[] { parameters });
                 
+
+                //return solutionclass object based on entrypoint 
                 if (entryPoint.Equals("createSolution"))
                 {
 
                     solution.solutionScoreKey = (int)Grade.createSolution(parameters);
-                    solution.testcaseInput = Grade.testcaseInput;
-                    solution.testcaseDescription = Grade.testcaseDescription;
                     return solution;
                 }
                 else

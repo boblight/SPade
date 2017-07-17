@@ -11,7 +11,5 @@ namespace SPade.Models
     {
         public int solutionScoreKey { get; set; }
         public List<Result> descriptionScore { get; set; }
-        public List<string> testcaseInput { get; set; }
-        public List<string> testcaseDescription { get; set; }
     }
 }
