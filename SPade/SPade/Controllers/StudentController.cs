@@ -133,6 +133,86 @@ namespace SPade.Controllers
         //the method which we call the scheduler to run
         public int ProcessSubmission(string filePathForGrade, string fileName, int assgnId, string langUsed,string userName)
         {
+
+            var line = "";
+            var packageName = "";
+
+            /* To edit java files to include package Names */
+            if (langUsed.Equals("Java"))
+            {
+
+                //Read the file uploaded
+                System.IO.StreamReader file =
+                    new System.IO.StreamReader(filePathForGrade + "/" + fileName.ToLower() + "/" + fileName + ".java");
+
+
+                //i length requirement is just a number for reference
+                //loops through file readline to retrieve package name if there is one
+                for (var i = 0; i < 20 && (line = file.ReadLine()) != null; i++)
+                {
+                    if (line.Contains("package"))
+                    {
+                        packageName = line;
+                        i = 20;
+                    }
+                }
+
+
+                //Remember to close the file, else you will get an error
+                file.Close();
+
+                /* https://stackoverflow.com/questions/10511628/how-to-prepend-a-header-in-a-text-file */
+                /* Link for the code below ^^^^^ */
+                //if there is no package name add it in
+                if (packageName.Equals(""))
+                {
+                    var tempfile = Path.GetTempFileName();
+                    using (var writer = new StreamWriter(tempfile))
+                    using (var reader =
+                        new StreamReader(filePathForGrade + "/" + fileName.ToLower() + "/" + fileName + ".java"))
+                    {
+                        writer.WriteLine("package " + fileName.ToLower() + ";");
+                        while (!reader.EndOfStream)
+                            writer.WriteLine(reader.ReadLine());
+                    }
+                    System.IO.File.Copy(tempfile,
+                        filePathForGrade + "/" + fileName.ToLower() + "/" + fileName + ".java", true);
+                    System.IO.File.Delete(tempfile);
+                }
+
+                // Change the packageName no matter if it is correct or wrong, just in case
+                /* https://stackoverflow.com/questions/1971008/edit-a-specific-line-of-a-text-file-in-c-sharp */
+                /* Link to the edit file ^^^^^ */
+                else
+                {
+                    var tempfile = Path.GetTempFileName();
+                    using (var writer = new StreamWriter(tempfile))
+                    using (var reader =
+                        new StreamReader(filePathForGrade + "/" + fileName.ToLower() + "/" + fileName + ".java"))
+                    {
+                        //
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            if (line.Equals(packageName))
+                            {
+                                writer.WriteLine("package " + fileName.ToLower() + ";");
+                            }
+                            else
+                            {
+                                writer.WriteLine(line);
+                            }
+                        }
+                    }
+                    System.IO.File.Copy(tempfile,
+                        filePathForGrade + "/" + fileName.ToLower() + "/" + fileName + ".java", true);
+                    System.IO.File.Delete(tempfile);
+                }
+            }
+
+
+
+
+
             var descriptionScoreKey = Int32.Parse(userName.Substring(1)+""+assgnId);
 
             //the grading of the assignment is done here (the scheduler adds this to queue)

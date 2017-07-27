@@ -48,7 +48,7 @@
             
             <div class="form-group">
                 <div>
-                    <button class="btn btn-primary" id="downloadAll">Download class submissions</button>
+                    <a class="btn btn-primary" id="downloadAll"><span>Download class submissions</span></a>
                 </div>
             </div>
 
@@ -98,25 +98,10 @@
         fillTable();
     });
 
-    $('#selectClass').on('change', function () {
-        $('#selectAssignment').empty();
-        getAssgn();
-    })
-
-
-    $('#downloadAll').on('click',
+    $('#selectClass').on('change',
         function() {
-            $.ajax({
-                type: 'POST',
-                url: 'DownloadAll',
-                data: '{\'Class\':\'' + $('#selectClass').val() + '\', \'Assignment\':\'' + $('#selectAssignment').val() + '\'}',
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                success: function(data) {
-                    
-                },
-                error:function() {}
-            });
+            $('#selectAssignment').empty();
+            getAssgn();
         });
 
     function fillTable() {
@@ -168,6 +153,12 @@
                         } else {
                             $('#downloadAll').show();
                         }
+
+                        $('#downloadAll').attr('href',
+                            '/Lecturer/DownloadAll/?Class=' +
+                            $('#selectClass').val() +
+                            '&Assignment=' +
+                            $('#selectAssignment').val());
                     }
                 });
 

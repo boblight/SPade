@@ -35,7 +35,7 @@ namespace SPade.Grading
                     }
                     else
                     {
-                        pathToExecutable = "-cp " + filePath + " " + fileName.ToLower() + "." + fileName;
+                        pathToExecutable = "-cp " + filePath + " " + fileName.ToLower()+ "." + fileName;
                     }
 
                     compile.WaitForExit(5000);//compilation process ends

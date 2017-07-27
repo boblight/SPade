@@ -411,11 +411,14 @@ namespace SPade.Controllers
                     {
                         if (!string.IsNullOrEmpty(lines[i]))
                         {
-                            Lecturer lect = new Lecturer();
-                            lect.StaffID = lines[i].Split(',')[0];
-                            lect.Name = lines[i].Split(',')[1];
-                            lect.Email = lines[i].Split(',')[2];
-                            lect.ContactNo = Int32.Parse(lines[i].Split(',')[3]);
+                            Lecturer lect = new Lecturer
+                            {
+                                StaffID = lines[i].Split(',')[0],
+                                Name = lines[i].Split(',')[1]
+                            };
+                            lect.Email = lect.StaffID+"@ichat.sp.edu.sg";
+                            var contactNoString = lines[i].Split(',')[3];
+                            lect.ContactNo = contactNoString.Equals("") ? 0 : Int32.Parse(contactNoString);
                             lect.CreatedAt = DateTime.Now;
                             lect.CreatedBy = User.Identity.GetUserName();
                             lect.UpdatedAt = DateTime.Now;
@@ -423,20 +426,20 @@ namespace SPade.Controllers
 
                             //check through and validate all details
                             //check staff id
-                            var match = Regex.Match(lect.StaffID, "^[s0-9]{8,8}$");
+                            var match = Regex.Match(lect.StaffID, "^[s0-9]{6,8}$");
                             if (!match.Success)
                             {
                                 ModelState.AddModelError("", "One of the staff id is invalid");
                                 return View();
                             }
 
-                            //check contact no.
-                            match = Regex.Match(lect.ContactNo.ToString(), "^[0-9]{8,8}$");
-                            if (!match.Success)
-                            {
-                                ModelState.AddModelError("", "One of the contact number is invalid");
-                                return View();
-                            }
+                            ////check contact no.
+                            //match = Regex.Match(lect.ContactNo.ToString(), "^[0-9]{8,8}$");
+                            //if (!match.Success)
+                            //{
+                            //    ModelState.AddModelError("", "One of the contact number is invalid");
+                            //    return View();
+                            //}
 
                             lectlist.Add(lect);
 

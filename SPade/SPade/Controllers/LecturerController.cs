@@ -1,5 +1,4 @@
-﻿using Ionic.Zip;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using SPade.Grading;
 using SPade.Models;
@@ -13,6 +12,7 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -23,6 +23,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using System.Web.Security;
 using System.Web.WebPages;
+using ZipFile = Ionic.Zip.ZipFile;
 
 namespace SPade.Controllers
 {
@@ -74,13 +75,24 @@ namespace SPade.Controllers
 
             List<Class> managedClasses = new List<Class>();
 
-            List<Lec_Class> lec_classes = db.Lec_Class.Where(lc => lc.StaffID == loggedInLecturer).ToList();
-
-            foreach (Lec_Class lc in lec_classes)
+            if (ModuleCoordinator().IsEmpty())
             {
-                List<Class> temp = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.ClassID == lc.ClassID).ToList();
-                managedClasses.AddRange(temp);
+                List<Lec_Class> lec_classes = db.Lec_Class.Where(lc => lc.StaffID == loggedInLecturer).ToList();
+
+                foreach (Lec_Class lc in lec_classes)
+                {
+                    List<Class> temp = db.Classes.Where(c => c.DeletedAt == null).Where(c => c.ClassID == lc.ClassID)
+                        .ToList();
+                    managedClasses.AddRange(temp);
+                }
             }
+            else
+            {
+                managedClasses = db.Classes.Where(c => c.DeletedAt == null).ToList();
+            }
+
+
+            
 
             //get the students in that classs
             foreach (Class c in managedClasses)
@@ -118,7 +130,7 @@ namespace SPade.Controllers
 
 
 
-            if (isAssociated)
+            if (isAssociated || !ModuleCoordinator().IsEmpty())
             {
 
                 sList = db.Students.Where(s => s.ClassID == cId && s.DeletedAt == null).ToList();
@@ -277,10 +289,11 @@ namespace SPade.Controllers
                             return View();
                         }
 
-                        s.AdminNo = lines[i].Split(',')[2];
+                        s.AdminNo = "p"+lines[i].Split(',')[2];
                         s.Name = lines[i].Split(',')[3];
-                        s.Email = lines[i].Split(',')[4];
-                        s.ContactNo = Int32.Parse(lines[i].Split(',')[5]);
+                        s.Email = s.AdminNo+"@ichat.sp.edu.sg";
+                        var contactNoString = lines[i].Split(',')[5];
+                        s.ContactNo = contactNoString.IsEmpty() ? 0 : Int32.Parse(lines[i].Split(',')[5]);
                         s.CreatedAt = DateTime.Now;
                         s.CreatedBy = User.Identity.GetUserName();
                         s.UpdatedAt = DateTime.Now;
@@ -296,17 +309,21 @@ namespace SPade.Controllers
                         }
 
                         //check contact no.
-                        match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
-                        if (!match.Success)
-                        {
-                            ModelState.AddModelError("", "One of the contact number is invalid");
-                            return View();
-                        }
+                        //match = Regex.Match(s.ContactNo.ToString(), "^[0-9]{8,8}$");
+                        //if (!match.Success)
+                        //{
+                        //    ModelState.AddModelError("", "One of the contact number is invalid");
+                        //    return View();
+                        //}
 
                         slist.Add(s);
 
-                        var user = new ApplicationUser { UserName = s.AdminNo, Email = s.Email };
-                        user.EmailConfirmed = true;
+                        var user = new ApplicationUser
+                        {
+                            UserName = s.AdminNo,
+                            Email = s.Email,
+                            EmailConfirmed = true
+                        };
                         var result = await UserManager.CreateAsync(user, "P@ssw0rd"); //default password
                         if (result.Succeeded)
                         {
@@ -1951,6 +1968,66 @@ namespace SPade.Controllers
         public int ProcessSubmission(string slnFilePath, string fileName, string assignmentTitle, string langType, bool isTestCasePresent)
         {
             int exitCode = 0;
+            var line = "";
+            var packageName = "";
+            if (langType.Equals("Java"))
+            {
+                System.IO.StreamReader file =
+                    new System.IO.StreamReader(slnFilePath + "/" + fileName.ToLower() + "/" + fileName + ".java");
+
+
+                //i length requirement is just a number for reference
+                //loops through file readline to retrieve package name
+                for (var i = 0; i < 20 && (line = file.ReadLine()) != null; i++)
+                {
+                    if (line.Contains("package"))
+                    {
+                        packageName = line;
+                        i = 20;
+                    }
+                }
+                file.Close();
+
+                if (packageName.Equals(""))
+                {
+                    var tempfile = Path.GetTempFileName();
+                    using (var writer = new StreamWriter(tempfile))
+                    using (var reader =
+                        new StreamReader(slnFilePath + "/" + fileName.ToLower() + "/" + fileName + ".java"))
+                    {
+                        writer.WriteLine("package " + fileName.ToLower() + ";");
+                        while (!reader.EndOfStream)
+                            writer.WriteLine(reader.ReadLine());
+                    }
+                    System.IO.File.Copy(tempfile, slnFilePath + "/" + fileName.ToLower() + "/" + fileName + ".java",
+                        true);
+                    System.IO.File.Delete(tempfile);
+                }
+                else
+                {
+                    var tempfile = Path.GetTempFileName();
+                    using (var writer = new StreamWriter(tempfile))
+                    using (var reader =
+                        new StreamReader(slnFilePath + "/" + fileName.ToLower() + "/" + fileName + ".java"))
+                    {
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            if (line.Equals(packageName))
+                            {
+                                writer.WriteLine("package " + fileName.ToLower() + ";");
+                            }
+                            else
+                            {
+                                writer.WriteLine(line);
+                            }
+                        }
+                    }
+                    System.IO.File.Copy(tempfile,
+                        slnFilePath + "/" + fileName.ToLower() + "/" + fileName + ".java", true);
+                    System.IO.File.Delete(tempfile);
+                }
+            }
+            
 
             //run the assignment grading in scheduler
             Sandboxer sandbox = new Sandboxer(slnFilePath, fileName, assignmentTitle, langType, isTestCasePresent);
@@ -2359,9 +2436,20 @@ namespace SPade.Controllers
             List<Course> courseList = new List<Course>();
 
             var x = User.Identity.GetUserName();
+            IQueryable<Class> query;
+
+            if (!ModuleCoordinator().IsEmpty())
+            {
+                query = db.Classes.Where(c => c.DeletedAt == null);
+            }
+            else
+            {
+                //get the classes managed by the lecturer 
+                query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
+            }
 
             //get the classes the lecturer manages again 
-            var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
+            //var query = from c in db.Classes join lc in db.Lec_Class on c.ClassID equals lc.ClassID where lc.StaffID.Equals(x) where c.DeletedAt == null select c;
             managedClasses = query.ToList();
 
             //get all the courses 
@@ -2602,7 +2690,8 @@ namespace SPade.Controllers
             return View(vtcvm);
         }
 
-        [HttpPost]
+        /*TO DOWNLOAD SUBMISSIONS ASSOCIATED WITH THIS ASSIGNMENT AND THE CLASS*/
+        [HttpGet]
         public ActionResult DownloadAll(string Class, string Assignment)
         {
             var classId = Int32.Parse(Class);
@@ -2612,29 +2701,23 @@ namespace SPade.Controllers
 
             var path = "~/Submissions/" + Assignment + "/" + Class;
             var zipname = assignmentName + "(" + className + ").zip";
-
-            //var fileName = file.Split('/');
-            //var zipname = fileName[fileName.Length - 2] + "(" + fileName[fileName.Length - 1] + ").zip"; //temp
-
             var memoryStream = new MemoryStream();
 
-            try
-            {
-                using (var zip = new ZipFile())
-                {
 
-                    zip.AddDirectory(Server.MapPath(path));
-                    zip.Save(memoryStream);
-                }
-            }
-            catch(Exception ex)
+            using (var zip = new ZipFile())
             {
-                Console.WriteLine(ex.Message);
+                //the code commented below allows u to zip a file
+                //and save it in another folderpath or path
+
+                //System.IO.Compression.ZipFile.CreateFromDirectory(Server.MapPath(path), Server.MapPath("~/TempSubmissions/" + zipname));
+
+
+                zip.AddDirectory(Server.MapPath(path));
+                zip.Save(memoryStream);
             }
-            
 
             memoryStream.Seek(0, SeekOrigin.Begin);
-            return File(memoryStream, "application/zip", zipname);
+            return File(memoryStream, "application/zip",zipname);
         }
 
         private string ModuleCoordinator()
