@@ -190,7 +190,7 @@ namespace SPade.Controllers
                     using (var reader =
                         new StreamReader(filePathForGrade + "/" + fileName.ToLower() + "/" + fileName + ".java"))
                     {
-                        //
+                        
                         while ((line = reader.ReadLine()) != null)
                         {
                             if (line.Equals(packageName))
@@ -569,6 +569,27 @@ namespace SPade.Controllers
             memoryStream.Seek(0, SeekOrigin.Begin);
             return File(memoryStream, "application/zip", zipname);
         }
+
+
+
+        private string ErrorLogging(string ex, string task)
+        {
+            //used to log errors when saving to db. makes it much easier to know whats going on
+            string user = String.Format("Logged in user: {0}" + System.Environment.NewLine, User.Identity.GetUserName());
+            string userTask = String.Format("User task: {0} " + System.Environment.NewLine, task);
+            string exception = String.Format("Exception Log: {0} " + System.Environment.NewLine, ex);
+
+            string log = user + userTask + System.Environment.NewLine + exception;
+
+            string fileName = "ErrorLog" + DateTime.Now.ToString("ddMMyyyyhhmmss");
+            string filePath = Server.MapPath(@"~/ErrorLogs/");
+            string fullPath = filePath + fileName + ".txt";
+
+            System.IO.File.WriteAllText(fullPath, log);
+
+            return fileName;
+        }
+
 
         private class DBres
         {

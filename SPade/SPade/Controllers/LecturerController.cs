@@ -1970,14 +1970,17 @@ namespace SPade.Controllers
             int exitCode = 0;
             var line = "";
             var packageName = "";
+
+            /* To edit java files to include package Names */
             if (langType.Equals("Java"))
             {
+                //Read the file uploaded
                 System.IO.StreamReader file =
                     new System.IO.StreamReader(slnFilePath + "/" + fileName.ToLower() + "/" + fileName + ".java");
 
 
                 //i length requirement is just a number for reference
-                //loops through file readline to retrieve package name
+                //loops through file readline to retrieve package name if there is one
                 for (var i = 0; i < 20 && (line = file.ReadLine()) != null; i++)
                 {
                     if (line.Contains("package"))
@@ -1986,8 +1989,16 @@ namespace SPade.Controllers
                         i = 20;
                     }
                 }
+
+
+
+                //Remember to close the file, else you will get an error
                 file.Close();
 
+
+                /* https://stackoverflow.com/questions/10511628/how-to-prepend-a-header-in-a-text-file */
+                /* Link for the code below ^^^^^ */
+                //if there is no package name add it in
                 if (packageName.Equals(""))
                 {
                     var tempfile = Path.GetTempFileName();
@@ -2003,6 +2014,11 @@ namespace SPade.Controllers
                         true);
                     System.IO.File.Delete(tempfile);
                 }
+
+
+                // Change the packageName no matter if it is correct or wrong, just in case
+                /* https://stackoverflow.com/questions/1971008/edit-a-specific-line-of-a-text-file-in-c-sharp */
+                /* Link to the edit file ^^^^^ */
                 else
                 {
                     var tempfile = Path.GetTempFileName();
