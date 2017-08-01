@@ -1981,12 +1981,12 @@ namespace SPade.Controllers
 
                 //i length requirement is just a number for reference
                 //loops through file readline to retrieve package name if there is one
-                for (var i = 0; i < 20 && (line = file.ReadLine()) != null; i++)
+                for (var i = 0; i < 10 && (line = file.ReadLine()) != null; i++)
                 {
                     if (line.Contains("package"))
                     {
                         packageName = line;
-                        i = 20;
+                        i = 10;
                     }
                 }
 

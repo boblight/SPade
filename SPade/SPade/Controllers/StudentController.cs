@@ -65,7 +65,7 @@ namespace SPade.Controllers
                     // "assignmentId/classId/studentadmissionNumber/lowerCaseFileName/lowerCasefile.py or .java or  .net
                     string title = Regex.Replace(assignment.AssgnTitle, @"\s+", "");
                     submissionName = @""+ assignment.AssignmentID + "/" + classId + "/" + User.Identity.GetUserName();
-                    var filePath = Server.MapPath(@"~/Submissions/" + assignment.AssignmentID + "/" + classId + "/" + User.Identity.GetUserName() +  "/" + fileName.ToLower() + "/" + fileName.ToLower() + fileExtensionName);
+                    var filePath = Server.MapPath(@"~/Submissions/" + assignment.AssignmentID + "/" + classId + "/" + User.Identity.GetUserName() +  "/" + fileName.ToLower() + "/" + fileName + fileExtensionName);
                     var filePathForGrade = Server.MapPath(@"~/Submissions/" + submissionName);
                     System.IO.DirectoryInfo fileDirectory = new DirectoryInfo(filePathForGrade);
 
@@ -148,15 +148,14 @@ namespace SPade.Controllers
 
                 //i length requirement is just a number for reference
                 //loops through file readline to retrieve package name if there is one
-                for (var i = 0; i < 20 && (line = file.ReadLine()) != null; i++)
+                for (var i = 0; i < 10 && (line = file.ReadLine()) != null; i++)
                 {
                     if (line.Contains("package"))
                     {
                         packageName = line;
-                        i = 20;
+                        i = 10;
                     }
                 }
-
 
                 //Remember to close the file, else you will get an error
                 file.Close();
@@ -349,7 +348,7 @@ namespace SPade.Controllers
             //List<Assignment> pass = new List<Assignment>();
             SubmitAssignmentViewModel svm = new SubmitAssignmentViewModel();
             Assignment assignment = db.Assignments.ToList().Find(a => a.AssignmentID == id);
-            svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id).Count();
+            svm.RetryRemaining = assignment.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == id && s.AdminNo == User.Identity.GetUserName()).Count();
 
             Module module = db.Modules.ToList().Find(m => m.ModuleCode == assignment.ModuleCode);
             svm.Module = module.ModuleCode + " " + module.ModuleName;
@@ -395,7 +394,7 @@ namespace SPade.Controllers
                     if (today >= a.StartDate.Date && today <= a.DueDate.Date)
                     {
                         ViewAssignmentViewModel v = new ViewAssignmentViewModel();
-                        v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID).Count();
+                        v.RetryRemaining = a.MaxAttempt - db.Submissions.ToList().FindAll(s => s.AssignmentID == a.AssignmentID && s.AdminNo == User.Identity.GetUserName()).Count();
                         v.assignment = a;
 
                         Module module = db.Modules.ToList().Find(m => m.ModuleCode == a.ModuleCode);
