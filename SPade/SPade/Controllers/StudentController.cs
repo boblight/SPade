@@ -550,7 +550,7 @@ namespace SPade.Controllers
             submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
 
             Session.Remove("submission"); //clear session
-            if (submissions.solution == null)
+            if (submissions.solution.Count == 0)
             {
                 if (descriptionScore.Count > 0)
                 {
