@@ -544,22 +544,22 @@ namespace SPade.Controllers
                 }
                 db.SaveChanges();
 
+            
+            submissionSolution submissions = new submissionSolution();
+            submissions.submission = submission;
+            submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
 
-                submissionSolution submissions = new submissionSolution();
-                submissions.submission = submission;
-                submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
-
-                Session.Remove("submission"); //clear session
-                if (submissions.solution.Count == 0)
+            Session.Remove("submission"); //clear session
+            if (submissions.solution == null)
+            {
+                if (descriptionScore.Count > 0)
                 {
-                    if (descriptionScore.Count > 0)
-                    {
-                        descriptionScore.Remove((int)Session["TempSolutionKey"]);
-                    }
-                    Session.Remove("TempResults");
-                    Session.Remove("TempSolutionKey");
+                    descriptionScore.Remove((int) Session["TempSolutionKey"]);
                 }
-
+                Session.Remove("TempResults");
+                Session.Remove("TempSolutionKey");
+            }
+            
 
                 return View(submissions);
             }catch(Exception ex)
