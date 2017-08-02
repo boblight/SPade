@@ -684,7 +684,7 @@ namespace SPade.Controllers
 
                 classids.Add(c.ClassID);
                 classnames.Add(className);
-                //c.ClassName = className;
+                c.ClassName = className;
             }
 
             model.className = classnames;

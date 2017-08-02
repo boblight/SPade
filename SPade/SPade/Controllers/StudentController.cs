@@ -531,13 +531,15 @@ namespace SPade.Controllers
             }
             db.SaveChanges();
 
-            
-            submissionSolution submissions = new submissionSolution();
-            submissions.submission = submission;
-            submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
+
+            submissionSolution submissions = new submissionSolution
+            {
+                submission = submission,
+                solution = (List<Result>) Session["TempResults"] ?? new List<Result>()
+            };
 
             Session.Remove("submission"); //clear session
-            if (submissions.solution == null)
+            if (submissions.solution.Count == 0)
             {
                 if (descriptionScore.Count > 0)
                 {
