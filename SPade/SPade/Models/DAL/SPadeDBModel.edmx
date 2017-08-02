@@ -102,13 +102,13 @@
         </EntityType>
         <EntityType Name="AssignmentTestCase">
           <Key>
-            <PropertyRef Name="TestCaseNo" />
-            <PropertyRef Name="AssignmentID" />
+            <PropertyRef Name="ATCId" />
           </Key>
           <Property Name="TestCaseNo" Type="int" Nullable="false" />
           <Property Name="AssignmentID" Type="int" Nullable="false" />
           <Property Name="Input" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Description" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="ATCId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
         <EntityType Name="Class">
           <Key>
@@ -667,13 +667,13 @@
         </EntityType>
         <EntityType Name="AssignmentTestCase">
           <Key>
-            <PropertyRef Name="TestCaseNo" />
-            <PropertyRef Name="AssignmentID" />
+            <PropertyRef Name="ATCId" />
           </Key>
           <Property Name="TestCaseNo" Type="Int32" Nullable="false" />
           <Property Name="AssignmentID" Type="Int32" Nullable="false" />
           <Property Name="Input" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ATCId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="Class">
           <Key>
@@ -1260,6 +1260,7 @@
                 <ScalarProperty Name="AssignmentID" ColumnName="AssignmentID" />
                 <ScalarProperty Name="Input" ColumnName="Input" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="ATCId" ColumnName="ATCId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

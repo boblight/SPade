@@ -261,34 +261,43 @@ namespace SPade.Controllers
                 if (finalState.Name == "Succeeded")
                 {
 
-                    //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
-                    HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
-
-                    //Get the dictionary key to access the related object 
-                    var descriptionScoreKey = dataObj.Result;
-                    if (descriptionScore.TryGetValue(descriptionScoreKey, out scores))
+                    try
                     {
-                        Session["TempResults"] = scores;
-                        Session["TempSolutionKey"] = descriptionScoreKey;
-                        foreach (var eachScore in scores)
+                        //Hangfire stores the data as JSON. We deserialize it here to a DataObj -> which is shaped like JSON structure
+                        HangfireData dataObj = JsonConvert.DeserializeObject<HangfireData>(finalState.Data);
+
+                        //Get the dictionary key to access the related object 
+                        var descriptionScoreKey = dataObj.Result;
+                        if (descriptionScore.TryGetValue(descriptionScoreKey, out scores))
                         {
-                            totalScore += eachScore.Score;
+                            Session["TempResults"] = scores;
+                            Session["TempSolutionKey"] = descriptionScoreKey;
+                            foreach (var eachScore in scores)
+                            {
+                                totalScore += eachScore.Score;
+                            }
+                            finalScore = totalScore / scores.Count;
                         }
-                        finalScore = totalScore / scores.Count;
-                    }
-                    else
+                        else
+                        {
+                            finalScore = descriptionScoreKey > 100 ? 0 : descriptionScoreKey;
+                        }
+
+
+
+
+
+
+                        sub.Grade = finalScore;
+                        db.Submissions.Add(sub);
+                        db.SaveChanges();
+                    }catch(Exception ex)
                     {
-                        finalScore = descriptionScoreKey > 100 ? 0 : descriptionScoreKey;
+                        sub.Grade = 3;
+                        db.Submissions.Add(sub);
+                        db.SaveChanges();
+                        var errorMsg = ErrorLogging(ex.ToString(), "get Grade for submission");
                     }
-
-
-
-
-
-
-                    sub.Grade = finalScore;
-                    db.Submissions.Add(sub);
-                    db.SaveChanges();
                 }
                 else
                 {
@@ -472,83 +481,95 @@ namespace SPade.Controllers
         // GET: PostSubmission
         public ActionResult PostSubmission()
         {
-            //this is to get the job running status
-            bool isJobRunning;
-
-            //this is to count for any infinite loop
-            int counter = 0;
-
-            //we get the job code that is assigned to it
-            string jobSessionId = (string)Session["jobID"];
-
-            do
+            try
             {
-                //check if the job has finished running or not
-                isJobRunning = QueryJobFinish(jobSessionId);
-                counter++;
-            } while (isJobRunning && counter < 10000);
 
-            Submission submission = (Submission)Session["submission"];
 
-            if (counter >= 10000) //ran into infinite loop
-            {
-                //cancel job 
-                BackgroundJob.Delete(jobSessionId);
-                //set if run into infinite loop
-                submission.Grade = 3;
-            }
+                //this is to get the job running status
+                bool isJobRunning;
 
-            Submission toUpdate = db.Submissions.Where(s => s.SubmissionID == submission.SubmissionID).FirstOrDefault();
+                //this is to count for any infinite loop
+                int counter = 0;
 
-            if (submission.Grade == 2)
-            {
-                ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to an exception being thrown " +
-                                                            "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error and make sure " +
-                                                            "you have uploaded the correct program.");
-                toUpdate.Grade = 0;
-            }
-            else if (submission.Grade == 3)
-            {
-                ModelState.AddModelError("SubmissionError", "Your program has encountered an infinite loop. Please check through your program and make appropriate " +
-                                                            "modification.");
-                toUpdate.Grade = 0;
-            }
-            else if (submission.Grade == 4)
-            {
-                ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
-                                                            "Also ensure that you have submitted the correct source code.");
-                toUpdate.Grade = 0;
-            }
-            else if (submission.Grade == 5)
-            {
-                ModelState.AddModelError("SubmissionError", "Program cannot be compiled, ensure you submit the correct source code.");
-                toUpdate.Grade = 0;
-            }
-            else if (submission.Grade < 1)
-            {
-                ModelState.AddModelError("SubmissionError", "Program has failed a couple of test cases. Please check through your program and make appropriate " +
-                                                            "modification to meet the requirements stated in the assignment description.");
-            }
-            db.SaveChanges();
+                //we get the job code that is assigned to it
+                string jobSessionId = (string)Session["jobID"];
 
-            
-            submissionSolution submissions = new submissionSolution();
-            submissions.submission = submission;
-            submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
-
-            Session.Remove("submission"); //clear session
-            if (submissions.solution == null)
-            {
-                if (descriptionScore.Count > 0)
+                do
                 {
-                    descriptionScore.Remove((int) Session["TempSolutionKey"]);
-                }
-                Session.Remove("TempResults");
-                Session.Remove("TempSolutionKey");
-            }
-            
+                    //check if the job has finished running or not
+                    isJobRunning = QueryJobFinish(jobSessionId);
+                    counter++;
+                } while (isJobRunning && counter < 10000);
 
-            return View(submissions);
+                Submission submission = (Submission)Session["submission"];
+
+                if (counter >= 10000) //ran into infinite loop
+                {
+                    //cancel job 
+                    BackgroundJob.Delete(jobSessionId);
+                    //set if run into infinite loop
+                    submission.Grade = 3;
+                }
+
+                Submission toUpdate = db.Submissions.Where(s => s.SubmissionID == submission.SubmissionID).FirstOrDefault();
+
+                if (submission.Grade == 2)
+                {
+                    ModelState.AddModelError("SubmissionError", "Your program has failed to run properly. This could be due to an exception being thrown " +
+                                                                "or syntax error in your code. Please ensure your inputs are validated. Otherwise, check for logic/syntax error and make sure " +
+                                                                "you have uploaded the correct program.");
+                    toUpdate.Grade = 0;
+                }
+                else if (submission.Grade == 3)
+                {
+                    ModelState.AddModelError("SubmissionError", "Your program has encountered an infinite loop. Please check through your program and make appropriate " +
+                                                                "modification.");
+                    toUpdate.Grade = 0;
+                }
+                else if (submission.Grade == 4)
+                {
+                    ModelState.AddModelError("SubmissionError", "Error occured when attempting to run code. Please check through your code for syntax errors or missing parenthesis." +
+                                                                "Also ensure that you have submitted the correct source code.");
+                    toUpdate.Grade = 0;
+                }
+                else if (submission.Grade == 5)
+                {
+                    ModelState.AddModelError("SubmissionError", "Program cannot be compiled, ensure you submit the correct source code.");
+                    toUpdate.Grade = 0;
+                }
+                else if (submission.Grade < 1)
+                {
+                    ModelState.AddModelError("SubmissionError", "Program has failed a couple of test cases. Please check through your program and make appropriate " +
+                                                                "modification to meet the requirements stated in the assignment description.");
+                }
+                db.SaveChanges();
+
+
+                submissionSolution submissions = new submissionSolution();
+                submissions.submission = submission;
+                submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
+
+                Session.Remove("submission"); //clear session
+                if (submissions.solution.Count == 0)
+                {
+                    if (descriptionScore.Count > 0)
+                    {
+                        descriptionScore.Remove((int)Session["TempSolutionKey"]);
+                    }
+                    Session.Remove("TempResults");
+                    Session.Remove("TempSolutionKey");
+                }
+
+
+                return View(submissions);
+            }catch(Exception ex)
+            {
+                string logName = ErrorLogging(ex.ToString(), "submissionError");
+                submissionSolution submissions = new submissionSolution();
+                submissions.submission = (Submission)Session["submission"];
+                submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
+                return View(submissions);
+            }
         }
 
         [HttpGet]

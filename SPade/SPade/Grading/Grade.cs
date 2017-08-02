@@ -14,7 +14,7 @@ namespace SPade.Grading
     {
         static Process proc;
         static ProcessStartInfo procInfo;
-        private static string javaPath = "C:/Program Files/Java/jdk1.8.0_131/bin/java.exe";
+        private static string javaPath = "C:/Program Files/Java/jdk1.8.0_101/bin/java.exe";
         private static string pythonPath = "C:/Python36/python.exe";
         private SPadeDBEntities db = new SPadeDBEntities();
         public static List<Result> descriptionScore = new List<Result>();

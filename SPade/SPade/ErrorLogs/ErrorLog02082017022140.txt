@@ -1,0 +1,4 @@
+Logged in user: p1234566
+User task: submissionError 
+
+Exception Log: Object reference not set to an instance of an object. 

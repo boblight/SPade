@@ -1,0 +1,5 @@
+Logged in user: p1234566
+User task: submissionError 
+
+Exception Log: System.NullReferenceException: Object reference not set to an instance of an object.
+   at SPade.Controllers.StudentController.PostSubmission() in C:\Users\spadeDIT\Desktop\SPadeServerV2\SPade-MVC\SPade\SPade\Controllers\StudentController.cs:line 502 
