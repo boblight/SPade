@@ -99,6 +99,7 @@
           <Property Name="DeletedBy" Type="varchar" MaxLength="20" />
           <Property Name="AssgnTitle" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="Hints" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="AssignmentTestCase">
           <Key>
@@ -661,6 +662,7 @@
           <Property Name="DeletedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="AssgnTitle" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Hints" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Class_Assgn" Relationship="Self.assgn_fk" FromRole="Assignment" ToRole="Class_Assgn" />
           <NavigationProperty Name="Submissions" Relationship="Self.FK_Submission_ToTable" FromRole="Assignment" ToRole="Submission" />
           <NavigationProperty Name="Module" Relationship="Self.Module_fk_constrain" FromRole="Assignment" ToRole="Module" />
@@ -1250,6 +1252,7 @@
                 <ScalarProperty Name="DeletedBy" ColumnName="DeletedBy" />
                 <ScalarProperty Name="AssgnTitle" ColumnName="AssgnTitle" />
                 <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="Hints" ColumnName="Hints" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

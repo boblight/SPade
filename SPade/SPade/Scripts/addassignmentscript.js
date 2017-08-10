@@ -198,6 +198,7 @@
     } else {
         $("#testCaseGroup").hide();
     }
+	
 
     //we reappend the text to the editor after postback
     function AppendTextToEditor() {

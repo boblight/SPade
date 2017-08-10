@@ -23,6 +23,9 @@ namespace SPade.ViewModels.Lecturer
         [Display(Name = "Assignment Question")]
         public string Describe { get; set; }
 
+        [AllowHtml]
+        public string Hints { get; set; }
+
         [Required]
         public string Solution { get; set; }
 
@@ -48,5 +51,6 @@ namespace SPade.ViewModels.Lecturer
         public List<AssignmentClass> ClassList { get; set; }
         public List<Module> Modules { get; set; }
         public int IsPostBack { get; set; }
+        public bool IsHintsPresent { get; set; }
     }
 }

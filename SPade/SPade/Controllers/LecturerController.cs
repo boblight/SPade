@@ -2122,6 +2122,7 @@ namespace SPade.Controllers
                 newAssignment.CreateAt = DateTime.Now;
                 newAssignment.UpdatedBy = User.Identity.GetUserName();
                 newAssignment.UpdatedAt = DateTime.Now;
+                newAssignment.Hints = addAssgn.Hints;
                 db.Assignments.Add(newAssignment);
                 db.SaveChanges();
 

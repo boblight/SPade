@@ -35,6 +35,7 @@ namespace SPade.Models.DAL
         public string DeletedBy { get; set; }
         public string AssgnTitle { get; set; }
         public System.DateTime StartDate { get; set; }
+        public string Hints { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Class_Assgn> Class_Assgn { get; set; }

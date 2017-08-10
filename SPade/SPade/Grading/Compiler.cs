@@ -22,7 +22,7 @@ namespace SPade.Grading
                 case "Java":
                     //compile java program
                     //compileInfo = new ProcessStartInfo("C:/Program Files/Java/jdk1.8.0_91/bin/javac.exe", fileName + ".java");
-                    compileInfo = new ProcessStartInfo(@"C:\Program Files\Java\jdk1.8.0_101\bin\javac.exe", fileName + ".java");
+                    compileInfo = new ProcessStartInfo(@"C:\Program Files\Java\jdk1.8.0_131\bin\javac.exe", fileName + ".java");
                     compileInfo.CreateNoWindow = true;
                     compileInfo.UseShellExecute = false;
                     compileInfo.WorkingDirectory = filePath + @"\" + fileName.ToLower();
