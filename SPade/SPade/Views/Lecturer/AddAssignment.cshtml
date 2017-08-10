@@ -365,9 +365,10 @@
             toolbarSelector: '#editor2_toolbar'
         });
         $("#editor2").cleanHtml();
-        $("#SelectedClasses").on('click',function() {
-            var hints = $("#editor2").html();
-            $("#Hints").val(hints);
-        })
+        $("#SelectedClasses").on('click',
+            function() {
+                var hints = $("#editor2").html();
+                $("#Hints").val(hints);
+            });
     </script>
 }          

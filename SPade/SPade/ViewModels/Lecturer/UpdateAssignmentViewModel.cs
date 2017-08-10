@@ -27,6 +27,8 @@ namespace SPade.ViewModels.Lecturer
         [Display(Name = "Assignment Question")]
         public string Describe { get; set; }
 
+        public string Hints { get; set; }
+
         [Required]
         public string Solution { get; set; }
 

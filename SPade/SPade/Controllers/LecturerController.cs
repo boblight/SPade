@@ -771,6 +771,7 @@ namespace SPade.Controllers
             model.ClassList = assgnClassList;
             model.UpdateSolution = false;
             model.IsTestCasePresent = true;
+            model.Hints = assgn.Hints;
 
             return View(model);
         }
@@ -1303,6 +1304,7 @@ namespace SPade.Controllers
                 updatedAssignment.DueDate = uVM.DueDate;
                 updatedAssignment.UpdatedBy = User.Identity.GetUserName();
                 updatedAssignment.UpdatedAt = DateTime.Now;
+                updatedAssignment.Hints = uVM.Hints;
 
                 //remove previously assigned classes 
                 db.Class_Assgn.RemoveRange(db.Class_Assgn.Where(ca => ca.AssignmentID == uVM.AssignmentId));
