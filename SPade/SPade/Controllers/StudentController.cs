@@ -502,6 +502,7 @@ namespace SPade.Controllers
                 } while (isJobRunning && counter < 10000);
 
                 Submission submission = (Submission)Session["submission"];
+                var hints = db.Assignments.Single(assgn => assgn.AssignmentID == submission.AssignmentID).Hints;
 
                 if (counter >= 10000) //ran into infinite loop
                 {
@@ -544,13 +545,16 @@ namespace SPade.Controllers
                 }
                 db.SaveChanges();
 
-            
-            submissionSolution submissions = new submissionSolution();
-            submissions.submission = submission;
-            submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
 
-            Session.Remove("submission"); //clear session
-            if (submissions.solution.Count == 0)
+                submissionSolution submissions = new submissionSolution
+                {
+                    Submission = submission,
+                    Solution = (List<Result>) Session["TempResults"] ?? new List<Result>(),
+                    Hints = hints
+                };
+
+                Session.Remove("submission"); //clear session
+            if (submissions.Solution.Count == 0)
             {
                 if (descriptionScore.Count > 0)
                 {
@@ -565,9 +569,12 @@ namespace SPade.Controllers
             }catch(Exception ex)
             {
                 string logName = ErrorLogging(ex.ToString(), "submissionError");
-                submissionSolution submissions = new submissionSolution();
-                submissions.submission = (Submission)Session["submission"];
-                submissions.solution = (List<Result>)Session["TempResults"] ?? new List<Result>();
+                submissionSolution submissions =
+                    new submissionSolution
+                    {
+                        Submission = (Submission) Session["submission"],
+                        Solution = (List<Result>) Session["TempResults"] ?? new List<Result>()
+                    };
                 return View(submissions);
             }
         }

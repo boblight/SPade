@@ -8,12 +8,12 @@
     <fieldset style="width: 90%; margin: 0 auto;">
         <legend>Results</legend>
 
-        <p>Completed By: @Html.DisplayFor(modelItem => modelItem.submission.AdminNo)</p>
-        <p>Submitted On: @Html.DisplayFor(modelItem => modelItem.submission.Timestamp)</p>
-        <p>Grade: @Math.Round(Model.submission.Grade * 100)% </p>
+        <p>Completed By: @Html.DisplayFor(modelItem => modelItem.Submission.AdminNo)</p>
+        <p>Submitted On: @Html.DisplayFor(modelItem => modelItem.Submission.Timestamp)</p>
+        <p>Grade: @Math.Round(Model.Submission.Grade * 100)% </p>
         <p>@Html.ValidationMessage("SubmissionError")</p>
         <br/>
-        @if (Model.solution.Count != 0)
+        @if (Model.Solution.Count != 0)
         {
         @*<p>@Html.ValidationMessage("SubmissionError")</p>*@
             <table class="table table-hover" style="border-width: 0;">
@@ -23,21 +23,43 @@
                     <th>Result</th>
                     <th></th>
                 </tr>
-                    @foreach (var solution in Model.solution)
+                @foreach (var solution in Model.Solution)
+                {
+                    if (!solution.Description.Equals(""))
                     {
-                        if (!solution.Description.Equals(""))
-                        {
-                            <tr style="font-size: 150%;">
-                                <td>@solution.Description</td>
-                                <td></td>
-                                <td>@(solution.Score == 1 ? "Pass" : "Fail")</td>
-                                <td></td>
-                            </tr>
-                        }
+                        <tr style="font-size: 150%;">
+                            <td>@solution.Description</td>
+                            <td></td>
+                            <td>@(solution.Score == 1 ? "Pass" : "Fail")</td>
+                            <td></td>
+                        </tr>
                     }
+                }
             </table>
         }
-        <p><a href="/Student/ViewAssignment" class="btn btn-default">Back to view Assignments</a></p>
-
+        @if (Model.Submission.Grade < 1)
+        {
+            <p id="hint" hidden>Hints : @Html.DisplayFor(modelItem => modelItem.Hints)</p>
+        }
+        <p><a href="/Student/ViewAssignment" class="btn btn-default" style="float: left">Back to view Assignments</a></p>
+        @if (Model.Submission.Grade < 1)
+        {
+            <p>
+                <input id="hintBtn" style="float: right" type="button" class="btn btn-default" value="hint"/>
+            </p>
+        }
     </fieldset>
 </div>
+
+@section Scripts {
+    <script>
+        $("#hintBtn").on("click", function () {
+            if ($("#hint").is(":hidden")) {
+                $("#hint").fadeIn();
+            } else {
+                $("#hint").fadeOut();
+            }
+            
+        })
+    </script>
+}

@@ -8,7 +8,8 @@ namespace SPade.ViewModels.Student
 {
     public class submissionSolution
     {
-        public List<Result> solution { get; set; }
-        public Submission submission { get; set; }
+        public List<Result> Solution { get; set; }
+        public Submission Submission { get; set; }
+        public string Hints { get; set; }
     }
 }
