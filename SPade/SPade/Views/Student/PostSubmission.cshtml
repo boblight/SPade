@@ -37,12 +37,12 @@
                 }
             </table>
         }
-        @if (Model.Submission.Grade < 1)
+        @if (Model.Submission.Grade < 1 && !Model.Hints.Equals(""))
         {
             <p id="hint" hidden>Hints : @Html.DisplayFor(modelItem => modelItem.Hints)</p>
         }
         <p><a href="/Student/ViewAssignment" class="btn btn-default" style="float: left">Back to view Assignments</a></p>
-        @if (Model.Submission.Grade < 1)
+        @if (Model.Submission.Grade < 1 && !Model.Hints.Equals(""))
         {
             <p>
                 <input id="hintBtn" style="float: right" type="button" class="btn btn-default" value="hint"/>

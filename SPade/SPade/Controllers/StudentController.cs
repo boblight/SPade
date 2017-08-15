@@ -502,7 +502,7 @@ namespace SPade.Controllers
                 } while (isJobRunning && counter < 10000);
 
                 Submission submission = (Submission)Session["submission"];
-                var hints = db.Assignments.Single(assgn => assgn.AssignmentID == submission.AssignmentID).Hints;
+                var hints = db.Assignments.Single(assgn => assgn.AssignmentID == submission.AssignmentID).Hints ?? "";
 
                 if (counter >= 10000) //ran into infinite loop
                 {
